@@ -1,0 +1,42 @@
+{
+  "name": "@npmcli/template-oss",
+  "version": "1.0.0",
+  "description": "templated files used in npm CLI team oss projects",
+  "main": "lib/index.js",
+  "scripts": {
+    "lint": "eslint '**/*.js'",
+    "lintfix": "npm run lint -- --fix",
+    "preversion": "npm test",
+    "postversion": "npm publish",
+    "prepublishOnly": "git push origin --follow-tags",
+    "snap": "tap",
+    "test": "tap",
+    "posttest": "npm run lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/npm/template-oss.git"
+  },
+  "keywords": [
+    "npm",
+    "oss"
+  ],
+  "author": "GitHub Inc.",
+  "license": "ISC",
+  "dependencies": {
+    "@npmcli/fs": "^1.0.0",
+    "@npmcli/package-json": "^1.0.1",
+    "@npmcli/promise-spawn": "^2.0.0"
+  },
+  "files": [
+    "bin",
+    "lib"
+  ],
+  "devDependencies": {
+    "@npmcli/eslint-config": "^1.0.0",
+    "eslint": "^7.32.0",
+    "eslint-plugin-node": "^11.1.0",
+    "spawk": "^1.7.1",
+    "tap": "^15.0.9"
+  }
+}
