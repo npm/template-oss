@@ -1,4 +1,4 @@
-const { basename, dirname, join } = require('path')
+const { basename, dirname, join, normalize } = require('path')
 const fs = require('@npmcli/fs')
 const spawk = require('spawk')
 const t = require('tap')
@@ -38,9 +38,12 @@ t.test('sets up a new project', async (t) => {
     version: '1.0.0',
   }
 
-  const root = t.testdir({
+  // normalize is necessary here until https://github.com/tapjs/libtap/pull/40
+  // is shipped in a new release of tap, otherwise the spawk interceptors
+  // below will not match and tests will fail in windows
+  const root = normalize(t.testdir({
     'package.json': JSON.stringify(pkg, null, 2),
-  })
+  }))
 
   const _env = process.env.npm_package_json
   process.env.npm_package_json = join(root, 'package.json')
