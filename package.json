@@ -12,7 +12,7 @@
     "snap": "tap",
     "test": "tap",
     "posttest": "npm run lint",
-    "postinstall": "bin/postinstall.js"
+    "postinstall": "node bin/postinstall.js"
   },
   "repository": {
     "type": "git",
