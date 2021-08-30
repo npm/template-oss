@@ -3,6 +3,8 @@ const fs = require('@npmcli/fs')
 const spawk = require('spawk')
 const t = require('tap')
 
+const TEMPLATE_VERSION = require('../package.json').version
+
 const copyContents = require('../lib/content/index.js')
 const installPackages = require('../lib/install.js')
 const patchPackage = require('../lib/package.js')
@@ -30,6 +32,35 @@ t.test('when npm_package_json is unset logs stack and sets exitCode', async (t) 
   await t.mock('../bin/postinstall.js')
   t.match(logs[0], /must be run/, 'logged the error')
   t.equal(process.exitCode, 1, 'set process.exitCode')
+})
+
+t.test('when patchPackage returns false no further action is taken', async (t) => {
+  const pkg = {
+    name: '@npmcli/foo-test',
+    templateVersion: TEMPLATE_VERSION,
+  }
+
+  // normalize is necessary here until https://github.com/tapjs/libtap/pull/40
+  // is shipped in a new release of tap, otherwise the spawk interceptors
+  // below will not match and tests will fail in windows
+  const root = normalize(t.testdir({
+    'package.json': JSON.stringify(pkg, null, 2),
+  }))
+
+  const _env = process.env.npm_package_json
+  process.env.npm_package_json = join(root, 'package.json')
+
+  t.teardown(() => {
+    process.env.npm_package_json = _env
+  })
+
+  // t.mock instead of require so the cache doesn't interfere
+  // this will reject if actions are taken due to spawk preventing unmatched
+  // spawn calls
+  await t.mock('../bin/postinstall.js')
+  // not setting process.exitCode tells us that the postinstall script
+  // finished successfully since it would be set if it failed
+  t.equal(process.exitCode, undefined, 'did not set process.exitCode')
 })
 
 t.test('sets up a new project', async (t) => {

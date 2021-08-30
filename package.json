@@ -11,7 +11,8 @@
     "prepublishOnly": "git push origin --follow-tags",
     "snap": "tap",
     "test": "tap",
-    "posttest": "npm run lint"
+    "posttest": "npm run lint",
+    "postinstall": "bin/postinstall.js"
   },
   "repository": {
     "type": "git",
@@ -38,5 +39,6 @@
     "eslint-plugin-node": "^11.1.0",
     "spawk": "^1.7.1",
     "tap": "^15.0.9"
-  }
+  },
+  "templateVersion": "1.0.0"
 }

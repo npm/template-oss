@@ -14,9 +14,11 @@ const main = async () => {
 
   const root = dirname(pkgPath)
 
-  await patchPackage(root)
-  await copyContent(root)
-  return installPackages(root)
+  const needsAction = await patchPackage(root)
+  if (needsAction) {
+    await copyContent(root)
+    return installPackages(root)
+  }
 }
 
 // we export the promise so it can be awaited in tests
