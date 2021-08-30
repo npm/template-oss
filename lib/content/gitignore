@@ -2,6 +2,7 @@
 /*
 
 # keep these
+!/.eslintrc*
 !/.github
 !**/.gitignore
 !/package.json
