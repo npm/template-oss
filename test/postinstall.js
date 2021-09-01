@@ -11,27 +11,32 @@ const patchPackage = require('../lib/package.js')
 
 spawk.preventUnmatched()
 
-t.test('when npm_package_json is unset logs stack and sets exitCode', async (t) => {
+t.test('when npm_config_global is true, does nothing', async (t) => {
   // this is set by virtue of running tests with npm, save it and remove it
-  const _env = process.env.npm_package_json
-  delete process.env.npm_package_json
-
-  const _error = console.error
-  const logs = []
-  console.error = (...args) => {
-    logs.push(...args)
-  }
+  const _env = process.env.npm_config_global
+  delete process.env.npm_config_global
 
   t.teardown(() => {
-    process.env.npm_package_json = _env
-    console.error = _error
-    process.exitCode = undefined // yes, really
+    process.env.npm_config_global = _env
   })
 
   // t.mock instead of require so the cache doesn't interfere
   await t.mock('../bin/postinstall.js')
-  t.match(logs[0], /must be run/, 'logged the error')
-  t.equal(process.exitCode, 1, 'set process.exitCode')
+  t.equal(process.exitCode, undefined, 'exitCode is unset')
+})
+
+t.test('when npm_config_local_prefix is unset, does nothing', async (t) => {
+  // this is set by virtue of running tests with npm, save it and remove it
+  const _env = process.env.npm_config_local_prefix
+  delete process.env.npm_config_local_prefix
+
+  t.teardown(() => {
+    process.env.npm_config_local_prefix = _env
+  })
+
+  // t.mock instead of require so the cache doesn't interfere
+  await t.mock('../bin/postinstall.js')
+  t.equal(process.exitCode, undefined, 'exitCode is unset')
 })
 
 t.test('when patchPackage returns false no further action is taken', async (t) => {
@@ -47,11 +52,14 @@ t.test('when patchPackage returns false no further action is taken', async (t) =
     'package.json': JSON.stringify(pkg, null, 2),
   }))
 
-  const _env = process.env.npm_package_json
-  process.env.npm_package_json = join(root, 'package.json')
+  const _global = process.env.npm_config_global
+  const _prefix = process.env.npm_config_local_prefix
+  delete process.env.npm_config_global
+  process.env.npm_config_local_prefix = root
 
   t.teardown(() => {
-    process.env.npm_package_json = _env
+    process.env.npm_config_global = _global
+    process.env.npm_config_local_prefix = _prefix
   })
 
   // t.mock instead of require so the cache doesn't interfere
@@ -76,11 +84,14 @@ t.test('sets up a new project', async (t) => {
     'package.json': JSON.stringify(pkg, null, 2),
   }))
 
-  const _env = process.env.npm_package_json
-  process.env.npm_package_json = join(root, 'package.json')
+  const _global = process.env.npm_config_global
+  const _prefix = process.env.npm_config_local_prefix
+  delete process.env.npm_config_global
+  process.env.npm_config_local_prefix = root
 
   t.teardown(() => {
-    process.env.npm_package_json = _env
+    process.env.npm_config_global = _global
+    process.env.npm_config_local_prefix = _prefix
   })
 
   const uninstall = spawk.spawn('npm', (args) => {
