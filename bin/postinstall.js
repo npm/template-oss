@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 const copyContent = require('../lib/content/index.js')
-const installPackages = require('../lib/install.js')
 const patchPackage = require('../lib/package.js')
 
 const main = async () => {
@@ -20,8 +19,7 @@ const main = async () => {
     return
   }
 
-  await copyContent(root)
-  return installPackages(root)
+  return copyContent(root)
 }
 
 // we export the promise so it can be awaited in tests, coverage is disabled

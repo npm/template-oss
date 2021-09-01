@@ -1,15 +1,11 @@
 const { basename, dirname, join, normalize } = require('path')
 const fs = require('@npmcli/fs')
-const spawk = require('spawk')
 const t = require('tap')
 
 const TEMPLATE_VERSION = require('../package.json').version
 
 const copyContents = require('../lib/content/index.js')
-const installPackages = require('../lib/install.js')
 const patchPackage = require('../lib/package.js')
-
-spawk.preventUnmatched()
 
 t.test('when npm_config_global is true, does nothing', async (t) => {
   // this is set by virtue of running tests with npm, save it and remove it
@@ -94,23 +90,8 @@ t.test('sets up a new project', async (t) => {
     process.env.npm_config_local_prefix = _prefix
   })
 
-  const uninstall = spawk.spawn('npm', (args) => {
-    return args[0] === 'uninstall' &&
-      installPackages.removeDeps.every((dep) => args.includes(dep))
-  }, { cwd: root })
-
-  const install = spawk.spawn('npm', (args) => {
-    return args[0] === 'install' &&
-      args[1] === '--save-dev' &&
-      installPackages.devDeps.every((dep) => args.includes(dep))
-  }, { cwd: root })
-
   // t.mock instead of require so the cache doesn't interfere
   await t.mock('../bin/postinstall.js')
-
-  // we mock the npm commands so this test doesn't take forever
-  t.ok(uninstall.called, 'ran uninstalls')
-  t.ok(install.called, 'ran installs')
 
   // verify file contents were copied
   const contents = await fs.readdir(root)

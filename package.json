@@ -3,8 +3,13 @@
   "version": "1.0.2",
   "description": "templated files used in npm CLI team oss projects",
   "main": "lib/index.js",
+  "bin": {
+    "npm-template-check": "bin/npm-template-check.js"
+  },
   "scripts": {
+    "prelint": "ln -sf ../../bin/npm-template-check.js node_modules/.bin/npm-template-check",
     "lint": "eslint '**/*.js'",
+    "postlint": "npm-template-check",
     "lintfix": "npm run lint -- --fix",
     "preversion": "npm test",
     "postversion": "npm publish",
@@ -34,11 +39,14 @@
     "lib"
   ],
   "devDependencies": {
-    "@npmcli/eslint-config": "^1.0.0",
+    "@npmcli/eslint-config": "*",
     "eslint": "^7.32.0",
     "eslint-plugin-node": "^11.1.0",
-    "spawk": "^1.7.1",
+    "tap": "*"
+  },
+  "peerDependencies": {
+    "@npmcli/eslint-config": "^1.0.0",
     "tap": "^15.0.9"
   },
-  "templateVersion": "1.0.1"
+  "templateVersion": "1.0.2"
 }
