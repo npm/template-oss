@@ -45,9 +45,10 @@ body:
         - **OS**: Ubuntu 20.04
         - **platform**: Macbook Pro
     value: |
-        - OS:
-        - Node:
         - npm:
+        - Node:
+        - OS:
+        - platform:
   validations:
     required: false
 
