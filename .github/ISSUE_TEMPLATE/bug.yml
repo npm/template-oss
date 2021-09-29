@@ -39,9 +39,10 @@ body:
     label: Environment
     description: |
       examples:
-        - **OS**: Ubuntu 20.04
-        - **Node**: 13.14.0
         - **npm**: 7.6.3
+        - **Node**: 13.14.0
+        - **OS**: Ubuntu 20.04
+        - **platform**: Macbook Pro
     value: |
         - OS:
         - Node:
