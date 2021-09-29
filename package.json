@@ -7,17 +7,17 @@
     "npm-template-check": "bin/npm-template-check.js"
   },
   "scripts": {
-    "prelint": "ln -sf ../../bin/npm-template-check.js node_modules/.bin/npm-template-check",
     "lint": "eslint '**/*.js'",
-    "postlint": "npm-template-check",
     "lintfix": "npm run lint -- --fix",
-    "preversion": "npm test",
-    "postversion": "npm publish",
-    "prepublishOnly": "git push origin --follow-tags",
-    "snap": "tap",
-    "test": "tap",
+    "postinstall": "node bin/postinstall.js",
+    "postlint": "npm-template-check",
     "posttest": "npm run lint",
-    "postinstall": "node bin/postinstall.js"
+    "postversion": "npm publish",
+    "prelint": "ln -sf ../../bin/npm-template-check.js node_modules/.bin/npm-template-check",
+    "prepublishOnly": "git push origin --follow-tags",
+    "preversion": "npm test",
+    "snap": "tap",
+    "test": "tap"
   },
   "repository": {
     "type": "git",
@@ -50,6 +50,6 @@
   },
   "templateVersion": "1.0.3",
   "engines": {
-    "node": ">=12"
+    "node": "^12.13.0 || ^14.15.0 || >=16"
   }
 }
