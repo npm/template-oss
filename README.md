@@ -9,22 +9,26 @@ single devDependency.
 
 These fields will be set in the project's `package.json`:
 
-```json
+```js
 {
-  "author": "GitHub Inc.",
-  "files": ["bin", "lib"],
-  "license": "ISC",
-  "templateVersion": "1.0.0",
-  "scripts": {
-    "lint": "eslint '**/*.js'",
-    "lintfix": "npm run lint -- --fix",
-    "preversion": "npm test",
-    "postversion": "npm publish",
-    "prepublishOnly": "git push origin --follow-tags",
-    "snap": "tap",
-    "test": "tap",
-    "posttest": "npm run lint",
-  }
+  author: 'GitHub Inc.',
+  files: ['bin', 'lib'],
+  license: 'ISC',
+  templateVersion: $TEMPLATE_VERSION,
+  scripts: {
+    lint: `eslint '**/*.js'`,
+    postlint: 'npm-template-check',
+    lintfix: 'npm run lint -- --fix',
+    preversion: 'npm test',
+    postversion: 'npm publish',
+    prepublishOnly: 'git push origin --follow-tags',
+    snap: 'tap',
+    test: 'tap',
+    posttest: 'npm run lint',
+  },
+  engines: {
+    node: '^12.13.0 || ^14.15.0 || >=16',
+  },
 }
 ```
 
@@ -47,8 +51,11 @@ These files will be copied, overwriting any existing files:
 
 - `.eslintrc.js`
 - `.github/workflows/ci.yml`
+- `.github/ISSUE_TEMPLATE/bug.yml`
+- `.github/ISSUE_TEMPLATE/config.yml`
 - `.gitignore`
 - `LICENSE.md`
+- `SECURITY.md'`
 
 #### Extending
 
@@ -59,24 +66,13 @@ and `.gitignore` becomes `gitignore`).
 Modify the `content` object at the top of `lib/content/index.js` to include
 your new file. The object keys are destination paths, and values are source.
 
+### `package.json` checks
 
-### Package installation and removal
-
-These packages will be removed:
-
-- `eslint-plugin-import`
-- `eslint-plugin-promise`
-- `eslint-plugin-standard`
-- `@npmcli/lint`
-
-
-Afterwards, these packages will be installed as devDependencies:
-
-- `eslint`
-- `eslint-plugin-node`
-- `@npmcli/eslint-config`
-- `tap`
+`npm-template-check` is run by `postlint` and will error if the `package.json`
+is not configured properly, with steps to run to correct any problems.
 
 #### Extending
 
-Make changes to the `removeDeps` and `devDeps` arrays in `lib/install.js`.
+Add any unwanted packages to `unwantedPackages` in `lib/check.js`. Currently
+the best way to install any packages is to include them as `peerDependencies`
+in this repo.
