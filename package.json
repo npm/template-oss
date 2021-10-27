@@ -48,7 +48,7 @@
     "@npmcli/eslint-config": "^1.0.0",
     "tap": "^15.0.9"
   },
-  "templateVersion": "1.0.3",
+  "templateVersion": "2.0.0",
   "engines": {
     "node": "^12.13.0 || ^14.15.0 || >=16"
   }
