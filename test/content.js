@@ -14,13 +14,19 @@ t.test('copies content', async (t) => {
   }
 })
 
-t.test('removes eslint configs', async (t) => {
+t.test('removes files', async (t) => {
   const content = {
     '.eslintrc.json': '{}',
     '.eslintrc.yml': '',
     '.eslintrc.local.json': '{}',
     'something.txt': '',
+    LICENSE: '',
+    'LICENSE.txt': '',
   }
+  const keepContent = [
+    '.eslintrc.local.json',
+    'something.txt',
+  ]
   const root = t.testdir(content)
 
   await copyContent(root)
@@ -31,10 +37,10 @@ t.test('removes eslint configs', async (t) => {
 
   for (const target in content) {
     const fullTarget = join(root, target)
-    if (target.startsWith('.eslintrc.') && !target.startsWith('.eslintrc.local.')) {
-      await t.rejects(fs.stat(fullTarget), { code: 'ENOENT' }, `removed ${target}`)
-    } else {
+    if (keepContent.find((f) => f === target)) {
       await t.resolves(fs.stat(fullTarget), `left existing ${target}`)
+    } else {
+      await t.rejects(fs.stat(fullTarget), { code: 'ENOENT' }, `removed ${target}`)
     }
   }
 })
