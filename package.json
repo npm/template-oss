@@ -13,7 +13,6 @@
     "postlint": "npm-template-check",
     "posttest": "npm run lint",
     "postversion": "npm publish",
-    "prelint": "ln -sf ../../bin/npm-template-check.js node_modules/.bin/npm-template-check",
     "prepublishOnly": "git push origin --follow-tags",
     "preversion": "npm test",
     "snap": "tap",
@@ -31,8 +30,7 @@
   "license": "ISC",
   "dependencies": {
     "@npmcli/fs": "^1.0.0",
-    "@npmcli/package-json": "^1.0.1",
-    "@npmcli/promise-spawn": "^2.0.0"
+    "@npmcli/package-json": "^1.0.1"
   },
   "files": [
     "bin",
@@ -40,6 +38,8 @@
   ],
   "devDependencies": {
     "@npmcli/eslint-config": "*",
+    "@npmcli/promise-spawn": "^2.0.0",
+    "@npmcli/template-oss": "file:./",
     "eslint": "^7.32.0",
     "eslint-plugin-node": "^11.1.0",
     "tap": "*"
@@ -48,7 +48,6 @@
     "@npmcli/eslint-config": "^1.0.0",
     "tap": "^15.0.9"
   },
-  "templateVersion": "2.0.0",
   "engines": {
     "node": "^12.13.0 || ^14.15.0 || >=16"
   }

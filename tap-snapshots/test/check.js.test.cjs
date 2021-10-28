@@ -1,0 +1,90 @@
+/* IMPORTANT
+ * This snapshot file is auto-generated, but designed for humans.
+ * It should be checked into source control and tracked carefully.
+ * Re-generate by setting TAP_SNAPSHOT=1 and running tests.
+ * Make sure to inspect the output below.  Do not ignore changes!
+ */
+'use strict'
+exports[`test/check.js TAP checks a package.json incorrect fields > problems 1`] = `
+Array [
+  Object {
+    "message": String(
+      The following package.json fields are incorrect:
+        Field: "author" Expected: "GitHub Inc." Found: "undefined"
+        Field: "files" Expected: "bin,lib" Found: "undefined"
+        Field: "license" Expected: "ISC" Found: "MIT"
+        Field: "templateVersion" Expected: "2.0.0" Found: "undefined"
+        Field: "scripts" Expected: "[object Object]" Found: "undefined"
+        Field: "engines" Expected: "[object Object]" Found: "undefined"
+    ),
+    "solution": "npm rm @npmcli/template-oss && npm i -D @npmcli/template-oss",
+  },
+]
+`
+
+exports[`test/check.js TAP checks a package.json incorrect object fields > problems 1`] = `
+Array [
+  Object {
+    "message": String(
+      The following package.json fields are incorrect:
+        Field: "author" Expected: "GitHub Inc." Found: "undefined"
+        Field: "files" Expected: "bin,lib" Found: "undefined"
+        Field: "license" Expected: "ISC" Found: "undefined"
+        Field: "templateVersion" Expected: "2.0.0" Found: "undefined"
+        Field: "scripts.lint" Expected: "eslint '**/*.js'" Found: "undefined"
+        Field: "scripts.postlint" Expected: "npm-template-check" Found: "undefined"
+        Field: "scripts.lintfix" Expected: "npm run lint -- --fix" Found: "undefined"
+        Field: "scripts.preversion" Expected: "npm test" Found: "undefined"
+        Field: "scripts.postversion" Expected: "npm publish" Found: "undefined"
+        Field: "scripts.prepublishOnly" Expected: "git push origin --follow-tags" Found: "undefined"
+        Field: "scripts.snap" Expected: "tap" Found: "undefined"
+        Field: "scripts.test" Expected: "tap" Found: "undefined"
+        Field: "scripts.posttest" Expected: "npm run lint" Found: "undefined"
+        Field: "engines" Expected: "[object Object]" Found: "undefined"
+    ),
+    "solution": "npm rm @npmcli/template-oss && npm i -D @npmcli/template-oss",
+  },
+]
+`
+
+exports[`test/check.js TAP checks a package.json missing fields > problems 1`] = `
+Array [
+  Object {
+    "message": String(
+      The following package.json fields are incorrect:
+        Field: "author" Expected: "GitHub Inc." Found: "undefined"
+        Field: "files" Expected: "bin,lib" Found: "undefined"
+        Field: "license" Expected: "ISC" Found: "undefined"
+        Field: "templateVersion" Expected: "2.0.0" Found: "undefined"
+        Field: "scripts" Expected: "[object Object]" Found: "undefined"
+        Field: "engines" Expected: "[object Object]" Found: "undefined"
+    ),
+    "solution": "npm rm @npmcli/template-oss && npm i -D @npmcli/template-oss",
+  },
+]
+`
+
+exports[`test/check.js TAP checks a package.json unwanted deps > problems 1`] = `
+Array [
+  Object {
+    "message": String(
+      The following package.json fields are incorrect:
+        Field: "author" Expected: "GitHub Inc." Found: "undefined"
+        Field: "files" Expected: "bin,lib" Found: "undefined"
+        Field: "license" Expected: "ISC" Found: "undefined"
+        Field: "templateVersion" Expected: "2.0.0" Found: "undefined"
+        Field: "scripts" Expected: "[object Object]" Found: "undefined"
+        Field: "engines" Expected: "[object Object]" Found: "undefined"
+    ),
+    "solution": "npm rm @npmcli/template-oss && npm i -D @npmcli/template-oss",
+  },
+  Object {
+    "message": "The following unwanted packages were found: @npmcli/lint eslint-plugin-promise eslint-plugin-standard eslint-plugin-import",
+    "solution": "npm rm @npmcli/lint eslint-plugin-promise eslint-plugin-standard eslint-plugin-import",
+  },
+]
+`
+
+exports[`test/check.js TAP checks a package.json unwanted deps > problems 2`] = `
+Array []
+`
