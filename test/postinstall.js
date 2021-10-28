@@ -1,4 +1,4 @@
-const { basename, dirname, join, normalize } = require('path')
+const { basename, dirname, join } = require('path')
 const fs = require('@npmcli/fs')
 const t = require('tap')
 
@@ -7,31 +7,32 @@ const TEMPLATE_VERSION = require('../package.json').version
 const copyContents = require('../lib/content/index.js')
 const patchPackage = require('../lib/package.js')
 
+// t.mock instead of require so the cache doesn't interfere
+const postinstall = () => t.mock('../bin/postinstall.js')
+
+let _global, _prefix
+
+t.beforeEach(() => {
+  _global = process.env.npm_config_global
+  _prefix = process.env.npm_config_local_prefix
+})
+
+t.afterEach(() => {
+  process.env.npm_config_global = _global
+  process.env.npm_config_local_prefix = _prefix
+})
+
 t.test('when npm_config_global is true, does nothing', async (t) => {
-  // this is set by virtue of running tests with npm, save it and remove it
-  const _env = process.env.npm_config_global
-  delete process.env.npm_config_global
+  process.env.npm_config_global = 'true'
 
-  t.teardown(() => {
-    process.env.npm_config_global = _env
-  })
-
-  // t.mock instead of require so the cache doesn't interfere
-  await t.mock('../bin/postinstall.js')
+  await postinstall()
   t.equal(process.exitCode, undefined, 'exitCode is unset')
 })
 
 t.test('when npm_config_local_prefix is unset, does nothing', async (t) => {
-  // this is set by virtue of running tests with npm, save it and remove it
-  const _env = process.env.npm_config_local_prefix
   delete process.env.npm_config_local_prefix
 
-  t.teardown(() => {
-    process.env.npm_config_local_prefix = _env
-  })
-
-  // t.mock instead of require so the cache doesn't interfere
-  await t.mock('../bin/postinstall.js')
+  await postinstall()
   t.equal(process.exitCode, undefined, 'exitCode is unset')
 })
 
@@ -41,27 +42,13 @@ t.test('when patchPackage returns false no further action is taken', async (t) =
     templateVersion: TEMPLATE_VERSION,
   }
 
-  // normalize is necessary here until https://github.com/tapjs/libtap/pull/40
-  // is shipped in a new release of tap, otherwise the spawk interceptors
-  // below will not match and tests will fail in windows
-  const root = normalize(t.testdir({
+  const root = t.testdir({
     'package.json': JSON.stringify(pkg, null, 2),
-  }))
-
-  const _global = process.env.npm_config_global
-  const _prefix = process.env.npm_config_local_prefix
-  delete process.env.npm_config_global
-  process.env.npm_config_local_prefix = root
-
-  t.teardown(() => {
-    process.env.npm_config_global = _global
-    process.env.npm_config_local_prefix = _prefix
   })
 
-  // t.mock instead of require so the cache doesn't interfere
-  // this will reject if actions are taken due to spawk preventing unmatched
-  // spawn calls
-  await t.mock('../bin/postinstall.js')
+  process.env.npm_config_local_prefix = root
+
+  await postinstall()
   // not setting process.exitCode tells us that the postinstall script
   // finished successfully since it would be set if it failed
   t.equal(process.exitCode, undefined, 'did not set process.exitCode')
@@ -72,26 +59,13 @@ t.test('sets up a new project', async (t) => {
     name: '@npmcli/foo-test',
     version: '1.0.0',
   }
-
-  // normalize is necessary here until https://github.com/tapjs/libtap/pull/40
-  // is shipped in a new release of tap, otherwise the spawk interceptors
-  // below will not match and tests will fail in windows
-  const root = normalize(t.testdir({
+  const root = t.testdir({
     'package.json': JSON.stringify(pkg, null, 2),
-  }))
-
-  const _global = process.env.npm_config_global
-  const _prefix = process.env.npm_config_local_prefix
-  delete process.env.npm_config_global
-  process.env.npm_config_local_prefix = root
-
-  t.teardown(() => {
-    process.env.npm_config_global = _global
-    process.env.npm_config_local_prefix = _prefix
   })
 
-  // t.mock instead of require so the cache doesn't interfere
-  await t.mock('../bin/postinstall.js')
+  process.env.npm_config_local_prefix = root
+
+  await postinstall()
 
   // verify file contents were copied
   const contents = await fs.readdir(root)
