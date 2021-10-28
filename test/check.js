@@ -4,6 +4,18 @@ const check = require('../lib/check.js')
 const { changes } = require('../lib/package')
 const { name } = require('../package.json')
 
+const normalizeSnapshot = (problems) => {
+  return problems.map((p) => {
+    if (p.message) {
+      p.message = p.message.replace(
+        /("templateVersion" Expected: ").*(" Found)/g,
+        '$1$TEMPLATE_VERSION$2'
+      )
+    }
+    return p
+  })
+}
+
 t.test('checks a package.json', (t) => {
   t.plan(5)
 
@@ -13,7 +25,7 @@ t.test('checks a package.json', (t) => {
     })
 
     const problems = await check(project)
-    t.matchSnapshot(problems, 'problems')
+    t.matchSnapshot(normalizeSnapshot(problems), 'problems')
     t.equal(problems.length, 1)
   })
 
@@ -25,7 +37,7 @@ t.test('checks a package.json', (t) => {
     })
 
     const problems = await check(project)
-    t.matchSnapshot(problems, 'problems')
+    t.matchSnapshot(normalizeSnapshot(problems), 'problems')
     t.equal(problems.length, 1)
   })
 
@@ -37,7 +49,7 @@ t.test('checks a package.json', (t) => {
     })
 
     const problems = await check(project)
-    t.matchSnapshot(problems, 'problems')
+    t.matchSnapshot(normalizeSnapshot(problems), 'problems')
     t.equal(problems.length, 1)
   })
 
@@ -54,7 +66,7 @@ t.test('checks a package.json', (t) => {
     })
 
     const problems = await check(project)
-    t.matchSnapshot(problems, 'problems')
+    t.matchSnapshot(normalizeSnapshot(problems), 'problems')
     t.equal(problems.length, 2)
   })
 
@@ -64,7 +76,7 @@ t.test('checks a package.json', (t) => {
     })
 
     const problems = await check(project)
-    t.matchSnapshot(problems, 'problems')
+    t.matchSnapshot(normalizeSnapshot(problems), 'problems')
     t.equal(problems.length, 0)
   })
 

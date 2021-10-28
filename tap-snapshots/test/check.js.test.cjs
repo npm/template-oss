@@ -13,7 +13,7 @@ Array [
         Field: "author" Expected: "GitHub Inc." Found: "undefined"
         Field: "files" Expected: "bin,lib" Found: "undefined"
         Field: "license" Expected: "ISC" Found: "MIT"
-        Field: "templateVersion" Expected: "2.0.0" Found: "undefined"
+        Field: "templateVersion" Expected: "$TEMPLATE_VERSION" Found: "undefined"
         Field: "scripts" Expected: "[object Object]" Found: "undefined"
         Field: "engines" Expected: "[object Object]" Found: "undefined"
     ),
@@ -30,7 +30,7 @@ Array [
         Field: "author" Expected: "GitHub Inc." Found: "undefined"
         Field: "files" Expected: "bin,lib" Found: "undefined"
         Field: "license" Expected: "ISC" Found: "undefined"
-        Field: "templateVersion" Expected: "2.0.0" Found: "undefined"
+        Field: "templateVersion" Expected: "$TEMPLATE_VERSION" Found: "undefined"
         Field: "scripts.lint" Expected: "eslint '**/*.js'" Found: "undefined"
         Field: "scripts.postlint" Expected: "npm-template-check" Found: "undefined"
         Field: "scripts.lintfix" Expected: "npm run lint -- --fix" Found: "undefined"
@@ -55,7 +55,7 @@ Array [
         Field: "author" Expected: "GitHub Inc." Found: "undefined"
         Field: "files" Expected: "bin,lib" Found: "undefined"
         Field: "license" Expected: "ISC" Found: "undefined"
-        Field: "templateVersion" Expected: "2.0.0" Found: "undefined"
+        Field: "templateVersion" Expected: "$TEMPLATE_VERSION" Found: "undefined"
         Field: "scripts" Expected: "[object Object]" Found: "undefined"
         Field: "engines" Expected: "[object Object]" Found: "undefined"
     ),
@@ -72,7 +72,7 @@ Array [
         Field: "author" Expected: "GitHub Inc." Found: "undefined"
         Field: "files" Expected: "bin,lib" Found: "undefined"
         Field: "license" Expected: "ISC" Found: "undefined"
-        Field: "templateVersion" Expected: "2.0.0" Found: "undefined"
+        Field: "templateVersion" Expected: "$TEMPLATE_VERSION" Found: "undefined"
         Field: "scripts" Expected: "[object Object]" Found: "undefined"
         Field: "engines" Expected: "[object Object]" Found: "undefined"
     ),
