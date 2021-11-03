@@ -44,11 +44,16 @@ body:
         - **Node**: 13.14.0
         - **OS**: Ubuntu 20.04
         - **platform**: Macbook Pro
+        - **`npm config ls`**: `; "user" config from ...`
     value: |
         - npm:
         - Node:
         - OS:
         - platform:
+        - npm config:
+        ```ini
+        ; copy and paste output from `npm config ls` here
+        ```
   validations:
     required: false
 
