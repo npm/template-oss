@@ -53,9 +53,10 @@ These files will be copied, overwriting any existing files:
 - `.github/workflows/ci.yml`
 - `.github/ISSUE_TEMPLATE/bug.yml`
 - `.github/ISSUE_TEMPLATE/config.yml`
+- `.github/CODEOWNERS`
 - `.gitignore`
 - `LICENSE.md`
-- `SECURITY.md'`
+- `SECURITY.md`
 
 #### Extending
 
