@@ -19,12 +19,10 @@ const main = async () => {
     return
   }
 
-  return copyContent(root)
+  await copyContent(root)
 }
 
-// we export the promise so it can be awaited in tests, coverage is disabled
-// for the catch handler because it does so little it's not worth testing
-module.exports = main().catch(/* istanbul ignore next */ (err) => {
+module.exports = main().catch((err) => {
   console.error(err.stack)
   process.exitCode = 1
 })

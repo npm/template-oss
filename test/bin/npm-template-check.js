@@ -1,67 +1,83 @@
 const t = require('tap')
 
-const { changes } = require('../../lib/postinstall/update-package')
-
 // t.mock instead of require so the cache doesn't interfere
-const check = () => t.mock('../../bin/npm-template-check.js')
+const check = (mocks) => t.mock('../../bin/npm-template-check.js', mocks && {
+  '../../lib/postlint/check-package.js': async () => mocks.package(),
+  '../../lib/postlint/check-gitignore.js': async () => mocks.gitignore(),
+})
 
-let _console, _prefix, errors, logs
+const _console = console
+const _prefix = process.env.npm_config_local_prefix
+let errors = []
+let logs = []
 
 t.beforeEach(() => {
-  _console = global.console
-  _prefix = process.env.npm_config_local_prefix
-  errors = []
-  logs = []
-  global.console = {
+  delete process.env.npm_config_local_prefix
+  // eslint-disable-next-line no-global-assign
+  console = {
     ..._console,
     error: (...args) => errors.push(...args),
-    logs: (...args) => logs.push(...args),
+    log: (...args) => logs.push(...args),
   }
 })
 
 t.afterEach(() => {
-  global.console = _console
   process.env.npm_config_local_prefix = _prefix
   errors = []
   logs = []
-  process.exitCode = 0
+  global.console = _console
+  delete process.exitCode
 })
 
 t.test('no local prefix', async (t) => {
-  delete process.env.npm_config_local_prefix
-
   await check()
 
   t.equal(process.exitCode, 1, 'exit code')
-  t.same(logs, [], 'logs')
+  t.strictSame(logs, [], 'logs')
   t.match(errors, ['Error: This package requires npm'], 'errors')
   t.equal(errors.length, 1)
 })
 
-t.test('empty package.json', async (t) => {
-  const root = t.testdir({
-    'package.json': '{}',
+// We have 100% coverage via the coverage map
+// so this is only for how the bin script formats
+// error logs
+t.test('with mocks', (t) => {
+  t.plan(2)
+
+  t.test('problems', async (t) => {
+    process.env.npm_config_local_prefix = t.testdir()
+
+    await check({
+      package: () => [{
+        message: 'message1',
+        solution: 'solution1',
+      }],
+      gitignore: () => [{
+        message: 'message2',
+        solution: 'solution2',
+      }],
+    })
+
+    t.equal(process.exitCode, 1, 'exit code')
+    t.strictSame(logs, [], 'logs')
+    t.strictSame(errors, [
+      'Some problems were detected:',
+      'message1\nmessage2',
+      'To correct them:',
+      'solution1\nsolution2',
+    ], 'errors')
   })
 
-  process.env.npm_config_local_prefix = root
+  t.test('no problems', async (t) => {
+    process.env.npm_config_local_prefix = t.testdir()
 
-  await check()
+    await check({
+      package: () => [],
+      gitignore: () => [],
+    })
 
-  t.equal(process.exitCode, 1, 'exit code')
-  t.same(logs, [], 'logs')
-  t.equal(errors.length, 4, 'errors')
-})
-
-t.test('valid package.json', async (t) => {
-  const root = t.testdir({
-    'package.json': JSON.stringify(changes),
+    t.equal(process.exitCode, undefined, 'exit code')
+    t.strictSame(logs, [], 'logs')
+    t.strictSame(errors, [], 'errors')
   })
-
-  process.env.npm_config_local_prefix = root
-
-  await check()
-
-  t.equal(process.exitCode, 0, 'exit code')
-  t.same(logs, [], 'logs')
-  t.same(errors, [], 'errors')
 })
