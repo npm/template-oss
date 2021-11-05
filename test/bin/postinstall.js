@@ -2,13 +2,13 @@ const { basename, dirname, join } = require('path')
 const fs = require('@npmcli/fs')
 const t = require('tap')
 
-const TEMPLATE_VERSION = require('../package.json').version
+const TEMPLATE_VERSION = require('../../package.json').version
 
-const copyContents = require('../lib/content/index.js')
-const patchPackage = require('../lib/package.js')
+const copyContents = require('../../lib/postinstall/copy-content.js')
+const patchPackage = require('../../lib/postinstall/update-package.js')
 
 // t.mock instead of require so the cache doesn't interfere
-const postinstall = () => t.mock('../bin/postinstall.js')
+const postinstall = () => t.mock('../../bin/postinstall.js')
 
 let _global, _prefix
 

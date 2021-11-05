@@ -1,9 +1,9 @@
 const t = require('tap')
 
-const { changes } = require('../lib/package')
+const { changes } = require('../../lib/postinstall/update-package')
 
 // t.mock instead of require so the cache doesn't interfere
-const check = () => t.mock('../bin/npm-template-check.js')
+const check = () => t.mock('../../bin/npm-template-check.js')
 
 let _console, _prefix, errors, logs
 

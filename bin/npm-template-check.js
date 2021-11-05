@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const check = require('../lib/check.js')
+const check = require('../lib/postlint/check-package.js')
 
 const main = async () => {
   const {

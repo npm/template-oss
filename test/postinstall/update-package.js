@@ -2,9 +2,12 @@ const { join } = require('path')
 const fs = require('@npmcli/fs')
 const t = require('tap')
 
-const TEMPLATE_VERSION = require('../package.json').version
+const {
+  version: TEMPLATE_VERSION,
+  name: TEMPLATE_NAME,
+} = require('../../package.json')
 
-const patchPackage = require('../lib/package.js')
+const patchPackage = require('../../lib/postinstall/update-package.js')
 
 t.test('can patch a package.json', async (t) => {
   const pkg = {

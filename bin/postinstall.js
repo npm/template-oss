@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-const copyContent = require('../lib/content/index.js')
-const patchPackage = require('../lib/package.js')
+const copyContent = require('../lib/postinstall/copy-content.js')
+const patchPackage = require('../lib/postinstall/update-package.js')
 
 const main = async () => {
   const {
