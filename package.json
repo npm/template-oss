@@ -30,7 +30,8 @@
   "license": "ISC",
   "dependencies": {
     "@npmcli/fs": "^1.0.0",
-    "@npmcli/package-json": "^1.0.1"
+    "@npmcli/package-json": "^1.0.1",
+    "which": "^2.0.2"
   },
   "files": [
     "bin",
