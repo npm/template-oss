@@ -58,3 +58,21 @@ t.test('returns false when templateVersion matches own version', async (t) => {
   })
   t.notMatch(JSON.parse(contents), patchPackage.changes, 'changes were NOT applied')
 })
+
+t.test('doesnt set templateVersion on own repo', async (t) => {
+  const pkg = {
+    name: TEMPLATE_NAME,
+  }
+
+  const project = t.testdir({
+    'package.json': JSON.stringify(pkg, null, 2),
+  })
+
+  const needsAction = await patchPackage(project)
+  t.equal(needsAction, true, 'needs action')
+
+  const contents = await fs.readFile(join(project, 'package.json'), {
+    encoding: 'utf8',
+  })
+  t.equal(JSON.parse(contents).templateVersion, undefined, 'did not get template version')
+})
