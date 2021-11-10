@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-const check = require('../lib/check.js')
+const checkPackage = require('../lib/postlint/check-package.js')
+const checkGitIgnore = require('../lib/postlint/check-gitignore.js')
 
 const main = async () => {
   const {
@@ -11,7 +12,11 @@ const main = async () => {
     throw new Error('This package requires npm >7.21.1')
   }
 
-  const problems = await check(root)
+  const problems = [
+    ...(await checkPackage(root)),
+    ...(await checkGitIgnore(root)),
+  ]
+
   if (problems.length) {
     console.error('Some problems were detected:')
     console.error()
@@ -23,9 +28,7 @@ const main = async () => {
   }
 }
 
-// we export the promise so it can be awaited in tests, coverage is disabled
-// for the catch handler because it does so little it's not worth testing
-module.exports = main().catch(/* istanbul ignore next */ (err) => {
+module.exports = main().catch((err) => {
   console.error(err.stack)
   process.exitCode = 1
 })

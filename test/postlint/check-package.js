@@ -1,8 +1,8 @@
 const t = require('tap')
 
-const check = require('../lib/check.js')
-const { changes } = require('../lib/package')
-const { name } = require('../package.json')
+const check = require('../../lib/postlint/check-package.js')
+const { changes } = require('../../lib/postinstall/update-package.js')
+const { name } = require('../../package.json')
 
 t.cleanSnapshot = (snapshot) => {
   return snapshot.replace(

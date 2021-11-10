@@ -2,7 +2,7 @@ const { join } = require('path')
 const fs = require('@npmcli/fs')
 const t = require('tap')
 
-const copyContent = require('../lib/content/index.js')
+const copyContent = require('../../lib/postinstall/copy-content.js')
 
 t.test('copies content', async (t) => {
   const root = t.testdir()

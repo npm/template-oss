@@ -30,7 +30,8 @@
   "license": "ISC",
   "dependencies": {
     "@npmcli/fs": "^1.0.0",
-    "@npmcli/package-json": "^1.0.1"
+    "@npmcli/package-json": "^1.0.1",
+    "which": "^2.0.2"
   },
   "files": [
     "bin",
@@ -40,13 +41,16 @@
     "@npmcli/eslint-config": "*",
     "@npmcli/promise-spawn": "^2.0.0",
     "@npmcli/template-oss": "file:./",
-    "eslint": "^7.32.0",
+    "eslint": "^8.1.0",
     "eslint-plugin-node": "^11.1.0",
     "tap": "*"
   },
   "peerDependencies": {
     "@npmcli/eslint-config": "^1.0.0",
     "tap": "^15.0.9"
+  },
+  "tap": {
+    "coverage-map": "map.js"
   },
   "engines": {
     "node": "^12.13.0 || ^14.15.0 || >=16"

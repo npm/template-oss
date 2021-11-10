@@ -38,9 +38,9 @@ action.
 
 #### Extending
 
-The `changes` constant located in `lib/package.js` should contain all patches
-for the `package.json` file. Be sure to correctly expand any object/array based
-values with the original package content.
+The `changes` constant located in `lib/postinstall/update-package.js` should contain
+all patches for the `package.json` file. Be sure to correctly expand any object/array
+based values with the original package content.
 
 ### Static files
 
@@ -64,7 +64,7 @@ Place files in the `lib/content/` directory, use only the file name and remove
 any leading `.` characters (i.e. `.github/workflows/ci.yml` becomes `ci.yml`
 and `.gitignore` becomes `gitignore`).
 
-Modify the `content` object at the top of `lib/content/index.js` to include
+Modify the `content` object at the top of `lib/postinstall/copy-content.js` to include
 your new file. The object keys are destination paths, and values are source.
 
 ### `package.json` checks
