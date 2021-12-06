@@ -8,7 +8,6 @@
 !/.github
 !**/.gitignore
 !/package.json
-!/package-lock.json
 !/docs
 !/bin
 !/lib
