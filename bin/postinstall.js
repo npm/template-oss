@@ -2,6 +2,7 @@
 
 const copyContent = require('../lib/postinstall/copy-content.js')
 const patchPackage = require('../lib/postinstall/update-package.js')
+const getConfig = require('../lib/config.js')
 
 const main = async () => {
   const {
@@ -14,12 +15,14 @@ const main = async () => {
     return
   }
 
-  const needsAction = await patchPackage(root)
-  if (!needsAction) {
-    return
-  }
+  const config = await getConfig(root)
+  for (const path of config.paths) {
+    if (!await patchPackage(path)) {
+      continue
+    }
 
-  await copyContent(root)
+    await copyContent(path, root)
+  }
 }
 
 module.exports = main().catch((err) => {

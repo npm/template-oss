@@ -2,6 +2,7 @@
 
 const checkPackage = require('../lib/postlint/check-package.js')
 const checkGitIgnore = require('../lib/postlint/check-gitignore.js')
+const getConfig = require('../lib/config.js')
 
 const main = async () => {
   const {
@@ -12,10 +13,15 @@ const main = async () => {
     throw new Error('This package requires npm >7.21.1')
   }
 
-  const problems = [
-    ...(await checkPackage(root)),
-    ...(await checkGitIgnore(root)),
-  ]
+  const config = await getConfig(root)
+
+  const problemSets = []
+  for (const path of config.paths) {
+    problemSets.push(await checkPackage(path))
+    problemSets.push(await checkGitIgnore(path))
+  }
+
+  const problems = problemSets.flat()
 
   if (problems.length) {
     console.error('Some problems were detected:')
