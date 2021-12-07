@@ -21,7 +21,7 @@ const main = async () => {
       continue
     }
 
-    await copyContent(path, root)
+    await copyContent(path, root, config)
   }
 }
 
