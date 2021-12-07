@@ -1,6 +1,7 @@
 const { join } = require('path')
 const fs = require('@npmcli/fs')
 const t = require('tap')
+const getConfig = require('../../lib/config.js')
 
 const copyContent = require('../../lib/postinstall/copy-content.js')
 
@@ -31,7 +32,11 @@ t.test('removes files', async (t) => {
     '.eslintrc.local.json',
     'something.txt',
   ]
-  const root = t.testdir(content)
+  const root = t.testdir(content, {
+    applyRootRepoFiles: true,
+    applyWorkspaceRepoFiles: true,
+    applyRootModuleFiles: true,
+  })
 
   await copyContent(root, root)
   for (const target of Object.keys(copyContent.moduleFiles)) {
@@ -58,7 +63,9 @@ t.test('handles workspaces', async (t) => {
     'package.json': JSON.stringify({
       name: 'testpkg',
       templateOSS: {
-        includeRoot: false,
+        applyRootRepoFiles: true,
+        applyWorkspaceRepoFiles: true,
+        applyRootModuleFiles: true,
         workspaces: ['workspace/a', 'workspace/b'],
       },
     }),
@@ -77,11 +84,141 @@ t.test('handles workspaces', async (t) => {
   }
   const root = t.testdir(pkgWithWorkspaces)
   const workspacea = join(root, 'workspace', 'a')
-  await copyContent(workspacea, root)
+  const config = await getConfig(root)
+  await copyContent(workspacea, root, config)
 
+  // change should have applied to the workspace, not the root
+  await t.resolves(fs.stat(join(root, 'workspace', 'a', '.eslintrc.js')))
+  await t.rejects(fs.stat(join(root, 'workspace', 'b', '.eslintrc.js')))
+
+  await t.rejects(fs.stat(join(root, '.eslintrc.js')))
+  await copyContent(root, root, config)
+  await t.resolves(fs.stat(join(root, '.eslintrc.js')))
   // should have made the workspace action in the root
   await t.resolves(fs.stat(join(root, '.github', 'workflows', 'ci-amazinga.yml')))
-  // change should have applied to the workspace, not the root
-  await t.rejects(fs.stat(join(root, '.eslintrc.js')))
+  await t.resolves(fs.stat(join(root, '.github', 'ISSUE_TEMPLATE', 'bug.yml')))
+})
+
+t.test('handles workspaces with no root repo files', async (t) => {
+  const pkgWithWorkspaces = {
+    'package.json': JSON.stringify({
+      name: 'testpkg',
+      templateOSS: {
+        applyRootRepoFiles: false,
+        applyWorkspaceRepoFiles: true,
+        applyRootModuleFiles: true,
+
+        workspaces: ['workspace/a', 'workspace/b'],
+      },
+    }),
+    workspace: {
+      a: {
+        'package.json': JSON.stringify({
+          name: 'amazinga',
+        }),
+      },
+      b: {
+        'package.json': JSON.stringify({
+          name: 'amazingb',
+        }),
+      },
+    },
+  }
+
+  const root = t.testdir(pkgWithWorkspaces)
+  const workspacea = join(root, 'workspace', 'a')
+  const config = await getConfig(root)
+  await copyContent(workspacea, root, config)
+  await copyContent(root, root, config)
+
+  await t.resolves(fs.stat(join(root, '.github', 'workflows', 'ci-amazinga.yml')))
+  await t.rejects(fs.stat(join(root, '.github', 'ISSUE_TEMPLATE', 'bug.yml')))
   await t.resolves(fs.stat(join(root, 'workspace', 'a', '.eslintrc.js')))
+  await t.rejects(fs.stat(join(root, 'workspace', 'b', '.eslintrc.js')))
+  await t.resolves(fs.stat(join(root, '.eslintrc.js')))
+})
+
+t.test('handles workspaces with no root repo and repo files', async (t) => {
+  const pkgWithWorkspaces = {
+    'package.json': JSON.stringify({
+      name: 'testpkg',
+      templateOSS: {
+        applyRootRepoFiles: false,
+        applyWorkspaceRepoFiles: false,
+        applyRootModuleFiles: true,
+
+        workspaces: ['workspace/a', 'workspace/b'],
+      },
+    }),
+    workspace: {
+      a: {
+        'package.json': JSON.stringify({
+          name: 'amazinga',
+        }),
+      },
+      b: {
+        'package.json': JSON.stringify({
+          name: 'amazingb',
+        }),
+      },
+    },
+  }
+
+  const root = t.testdir(pkgWithWorkspaces)
+  const workspacea = join(root, 'workspace', 'a')
+  const config = await getConfig(root)
+  await copyContent(workspacea, root, config)
+
+  await t.rejects(fs.stat(join(root, '.github', 'workflows', 'ci-amazinga.yml')))
+  await t.rejects(fs.stat(join(root, '.github', 'ISSUE_TEMPLATE', 'bug.yml')))
+  await t.resolves(fs.stat(join(root, 'workspace', 'a', '.eslintrc.js')))
+  await t.rejects(fs.stat(join(root, 'workspace', 'b', '.eslintrc.js')))
+
+  await t.rejects(fs.stat(join(root, '.eslintrc.js')))
+  await copyContent(root, root, config)
+  await t.resolves(fs.stat(join(root, '.eslintrc.js')))
+  await t.rejects(fs.stat(join(root, '.github', 'ISSUE_TEMPLATE', 'bug.yml')))
+})
+
+t.test('handles workspaces with no root files', async (t) => {
+  const pkgWithWorkspaces = {
+    'package.json': JSON.stringify({
+      name: 'testpkg',
+      templateOSS: {
+        applyRootRepoFiles: false,
+        applyWorkspaceRepoFiles: false,
+        applyRootModuleFiles: false,
+
+        workspaces: ['workspace/a', 'workspace/b'],
+      },
+    }),
+    workspace: {
+      a: {
+        'package.json': JSON.stringify({
+          name: 'amazinga',
+        }),
+      },
+      b: {
+        'package.json': JSON.stringify({
+          name: 'amazingb',
+        }),
+      },
+    },
+  }
+
+  const root = t.testdir(pkgWithWorkspaces)
+  const workspacea = join(root, 'workspace', 'a')
+  const config = await getConfig(root)
+  await copyContent(workspacea, root, config)
+
+  await t.rejects(fs.stat(join(root, '.github', 'workflows', 'ci-amazinga.yml')))
+  await t.rejects(fs.stat(join(root, '.github', 'ISSUE_TEMPLATE', 'bug.yml')))
+  await t.resolves(fs.stat(join(root, 'workspace', 'a', '.eslintrc.js')))
+  await t.rejects(fs.stat(join(root, 'workspace', 'b', '.eslintrc.js')))
+
+  await t.rejects(fs.stat(join(root, '.eslintrc.js')))
+  await copyContent(root, root, config)
+  await t.rejects(fs.stat(join(root, '.eslintrc.js')))
+  await t.rejects(fs.stat(join(root, '.github', 'workflows', 'ci-amazinga.yml')))
+  await t.rejects(fs.stat(join(root, '.github', 'ISSUE_TEMPLATE', 'bug.yml')))
 })
