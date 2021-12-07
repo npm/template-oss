@@ -8,7 +8,11 @@ t.test('copies content', async (t) => {
   const root = t.testdir()
 
   await copyContent(root, root)
-  for (let target of Object.keys(copyContent.content)) {
+  for (let target of Object.keys(copyContent.moduleFiles)) {
+    target = join(root, target)
+    await t.resolves(fs.stat(target))
+  }
+  for (let target of Object.keys(copyContent.repoFiles)) {
     target = join(root, target)
     await t.resolves(fs.stat(target))
   }
@@ -30,11 +34,11 @@ t.test('removes files', async (t) => {
   const root = t.testdir(content)
 
   await copyContent(root, root)
-  for (const target of Object.keys(copyContent.content)) {
+  for (const target of Object.keys(copyContent.moduleFiles)) {
     const fullTarget = join(root, target)
     await t.resolves(fs.stat(fullTarget), `copied ${target}`)
   }
-  for (const target of Object.keys(copyContent.rootContent)) {
+  for (const target of Object.keys(copyContent.repoFiles)) {
     const fullTarget = join(root, target)
     await t.resolves(fs.stat(fullTarget), `copied ${target}`)
   }
@@ -50,7 +54,7 @@ t.test('removes files', async (t) => {
 })
 
 t.test('handles workspaces', async (t) => {
-  const content = {
+  const pkgWithWorkspaces = {
     'package.json': JSON.stringify({
       name: 'testpkg',
       templateOSS: {
@@ -71,7 +75,7 @@ t.test('handles workspaces', async (t) => {
       },
     },
   }
-  const root = t.testdir(content)
+  const root = t.testdir(pkgWithWorkspaces)
   const workspacea = join(root, 'workspace', 'a')
   await copyContent(workspacea, root)
 
