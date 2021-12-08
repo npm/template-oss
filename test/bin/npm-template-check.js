@@ -81,3 +81,41 @@ t.test('with mocks', (t) => {
     t.strictSame(errors, [], 'errors')
   })
 })
+
+t.test('workspace without root module files', async (t) => {
+  const pkgWithWorkspaces = {
+    'package.json': JSON.stringify({
+      name: 'testpkg',
+      templateOSS: {
+        applyRootRepoFiles: false,
+        applyWorkspaceRepoFiles: true,
+        applyRootModuleFiles: false,
+
+        workspaces: ['amazinga'],
+      },
+    }),
+    workspace: {
+      a: {
+        'package.json': JSON.stringify({
+          name: 'amazinga',
+        }),
+      },
+    },
+  }
+  const root = t.testdir(pkgWithWorkspaces)
+  process.env.npm_config_local_prefix = root
+
+  await check({
+    package: (path, root, config) => [{
+      message: 'package',
+      solution: `${path} ${root} ${config.applyRootModuleFiles}`,
+    }],
+    gitignore: (path, root, config) => [{
+      message: 'gitignore',
+      solution: `${path} ${root} ${config.applyRootRepoFiles}`,
+    }],
+  })
+
+  t.strictSame(logs, [], 'logs')
+  t.strictSame(errors, [], 'errors')
+})

@@ -76,3 +76,38 @@ t.test('doesnt set templateVersion on own repo', async (t) => {
   })
   t.equal(JSON.parse(contents).templateVersion, undefined, 'did not get template version')
 })
+
+t.test('only sets templateVersion on root pkg when configured', async (t) => {
+  const pkgWithWorkspaces = {
+    'package.json': JSON.stringify({
+      name: 'testpkg',
+      templateOSS: {
+        applyRootRepoFiles: false,
+        applyWorkspaceRepoFiles: true,
+        applyRootModuleFiles: false,
+
+        workspaces: ['amazinga'],
+      },
+    }),
+    workspace: {
+      a: {
+        'package.json': JSON.stringify({
+          name: 'amazinga',
+        }),
+      },
+    },
+  }
+  const root = t.testdir(pkgWithWorkspaces)
+  await patchPackage(root, root, {
+    applyRootRepoFiles: false,
+    applyWorkspaceRepoFiles: true,
+    applyRootModuleFiles: false,
+  })
+
+  const contents = JSON.parse(await fs.readFile(join(root, 'package.json'), {
+    encoding: 'utf8',
+  }))
+
+  t.not(contents.templateVersion, undefined, 'should set templateVersion')
+  t.equal(contents.author, undefined, 'should not set other fields')
+})

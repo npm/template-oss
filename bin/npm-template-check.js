@@ -17,8 +17,12 @@ const main = async () => {
 
   const problemSets = []
   for (const path of config.paths) {
-    problemSets.push(await checkPackage(path))
-    problemSets.push(await checkGitIgnore(path))
+    if (path !== root || config.applyRootModuleFiles) {
+      problemSets.push(await checkPackage(path))
+    }
+    if (path !== root || config.applyRootRepoFiles) {
+      problemSets.push(await checkGitIgnore(path))
+    }
   }
 
   const problems = problemSets.flat()

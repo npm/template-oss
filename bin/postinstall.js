@@ -17,7 +17,7 @@ const main = async () => {
 
   const config = await getConfig(root)
   for (const path of config.paths) {
-    if (!await patchPackage(path)) {
+    if (!await patchPackage(path, root, config)) {
       continue
     }
 
