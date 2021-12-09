@@ -10,10 +10,8 @@ Array [
   Object {
     "message": String(
       The following package.json fields are incorrect:
-        Field: "author" Expected: "GitHub Inc." Found: undefined
+        Field: "author" Expected: "GitHub Inc." Found: "Bob"
         Field: "files" Expected: ["bin","lib"] Found: undefined
-        Field: "license" Expected: "ISC" Found: "MIT"
-        Field: "templateVersion" Expected: "$TEMPLATE_VERSION" Found: undefined
         Field: "scripts" Expected: {"lint":"eslint '**/*.js'","postlint":"npm-template-check","lintfix":"npm run lint -- --fix","preversion":"npm test","postversion":"npm publish","prepublishOnly":"git push origin --follow-tags","snap":"tap","test":"tap","posttest":"npm run lint"} Found: undefined
         Field: "engines" Expected: {"node":"^12.13.0 || ^14.15.0 || >=16"} Found: undefined
     ),
@@ -29,8 +27,6 @@ Array [
       The following package.json fields are incorrect:
         Field: "author" Expected: "GitHub Inc." Found: undefined
         Field: "files" Expected: ["bin","lib"] Found: undefined
-        Field: "license" Expected: "ISC" Found: undefined
-        Field: "templateVersion" Expected: "$TEMPLATE_VERSION" Found: undefined
         Field: "scripts.lint" Expected: "eslint '**/*.js'" Found: undefined
         Field: "scripts.postlint" Expected: "npm-template-check" Found: undefined
         Field: "scripts.lintfix" Expected: "npm run lint -- --fix" Found: undefined
@@ -54,8 +50,6 @@ Array [
       The following package.json fields are incorrect:
         Field: "author" Expected: "GitHub Inc." Found: undefined
         Field: "files" Expected: ["bin","lib"] Found: undefined
-        Field: "license" Expected: "ISC" Found: undefined
-        Field: "templateVersion" Expected: "$TEMPLATE_VERSION" Found: undefined
         Field: "scripts" Expected: {"lint":"eslint '**/*.js'","postlint":"npm-template-check","lintfix":"npm run lint -- --fix","preversion":"npm test","postversion":"npm publish","prepublishOnly":"git push origin --follow-tags","snap":"tap","test":"tap","posttest":"npm run lint"} Found: undefined
         Field: "engines" Expected: {"node":"^12.13.0 || ^14.15.0 || >=16"} Found: undefined
     ),
@@ -71,8 +65,6 @@ Array [
       The following package.json fields are incorrect:
         Field: "author" Expected: "GitHub Inc." Found: undefined
         Field: "files" Expected: ["bin","lib"] Found: undefined
-        Field: "license" Expected: "ISC" Found: undefined
-        Field: "templateVersion" Expected: "$TEMPLATE_VERSION" Found: undefined
         Field: "scripts" Expected: {"lint":"eslint '**/*.js'","postlint":"npm-template-check","lintfix":"npm run lint -- --fix","preversion":"npm test","postversion":"npm publish","prepublishOnly":"git push origin --follow-tags","snap":"tap","test":"tap","posttest":"npm run lint"} Found: undefined
         Field: "engines" Expected: {"node":"^12.13.0 || ^14.15.0 || >=16"} Found: undefined
     ),

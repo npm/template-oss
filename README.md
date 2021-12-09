@@ -5,6 +5,28 @@ single devDependency.
 
 **CAUTION: THESE CHANGES WILL OVERWRITE ANY LOCAL FILES AND SETTINGS**
 
+### Configuration
+
+Configure the use of `template-oss` in the root `package.json`.
+
+```js
+{
+  name: 'my-package',
+  // ...
+  templateOSS: {
+    // copy repo specific files for the root pkg
+    applyRootRepoFiles: true,
+    // modify package.json and copy module specific files for the root pkg
+    applyRootModuleFiles: true,
+    // copy repo files for each whitelisted workspaces
+    applyWorkspaceRepoFiles: true,
+    // whitelist workspace by package name to modify package.json
+    // and copy module files
+    workspaces: ['workspace-package-name'],
+    version: '2.3.1'
+  }
+}
+
 ### `package.json` patches
 
 These fields will be set in the project's `package.json`:
@@ -58,13 +80,18 @@ These files will be copied, overwriting any existing files:
 - `LICENSE.md`
 - `SECURITY.md`
 
+### Dynamic Files
+
+Currently, the only dynamic file generated is a github workflow for a given workspace.
+`.github/workflows/ci-$$package-name$$.yml`
+
 #### Extending
 
 Place files in the `lib/content/` directory, use only the file name and remove
 any leading `.` characters (i.e. `.github/workflows/ci.yml` becomes `ci.yml`
 and `.gitignore` becomes `gitignore`).
 
-Modify the `content` object at the top of `lib/postinstall/copy-content.js` to include
+Modify the `repoFiles` and `moduleFiles` objects at the top of `lib/postinstall/copy-content.js` to include
 your new file. The object keys are destination paths, and values are source.
 
 ### `package.json` checks

@@ -6,7 +6,7 @@ const { name } = require('../../package.json')
 
 t.cleanSnapshot = (snapshot) => {
   return snapshot.replace(
-    /("templateVersion" Expected: ").*(" Found)/g,
+    /("version" Expected: ").*(" Found)/g,
     '$1$TEMPLATE_VERSION$2'
   )
 }
@@ -27,7 +27,7 @@ t.test('checks a package.json', (t) => {
   t.test('incorrect fields', async (t) => {
     const project = t.testdir({
       'package.json': JSON.stringify({
-        license: 'MIT',
+        author: 'Bob',
       }),
     })
 
@@ -85,6 +85,7 @@ t.test('this repo doesnt get version', async (t) => {
   }
 
   delete pkg.templateVersion
+  delete pkg.templateOSS
 
   const project = t.testdir({
     'package.json': JSON.stringify(pkg),
