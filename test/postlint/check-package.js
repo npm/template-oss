@@ -27,7 +27,7 @@ t.test('checks a package.json', (t) => {
   t.test('incorrect fields', async (t) => {
     const project = t.testdir({
       'package.json': JSON.stringify({
-        license: 'MIT',
+        author: 'Bob',
       }),
     })
 

@@ -25,8 +25,6 @@ t.test('removes files', async (t) => {
     '.eslintrc.yml': '',
     '.eslintrc.local.json': '{}',
     'something.txt': '',
-    LICENSE: '',
-    'LICENSE.txt': '',
   }
   const keepContent = [
     '.eslintrc.local.json',
