@@ -4,6 +4,8 @@
 /*
 
 # keep these
+!/.commitlintrc.js
+!/.npmrc
 !/.eslintrc*
 !/.github
 !**/.gitignore
