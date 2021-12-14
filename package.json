@@ -48,7 +48,7 @@
     "tap": "*"
   },
   "peerDependencies": {
-    "@npmcli/eslint-config": "^1.0.0",
+    "@npmcli/eslint-config": "^2.0.0",
     "tap": "^15.0.9"
   },
   "tap": {
