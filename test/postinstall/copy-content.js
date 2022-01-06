@@ -75,7 +75,7 @@ t.test('handles workspaces', async (t) => {
       },
       b: {
         'package.json': JSON.stringify({
-          name: 'amazingb',
+          name: '@somenamespace/amazingb',
         }),
       },
     },
@@ -95,6 +95,11 @@ t.test('handles workspaces', async (t) => {
   // should have made the workspace action in the root
   await t.resolves(fs.stat(join(root, '.github', 'workflows', 'ci-amazinga.yml')))
   await t.resolves(fs.stat(join(root, '.github', 'ISSUE_TEMPLATE', 'bug.yml')))
+
+  const workspaceb = join(root, 'workspace', 'b')
+  await copyContent(workspaceb, root, config)
+
+  await t.resolves(fs.stat(join(root, '.github', 'workflows', 'ci-somenamespace-amazingb.yml')))
 })
 
 t.test('handles workspaces with no root repo files', async (t) => {
