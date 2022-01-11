@@ -225,3 +225,20 @@ t.test('handles workspaces with no root files', async (t) => {
   await t.rejects(fs.stat(join(root, '.github', 'workflows', 'ci-amazinga.yml')))
   await t.rejects(fs.stat(join(root, '.github', 'ISSUE_TEMPLATE', 'bug.yml')))
 })
+
+t.test('no windows ci', async (t) => {
+  const pkgWithNoWindowsCI = {
+    'package.json': JSON.stringify({
+      name: 'testpkg',
+      templateOSS: {
+        windowsCI: false,
+      },
+    }),
+  }
+  const root = t.testdir(pkgWithNoWindowsCI)
+  const config = await getConfig(root)
+  await copyContent(root, root, config)
+  const target = join(root, 'ci.yml')
+  const contents = await fs.readFile(target, 'utf8')
+  await t.notMatch(/windows/, contents, 'no windows ci')
+})
