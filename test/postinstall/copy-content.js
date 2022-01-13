@@ -238,7 +238,7 @@ t.test('no windows ci', async (t) => {
   const root = t.testdir(pkgWithNoWindowsCI)
   const config = await getConfig(root)
   await copyContent(root, root, config)
-  const target = join(root, 'ci.yml')
+  const target = join(root, '.github', 'workflows', 'ci.yml')
   const contents = await fs.readFile(target, 'utf8')
   await t.notMatch(/windows/, contents, 'no windows ci')
 })
