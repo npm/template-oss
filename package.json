@@ -4,7 +4,8 @@
   "description": "templated files used in npm CLI team oss projects",
   "main": "lib/index.js",
   "bin": {
-    "npm-template-check": "bin/npm-template-check.js"
+    "npm-template-check": "bin/npm-template-check.js",
+    "npm-template-copy": "bin/postinstall.js"
   },
   "scripts": {
     "lint": "eslint '**/*.js'",
@@ -16,7 +17,8 @@
     "prepublishOnly": "git push origin --follow-tags",
     "preversion": "npm test",
     "snap": "tap",
-    "test": "tap"
+    "test": "tap",
+    "template-copy": "npm-template-copy --force"
   },
   "repository": {
     "type": "git",

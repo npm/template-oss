@@ -61,6 +61,32 @@ t.test('returns false when templateVersion matches own version', async (t) => {
   t.notMatch(JSON.parse(contents), patchPackage.changes, 'changes were NOT applied')
 })
 
+t.test('returns true when templateVersion matches own version when forced', async (t) => {
+  const pkg = {
+    name: '@npmcli/foo',
+    templateOSS: {
+      version: TEMPLATE_VERSION,
+    },
+    version: '1.0.0',
+    author: 'someone else',
+    files: [],
+    license: 'MIT',
+  }
+
+  const project = t.testdir({
+    'package.json': JSON.stringify(pkg, null, 2),
+  })
+
+  const needsAction = await patchPackage(project, undefined, { force: true })
+  t.equal(needsAction, true, 'returned true')
+
+  const contents = await fs.readFile(join(project, 'package.json'), {
+    encoding: 'utf8',
+  })
+  const parsed = JSON.parse(contents)
+  t.match(parsed, patchPackage.changes, 'all changes were applied')
+})
+
 t.test('doesnt set templateVersion on own repo', async (t) => {
   const pkg = {
     name: TEMPLATE_NAME,

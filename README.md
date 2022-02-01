@@ -41,6 +41,7 @@ These fields will be set in the project's `package.json`:
     lint: `eslint '**/*.js'`,
     postlint: 'npm-template-check',
     lintfix: 'npm run lint -- --fix',
+    'template-copy': 'npm-template-copy --force',
     preversion: 'npm test',
     postversion: 'npm publish',
     prepublishOnly: 'git push origin --follow-tags',
@@ -98,6 +99,11 @@ your new file. The object keys are destination paths, and values are source.
 
 `npm-template-check` is run by `postlint` and will error if the `package.json`
 is not configured properly, with steps to run to correct any problems.
+
+### Manual copy
+
+Template files will be copied automatically when `template-oss` is updated.
+You can force an update with `npm run template-copy`.
 
 #### Extending
 
