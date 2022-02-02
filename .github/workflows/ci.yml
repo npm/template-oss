@@ -9,7 +9,7 @@ on:
       - main
       - latest
   schedule:
-    # "At 02:00 on Monday" https://crontab.guru/#0_1_*_*_1
+    # "At 02:00 on Monday" https://crontab.guru/#0_2_*_*_1
     - cron: "0 2 * * 1"
 
 jobs:
