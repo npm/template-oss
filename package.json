@@ -1,6 +1,6 @@
 {
   "name": "@npmcli/template-oss",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "description": "templated files used in npm CLI team oss projects",
   "main": "lib/index.js",
   "bin": {
