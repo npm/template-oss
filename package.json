@@ -31,7 +31,7 @@
   "author": "GitHub Inc.",
   "license": "ISC",
   "dependencies": {
-    "@npmcli/fs": "^1.1.0",
+    "@npmcli/fs": "^1.1.1",
     "@npmcli/map-workspaces": "^2.0.0",
     "@npmcli/package-json": "^1.0.1",
     "json-parse-even-better-errors": "^2.3.1",
