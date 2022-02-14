@@ -45,7 +45,7 @@
     "@npmcli/eslint-config": "*",
     "@npmcli/promise-spawn": "^2.0.0",
     "@npmcli/template-oss": "file:./",
-    "eslint": "^8.8.0",
+    "eslint": "^8.9.0",
     "eslint-plugin-node": "^11.1.0",
     "tap": "*"
   },
