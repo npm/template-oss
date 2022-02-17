@@ -1,5 +1,12 @@
 # Changelog
 
+### [2.7.2](https://www.github.com/npm/template-oss/compare/v2.7.1...v2.7.2) (2022-02-17)
+
+
+### Dependencies
+
+* update @npmcli/fs requirement from ^1.1.0 to ^1.1.1 ([7207aaf](https://www.github.com/npm/template-oss/commit/7207aaf27003071057084b6cb1deebb09a51725a))
+
 ### [2.7.1](https://www.github.com/npm/template-oss/compare/v2.7.0...v2.7.1) (2022-02-07)
 
 
