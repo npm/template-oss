@@ -102,8 +102,8 @@ t.test('workspace without root module files', async (t) => {
       },
     },
   }
-  const root = t.testdir(pkgWithWorkspaces)
-  process.env.npm_config_local_prefix = root
+  const localPrefix = t.testdir(pkgWithWorkspaces)
+  process.env.npm_config_local_prefix = localPrefix
 
   await check({
     package: (path, root, config) => [{
