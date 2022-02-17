@@ -161,3 +161,29 @@ t.test('converts template Version', async (t) => {
   t.equal(contents.templateVersion, undefined, 'did not get template version')
   t.equal(contents.templateOSS.version, TEMPLATE_VERSION, 'did not get template version')
 })
+
+t.test('removes standard', async (t) => {
+  const pkg = {
+    name: 'testpkg',
+    scripts: {
+      test: 'test',
+      'lint:fix': 'something',
+    },
+    standard: {
+      ignore: [],
+    },
+  }
+
+  const project = t.testdir({
+    'package.json': JSON.stringify(pkg, null, 2),
+  })
+
+  const needsAction = await patchPackage(project)
+  t.equal(needsAction, true, 'needs action')
+
+  const contents = JSON.parse(await fs.readFile(join(project, 'package.json'), {
+    encoding: 'utf8',
+  }))
+  t.equal(contents.standard, undefined, 'removed standard')
+  t.equal(contents.scripts['lint:fix'], undefined, 'removes lint:fix script')
+})

@@ -78,8 +78,9 @@ Array [
         eslint-plugin-promise
         eslint-plugin-standard
         eslint-plugin-import
+        standard
     ),
-    "solution": "npm rm @npmcli/lint eslint-plugin-promise eslint-plugin-standard eslint-plugin-import",
+    "solution": "npm rm @npmcli/lint eslint-plugin-promise eslint-plugin-standard eslint-plugin-import standard",
   },
 ]
 `
