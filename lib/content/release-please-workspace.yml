@@ -1,11 +1,14 @@
 # This file is automatically added by @npmcli/template-oss. Do not edit.
 
-name: Release Please
+name: Node Workspace Release Please %%pkgname%%
 
 on:
   push:
+    paths:
+      - %%pkgpath%%/**
     branches:
-      - main
+      - release-next
+      - latest
 
 jobs:
   release-please:
@@ -15,6 +18,8 @@ jobs:
         id: release
         with:
           release-type: node
+          monorepo-tags: true
+          path: %%pkgpath%%/**        
           # If you change changelog-types be sure to also update commitlintrc.js
           changelog-types: >
             [{"type":"feat","section":"Features","hidden":false},
