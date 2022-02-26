@@ -50,7 +50,7 @@
     "tap": "*"
   },
   "peerDependencies": {
-    "@npmcli/eslint-config": "^2.0.0",
+    "@npmcli/eslint-config": "*",
     "tap": "^15.0.9"
   },
   "tap": {
