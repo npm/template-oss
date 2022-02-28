@@ -1,5 +1,12 @@
 # Changelog
 
+### [2.8.2](https://www.github.com/npm/template-oss/compare/v2.8.1...v2.8.2) (2022-02-28)
+
+
+### Dependencies
+
+* bump @npmcli/fs from 1.1.1 to 2.0.1 ([#60](https://www.github.com/npm/template-oss/issues/60)) ([ecee70c](https://www.github.com/npm/template-oss/commit/ecee70cbd59541c580f76720cc2dfefb1f417603))
+
 ### [2.8.1](https://www.github.com/npm/template-oss/compare/v2.8.0...v2.8.1) (2022-02-23)
 
 
