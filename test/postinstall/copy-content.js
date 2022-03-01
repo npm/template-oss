@@ -94,12 +94,18 @@ t.test('handles workspaces', async (t) => {
   await t.resolves(fs.stat(join(root, '.eslintrc.js')))
   // should have made the workspace action in the root
   await t.resolves(fs.stat(join(root, '.github', 'workflows', 'ci-amazinga.yml')))
+  await t.resolves(fs.stat(join(root, '.github', 'workflows', 'release-please-amazinga.yml')))
   await t.resolves(fs.stat(join(root, '.github', 'ISSUE_TEMPLATE', 'bug.yml')))
 
   const workspaceb = join(root, 'workspace', 'b')
   await copyContent(workspaceb, root, config)
 
-  await t.resolves(fs.stat(join(root, '.github', 'workflows', 'ci-somenamespace-amazingb.yml')))
+  const workspacebCi = join(root, '.github', 'workflows', 'ci-somenamespace-amazingb.yml')
+  await t.resolves(fs.stat(workspacebCi))
+  const workspacebCiContent = await fs.readFile(workspacebCi, { encoding: 'utf-8' })
+  t.match(workspacebCiContent, '@somenamespace/amazingb')
+  t.match(workspacebCiContent, join('workspace', 'b'))
+  t.notMatch(workspacebCiContent, '%%')
 })
 
 t.test('handles workspaces with no root repo files', async (t) => {
