@@ -2,27 +2,26 @@
   "name": "@npmcli/template-oss",
   "version": "2.9.2",
   "description": "templated files used in npm CLI team oss projects",
-  "main": "lib/index.js",
+  "main": "lib/content/index.js",
   "bin": {
-    "npm-template-check": "bin/npm-template-check.js",
-    "npm-template-copy": "bin/postinstall.js"
+    "template-oss-apply": "bin/apply.js",
+    "template-oss-check": "bin/check.js"
   },
   "scripts": {
     "lint": "eslint \"**/*.js\"",
     "lintfix": "npm run lint -- --fix",
-    "postinstall": "node bin/postinstall.js",
-    "postlint": "npm-template-check",
     "posttest": "npm run lint",
     "postversion": "npm publish",
     "prepublishOnly": "git push origin --follow-tags",
     "preversion": "npm test",
     "snap": "tap",
     "test": "tap",
-    "template-copy": "npm-template-copy --force"
+    "template-oss-apply": "template-oss-apply --force",
+    "postlint": "template-oss-check"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/npm/template-oss.git"
+    "url": "https://github.com/npm/template-oss.git"
   },
   "keywords": [
     "npm",
@@ -32,31 +31,35 @@
   "license": "ISC",
   "dependencies": {
     "@npmcli/fs": "^2.0.1",
+    "@npmcli/git": "^3.0.0",
     "@npmcli/map-workspaces": "^2.0.2",
     "@npmcli/package-json": "^1.0.1",
+    "diff": "^5.0.0",
+    "handlebars": "^4.7.7",
+    "hosted-git-info": "^4.1.0",
+    "json-diff": "^0.7.2",
     "json-parse-even-better-errors": "^2.3.1",
-    "which": "^2.0.2"
+    "lodash": "^4.17.21",
+    "proc-log": "^2.0.0",
+    "semver": "^7.3.5",
+    "yaml": "^2.0.0-10"
   },
   "files": [
-    "bin",
-    "lib"
+    "bin/",
+    "lib/"
   ],
   "devDependencies": {
-    "@npmcli/eslint-config": "*",
-    "@npmcli/promise-spawn": "^2.0.1",
+    "@npmcli/eslint-config": "^3.0.0",
     "@npmcli/template-oss": "file:./",
-    "eslint": "^8.11.0",
-    "eslint-plugin-node": "^11.1.0",
-    "tap": "*"
+    "tap": "^15.1.6"
   },
-  "peerDependencies": {
-    "@npmcli/eslint-config": "^2.0.0",
-    "tap": "^15.0.9"
-  },
-  "tap": {
-    "coverage-map": "map.js"
+  "templateOSS": {
+    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten."
   },
   "engines": {
-    "node": "^12.13.0 || ^14.15.0 || >=16"
-  }
+    "node": "^12.13.0 || ^14.15.0 || >=16.0.0"
+  },
+  "eslintIgnore": [
+    "lib/content/"
+  ]
 }

@@ -1,3 +1,0 @@
-# Dont modify line endings of our bin scripts
-# so git status stays clean for windows tests
-*.js -crlf
