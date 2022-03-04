@@ -43,7 +43,7 @@
   ],
   "devDependencies": {
     "@npmcli/eslint-config": "*",
-    "@npmcli/promise-spawn": "^2.0.0",
+    "@npmcli/promise-spawn": "^2.0.1",
     "@npmcli/template-oss": "file:./",
     "eslint": "^8.10.0",
     "eslint-plugin-node": "^11.1.0",
