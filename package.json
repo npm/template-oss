@@ -8,7 +8,7 @@
     "npm-template-copy": "bin/postinstall.js"
   },
   "scripts": {
-    "lint": "eslint '**/*.js'",
+    "lint": "eslint \"**/*.js\"",
     "lintfix": "npm run lint -- --fix",
     "postinstall": "node bin/postinstall.js",
     "postlint": "npm-template-check",
