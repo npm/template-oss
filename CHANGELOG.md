@@ -1,5 +1,12 @@
 # Changelog
 
+### [2.9.3](https://www.github.com/npm/template-oss/compare/v2.9.2...v2.9.3) (2022-03-10)
+
+
+### Bug Fixes
+
+* use npm-template-copy ([#76](https://www.github.com/npm/template-oss/issues/76)) ([9af2ad3](https://www.github.com/npm/template-oss/commit/9af2ad39ff2cd0b1928fa8ac23abd0bfd7ebb56f))
+
 ### [2.9.2](https://www.github.com/npm/template-oss/compare/v2.9.1...v2.9.2) (2022-03-02)
 
 
