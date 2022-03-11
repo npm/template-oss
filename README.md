@@ -38,7 +38,7 @@ These fields will be set in the project's `package.json`:
   license: 'ISC',
   templateVersion: $TEMPLATE_VERSION,
   scripts: {
-    lint: `eslint '**/*.js'`,
+    lint: 'eslint "**/*.js"',
     postlint: 'npm-template-check',
     lintfix: 'npm run lint -- --fix',
     'template-copy': 'npm-template-copy --force',
