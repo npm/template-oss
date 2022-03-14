@@ -16,6 +16,7 @@ jobs:
         id: release
         with:
           release-type: node
+          changelog-type: github
           changelog-types: >
             [
               {"type":"feat","section":"Features","hidden":false},
