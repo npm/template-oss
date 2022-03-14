@@ -12,16 +12,16 @@
     "snap": "tap",
     "test": "tap",
     "posttest": "npm run lint",
-    "template-copy": {{{json __DELETE__}}},
-    "lint:fix": {{{json __DELETE__}}}
+    "template-copy": {{{del}}},
+    "lint:fix": {{{del}}}
   },
-  "repository": {{{json (def . 'repository' __DELETE__)}}},
+  "repository": {{#if repository}}{{{json repository}}}{{else}}{{{del}}}{{/if}},
   "engines": {
     "node": {{{json engines}}}
   },
   {{{json __CONFIG_KEY__}}}: {
-    "version": {{#if __DOGFOOD__}}{{{json __DELETE__}}}{{else}}{{{json __VERSION__}}}{{/if}}
+    "version": {{#if __DOGFOOD__}}{{{del}}}{{else}}{{{json __VERSION__}}}{{/if}}
   },
-  "templateVersion": {{{json __DELETE__}}},
-  "standard": {{{json __DELETE__}}}
+  "templateVersion": {{{del}}},
+  "standard": {{{del}}}
 }
