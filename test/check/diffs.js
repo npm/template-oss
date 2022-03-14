@@ -96,6 +96,24 @@ t.test('json merge', async (t) => {
   await t.resolveMatchSnapshot(s.readdirSource(), 'source after apply')
 })
 
+t.test('json delete', async (t) => {
+  const s = await setup(t, {
+    testdir: {
+      'target.json': JSON.stringify({ a: 1 }),
+      content: {
+        'source.json': JSON.stringify({ a: '__DELETE__', b: 2 }),
+        'index.js': await setup.fixture('json-delete.js'),
+      },
+    },
+    content: 'content',
+  })
+
+  await t.resolveMatchSnapshot(s.check(), 'initial check')
+  await s.apply()
+  t.strictSame(await s.check(), [])
+  await t.resolveMatchSnapshot(s.readdirSource(), 'source after apply')
+})
+
 t.test('node 10', async (t) => {
   const s = await setup(t, { ok: true })
   await s.apply()

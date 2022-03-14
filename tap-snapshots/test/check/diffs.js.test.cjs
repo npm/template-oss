@@ -75,6 +75,56 @@ package.json
 }
 `
 
+exports[`test/check/diffs.js TAP json delete > initial check 1`] = `
+Some problems were detected:
+
+-------------------------------------------------------------------
+
+The repo file target.json needs to be updated:
+
+  target.json
+  ========================================
+  "//@npmcli/template-oss" is missing, expected "This file is automatically added by @npmcli/template-oss. Do not edit."
+  "a" is 1, expected to be removed
+  "b" is missing, expected 2
+
+To correct it: npx template-oss-apply --force
+
+-------------------------------------------------------------------
+`
+
+exports[`test/check/diffs.js TAP json delete > source after apply 1`] = `
+content/index.js
+========================================
+module.exports = {
+  rootRepo: {
+    add: {
+      'target.json': {
+        file: 'source.json',
+        parser: (p) => p.Json,
+      },
+    },
+  },
+}
+
+content/source.json
+========================================
+{"a":"__DELETE__","b":2}
+
+package.json
+========================================
+{
+  "name": "testpkg"
+}
+
+target.json
+========================================
+{
+  "//@npmcli/template-oss": "This file is automatically added by @npmcli/template-oss. Do not edit.",
+  "b": 2
+}
+`
+
 exports[`test/check/diffs.js TAP json merge > initial check 1`] = `
 Some problems were detected:
 
@@ -358,8 +408,7 @@ The module file package.json needs to be updated:
   package.json
   ========================================
   "author" is "heynow", expected "GitHub Inc."
-  "files.1" is "x", expected to be removed
-  "files.2" is missing, expected "lib/"
+  "files[1]" is "x", expected "lib/"
   "scripts.lint:fix" is "x", expected to be removed
   "scripts.preversion" is "x", expected "npm test"
   "standard" is {
