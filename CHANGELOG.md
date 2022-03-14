@@ -1,5 +1,22 @@
 # Changelog
 
+## [2.10.0](https://www.github.com/npm/template-oss/compare/v2.9.2...v2.10.0) (2022-03-14)
+
+
+### Features
+
+* **eslint:** support glob for windows ([#79](https://www.github.com/npm/template-oss/issues/79)) ([9a28510](https://www.github.com/npm/template-oss/commit/9a285107ef044ecc3d1fad68a036d3701adc549b))
+
+
+### Bug Fixes
+
+* use npm-template-copy ([#76](https://www.github.com/npm/template-oss/issues/76)) ([9af2ad3](https://www.github.com/npm/template-oss/commit/9af2ad39ff2cd0b1928fa8ac23abd0bfd7ebb56f))
+
+
+### Dependencies
+
+* update @npmcli/map-workspaces requirement from ^2.0.1 to ^2.0.2 ([#82](https://www.github.com/npm/template-oss/issues/82)) ([666ac23](https://www.github.com/npm/template-oss/commit/666ac238681aea52875f56814a168873407000c0))
+
 ### [2.9.2](https://www.github.com/npm/template-oss/compare/v2.9.1...v2.9.2) (2022-03-02)
 
 
