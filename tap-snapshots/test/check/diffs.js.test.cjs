@@ -224,7 +224,7 @@ The repo file ci.yml needs to be updated:
 
   .github/workflows/ci.yml
   ========================================
-  @@ -53,8 +53,9 @@
+  @@ -52,8 +52,9 @@
        strategy:
          fail-fast: false
          matrix:
@@ -295,7 +295,7 @@ The repo file ci.yml needs to be updated:
 
   .github/workflows/ci.yml
   ========================================
-  @@ -79,4 +79,24 @@
+  @@ -78,4 +78,24 @@
              git config --global user.name "npm cli ops bot"
          - uses: actions/setup-node@v3
            with:

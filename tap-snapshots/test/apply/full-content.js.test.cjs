@@ -185,7 +185,6 @@ on:
     branches:
       - main
       - latest
-      - release-next
   schedule:
     # "At 02:00 on Monday" https://crontab.guru/#0_2_*_*_1
     - cron: "0 2 * * 1"
@@ -286,13 +285,11 @@ on:
     branches:
       - main
       - latest
-      - release-next
   pull_request:
     # The branches below must be a subset of the branches above
     branches:
       - main
       - latest
-      - release-next
   schedule:
     # "At 03:00 on Monday" https://crontab.guru/#0_3_*_*_1
     - cron: "0 3 * * 1"
@@ -454,7 +451,6 @@ on:
     branches:
       - main
       - latest
-      - release-next
 
 jobs:
   release-please:
@@ -730,7 +726,6 @@ on:
     branches:
       - main
       - latest
-      - release-next
     paths:
       - workspaces/b
   schedule:
@@ -839,7 +834,6 @@ on:
     branches:
       - main
       - latest
-      - release-next
     paths:
       - workspaces/a
   schedule:
@@ -946,7 +940,6 @@ on:
     branches:
       - main
       - latest
-      - release-next
   schedule:
     # "At 02:00 on Monday" https://crontab.guru/#0_2_*_*_1
     - cron: "0 2 * * 1"
@@ -1047,13 +1040,11 @@ on:
     branches:
       - main
       - latest
-      - release-next
   pull_request:
     # The branches below must be a subset of the branches above
     branches:
       - main
       - latest
-      - release-next
   schedule:
     # "At 03:00 on Monday" https://crontab.guru/#0_3_*_*_1
     - cron: "0 3 * * 1"
@@ -1217,7 +1208,6 @@ on:
     branches:
       - main
       - latest
-      - release-next
 
 jobs:
   release-please:
@@ -1251,7 +1241,6 @@ on:
     branches:
       - main
       - latest
-      - release-next
 
 jobs:
   release-please:
@@ -1283,7 +1272,6 @@ on:
     branches:
       - main
       - latest
-      - release-next
 
 jobs:
   release-please:

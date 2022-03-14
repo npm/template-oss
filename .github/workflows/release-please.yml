@@ -7,7 +7,6 @@ on:
     branches:
       - main
       - latest
-      - release-next
 
 jobs:
   release-please:

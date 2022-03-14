@@ -7,13 +7,11 @@ on:
     branches:
       - main
       - latest
-      - release-next
   pull_request:
     # The branches below must be a subset of the branches above
     branches:
       - main
       - latest
-      - release-next
   schedule:
     # "At 03:00 on Monday" https://crontab.guru/#0_3_*_*_1
     - cron: "0 3 * * 1"
