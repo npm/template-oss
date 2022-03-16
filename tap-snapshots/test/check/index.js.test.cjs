@@ -75,10 +75,10 @@ To correct it: npx template-oss-apply --force
 The following required devDependencies were not found:
 
   @npmcli/template-oss@*
-  @npmcli/eslint-config@^3.0.0
-  tap@^15.0.0
+  @npmcli/eslint-config@>=3.0.0
+  tap@>=15.0.0
 
-To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @npmcli/template-oss@* @npmcli/eslint-config@^3.0.0 tap@^15.0.0 --save-dev
+To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @npmcli/template-oss@* @npmcli/eslint-config@>=3.0.0 tap@>=15.0.0 --save-dev
 
 -------------------------------------------------------------------
 `
@@ -153,10 +153,10 @@ To correct it: npx template-oss-apply --force
 The following required devDependencies were not found:
 
   @npmcli/template-oss@*
-  @npmcli/eslint-config@^3.0.0
-  tap@^15.0.0
+  @npmcli/eslint-config@>=3.0.0
+  tap@>=15.0.0
 
-To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @npmcli/template-oss@* @npmcli/eslint-config@^3.0.0 tap@^15.0.0 --save-dev
+To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @npmcli/template-oss@* @npmcli/eslint-config@>=3.0.0 tap@>=15.0.0 --save-dev
 
 -------------------------------------------------------------------
 
@@ -214,10 +214,10 @@ To correct it: npx template-oss-apply --force
 The following required devDependencies were not found:
 
   @npmcli/template-oss@*
-  @npmcli/eslint-config@^3.0.0
-  tap@^15.0.0
+  @npmcli/eslint-config@>=3.0.0
+  tap@>=15.0.0
 
-To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @npmcli/template-oss@* @npmcli/eslint-config@^3.0.0 tap@^15.0.0 --save-dev
+To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @npmcli/template-oss@* @npmcli/eslint-config@>=3.0.0 tap@>=15.0.0 --save-dev
 
 -------------------------------------------------------------------
 
@@ -275,10 +275,10 @@ To correct it: npx template-oss-apply --force
 The following required devDependencies were not found:
 
   @npmcli/template-oss@*
-  @npmcli/eslint-config@^3.0.0
-  tap@^15.0.0
+  @npmcli/eslint-config@>=3.0.0
+  tap@>=15.0.0
 
-To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @npmcli/template-oss@* @npmcli/eslint-config@^3.0.0 tap@^15.0.0 --save-dev
+To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @npmcli/template-oss@* @npmcli/eslint-config@>=3.0.0 tap@>=15.0.0 --save-dev
 
 -------------------------------------------------------------------
 `
