@@ -118,7 +118,7 @@ updates:
       interval: daily
     allow:
       - dependency-type: direct
-    versioning-strategy: increase
+    versioning-strategy: increase-if-necessary
     commit-message:
       prefix: deps
       prefix-development: chore
@@ -657,7 +657,7 @@ updates:
       interval: daily
     allow:
       - dependency-type: direct
-    versioning-strategy: increase
+    versioning-strategy: increase-if-necessary
     commit-message:
       prefix: deps
       prefix-development: chore
