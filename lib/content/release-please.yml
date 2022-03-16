@@ -19,7 +19,6 @@ jobs:
         id: release
         with:
           release-type: node
-          changelog-type: github
           {{#if pkgRelPath}}
           monorepo-tags: true
           paths: {{pkgRelPath}}
