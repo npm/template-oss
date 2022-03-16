@@ -460,7 +460,6 @@ jobs:
         id: release
         with:
           release-type: node
-          changelog-type: github
           changelog-types: >
             [
               {"type":"feat","section":"Features","hidden":false},
@@ -1218,7 +1217,6 @@ jobs:
         id: release
         with:
           release-type: node
-          changelog-type: github
           monorepo-tags: true
           paths: workspaces/b
           changelog-types: >
@@ -1252,7 +1250,6 @@ jobs:
         id: release
         with:
           release-type: node
-          changelog-type: github
           monorepo-tags: true
           paths: workspaces/a
           changelog-types: >
@@ -1284,7 +1281,6 @@ jobs:
         id: release
         with:
           release-type: node
-          changelog-type: github
           changelog-types: >
             [
               {"type":"feat","section":"Features","hidden":false},
