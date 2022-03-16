@@ -7,7 +7,7 @@ on:
       - '*'
     {{#if pkgRelPath}}
     paths:
-      - {{pkgRelPath}}
+      - {{pkgRelPath}}/**
     {{/if}}
   push:
     branches:
@@ -16,7 +16,7 @@ on:
       {{/each}}
     {{#if pkgRelPath}}
     paths:
-      - {{pkgRelPath}}
+      - {{pkgRelPath}}/**
     {{/if}}
   schedule:
     # "At 02:00 on Monday" https://crontab.guru/#0_2_*_*_1
@@ -54,6 +54,6 @@ jobs:
         shell: $\{{ matrix.platform.shell }}
     steps:
       {{> setupGit}}
-      {{> setupNode}}
+      {{> setupNode nodeVersion="${{ matrix.node-version }}"}}
       - run: npm i
       - run: npm test --ignore-scripts {{~#if isWorkspace}} -w {{pkgName}}{{/if}}
