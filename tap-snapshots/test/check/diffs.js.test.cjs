@@ -299,7 +299,7 @@ The repo file ci.yml needs to be updated:
              git config --global user.name "npm cli ops bot"
          - uses: actions/setup-node@v3
            with:
-             node-version: 16.x
+             node-version: \${{ matrix.node-version }}
   +      - name: Update to workable npm (windows)
   +        # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
   +        if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12') || startsWith(matrix.node-version, '14'))

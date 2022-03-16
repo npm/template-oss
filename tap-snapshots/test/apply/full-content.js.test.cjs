@@ -252,7 +252,7 @@ jobs:
           git config --global user.name "npm cli ops bot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: \${{ matrix.node-version }}
       - name: Update to workable npm (windows)
         # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
         if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12') || startsWith(matrix.node-version, '14'))
@@ -721,13 +721,13 @@ on:
     branches:
       - '*'
     paths:
-      - workspaces/b
+      - workspaces/b/**
   push:
     branches:
       - main
       - latest
     paths:
-      - workspaces/b
+      - workspaces/b/**
   schedule:
     # "At 02:00 on Monday" https://crontab.guru/#0_2_*_*_1
     - cron: "0 2 * * 1"
@@ -795,7 +795,7 @@ jobs:
           git config --global user.name "npm cli ops bot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: \${{ matrix.node-version }}
       - name: Update to workable npm (windows)
         # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
         if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12') || startsWith(matrix.node-version, '14'))
@@ -829,13 +829,13 @@ on:
     branches:
       - '*'
     paths:
-      - workspaces/a
+      - workspaces/a/**
   push:
     branches:
       - main
       - latest
     paths:
-      - workspaces/a
+      - workspaces/a/**
   schedule:
     # "At 02:00 on Monday" https://crontab.guru/#0_2_*_*_1
     - cron: "0 2 * * 1"
@@ -903,7 +903,7 @@ jobs:
           git config --global user.name "npm cli ops bot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: \${{ matrix.node-version }}
       - name: Update to workable npm (windows)
         # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
         if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12') || startsWith(matrix.node-version, '14'))
@@ -1007,7 +1007,7 @@ jobs:
           git config --global user.name "npm cli ops bot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: \${{ matrix.node-version }}
       - name: Update to workable npm (windows)
         # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
         if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12') || startsWith(matrix.node-version, '14'))
