@@ -1,5 +1,29 @@
 # Changelog
 
+## [3.0.0](https://github.com/npm/template-oss/compare/v2.9.2...v3.0.0) (2022-03-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* bin scripts are now `template-oss-apply` and `template-oss-check` renamed apply props `rootRepo`, `rootModule`, `workspaceRepo`, `workspaceModule`
+
+### Features
+
+* **eslint:** support glob for windows ([#79](https://github.com/npm/template-oss/issues/79)) ([9a28510](https://github.com/npm/template-oss/commit/9a285107ef044ecc3d1fad68a036d3701adc549b))
+* rewrite to make it more extensible ([#81](https://github.com/npm/template-oss/issues/81)) ([605ccbd](https://github.com/npm/template-oss/commit/605ccbd7ef0a2c36b7e1750a045cd390b226db46))
+
+
+### Bug Fixes
+
+* remove unsupported changelog-type option ([#89](https://github.com/npm/template-oss/issues/89)) ([38585d1](https://github.com/npm/template-oss/commit/38585d18ec5742755bf2a14f2a6b1a7317110e67))
+* use npm-template-copy ([#76](https://github.com/npm/template-oss/issues/76)) ([9af2ad3](https://github.com/npm/template-oss/commit/9af2ad39ff2cd0b1928fa8ac23abd0bfd7ebb56f))
+
+
+### Dependencies
+
+* bump hosted-git-info from 4.1.0 to 5.0.0 ([#87](https://github.com/npm/template-oss/issues/87)) ([dbda2cd](https://github.com/npm/template-oss/commit/dbda2cd9bc1bf4e85c50b8115e3275ec6ee69c06))
+* update @npmcli/map-workspaces requirement from ^2.0.1 to ^2.0.2 ([#82](https://github.com/npm/template-oss/issues/82)) ([666ac23](https://github.com/npm/template-oss/commit/666ac238681aea52875f56814a168873407000c0))
+
 ### [2.9.2](https://www.github.com/npm/template-oss/compare/v2.9.1...v2.9.2) (2022-03-02)
 
 
