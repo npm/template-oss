@@ -1,0 +1,27 @@
+{
+  "author": "GitHub Inc.",
+  "files": {{{json distPaths}}},
+  "scripts": {
+    "lint": "eslint \"**/*.js\"",
+    "postlint": "template-oss-check",
+    "template-oss-apply": "template-oss-apply --force",
+    "lintfix": "npm run lint -- --fix",
+    "preversion": "npm test",
+    "postversion": "npm publish",
+    "prepublishOnly": "git push origin --follow-tags",
+    "snap": "tap",
+    "test": "tap",
+    "posttest": "npm run lint",
+    "template-copy": {{{del}}},
+    "lint:fix": {{{del}}}
+  },
+  "repository": {{#if repository}}{{{json repository}}}{{else}}{{{del}}}{{/if}},
+  "engines": {
+    "node": {{{json engines}}}
+  },
+  {{{json __CONFIG_KEY__}}}: {
+    "version": {{#if __DOGFOOD__}}{{{del}}}{{else}}{{{json __VERSION__}}}{{/if}}
+  },
+  "templateVersion": {{{del}}},
+  "standard": {{{del}}}
+}

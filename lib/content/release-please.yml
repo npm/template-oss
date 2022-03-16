@@ -1,24 +1,32 @@
-# This file is automatically added by @npmcli/template-oss. Do not edit.
-
-name: Release Please
+name: Release Please {{~#if isWorkspace}} - {{pkgName}}{{/if}}
 
 on:
   push:
+    {{#if pkgRelPath}}
+    paths:
+      - {{pkgRelPath}}/**
+    {{/if}}
     branches:
-      - main
+      {{#each branches}}
+      - {{.}}
+      {{/each}}
 
 jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
-      - uses: google-github-actions/release-please-action@v2
+      - uses: google-github-actions/release-please-action@v3
         id: release
         with:
           release-type: node
-          # If you change changelog-types be sure to also update commitlintrc.js
+          changelog-type: github
+          {{#if pkgRelPath}}
+          monorepo-tags: true
+          paths: {{pkgRelPath}}
+          {{/if}}
           changelog-types: >
-            [{"type":"feat","section":"Features","hidden":false},
-            {"type":"fix","section":"Bug Fixes","hidden":false},
-            {"type":"docs","section":"Documentation","hidden":false},
-            {"type":"deps","section":"Dependencies","hidden":false},
-            {"type":"chore","hidden":true}]
+            [
+              {{#each changelogTypes}}
+              {{{json .}}}{{#unless @last}},{{/unless}}
+              {{/each}}
+            ]

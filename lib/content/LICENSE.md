@@ -1,5 +1,3 @@
-<!-- This file is automatically added by @npmcli/template-oss. Do not edit. -->
-
 ISC License
 
 Copyright npm, Inc.
