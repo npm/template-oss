@@ -153,7 +153,10 @@ const setupGit = async (...args) => {
   }
 }
 
-const cleanSnapshot = (str) => str.replace(/\\+/g, '/').replace(/\r\n/g, '\n')
+const cleanSnapshot = (str) => str
+  .replace(/\\+/g, '/')
+  .replace(/\r\n/g, '\n')
+  .replace(/("version":\s")[\d.]+(")/g, '$1{{VERSION}}$2')
 const formatSnapshots = {
   readdir: (arr) => arr.join('\n').trim(),
   readdirSource: (obj) => Object.entries(obj).map(([file, content]) =>

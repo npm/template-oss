@@ -535,7 +535,7 @@ package.json
   },
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
-    "version": "2.9.2"
+    "version": "{{VERSION}}"
   }
 }
 `
@@ -1361,7 +1361,7 @@ package.json
   },
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
-    "version": "2.9.2"
+    "version": "{{VERSION}}"
   }
 }
 
@@ -1436,7 +1436,7 @@ workspaces/a/package.json
   },
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
-    "version": "2.9.2"
+    "version": "{{VERSION}}"
   }
 }
 
@@ -1511,7 +1511,7 @@ workspaces/b/package.json
   },
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
-    "version": "2.9.2"
+    "version": "{{VERSION}}"
   }
 }
 `
