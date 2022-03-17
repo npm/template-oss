@@ -54,6 +54,6 @@ jobs:
         shell: $\{{ matrix.platform.shell }}
     steps:
       {{> setupGit}}
-      {{> setupNode nodeVersion="${{ matrix.node-version }}"}}
+      {{> setupNode useMatrix=true}}
       - run: npm i
       - run: npm test --ignore-scripts {{~#if isWorkspace}} -w {{pkgName}}{{/if}}

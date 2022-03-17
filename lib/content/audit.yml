@@ -11,6 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       {{> setupGit}}
-      {{> setupNode }}
+      {{> setupNode}}
       - run: npm i --package-lock
       - run: npm audit

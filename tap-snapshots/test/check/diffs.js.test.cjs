@@ -224,7 +224,7 @@ The repo file ci.yml needs to be updated:
 
   .github/workflows/ci.yml
   ========================================
-  @@ -52,8 +52,9 @@
+  @@ -37,8 +37,9 @@
        strategy:
          fail-fast: false
          matrix:
@@ -295,14 +295,14 @@ The repo file ci.yml needs to be updated:
 
   .github/workflows/ci.yml
   ========================================
-  @@ -78,4 +78,24 @@
+  @@ -63,4 +63,24 @@
              git config --global user.name "npm cli ops bot"
          - uses: actions/setup-node@v3
            with:
              node-version: \${{ matrix.node-version }}
   +      - name: Update to workable npm (windows)
   +        # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
-  +        if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12') || startsWith(matrix.node-version, '14'))
+  +        if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
   +        run: |
   +          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
   +          tar xf npm-7.5.4.tgz
@@ -312,10 +312,10 @@ The repo file ci.yml needs to be updated:
   +          rmdir /s /q package
   +      - name: Update npm to 7
   +        # If we do test on npm 10 it needs npm7
-  +        if: matrix.node-version <= 10
+  +        if: startsWith(matrix.node-version, '10.')
   +        run: npm i --prefer-online --no-fund --no-audit -g npm@7
   +      - name: Update npm to latest
-  +        if: matrix.node-version > 10
+  +        if: \${{ !startsWith(matrix.node-version, '10.') }}
   +        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
   +      - run: npm -v
   +      - run: npm i
@@ -355,22 +355,7 @@ The repo file audit.yml needs to be updated:
         - uses: actions/setup-node@v3
           with:
             node-version: 16.x
-        - name: Update to workable npm (windows)
-          # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
-          if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12') || startsWith(matrix.node-version, '14'))
-          run: |
-            curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
-            tar xf npm-7.5.4.tgz
-            cd package
-            node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
-            cd ..
-            rmdir /s /q package
-        - name: Update npm to 7
-          # If we do test on npm 10 it needs npm7
-          if: matrix.node-version <= 10
-          run: npm i --prefer-online --no-fund --no-audit -g npm@7
         - name: Update npm to latest
-          if: matrix.node-version > 10
           run: npm i --prefer-online --no-fund --no-audit -g npm@latest
         - run: npm -v
         - run: npm i --package-lock
