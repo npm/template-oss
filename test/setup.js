@@ -1,12 +1,14 @@
 const t = require('tap')
 const { join, isAbsolute, resolve } = require('path')
-const { merge, defaults } = require('lodash')
+const { merge, defaults, escapeRegExp: esc } = require('lodash')
 const fs = require('@npmcli/fs')
 const Git = require('@npmcli/git')
+const npa = require('npm-package-arg')
 const output = require('../lib/util/output.js')
 const apply = require('../lib/apply/index.js')
 const check = require('../lib/check/index.js')
 const CONTENT = require('..')
+const { name: NAME, version: VERSION } = require('../package.json')
 
 const createPackageJson = (pkg) => ({
   'package.json': JSON.stringify(pkg, null, 2),
@@ -21,7 +23,14 @@ const pkgWithName = (name, defName) => {
 }
 
 // minimum package.json for no errors
-const okPackage = () => ({ ...CONTENT.requiredPackages })
+const okPackage = () => Object.entries(CONTENT.requiredPackages)
+  .reduce((acc, [location, deps]) => {
+    acc[location] = Object.fromEntries(deps.map((name) => {
+      const arg = npa(name)
+      return [arg.name, arg.fetchSpec === 'latest' ? '*' : arg.fetchSpec]
+    }))
+    return acc
+  }, {})
 
 const setupRoot = async (root, content) => {
   const rootPath = (...p) => join(root, ...p)
@@ -156,7 +165,7 @@ const setupGit = async (...args) => {
 const cleanSnapshot = (str) => str
   .replace(/\\+/g, '/')
   .replace(/\r\n/g, '\n')
-  .replace(/("version":\s")[\d.]+(")/g, '$1{{VERSION}}$2')
+  .replace(new RegExp(`("version": "|${esc(NAME)}@)${esc(VERSION)}`, 'g'), '$1{{VERSION}}')
 const formatSnapshots = {
   readdir: (arr) => arr.join('\n').trim(),
   readdirSource: (obj) => Object.entries(obj).map(([file, content]) =>

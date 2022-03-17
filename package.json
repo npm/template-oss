@@ -40,6 +40,7 @@
     "json-parse-even-better-errors": "^2.3.1",
     "just-diff": "^5.0.1",
     "lodash": "^4.17.21",
+    "npm-package-arg": "^9.0.1",
     "proc-log": "^2.0.0",
     "semver": "^7.3.5",
     "yaml": "^2.0.0-10"
