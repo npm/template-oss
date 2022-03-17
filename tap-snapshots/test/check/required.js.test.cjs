@@ -20,9 +20,3 @@ To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @n
 
 -------------------------------------------------------------------
 `
-
-exports[`test/check/required.js TAP ok with required > expect resolving Promise 1`] = `
-Some problems were detected:
-
--------------------------------------------------------------------
-`
