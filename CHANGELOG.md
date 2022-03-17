@@ -1,5 +1,20 @@
 # Changelog
 
+## [3.1.0](https://github.com/npm/template-oss/compare/v3.0.0...v3.1.0) (2022-03-17)
+
+
+### Features
+
+* require this packaged to be a pinned dep ([ea04dfb](https://github.com/npm/template-oss/commit/ea04dfbd55e41fd4c241aa3302339fec2d0671ea)), closes [#88](https://github.com/npm/template-oss/issues/88) [#93](https://github.com/npm/template-oss/issues/93)
+
+
+### Bug Fixes
+
+* change dependabot to increase-if-necessary ([#91](https://github.com/npm/template-oss/issues/91)) ([f20fb37](https://github.com/npm/template-oss/commit/f20fb375bc79a455133650dd94420fda6e4e97fb))
+* only reference matrix in relavent actions ([f951c95](https://github.com/npm/template-oss/commit/f951c95d7a8a499d6a3f2dc1a44857a35902061e))
+* use commitlint config via rc file only ([#95](https://github.com/npm/template-oss/issues/95)) ([dd84416](https://github.com/npm/template-oss/commit/dd84416ae973cb8ab43cda14cbbe4d7d612605b1))
+* use proper path and node version in actions ([d5d546e](https://github.com/npm/template-oss/commit/d5d546e46d746e4380c905c2d1d725ef9b10163f))
+
 ## [3.0.0](https://github.com/npm/template-oss/compare/v2.9.2...v3.0.0) (2022-03-16)
 
 
