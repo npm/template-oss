@@ -74,11 +74,11 @@ To correct it: npx template-oss-apply --force
 
 The following required devDependencies were not found:
 
-  @npmcli/template-oss@*
-  @npmcli/eslint-config@>=3.0.0
-  tap@>=15.0.0
+  @npmcli/template-oss@{{VERSION}}
+  @npmcli/eslint-config
+  tap
 
-To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @npmcli/template-oss@* @npmcli/eslint-config@>=3.0.0 tap@>=15.0.0 --save-dev
+To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @npmcli/eslint-config@latest tap@latest --save-dev && npm i @npmcli/template-oss@{{VERSION}} --save-dev --save-exact
 
 -------------------------------------------------------------------
 `
@@ -152,11 +152,11 @@ To correct it: npx template-oss-apply --force
 
 The following required devDependencies were not found:
 
-  @npmcli/template-oss@*
-  @npmcli/eslint-config@>=3.0.0
-  tap@>=15.0.0
+  @npmcli/template-oss@{{VERSION}}
+  @npmcli/eslint-config
+  tap
 
-To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @npmcli/template-oss@* @npmcli/eslint-config@>=3.0.0 tap@>=15.0.0 --save-dev
+To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @npmcli/eslint-config@latest tap@latest --save-dev && npm i @npmcli/template-oss@{{VERSION}} --save-dev --save-exact
 
 -------------------------------------------------------------------
 
@@ -213,11 +213,11 @@ To correct it: npx template-oss-apply --force
 
 The following required devDependencies were not found:
 
-  @npmcli/template-oss@*
-  @npmcli/eslint-config@>=3.0.0
-  tap@>=15.0.0
+  @npmcli/template-oss@{{VERSION}}
+  @npmcli/eslint-config
+  tap
 
-To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @npmcli/template-oss@* @npmcli/eslint-config@>=3.0.0 tap@>=15.0.0 --save-dev
+To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @npmcli/eslint-config@latest tap@latest --save-dev && npm i @npmcli/template-oss@{{VERSION}} --save-dev --save-exact
 
 -------------------------------------------------------------------
 
@@ -274,11 +274,11 @@ To correct it: npx template-oss-apply --force
 
 The following required devDependencies were not found:
 
-  @npmcli/template-oss@*
-  @npmcli/eslint-config@>=3.0.0
-  tap@>=15.0.0
+  @npmcli/template-oss@{{VERSION}}
+  @npmcli/eslint-config
+  tap
 
-To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @npmcli/template-oss@* @npmcli/eslint-config@>=3.0.0 tap@>=15.0.0 --save-dev
+To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @npmcli/eslint-config@latest tap@latest --save-dev && npm i @npmcli/template-oss@{{VERSION}} --save-dev --save-exact
 
 -------------------------------------------------------------------
 `
