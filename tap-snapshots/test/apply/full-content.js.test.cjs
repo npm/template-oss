@@ -301,6 +301,7 @@ on: pull_request
 
 # https://docs.github.com/en/rest/overview/permissions-required-for-github-apps
 permissions:
+  actions: write
   contents: write
 
 jobs:
@@ -963,6 +964,7 @@ on: pull_request
 
 # https://docs.github.com/en/rest/overview/permissions-required-for-github-apps
 permissions:
+  actions: write
   contents: write
 
 jobs:
