@@ -3,7 +3,7 @@
 name: CI
 
 on:
-  workflow_dispatch: null
+  workflow_dispatch:
   pull_request:
     branches:
       - '*'

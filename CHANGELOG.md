@@ -1,5 +1,12 @@
 # Changelog
 
+### [3.1.2](https://github.com/npm/template-oss/compare/v3.1.1...v3.1.2) (2022-03-21)
+
+
+### Bug Fixes
+
+* allow post-dependabot action to edit workflows ([#103](https://github.com/npm/template-oss/issues/103)) ([0ca9a9e](https://github.com/npm/template-oss/commit/0ca9a9ee6ee5493112395d313c3e5632b3d5d8f7))
+
 ### [3.1.1](https://github.com/npm/template-oss/compare/v3.1.0...v3.1.1) (2022-03-21)
 
 
