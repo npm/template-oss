@@ -17,7 +17,8 @@
     "snap": "tap",
     "test": "tap",
     "template-oss-apply": "template-oss-apply --force",
-    "postlint": "template-oss-check"
+    "postlint": "template-oss-check",
+    "postinstall": "template-oss-apply"
   },
   "repository": {
     "type": "git",
