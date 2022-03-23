@@ -318,7 +318,7 @@ The repo file ci.yml needs to be updated:
   +        if: \${{ !startsWith(matrix.node-version, '10.') }}
   +        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
   +      - run: npm -v
-  +      - run: npm i
+  +      - run: npm i --ignore-scripts
   +      - run: npm test --ignore-scripts
 
 To correct it: npx template-oss-apply --force
@@ -358,7 +358,7 @@ The repo file audit.yml needs to be updated:
         - name: Update npm to latest
           run: npm i --prefer-online --no-fund --no-audit -g npm@latest
         - run: npm -v
-        - run: npm i --package-lock
+        - run: npm i --ignore-scripts --package-lock
         - run: npm audit
   
 
