@@ -338,7 +338,7 @@ The repo file audit.yml needs to be updated:
   name: Audit
   
   on:
-    workflow_dispatch: null
+    workflow_dispatch:
     schedule:
       # "At 01:00 on Monday" https://crontab.guru/#0_1_*_*_1
       - cron: "0 1 * * 1"

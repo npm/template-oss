@@ -132,7 +132,7 @@ updates:
 name: Audit
 
 on:
-  workflow_dispatch: null
+  workflow_dispatch:
   schedule:
     # "At 01:00 on Monday" https://crontab.guru/#0_1_*_*_1
     - cron: "0 1 * * 1"
@@ -162,7 +162,7 @@ jobs:
 name: CI
 
 on:
-  workflow_dispatch: null
+  workflow_dispatch:
   pull_request:
     branches:
       - '*'
@@ -609,7 +609,7 @@ updates:
 name: Audit
 
 on:
-  workflow_dispatch: null
+  workflow_dispatch:
   schedule:
     # "At 01:00 on Monday" https://crontab.guru/#0_1_*_*_1
     - cron: "0 1 * * 1"
@@ -639,7 +639,7 @@ jobs:
 name: CI - bbb
 
 on:
-  workflow_dispatch: null
+  workflow_dispatch:
   pull_request:
     branches:
       - '*'
@@ -732,7 +732,7 @@ jobs:
 name: CI - @name/aaaa
 
 on:
-  workflow_dispatch: null
+  workflow_dispatch:
   pull_request:
     branches:
       - '*'
@@ -825,7 +825,7 @@ jobs:
 name: CI
 
 on:
-  workflow_dispatch: null
+  workflow_dispatch:
   pull_request:
     branches:
       - '*'
