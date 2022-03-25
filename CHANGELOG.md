@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.2.0](https://github.com/npm/template-oss/compare/v3.1.1...v3.2.0) (2022-03-25)
+
+
+### Features
+
+* ignore scripts for all ci installs ([#106](https://github.com/npm/template-oss/issues/106)) ([b9c9c95](https://github.com/npm/template-oss/commit/b9c9c95f0b922a8a163ebc6b7a3faf772dc05c23))
+
+
+### Bug Fixes
+
+* allow post-dependabot action to edit workflows ([#103](https://github.com/npm/template-oss/issues/103)) ([0ca9a9e](https://github.com/npm/template-oss/commit/0ca9a9ee6ee5493112395d313c3e5632b3d5d8f7))
+
 ### [3.1.2](https://github.com/npm/template-oss/compare/v3.1.1...v3.1.2) (2022-03-21)
 
 
