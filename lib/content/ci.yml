@@ -28,7 +28,7 @@ jobs:
     steps:
       {{> setupGit}}
       {{> setupNode}}
-      - run: npm i
+      - run: npm i --ignore-scripts
       - run: npm run lint {{~#if isWorkspace}} -w {{pkgName}}{{/if}}
 
   test:
@@ -55,5 +55,5 @@ jobs:
     steps:
       {{> setupGit}}
       {{> setupNode useMatrix=true}}
-      - run: npm i
+      - run: npm i --ignore-scripts
       - run: npm test --ignore-scripts {{~#if isWorkspace}} -w {{pkgName}}{{/if}}

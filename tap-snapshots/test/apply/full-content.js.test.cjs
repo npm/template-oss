@@ -152,7 +152,7 @@ jobs:
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
-      - run: npm i --package-lock
+      - run: npm i --ignore-scripts --package-lock
       - run: npm audit
 
 .github/workflows/ci.yml
@@ -189,7 +189,7 @@ jobs:
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
-      - run: npm i
+      - run: npm i --ignore-scripts
       - run: npm run lint
 
   test:
@@ -241,7 +241,7 @@ jobs:
         if: \${{ !startsWith(matrix.node-version, '10.') }}
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
-      - run: npm i
+      - run: npm i --ignore-scripts
       - run: npm test --ignore-scripts
 
 .github/workflows/codeql-analysis.yml
@@ -331,7 +331,7 @@ jobs:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
           gh pr checkout \${{ github.event.pull_request.number }}
-          npm install --no-scripts
+          npm install --ignore-scripts
           npm run template-oss-apply
           git add .
           git commit -am "chore: postinstall for dependabot template-oss PR"
@@ -629,7 +629,7 @@ jobs:
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
-      - run: npm i --package-lock
+      - run: npm i --ignore-scripts --package-lock
       - run: npm audit
 
 .github/workflows/ci-bbb.yml
@@ -670,7 +670,7 @@ jobs:
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
-      - run: npm i
+      - run: npm i --ignore-scripts
       - run: npm run lint -w bbb
 
   test:
@@ -722,7 +722,7 @@ jobs:
         if: \${{ !startsWith(matrix.node-version, '10.') }}
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
-      - run: npm i
+      - run: npm i --ignore-scripts
       - run: npm test --ignore-scripts -w bbb
 
 .github/workflows/ci-name-aaaa.yml
@@ -763,7 +763,7 @@ jobs:
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
-      - run: npm i
+      - run: npm i --ignore-scripts
       - run: npm run lint -w @name/aaaa
 
   test:
@@ -815,7 +815,7 @@ jobs:
         if: \${{ !startsWith(matrix.node-version, '10.') }}
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
-      - run: npm i
+      - run: npm i --ignore-scripts
       - run: npm test --ignore-scripts -w @name/aaaa
 
 .github/workflows/ci.yml
@@ -852,7 +852,7 @@ jobs:
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
-      - run: npm i
+      - run: npm i --ignore-scripts
       - run: npm run lint
 
   test:
@@ -904,7 +904,7 @@ jobs:
         if: \${{ !startsWith(matrix.node-version, '10.') }}
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
-      - run: npm i
+      - run: npm i --ignore-scripts
       - run: npm test --ignore-scripts
 
 .github/workflows/codeql-analysis.yml
@@ -994,7 +994,7 @@ jobs:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
           gh pr checkout \${{ github.event.pull_request.number }}
-          npm install --no-scripts
+          npm install --ignore-scripts
           npm run template-oss-apply
           git add .
           git commit -am "chore: postinstall for dependabot template-oss PR"
