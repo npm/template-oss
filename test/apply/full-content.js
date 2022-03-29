@@ -37,7 +37,12 @@ t.test('workspaces + everything', async (t) => {
 t.test('with empty content', async (t) => {
   const s = await setup(t, { content: {} })
   await s.apply()
-  t.strictSame(await s.readdirSource(), {
-    'package.json': JSON.stringify({ name: 'testpkg' }, null, 2),
+  const source = await s.readdirSource()
+  t.strictSame(Object.keys(source), ['package.json'])
+  t.strictSame(JSON.parse(source['package.json']), {
+    name: 'testpkg',
+    templateOSS: {
+      version: setup.pkgVersion,
+    },
   })
 })

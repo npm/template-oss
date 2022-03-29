@@ -71,7 +71,10 @@ source
 package.json
 ========================================
 {
-  "name": "testpkg"
+  "name": "testpkg",
+  "templateOSS": {
+    "version": "{{VERSION}}"
+  }
 }
 `
 
@@ -114,7 +117,10 @@ content/source.json
 package.json
 ========================================
 {
-  "name": "testpkg"
+  "name": "testpkg",
+  "templateOSS": {
+    "version": "{{VERSION}}"
+  }
 }
 
 target.json
@@ -163,7 +169,10 @@ content/source.json
 package.json
 ========================================
 {
-  "name": "testpkg"
+  "name": "testpkg",
+  "templateOSS": {
+    "version": "{{VERSION}}"
+  }
 }
 
 target.json
@@ -204,7 +213,10 @@ content/source.json
 package.json
 ========================================
 {
-  "name": "testpkg"
+  "name": "testpkg",
+  "templateOSS": {
+    "version": "{{VERSION}}"
+  }
 }
 
 target.json
@@ -276,7 +288,10 @@ source
 package.json
 ========================================
 {
-  "name": "testpkg"
+  "name": "testpkg",
+  "templateOSS": {
+    "version": "{{VERSION}}"
+  }
 }
 
 target.txt

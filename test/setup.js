@@ -176,6 +176,7 @@ const formatSnapshots = {
 module.exports = setup
 module.exports.git = setupGit
 module.exports.content = CONTENT
+module.exports.pkgVersion = VERSION
 module.exports.clean = cleanSnapshot
 module.exports.format = formatSnapshots
 module.exports.okPackage = okPackage
