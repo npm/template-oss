@@ -20,7 +20,7 @@
     "node": {{{json engines}}}
   },
   {{{json __CONFIG_KEY__}}}: {
-    "version": {{#if __DOGFOOD__}}{{{del}}}{{else}}{{{json __VERSION__}}}{{/if}}
+    "version": {{#if isDogFood}}{{{del}}}{{else}}{{{json __VERSION__}}}{{/if}}
   },
   "templateVersion": {{{del}}},
   "standard": {{{del}}}
