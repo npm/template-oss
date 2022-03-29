@@ -7,8 +7,12 @@
     "template-oss-apply": "template-oss-apply --force",
     "lintfix": "npm run lint -- --fix",
     "preversion": "npm test",
+    {{#if pkgPrivate}}
+    "postversion": "git push origin --follow-tags",
+    {{else}}
     "postversion": "npm publish",
     "prepublishOnly": "git push origin --follow-tags",
+    {{/if}}
     "snap": "tap",
     "test": "tap",
     "posttest": "npm run lint",
