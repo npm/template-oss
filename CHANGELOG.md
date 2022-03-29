@@ -1,5 +1,14 @@
 # Changelog
 
+### [3.2.1](https://github.com/npm/template-oss/compare/v3.2.0...v3.2.1) (2022-03-29)
+
+
+### Bug Fixes
+
+* add root: true to eslint configs ([bd24358](https://github.com/npm/template-oss/commit/bd24358330d9c7ab672acccf5d9167bd62a11ee6))
+* properly apply file changes and version update ([fa0b173](https://github.com/npm/template-oss/commit/fa0b1739bfd61c4911aac2a9888888a44e5be15c))
+* rm security.md files from workspaces ([43f0d25](https://github.com/npm/template-oss/commit/43f0d259ec2013725adb88a061bcfd1fc7dcc070))
+
 ## [3.2.0](https://github.com/npm/template-oss/compare/v3.1.1...v3.2.0) (2022-03-25)
 
 
