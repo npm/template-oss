@@ -30,6 +30,7 @@ const localConfigs = readdir(__dirname)
   .map((file) => \`./\${file}\`)
 
 module.exports = {
+  root: true,
   extends: [
     '@npmcli',
     ...localConfigs,
@@ -503,6 +504,7 @@ const localConfigs = readdir(__dirname)
   .map((file) => \`./\${file}\`)
 
 module.exports = {
+  root: true,
   extends: [
     '@npmcli',
     ...localConfigs,
@@ -1222,6 +1224,7 @@ const localConfigs = readdir(__dirname)
   .map((file) => \`./\${file}\`)
 
 module.exports = {
+  root: true,
   extends: [
     '@npmcli',
     ...localConfigs,
@@ -1297,6 +1300,7 @@ const localConfigs = readdir(__dirname)
   .map((file) => \`./\${file}\`)
 
 module.exports = {
+  root: true,
   extends: [
     '@npmcli',
     ...localConfigs,
