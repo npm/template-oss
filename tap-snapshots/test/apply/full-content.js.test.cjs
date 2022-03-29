@@ -1066,7 +1066,7 @@ jobs:
         with:
           release-type: node
           monorepo-tags: true
-          paths: workspaces/b
+          path: workspaces/b
           changelog-types: >
             [
               {"type":"feat","section":"Features","hidden":false},
@@ -1099,7 +1099,7 @@ jobs:
         with:
           release-type: node
           monorepo-tags: true
-          paths: workspaces/a
+          path: workspaces/a
           changelog-types: >
             [
               {"type":"feat","section":"Features","hidden":false},

@@ -21,7 +21,7 @@ jobs:
           release-type: node
           {{#if pkgRelPath}}
           monorepo-tags: true
-          paths: {{pkgRelPath}}
+          path: {{pkgRelPath}}
           {{/if}}
           changelog-types: >
             [
