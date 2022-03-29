@@ -1,5 +1,20 @@
 # Changelog
 
+### [3.2.2](https://github.com/npm/template-oss/compare/v3.2.1...v3.2.2) (2022-03-29)
+
+
+### Bug Fixes
+
+* correct path key for workspace release ([a4ae34f](https://github.com/npm/template-oss/commit/a4ae34f85500747e66666891dde8c3e9acf5485c))
+* dont write release please file for private workspace ([15c19c1](https://github.com/npm/template-oss/commit/15c19c179a79a79e9785bfcf5818cd4f6631480a))
+* lint after post dependabot install ([da74ad9](https://github.com/npm/template-oss/commit/da74ad966ec5d0d000014258738772d3074d82f5))
+* race conditiion when saving package.json ([cd3fee9](https://github.com/npm/template-oss/commit/cd3fee91d8bf54d6bd9b71406b9282c19aae0689))
+
+
+### Dependencies
+
+* yaml@2.0.0-11 ([a1e3c57](https://github.com/npm/template-oss/commit/a1e3c57a146238bda04ee80f50c8306b4aab36c3))
+
 ### [3.2.1](https://github.com/npm/template-oss/compare/v3.2.0...v3.2.1) (2022-03-29)
 
 
