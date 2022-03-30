@@ -1,6 +1,9 @@
 - uses: actions/setup-node@v3
   with:
     node-version: {{#if useMatrix}}$\{{ matrix.node-version }}{{else}}{{#each ciVersions}}{{#if @last}}{{.}}{{/if}}{{/each}}{{/if}}
+    {{#if lockfile}}
+    cache: npm
+    {{/if}}
 {{#if useMatrix}}
 - name: Update to workable npm (windows)
   # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
