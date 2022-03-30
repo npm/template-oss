@@ -300,7 +300,7 @@ name: Post Dependabot Actions
 
 on: pull_request
 
-# https://docs.github.com/en/rest/overview/permissions-required-for-github-apps
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#permissions
 permissions:
   actions: write
   contents: write
@@ -964,7 +964,7 @@ name: Post Dependabot Actions
 
 on: pull_request
 
-# https://docs.github.com/en/rest/overview/permissions-required-for-github-apps
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#permissions
 permissions:
   actions: write
   contents: write
