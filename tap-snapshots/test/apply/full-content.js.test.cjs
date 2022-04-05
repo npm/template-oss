@@ -302,11 +302,10 @@ on: pull_request
 
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#permissions
 permissions:
-  actions: write
   contents: write
 
 jobs:
-  Install:
+  template-oss-apply:
     runs-on: ubuntu-latest
     if: github.actor == 'dependabot[bot]'
     steps:
@@ -967,11 +966,10 @@ on: pull_request
 
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#permissions
 permissions:
-  actions: write
   contents: write
 
 jobs:
-  Install:
+  template-oss-apply:
     runs-on: ubuntu-latest
     if: github.actor == 'dependabot[bot]'
     steps:
