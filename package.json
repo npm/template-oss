@@ -34,7 +34,7 @@
     "@npmcli/fs": "^2.0.1",
     "@npmcli/git": "^3.0.0",
     "@npmcli/map-workspaces": "^2.0.2",
-    "@npmcli/package-json": "^1.0.1",
+    "@npmcli/package-json": "^2.0.0",
     "diff": "^5.0.0",
     "handlebars": "^4.7.7",
     "hosted-git-info": "^5.0.0",
