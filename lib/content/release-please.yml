@@ -22,6 +22,9 @@ jobs:
           {{#if pkgRelPath}}
           monorepo-tags: true
           path: {{pkgRelPath}}
+          # name can be removed after this is merged
+          # https://github.com/google-github-actions/release-please-action/pull/459
+          package-name: "{{pkgName}}"
           {{/if}}
           changelog-types: >
             [
