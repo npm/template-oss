@@ -1,5 +1,12 @@
 # Changelog
 
+### [3.3.2](https://github.com/npm/template-oss/compare/v3.3.1...v3.3.2) (2022-04-06)
+
+
+### Bug Fixes
+
+* add pull requests permissions to release please ([#129](https://github.com/npm/template-oss/issues/129)) ([82064ff](https://github.com/npm/template-oss/commit/82064ff6f7cacaa2c5fb9ebad0eaee1209963f8e))
+
 ### [3.3.1](https://github.com/npm/template-oss/compare/v3.3.0...v3.3.1) (2022-04-06)
 
 
