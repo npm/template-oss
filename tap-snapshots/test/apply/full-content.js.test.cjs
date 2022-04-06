@@ -1067,6 +1067,9 @@ jobs:
           release-type: node
           monorepo-tags: true
           path: workspaces/b
+          # name can be removed after this is merged
+          # https://github.com/google-github-actions/release-please-action/pull/459
+          package-name: "bbb"
           changelog-types: >
             [
               {"type":"feat","section":"Features","hidden":false},
@@ -1100,6 +1103,9 @@ jobs:
           release-type: node
           monorepo-tags: true
           path: workspaces/a
+          # name can be removed after this is merged
+          # https://github.com/google-github-actions/release-please-action/pull/459
+          package-name: "@name/aaaa"
           changelog-types: >
             [
               {"type":"feat","section":"Features","hidden":false},
