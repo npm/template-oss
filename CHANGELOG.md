@@ -1,5 +1,26 @@
 # Changelog
 
+## [3.3.0](https://github.com/npm/template-oss/compare/v3.2.2...v3.3.0) (2022-04-06)
+
+
+### Features
+
+* add audit and fund flags to install ([0555d67](https://github.com/npm/template-oss/commit/0555d670b6f4ebc5929e65af28daae1e34599369)), closes [#108](https://github.com/npm/template-oss/issues/108)
+* add lockfile option to control npmrc and ci cache ([9ab4497](https://github.com/npm/template-oss/commit/9ab449797deda9d3c02d582def9c8eaec342e943))
+* update root package-lock after workspace releases ([#125](https://github.com/npm/template-oss/issues/125)) ([bd3da0e](https://github.com/npm/template-oss/commit/bd3da0ebda3f7fa7c424379e07aa2863fc831feb))
+
+
+### Bug Fixes
+
+* explicitly set package-name for release please workspaces ([f6aa844](https://github.com/npm/template-oss/commit/f6aa84473c2fc70676ea4b2da356ea9e5a23d5b5))
+* remove actions permission from post-dependabot ([a245bbc](https://github.com/npm/template-oss/commit/a245bbcb0f476b7e4426387af4e453c91e2ff97e))
+* update comment link to github permissions ([#117](https://github.com/npm/template-oss/issues/117)) ([ba5907b](https://github.com/npm/template-oss/commit/ba5907b96343bec8059544736fa154c951353de5))
+
+
+### Dependencies
+
+* bump @npmcli/package-json from 1.0.1 to 2.0.0 ([#122](https://github.com/npm/template-oss/issues/122)) ([afe6fb1](https://github.com/npm/template-oss/commit/afe6fb17c31629751dfa512767a7a84739a2511c))
+
 ### [3.2.2](https://github.com/npm/template-oss/compare/v3.2.1...v3.2.2) (2022-03-29)
 
 
