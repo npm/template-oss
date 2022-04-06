@@ -14,6 +14,7 @@ on:
 {{#if isWorkspace}}
 permissions:
   contents: write
+  pull-requests: write
 {{/if}}
 
 jobs:
