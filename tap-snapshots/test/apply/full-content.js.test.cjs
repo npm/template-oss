@@ -1058,6 +1058,8 @@ on:
     branches:
       - main
       - latest
+permissions:
+  contents: write
 
 jobs:
   release-please:
@@ -1076,7 +1078,29 @@ jobs:
               {"type":"docs","section":"Documentation","hidden":false},
               {"type":"deps","section":"Dependencies","hidden":false},
               {"type":"chore","hidden":true}
-            ]
+            ]      - uses: actions/checkout@v3
+      - name: Setup git user
+        run: |
+          git config --global user.email "ops+npm-cli@npmjs.com"
+          git config --global user.name "npm cli ops bot"
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - name: Update npm to latest
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+      - run: npm -v
+      - name: Update package-lock.json and commit
+        if: steps.release.outputs.pr
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr checkout \${{ fromJSON(steps.release.outputs.pr).number }}
+          npm run resetdeps
+          title="\${{ fromJSON(steps.release.outputs.pr).title }}"
+          # get the version from the pr title
+          # get everything after the last space
+          git commit -am "deps: bbb@\${title##* }"
+          git push
 
 .github/workflows/release-please-name-aaaa.yml
 ========================================
@@ -1091,6 +1115,8 @@ on:
     branches:
       - main
       - latest
+permissions:
+  contents: write
 
 jobs:
   release-please:
@@ -1109,7 +1135,29 @@ jobs:
               {"type":"docs","section":"Documentation","hidden":false},
               {"type":"deps","section":"Dependencies","hidden":false},
               {"type":"chore","hidden":true}
-            ]
+            ]      - uses: actions/checkout@v3
+      - name: Setup git user
+        run: |
+          git config --global user.email "ops+npm-cli@npmjs.com"
+          git config --global user.name "npm cli ops bot"
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - name: Update npm to latest
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+      - run: npm -v
+      - name: Update package-lock.json and commit
+        if: steps.release.outputs.pr
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr checkout \${{ fromJSON(steps.release.outputs.pr).number }}
+          npm run resetdeps
+          title="\${{ fromJSON(steps.release.outputs.pr).title }}"
+          # get the version from the pr title
+          # get everything after the last space
+          git commit -am "deps: @name/aaaa@\${title##* }"
+          git push
 
 .github/workflows/release-please.yml
 ========================================

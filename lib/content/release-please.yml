@@ -11,6 +11,11 @@ on:
       - {{.}}
       {{/each}}
 
+{{~#if isWorkspace}}
+permissions:
+  contents: write
+{{/if}}
+
 jobs:
   release-please:
     runs-on: ubuntu-latest
@@ -29,3 +34,19 @@ jobs:
               {{{json .}}}{{#unless @last}},{{/unless}}
               {{/each}}
             ]
+      {{~#if isWorkspace}}
+      {{> setupGit}}
+      {{> setupNode}}
+      - name: Update package-lock.json and commit
+        if: steps.release.outputs.pr
+        env:
+          GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr checkout $\{{ fromJSON(steps.release.outputs.pr).number }}
+          npm run resetdeps
+          title="$\{{ fromJSON(steps.release.outputs.pr).title }}"
+          # get the version from the pr title
+          # get everything after the last space
+          git commit -am "deps: {{pkgName}}@${title##* }"
+          git push
+      {{/if}}
