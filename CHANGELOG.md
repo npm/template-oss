@@ -1,5 +1,12 @@
 # Changelog
 
+### [3.3.1](https://github.com/npm/template-oss/compare/v3.3.0...v3.3.1) (2022-04-06)
+
+
+### Bug Fixes
+
+* yaml newlines in release please action ([#127](https://github.com/npm/template-oss/issues/127)) ([a64af5d](https://github.com/npm/template-oss/commit/a64af5de1e340ff12ce833b9b0cf6b06615ec6cd))
+
 ## [3.3.0](https://github.com/npm/template-oss/compare/v3.2.2...v3.3.0) (2022-04-06)
 
 
