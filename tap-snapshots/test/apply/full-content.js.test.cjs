@@ -1059,6 +1059,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   release-please:
@@ -1121,6 +1122,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   release-please:
