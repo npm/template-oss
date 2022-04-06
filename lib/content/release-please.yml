@@ -11,7 +11,7 @@ on:
       - {{.}}
       {{/each}}
 
-{{~#if isWorkspace}}
+{{#if isWorkspace}}
 permissions:
   contents: write
 {{/if}}
@@ -37,7 +37,7 @@ jobs:
               {{{json .}}}{{#unless @last}},{{/unless}}
               {{/each}}
             ]
-      {{~#if isWorkspace}}
+      {{#if isWorkspace}}
       {{> setupGit}}
       {{> setupNode}}
       - name: Update package-lock.json and commit
