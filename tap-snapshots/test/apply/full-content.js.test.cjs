@@ -1056,6 +1056,7 @@ on:
     branches:
       - main
       - latest
+
 permissions:
   contents: write
 
@@ -1079,7 +1080,8 @@ jobs:
               {"type":"docs","section":"Documentation","hidden":false},
               {"type":"deps","section":"Dependencies","hidden":false},
               {"type":"chore","hidden":true}
-            ]      - uses: actions/checkout@v3
+            ]
+      - uses: actions/checkout@v3
       - name: Setup git user
         run: |
           git config --global user.email "ops+npm-cli@npmjs.com"
@@ -1116,6 +1118,7 @@ on:
     branches:
       - main
       - latest
+
 permissions:
   contents: write
 
@@ -1139,7 +1142,8 @@ jobs:
               {"type":"docs","section":"Documentation","hidden":false},
               {"type":"deps","section":"Dependencies","hidden":false},
               {"type":"chore","hidden":true}
-            ]      - uses: actions/checkout@v3
+            ]
+      - uses: actions/checkout@v3
       - name: Setup git user
         run: |
           git config --global user.email "ops+npm-cli@npmjs.com"
