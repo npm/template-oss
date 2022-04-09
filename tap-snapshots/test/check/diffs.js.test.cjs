@@ -311,7 +311,7 @@ The repo file ci.yml needs to be updated:
   .github/workflows/ci.yml
   ========================================
   @@ -63,4 +63,24 @@
-             git config --global user.name "npm cli ops bot"
+             git config --global user.name "ops+robot@npmjs.com"
          - uses: actions/setup-node@v3
            with:
              node-version: \${{ matrix.node-version }}
@@ -365,8 +365,8 @@ The repo file audit.yml needs to be updated:
         - uses: actions/checkout@v3
         - name: Setup git user
           run: |
-            git config --global user.email "ops+npm-cli@npmjs.com"
-            git config --global user.name "npm cli ops bot"
+            git config --global user.email "npm team"
+            git config --global user.name "ops+robot@npmjs.com"
         - uses: actions/setup-node@v3
           with:
             node-version: 16.x
