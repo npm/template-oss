@@ -5,17 +5,17 @@
     "lint": "eslint \"**/*.js\"",
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
-    "lintfix": "npm run lint -- --fix",
-    "preversion": "npm test",
+    "lintfix": "{{npmBin}} run lint -- --fix",
+    "preversion": "{{npmBin}} test",
     {{#if pkgPrivate}}
     "postversion": "git push origin --follow-tags",
     {{else}}
-    "postversion": "npm publish",
+    "postversion": "{{npmBin}} publish",
     "prepublishOnly": "git push origin --follow-tags",
     {{/if}}
     "snap": "tap",
     "test": "tap",
-    "posttest": "npm run lint",
+    "posttest": "{{npmBin}} run lint",
     "template-copy": {{{del}}},
     "lint:fix": {{{del}}}
   },
