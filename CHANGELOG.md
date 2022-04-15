@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.4.0](https://github.com/npm/template-oss/compare/v3.3.2...v3.4.0) (2022-04-15)
+
+
+### Features
+
+* allow option to set npm bin in package.json ([32f7f7c](https://github.com/npm/template-oss/commit/32f7f7c3df80b40a7536182e72b883d77ba46e64))
+
+
+### Bug Fixes
+
+* dont create release please for private root pkg ([2f7dcfa](https://github.com/npm/template-oss/commit/2f7dcfa8c8f00677ad24ad15dd059556f1dfa1e8))
+* lockfile setting adds lockfile to allowed gitignore ([c808c4f](https://github.com/npm/template-oss/commit/c808c4ffd8ed7d1c198736a815df15e9a68ebb9c))
+* use ops+robot as git user for all ci ([aeb0162](https://github.com/npm/template-oss/commit/aeb0162f68358f5783f63868a0c7c79d327f87fe))
+
 ### [3.3.2](https://github.com/npm/template-oss/compare/v3.3.1...v3.3.2) (2022-04-06)
 
 
