@@ -12,6 +12,9 @@
 !/README*
 !/LICENSE*
 !/CHANGELOG*
+{{#if lockfile}}
+package-lock.json
+{{/if}}
 {{#each ignorePaths}}
 {{.}}
 {{/each}}
