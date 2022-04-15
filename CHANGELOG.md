@@ -1,5 +1,12 @@
 # Changelog
 
+### [3.4.1](https://github.com/npm/template-oss/compare/v3.4.0...v3.4.1) (2022-04-15)
+
+
+### Bug Fixes
+
+* properly allow package-lock when lockfile=true ([c613429](https://github.com/npm/template-oss/commit/c613429d2b46d94561aa20a8d39ca969a30f4391))
+
 ## [3.4.0](https://github.com/npm/template-oss/compare/v3.3.2...v3.4.0) (2022-04-15)
 
 
