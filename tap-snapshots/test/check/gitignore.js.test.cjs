@@ -13,6 +13,7 @@ Some problems were detected:
 The following files are tracked by git but matching a pattern in .gitignore:
 
   ignorethis
+  package-lock.json
 
 To correct it: move files to not match one of the following patterns:
 

@@ -9,6 +9,7 @@ t.test('will report tracked files in gitignore', async (t) => {
   const s = await setup.git(t, { ok: true })
 
   await s.writeFile('ignorethis', 'empty')
+  await s.writeFile('package-lock.json', '{}')
 
   await s.gca()
   await s.apply()
@@ -62,4 +63,21 @@ t.test('works with workspaces in separate dirs', async (t) => {
   await s.gca()
   await s.apply()
   await t.resolveMatchSnapshot(s.check())
+})
+
+t.test('allow package-lock', async (t) => {
+  const s = await setup.git(t, {
+    ok: true,
+    package: {
+      templateOSS: {
+        lockfile: true,
+      },
+    },
+  })
+
+  await s.writeFile('package-lock.json', '{}')
+
+  await s.gca()
+  await s.apply()
+  t.strictSame(await s.check(), [])
 })
