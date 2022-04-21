@@ -36,6 +36,7 @@
     "@npmcli/map-workspaces": "^2.0.2",
     "@npmcli/package-json": "^2.0.0",
     "diff": "^5.0.0",
+    "glob": "^8.0.1",
     "handlebars": "^4.7.7",
     "hosted-git-info": "^5.0.0",
     "json-parse-even-better-errors": "^2.3.1",
