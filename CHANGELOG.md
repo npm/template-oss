@@ -1,5 +1,13 @@
 # Changelog
 
+### [3.4.2](https://github.com/npm/template-oss/compare/v3.4.1...v3.4.2) (2022-04-22)
+
+
+### Bug Fixes
+
+* correctly set git user and email ([eb55928](https://github.com/npm/template-oss/commit/eb55928ada5db8657c57a568057aa886fa8dae4b))
+* properly install and use glob ([9bf3126](https://github.com/npm/template-oss/commit/9bf3126b03c8fa8629004ceb0fe0de480fc451f9))
+
 ### [3.4.1](https://github.com/npm/template-oss/compare/v3.4.0...v3.4.1) (2022-04-15)
 
 
