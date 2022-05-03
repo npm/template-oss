@@ -23,6 +23,8 @@ module.exports = {
 ========================================
 /* This file is automatically added by @npmcli/template-oss. Do not edit. */
 
+'use strict'
+
 const { readdirSync: readdir } = require('fs')
 
 const localConfigs = readdir(__dirname)
@@ -496,6 +498,8 @@ module.exports = {
 .eslintrc.js
 ========================================
 /* This file is automatically added by @npmcli/template-oss. Do not edit. */
+
+'use strict'
 
 const { readdirSync: readdir } = require('fs')
 
@@ -1277,6 +1281,8 @@ workspaces/a/.eslintrc.js
 ========================================
 /* This file is automatically added by @npmcli/template-oss. Do not edit. */
 
+'use strict'
+
 const { readdirSync: readdir } = require('fs')
 
 const localConfigs = readdir(__dirname)
@@ -1352,6 +1358,8 @@ workspaces/a/package.json
 workspaces/b/.eslintrc.js
 ========================================
 /* This file is automatically added by @npmcli/template-oss. Do not edit. */
+
+'use strict'
 
 const { readdirSync: readdir } = require('fs')
 
