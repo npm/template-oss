@@ -1,5 +1,12 @@
 # Changelog
 
+### [3.4.3](https://github.com/npm/template-oss/compare/v3.4.2...v3.4.3) (2022-05-03)
+
+
+### Bug Fixes
+
+* add 'use strict' to .eslintrc.js ([#141](https://github.com/npm/template-oss/issues/141)) ([6486967](https://github.com/npm/template-oss/commit/64869675f597eaf96e491b19edb8718db9939352))
+
 ### [3.4.2](https://github.com/npm/template-oss/compare/v3.4.1...v3.4.2) (2022-04-22)
 
 
