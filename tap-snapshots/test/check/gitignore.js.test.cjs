@@ -33,6 +33,7 @@ To correct it: move files to not match one of the following patterns:
   !/.github/
   !/.gitignore
   !/.npmrc
+  !/CODE_OF_CONDUCT.md
   !/SECURITY.md
   !/bin/
   !/lib/
@@ -68,6 +69,7 @@ To correct it: move files to not match one of the following patterns:
   !/.github/
   !/.gitignore
   !/.npmrc
+  !/CODE_OF_CONDUCT.md
   !/SECURITY.md
   !/bin/
   !/lib/
@@ -154,6 +156,7 @@ To correct it: move files to not match one of the following patterns:
   !/.github/
   !/.gitignore
   !/.npmrc
+  !/CODE_OF_CONDUCT.md
   !/SECURITY.md
   !/bin/
   !/lib/

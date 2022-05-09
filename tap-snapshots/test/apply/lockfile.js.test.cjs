@@ -29,6 +29,7 @@ exports[`test/apply/lockfile.js TAP lockfile > expect resolving Promise 1`] = `
 !/.github/
 !/.gitignore
 !/.npmrc
+!/CODE_OF_CONDUCT.md
 !/SECURITY.md
 !/bin/
 !/lib/
@@ -66,6 +67,7 @@ exports[`test/apply/lockfile.js TAP no lockfile by default > expect resolving Pr
 !/.github/
 !/.gitignore
 !/.npmrc
+!/CODE_OF_CONDUCT.md
 !/SECURITY.md
 !/bin/
 !/lib/
