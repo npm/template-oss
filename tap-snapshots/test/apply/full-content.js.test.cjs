@@ -147,8 +147,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup git user
         run: |
-          git config --global user.email "ops+robot@npmjs.com"
-          git config --global user.name "npm team"
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
@@ -184,8 +184,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup git user
         run: |
-          git config --global user.email "ops+robot@npmjs.com"
-          git config --global user.name "npm team"
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
@@ -221,8 +221,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup git user
         run: |
-          git config --global user.email "ops+robot@npmjs.com"
-          git config --global user.name "npm team"
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
           node-version: \${{ matrix.node-version }}
@@ -285,8 +285,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup git user
         run: |
-          git config --global user.email "ops+robot@npmjs.com"
-          git config --global user.name "npm team"
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v1
         with:
@@ -314,8 +314,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup git user
         run: |
-          git config --global user.email "ops+robot@npmjs.com"
-          git config --global user.name "npm team"
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
@@ -364,8 +364,8 @@ jobs:
           fetch-depth: 0
       - name: Setup git user
         run: |
-          git config --global user.email "ops+robot@npmjs.com"
-          git config --global user.name "npm team"
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
@@ -627,8 +627,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup git user
         run: |
-          git config --global user.email "ops+robot@npmjs.com"
-          git config --global user.name "npm team"
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
@@ -668,8 +668,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup git user
         run: |
-          git config --global user.email "ops+robot@npmjs.com"
-          git config --global user.name "npm team"
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
@@ -705,8 +705,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup git user
         run: |
-          git config --global user.email "ops+robot@npmjs.com"
-          git config --global user.name "npm team"
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
           node-version: \${{ matrix.node-version }}
@@ -761,8 +761,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup git user
         run: |
-          git config --global user.email "ops+robot@npmjs.com"
-          git config --global user.name "npm team"
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
@@ -798,8 +798,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup git user
         run: |
-          git config --global user.email "ops+robot@npmjs.com"
-          git config --global user.name "npm team"
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
           node-version: \${{ matrix.node-version }}
@@ -850,8 +850,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup git user
         run: |
-          git config --global user.email "ops+robot@npmjs.com"
-          git config --global user.name "npm team"
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
@@ -887,8 +887,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup git user
         run: |
-          git config --global user.email "ops+robot@npmjs.com"
-          git config --global user.name "npm team"
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
           node-version: \${{ matrix.node-version }}
@@ -951,8 +951,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup git user
         run: |
-          git config --global user.email "ops+robot@npmjs.com"
-          git config --global user.name "npm team"
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v1
         with:
@@ -980,8 +980,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup git user
         run: |
-          git config --global user.email "ops+robot@npmjs.com"
-          git config --global user.name "npm team"
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
@@ -1030,8 +1030,8 @@ jobs:
           fetch-depth: 0
       - name: Setup git user
         run: |
-          git config --global user.email "ops+robot@npmjs.com"
-          git config --global user.name "npm team"
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
@@ -1089,8 +1089,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup git user
         run: |
-          git config --global user.email "ops+robot@npmjs.com"
-          git config --global user.name "npm team"
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
@@ -1152,8 +1152,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup git user
         run: |
-          git config --global user.email "ops+robot@npmjs.com"
-          git config --global user.name "npm team"
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
