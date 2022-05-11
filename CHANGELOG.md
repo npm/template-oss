@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.5.0](https://github.com/npm/template-oss/compare/v3.4.3...v3.5.0) (2022-05-11)
+
+
+### Features
+
+* add CODE_OF_CONDUCT.md ([#146](https://github.com/npm/template-oss/issues/146)) ([ad8c6fc](https://github.com/npm/template-oss/commit/ad8c6fc7bd06bb9edb3b44619d9bf5fc306bcb0b))
+
+
+### Bug Fixes
+
+* update bot account information ([#147](https://github.com/npm/template-oss/issues/147)) ([f802204](https://github.com/npm/template-oss/commit/f802204efa59a30a138d2338c478e357562b7fb1))
+
 ### [3.4.3](https://github.com/npm/template-oss/compare/v3.4.2...v3.4.3) (2022-05-03)
 
 
