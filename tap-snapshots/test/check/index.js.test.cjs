@@ -34,6 +34,7 @@ The following module files need to be added:
   .gitignore
   .npmrc
   SECURITY.md
+  CODE_OF_CONDUCT.md
 
 To correct it: npx template-oss-apply --force
 
@@ -112,6 +113,7 @@ The following module files need to be added:
   .gitignore
   .npmrc
   SECURITY.md
+  CODE_OF_CONDUCT.md
 
 To correct it: npx template-oss-apply --force
 

@@ -28,6 +28,7 @@ exports[`test/apply/index.js TAP turn off repo > expect resolving Promise 1`] = 
 .eslintrc.js
 .gitignore
 .npmrc
+CODE_OF_CONDUCT.md
 SECURITY.md
 package.json
 `

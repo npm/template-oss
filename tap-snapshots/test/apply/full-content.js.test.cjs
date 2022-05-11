@@ -433,6 +433,7 @@ jobs:
 !/.github/
 !/.gitignore
 !/.npmrc
+!/CODE_OF_CONDUCT.md
 !/SECURITY.md
 !/bin/
 !/lib/
@@ -443,6 +444,16 @@ jobs:
 ; This file is automatically added by @npmcli/template-oss. Do not edit.
 
 package-lock=false
+
+CODE_OF_CONDUCT.md
+========================================
+<!-- This file is automatically added by @npmcli/template-oss. Do not edit. -->
+
+All interactions in this repo are covered by the [npm Code of
+Conduct](https://docs.npmjs.com/policies/conduct)
+
+The npm cli team may, at its own discretion, moderate, remove, or edit
+any interactions such as pull requests, issues, and comments.
 
 SECURITY.md
 ========================================
@@ -1225,6 +1236,7 @@ jobs:
 !/.github/
 !/.gitignore
 !/.npmrc
+!/CODE_OF_CONDUCT.md
 !/SECURITY.md
 !/bin/
 !/lib/
@@ -1236,6 +1248,16 @@ jobs:
 ; This file is automatically added by @npmcli/template-oss. Do not edit.
 
 package-lock=false
+
+CODE_OF_CONDUCT.md
+========================================
+<!-- This file is automatically added by @npmcli/template-oss. Do not edit. -->
+
+All interactions in this repo are covered by the [npm Code of
+Conduct](https://docs.npmjs.com/policies/conduct)
+
+The npm cli team may, at its own discretion, moderate, remove, or edit
+any interactions such as pull requests, issues, and comments.
 
 SECURITY.md
 ========================================
