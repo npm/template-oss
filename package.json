@@ -45,7 +45,7 @@
     "npm-package-arg": "^9.0.1",
     "proc-log": "^2.0.0",
     "semver": "^7.3.5",
-    "yaml": "^2.0.0-11"
+    "yaml": "2.0.0-11"
   },
   "files": [
     "bin/",
