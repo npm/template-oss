@@ -15,6 +15,7 @@ exports[`test/apply/index.js TAP turn off module > expect resolving Promise 1`] 
 .github/ISSUE_TEMPLATE/bug.yml
 .github/ISSUE_TEMPLATE/config.yml
 .github/dependabot.yml
+.github/matchers/tap.json
 .github/workflows/audit.yml
 .github/workflows/ci.yml
 .github/workflows/codeql-analysis.yml

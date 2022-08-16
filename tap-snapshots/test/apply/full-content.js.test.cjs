@@ -128,6 +128,41 @@ updates:
     labels:
       - "Dependencies"
 
+.github/matchers/tap.json
+========================================
+{
+  "//@npmcli/template-oss": "This file is automatically added by @npmcli/template-oss. Do not edit.",
+  "problemMatcher": [
+    {
+      "owner": "tap",
+      "pattern": [
+        {
+          "regexp": "^/s*not ok /d+ - (.*)",
+          "message": 1
+        },
+        {
+          "regexp": "^/s*---"
+        },
+        {
+          "regexp": "^/s*at:"
+        },
+        {
+          "regexp": "^/s*line:/s*(/d+)",
+          "line": 1
+        },
+        {
+          "regexp": "^/s*column:/s*(/d+)",
+          "column": 1
+        },
+        {
+          "regexp": "^/s*file:/s*(.*)",
+          "file": 1
+        }
+      ]
+    }
+  ]
+}
+
 .github/workflows/audit.yml
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
@@ -244,6 +279,8 @@ jobs:
         if: \${{ !startsWith(matrix.node-version, '10.') }}
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
+      - name: add tap problem matcher
+        run: echo "::add-matcher::.github/matchers/tap.json"
       - run: npm i --ignore-scripts --no-audit --no-fund
       - run: npm test --ignore-scripts
 
@@ -619,6 +656,41 @@ updates:
     labels:
       - "Dependencies"
 
+.github/matchers/tap.json
+========================================
+{
+  "//@npmcli/template-oss": "This file is automatically added by @npmcli/template-oss. Do not edit.",
+  "problemMatcher": [
+    {
+      "owner": "tap",
+      "pattern": [
+        {
+          "regexp": "^/s*not ok /d+ - (.*)",
+          "message": 1
+        },
+        {
+          "regexp": "^/s*---"
+        },
+        {
+          "regexp": "^/s*at:"
+        },
+        {
+          "regexp": "^/s*line:/s*(/d+)",
+          "line": 1
+        },
+        {
+          "regexp": "^/s*column:/s*(/d+)",
+          "column": 1
+        },
+        {
+          "regexp": "^/s*file:/s*(.*)",
+          "file": 1
+        }
+      ]
+    }
+  ]
+}
+
 .github/workflows/audit.yml
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
@@ -739,6 +811,8 @@ jobs:
         if: \${{ !startsWith(matrix.node-version, '10.') }}
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
+      - name: add tap problem matcher
+        run: echo "::add-matcher::.github/matchers/tap.json"
       - run: npm i --ignore-scripts --no-audit --no-fund
       - run: npm test --ignore-scripts -w bbb
 
@@ -832,6 +906,8 @@ jobs:
         if: \${{ !startsWith(matrix.node-version, '10.') }}
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
+      - name: add tap problem matcher
+        run: echo "::add-matcher::.github/matchers/tap.json"
       - run: npm i --ignore-scripts --no-audit --no-fund
       - run: npm test --ignore-scripts -w @name/aaaa
 
@@ -921,6 +997,8 @@ jobs:
         if: \${{ !startsWith(matrix.node-version, '10.') }}
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
+      - name: add tap problem matcher
+        run: echo "::add-matcher::.github/matchers/tap.json"
       - run: npm i --ignore-scripts --no-audit --no-fund
       - run: npm test --ignore-scripts
 
