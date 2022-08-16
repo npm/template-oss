@@ -310,13 +310,11 @@ The repo file ci.yml needs to be updated:
 
   .github/workflows/ci.yml
   ========================================
-  @@ -63,4 +63,24 @@
-             git config --global user.name "npm CLI robot"
-         - uses: actions/setup-node@v3
+  @@ -65,4 +65,24 @@
            with:
              node-version: \${{ matrix.node-version }}
-  +      - name: Update to workable npm (windows)
-  +        # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
+         - name: Update to workable npm (windows)
+           # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
   +        if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
   +        run: |
   +          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
@@ -333,6 +331,8 @@ The repo file ci.yml needs to be updated:
   +        if: \${{ !startsWith(matrix.node-version, '10.') }}
   +        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
   +      - run: npm -v
+  +      - name: add tap problem matcher
+  +        run: echo "::add-matcher::.github/matchers/tap.json"
   +      - run: npm i --ignore-scripts --no-audit --no-fund
   +      - run: npm test --ignore-scripts
 

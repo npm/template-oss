@@ -18,6 +18,7 @@ The following repo files need to be added:
   .github/ISSUE_TEMPLATE/config.yml
   .github/CODEOWNERS
   .github/dependabot.yml
+  .github/matchers/tap.json
   .github/workflows/audit.yml
   .github/workflows/codeql-analysis.yml
   .github/workflows/post-dependabot.yml
@@ -97,6 +98,7 @@ The following repo files need to be added:
   .github/ISSUE_TEMPLATE/config.yml
   .github/CODEOWNERS
   .github/dependabot.yml
+  .github/matchers/tap.json
   .github/workflows/audit.yml
   .github/workflows/codeql-analysis.yml
   .github/workflows/post-dependabot.yml
