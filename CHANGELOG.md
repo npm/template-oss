@@ -1,5 +1,20 @@
 # Changelog
 
+## [3.6.0](https://github.com/npm/template-oss/compare/v3.5.0...v3.6.0) (2022-08-22)
+
+
+### Features
+
+* add a problem matcher for tap output ([#160](https://github.com/npm/template-oss/issues/160)) ([8176e44](https://github.com/npm/template-oss/commit/8176e44f9764e09e7d5c52c2aadfc1c0ca228af3))
+* make cron workflows run early PT ([#159](https://github.com/npm/template-oss/issues/159)) ([6f571eb](https://github.com/npm/template-oss/commit/6f571eb93c2c101926a8dae7b7160e981c208ab7))
+
+
+### Bug Fixes
+
+* compare to \n instead of os.EOL ([#157](https://github.com/npm/template-oss/issues/157)) ([5517e9e](https://github.com/npm/template-oss/commit/5517e9eb0f081217423a2c193eabe2496c08eaab))
+* pin yaml to 2.0.0-11 ([#161](https://github.com/npm/template-oss/issues/161)) ([e095275](https://github.com/npm/template-oss/commit/e095275f229c66d8820f4edc5b801ceee60538df))
+* remove more usage of os.EOL ([#162](https://github.com/npm/template-oss/issues/162)) ([4dde648](https://github.com/npm/template-oss/commit/4dde648deb0d880d12f8810914309a9aa0947010))
+
 ## [3.5.0](https://github.com/npm/template-oss/compare/v3.4.3...v3.5.0) (2022-05-11)
 
 
