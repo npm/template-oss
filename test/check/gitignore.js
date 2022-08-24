@@ -44,12 +44,14 @@ t.test('works with workspaces in separate dirs', async (t) => {
       'workspace-a': {
         'package.json': JSON.stringify({
           name: 'a',
+          version: '1.0.0',
           ...setup.okPackage(),
         }),
       },
       'workspace-b': {
         'package.json': JSON.stringify({
           name: 'b',
+          version: '1.0.0',
           ...setup.okPackage(),
         }),
       },

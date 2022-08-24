@@ -33,11 +33,13 @@ To correct it: move files to not match one of the following patterns:
   !/.github/
   !/.gitignore
   !/.npmrc
+  !/.release-please-manifest.json
   !/CODE_OF_CONDUCT.md
   !/SECURITY.md
   !/bin/
   !/lib/
   !/package.json
+  !/release-please-config.json
 
 -------------------------------------------------------------------
 `
@@ -69,11 +71,13 @@ To correct it: move files to not match one of the following patterns:
   !/.github/
   !/.gitignore
   !/.npmrc
+  !/.release-please-manifest.json
   !/CODE_OF_CONDUCT.md
   !/SECURITY.md
   !/bin/
   !/lib/
   !/package.json
+  !/release-please-config.json
   !/workspaces/
 
 -------------------------------------------------------------------
@@ -156,11 +160,13 @@ To correct it: move files to not match one of the following patterns:
   !/.github/
   !/.gitignore
   !/.npmrc
+  !/.release-please-manifest.json
   !/CODE_OF_CONDUCT.md
   !/SECURITY.md
   !/bin/
   !/lib/
   !/package.json
+  !/release-please-config.json
   !/workspace-a
   !/workspace-b
 

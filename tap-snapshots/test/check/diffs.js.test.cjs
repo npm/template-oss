@@ -72,6 +72,7 @@ package.json
 ========================================
 {
   "name": "testpkg",
+  "version": "1.0.0",
   "templateOSS": {
     "version": "{{VERSION}}"
   }
@@ -118,6 +119,7 @@ package.json
 ========================================
 {
   "name": "testpkg",
+  "version": "1.0.0",
   "templateOSS": {
     "version": "{{VERSION}}"
   }
@@ -170,6 +172,7 @@ package.json
 ========================================
 {
   "name": "testpkg",
+  "version": "1.0.0",
   "templateOSS": {
     "version": "{{VERSION}}"
   }
@@ -214,6 +217,7 @@ package.json
 ========================================
 {
   "name": "testpkg",
+  "version": "1.0.0",
   "templateOSS": {
     "version": "{{VERSION}}"
   }
@@ -289,6 +293,7 @@ package.json
 ========================================
 {
   "name": "testpkg",
+  "version": "1.0.0",
   "templateOSS": {
     "version": "{{VERSION}}"
   }

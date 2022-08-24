@@ -76,7 +76,9 @@ t.test('workspaces', async (t) => {
 
 t.test('private workspace', async (t) => {
   const s = await setup(t, {
-    package: {},
+    package: {
+      name: 'root-pkg',
+    },
     workspaces: {
       a: { private: true },
       b: {},
@@ -86,6 +88,8 @@ t.test('private workspace', async (t) => {
 
   const pkg = await s.readJson(join('workspaces', 'b', 'package.json'))
   const privatePkg = await s.readJson(join('workspaces', 'a', 'package.json'))
+  const rpManifest = await s.readJson('.release-please-manifest.json')
+  const rpConfig = await s.readJson('release-please-config.json')
 
   t.ok(pkg.scripts.prepublishOnly)
   t.ok(pkg.scripts.postversion)
@@ -95,8 +99,15 @@ t.test('private workspace', async (t) => {
 
   t.equal(pkg.scripts.prepublishOnly, privatePkg.scripts.postversion)
 
+  t.equal(rpManifest['.'], '1.0.0')
+  t.equal(rpManifest['workspaces/b'], '1.0.0')
+  t.notOk(rpManifest['workspaces/a'])
+  t.ok(rpConfig.packages['.'])
+  t.ok(rpConfig.packages['workspaces/b'])
+  t.notOk(rpConfig.packages['workspaces/a'])
+
   const rp = s.join('.github', 'workflows')
   t.ok(fs.existsSync(join(rp, 'release-please.yml')))
-  t.ok(fs.existsSync(join(rp, 'release-please-b.yml')))
+  t.notOk(fs.existsSync(join(rp, 'release-please-b.yml')))
   t.notOk(fs.existsSync(join(rp, 'release-please-a.yml')))
 })

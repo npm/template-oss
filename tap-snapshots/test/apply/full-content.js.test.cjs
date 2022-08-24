@@ -430,22 +430,53 @@ on:
       - main
       - latest
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    outputs:
+      prs: \${{ steps.release.outputs.prs }}
     steps:
       - uses: google-github-actions/release-please-action@v3
         id: release
         with:
-          release-type: node
-          changelog-types: >
-            [
-              {"type":"feat","section":"Features","hidden":false},
-              {"type":"fix","section":"Bug Fixes","hidden":false},
-              {"type":"docs","section":"Documentation","hidden":false},
-              {"type":"deps","section":"Dependencies","hidden":false},
-              {"type":"chore","hidden":true}
-            ]
+          command: manifest
+
+  update-prs:
+    needs: release-please
+    if: needs.release-please.outputs.prs
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        pr: \${{ fromJSON(needs.release-please.outputs.prs) }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup git user
+        run: |
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - name: Update npm to latest
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+      - run: npm -v
+      - name: Update PR \${{ matrix.pr.number }} dependencies and commit
+        if: steps.release.outputs.pr
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr checkout \${{ matrix.pr.number }}
+          npm run resetdeps
+          title="\${{ matrix.pr.title }}"
+          # get the dependency spec from the pr title
+          # get everything after ': release ' + replace space with @
+          dep_spec=$(echo "\${title##*: release }" | tr ' ' @)
+          git commit -am "deps: $dep_spec"
+          git push
 
 .gitignore
 ========================================
@@ -470,17 +501,25 @@ jobs:
 !/.github/
 !/.gitignore
 !/.npmrc
+!/.release-please-manifest.json
 !/CODE_OF_CONDUCT.md
 !/SECURITY.md
 !/bin/
 !/lib/
 !/package.json
+!/release-please-config.json
 
 .npmrc
 ========================================
 ; This file is automatically added by @npmcli/template-oss. Do not edit.
 
 package-lock=false
+
+.release-please-manifest.json
+========================================
+{
+  ".": "1.0.0"
+}
 
 CODE_OF_CONDUCT.md
 ========================================
@@ -502,6 +541,7 @@ package.json
 ========================================
 {
   "name": "testpkg",
+  "version": "1.0.0",
   "scripts": {
     "lint": "eslint /"**/*.js/"",
     "postlint": "template-oss-check",
@@ -525,6 +565,41 @@ package.json
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
     "version": "{{VERSION}}"
+  }
+}
+
+release-please-config.json
+========================================
+{
+  "separate-pull-requests": true,
+  "changelog-sections": [
+    {
+      "type": "feat",
+      "section": "Features",
+      "hidden": false
+    },
+    {
+      "type": "fix",
+      "section": "Bug Fixes",
+      "hidden": false
+    },
+    {
+      "type": "docs",
+      "section": "Documentation",
+      "hidden": false
+    },
+    {
+      "type": "deps",
+      "section": "Dependencies",
+      "hidden": false
+    },
+    {
+      "type": "chore",
+      "hidden": true
+    }
+  ],
+  "packages": {
+    ".": {}
   }
 }
 `
@@ -1136,132 +1211,6 @@ jobs:
           npx --offline commitlint -V --from origin/main --to \${{ github.event.pull_request.head.sha }} /
             || echo $PR_TITLE | npx --offline commitlint -V
 
-.github/workflows/release-please-bbb.yml
-========================================
-# This file is automatically added by @npmcli/template-oss. Do not edit.
-
-name: Release Please - bbb
-
-on:
-  push:
-    paths:
-      - workspaces/b/**
-    branches:
-      - main
-      - latest
-
-permissions:
-  contents: write
-  pull-requests: write
-
-jobs:
-  release-please:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: google-github-actions/release-please-action@v3
-        id: release
-        with:
-          release-type: node
-          monorepo-tags: true
-          path: workspaces/b
-          # name can be removed after this is merged
-          # https://github.com/google-github-actions/release-please-action/pull/459
-          package-name: "bbb"
-          changelog-types: >
-            [
-              {"type":"feat","section":"Features","hidden":false},
-              {"type":"fix","section":"Bug Fixes","hidden":false},
-              {"type":"docs","section":"Documentation","hidden":false},
-              {"type":"deps","section":"Dependencies","hidden":false},
-              {"type":"chore","hidden":true}
-            ]
-      - uses: actions/checkout@v3
-      - name: Setup git user
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
-      - name: Update npm to latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - run: npm -v
-      - name: Update package-lock.json and commit
-        if: steps.release.outputs.pr
-        env:
-          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh pr checkout \${{ fromJSON(steps.release.outputs.pr).number }}
-          npm run resetdeps
-          title="\${{ fromJSON(steps.release.outputs.pr).title }}"
-          # get the version from the pr title
-          # get everything after the last space
-          git commit -am "deps: bbb@\${title##* }"
-          git push
-
-.github/workflows/release-please-name-aaaa.yml
-========================================
-# This file is automatically added by @npmcli/template-oss. Do not edit.
-
-name: Release Please - @name/aaaa
-
-on:
-  push:
-    paths:
-      - workspaces/a/**
-    branches:
-      - main
-      - latest
-
-permissions:
-  contents: write
-  pull-requests: write
-
-jobs:
-  release-please:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: google-github-actions/release-please-action@v3
-        id: release
-        with:
-          release-type: node
-          monorepo-tags: true
-          path: workspaces/a
-          # name can be removed after this is merged
-          # https://github.com/google-github-actions/release-please-action/pull/459
-          package-name: "@name/aaaa"
-          changelog-types: >
-            [
-              {"type":"feat","section":"Features","hidden":false},
-              {"type":"fix","section":"Bug Fixes","hidden":false},
-              {"type":"docs","section":"Documentation","hidden":false},
-              {"type":"deps","section":"Dependencies","hidden":false},
-              {"type":"chore","hidden":true}
-            ]
-      - uses: actions/checkout@v3
-      - name: Setup git user
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
-      - name: Update npm to latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - run: npm -v
-      - name: Update package-lock.json and commit
-        if: steps.release.outputs.pr
-        env:
-          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh pr checkout \${{ fromJSON(steps.release.outputs.pr).number }}
-          npm run resetdeps
-          title="\${{ fromJSON(steps.release.outputs.pr).title }}"
-          # get the version from the pr title
-          # get everything after the last space
-          git commit -am "deps: @name/aaaa@\${title##* }"
-          git push
-
 .github/workflows/release-please.yml
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
@@ -1274,22 +1223,53 @@ on:
       - main
       - latest
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    outputs:
+      prs: \${{ steps.release.outputs.prs }}
     steps:
       - uses: google-github-actions/release-please-action@v3
         id: release
         with:
-          release-type: node
-          changelog-types: >
-            [
-              {"type":"feat","section":"Features","hidden":false},
-              {"type":"fix","section":"Bug Fixes","hidden":false},
-              {"type":"docs","section":"Documentation","hidden":false},
-              {"type":"deps","section":"Dependencies","hidden":false},
-              {"type":"chore","hidden":true}
-            ]
+          command: manifest
+
+  update-prs:
+    needs: release-please
+    if: needs.release-please.outputs.prs
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        pr: \${{ fromJSON(needs.release-please.outputs.prs) }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup git user
+        run: |
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - name: Update npm to latest
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+      - run: npm -v
+      - name: Update PR \${{ matrix.pr.number }} dependencies and commit
+        if: steps.release.outputs.pr
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr checkout \${{ matrix.pr.number }}
+          npm run resetdeps
+          title="\${{ matrix.pr.title }}"
+          # get the dependency spec from the pr title
+          # get everything after ': release ' + replace space with @
+          dep_spec=$(echo "\${title##*: release }" | tr ' ' @)
+          git commit -am "deps: $dep_spec"
+          git push
 
 .gitignore
 ========================================
@@ -1314,11 +1294,13 @@ jobs:
 !/.github/
 !/.gitignore
 !/.npmrc
+!/.release-please-manifest.json
 !/CODE_OF_CONDUCT.md
 !/SECURITY.md
 !/bin/
 !/lib/
 !/package.json
+!/release-please-config.json
 !/workspaces/
 
 .npmrc
@@ -1326,6 +1308,14 @@ jobs:
 ; This file is automatically added by @npmcli/template-oss. Do not edit.
 
 package-lock=false
+
+.release-please-manifest.json
+========================================
+{
+  ".": "1.0.0",
+  "workspaces/a": "1.0.0",
+  "workspaces/b": "1.0.0"
+}
 
 CODE_OF_CONDUCT.md
 ========================================
@@ -1347,6 +1337,7 @@ package.json
 ========================================
 {
   "name": "testpkg",
+  "version": "1.0.0",
   "workspaces": [
     "workspaces/a",
     "workspaces/b"
@@ -1374,6 +1365,43 @@ package.json
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
     "version": "{{VERSION}}"
+  }
+}
+
+release-please-config.json
+========================================
+{
+  "separate-pull-requests": true,
+  "changelog-sections": [
+    {
+      "type": "feat",
+      "section": "Features",
+      "hidden": false
+    },
+    {
+      "type": "fix",
+      "section": "Bug Fixes",
+      "hidden": false
+    },
+    {
+      "type": "docs",
+      "section": "Documentation",
+      "hidden": false
+    },
+    {
+      "type": "deps",
+      "section": "Dependencies",
+      "hidden": false
+    },
+    {
+      "type": "chore",
+      "hidden": true
+    }
+  ],
+  "packages": {
+    ".": {},
+    "workspaces/a": {},
+    "workspaces/b": {}
   }
 }
 
@@ -1429,6 +1457,7 @@ workspaces/a/package.json
 ========================================
 {
   "name": "@name/aaaa",
+  "version": "1.0.0",
   "scripts": {
     "lint": "eslint /"**/*.js/"",
     "postlint": "template-oss-check",
@@ -1507,6 +1536,7 @@ workspaces/b/package.json
 ========================================
 {
   "name": "bbb",
+  "version": "1.0.0",
   "scripts": {
     "lint": "eslint /"**/*.js/"",
     "postlint": "template-oss-check",
