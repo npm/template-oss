@@ -172,8 +172,8 @@ name: Audit
 on:
   workflow_dispatch:
   schedule:
-    # "At 01:00 on Monday" https://crontab.guru/#0_1_*_*_1
-    - cron: "0 1 * * 1"
+    # "At 08:00 UTC (01:00 PT) on Monday" https://crontab.guru/#0_8_*_*_1
+    - cron: "0 8 * * 1"
 
 jobs:
   audit:
@@ -209,8 +209,8 @@ on:
       - main
       - latest
   schedule:
-    # "At 02:00 on Monday" https://crontab.guru/#0_2_*_*_1
-    - cron: "0 2 * * 1"
+    # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
+    - cron: "0 9 * * 1"
 
 jobs:
   lint:
@@ -301,8 +301,8 @@ on:
       - main
       - latest
   schedule:
-    # "At 03:00 on Monday" https://crontab.guru/#0_3_*_*_1
-    - cron: "0 3 * * 1"
+    # "At 10:00 UTC (03:00 PT) on Monday" https://crontab.guru/#0_10_*_*_1
+    - cron: "0 10 * * 1"
 
 jobs:
   analyze:
@@ -700,8 +700,8 @@ name: Audit
 on:
   workflow_dispatch:
   schedule:
-    # "At 01:00 on Monday" https://crontab.guru/#0_1_*_*_1
-    - cron: "0 1 * * 1"
+    # "At 08:00 UTC (01:00 PT) on Monday" https://crontab.guru/#0_8_*_*_1
+    - cron: "0 8 * * 1"
 
 jobs:
   audit:
@@ -741,8 +741,8 @@ on:
     paths:
       - workspaces/b/**
   schedule:
-    # "At 02:00 on Monday" https://crontab.guru/#0_2_*_*_1
-    - cron: "0 2 * * 1"
+    # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
+    - cron: "0 9 * * 1"
 
 jobs:
   lint:
@@ -836,8 +836,8 @@ on:
     paths:
       - workspaces/a/**
   schedule:
-    # "At 02:00 on Monday" https://crontab.guru/#0_2_*_*_1
-    - cron: "0 2 * * 1"
+    # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
+    - cron: "0 9 * * 1"
 
 jobs:
   lint:
@@ -927,8 +927,8 @@ on:
       - main
       - latest
   schedule:
-    # "At 02:00 on Monday" https://crontab.guru/#0_2_*_*_1
-    - cron: "0 2 * * 1"
+    # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
+    - cron: "0 9 * * 1"
 
 jobs:
   lint:
@@ -1019,8 +1019,8 @@ on:
       - main
       - latest
   schedule:
-    # "At 03:00 on Monday" https://crontab.guru/#0_3_*_*_1
-    - cron: "0 3 * * 1"
+    # "At 10:00 UTC (03:00 PT) on Monday" https://crontab.guru/#0_10_*_*_1
+    - cron: "0 10 * * 1"
 
 jobs:
   analyze:
