@@ -1,5 +1,18 @@
 # Changelog
 
+## [3.7.0](https://github.com/npm/template-oss/compare/v3.6.0...v3.7.0) (2022-08-25)
+
+
+### Features
+
+* use release please manifest configuration ([#164](https://github.com/npm/template-oss/issues/164)) ([95118ec](https://github.com/npm/template-oss/commit/95118ec0704162c1c25f3ccc0099ac972bfd752a))
+
+
+### Bug Fixes
+
+* default root component to empty string to match previous behavior ([#166](https://github.com/npm/template-oss/issues/166)) ([0f2a89f](https://github.com/npm/template-oss/commit/0f2a89f6fa55e918cab151af11e96a256ecd5a7e))
+* remove old release please files ([#170](https://github.com/npm/template-oss/issues/170)) ([09d955f](https://github.com/npm/template-oss/commit/09d955f3dbc68e16cbe34d018d6197a06bc66727))
+
 ## [3.6.0](https://github.com/npm/template-oss/compare/v3.5.0...v3.6.0) (2022-08-22)
 
 
