@@ -173,6 +173,7 @@ The following repo files need to be added:
   .github/workflows/release-please.yml
   .release-please-manifest.json
   release-please-config.json
+  .github/matchers/tap.json
   .github/workflows/ci-name-aaaa.yml
 
 To correct it: npx template-oss-apply --force
@@ -236,6 +237,7 @@ The following repo files need to be added:
   .github/workflows/release-please.yml
   .release-please-manifest.json
   release-please-config.json
+  .github/matchers/tap.json
   .github/workflows/ci-bbb.yml
 
 To correct it: npx template-oss-apply --force
