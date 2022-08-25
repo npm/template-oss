@@ -37,6 +37,7 @@ package.json
 `
 
 exports[`test/apply/index.js TAP workspaces > expect resolving Promise 1`] = `
+.github/matchers/tap.json
 .github/workflows/ci-d.yml
 .github/workflows/release-please.yml
 .release-please-manifest.json
