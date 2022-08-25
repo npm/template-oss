@@ -599,7 +599,9 @@ release-please-config.json
     }
   ],
   "packages": {
-    ".": {}
+    ".": {
+      "package-name": ""
+    }
   }
 }
 `
@@ -1399,7 +1401,9 @@ release-please-config.json
     }
   ],
   "packages": {
-    ".": {},
+    ".": {
+      "package-name": ""
+    },
     "workspaces/a": {},
     "workspaces/b": {}
   }
