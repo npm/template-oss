@@ -22,7 +22,9 @@ exports[`test/apply/index.js TAP turn off module > expect resolving Promise 1`] 
 .github/workflows/post-dependabot.yml
 .github/workflows/pull-request.yml
 .github/workflows/release-please.yml
+.release-please-manifest.json
 package.json
+release-please-config.json
 `
 
 exports[`test/apply/index.js TAP turn off repo > expect resolving Promise 1`] = `
@@ -36,8 +38,10 @@ package.json
 
 exports[`test/apply/index.js TAP workspaces > expect resolving Promise 1`] = `
 .github/workflows/ci-d.yml
-.github/workflows/release-please-d.yml
+.github/workflows/release-please.yml
+.release-please-manifest.json
 package.json
+release-please-config.json
 workspaces/a/.eslintrc.js
 workspaces/a/.gitignore
 workspaces/a/package.json

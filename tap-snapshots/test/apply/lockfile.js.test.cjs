@@ -29,11 +29,13 @@ exports[`test/apply/lockfile.js TAP lockfile > expect resolving Promise 1`] = `
 !/.github/
 !/.gitignore
 !/.npmrc
+!/.release-please-manifest.json
 !/CODE_OF_CONDUCT.md
 !/SECURITY.md
 !/bin/
 !/lib/
 !/package.json
+!/release-please-config.json
 !/package-lock.json
 
 .npmrc
@@ -67,11 +69,13 @@ exports[`test/apply/lockfile.js TAP no lockfile by default > expect resolving Pr
 !/.github/
 !/.gitignore
 !/.npmrc
+!/.release-please-manifest.json
 !/CODE_OF_CONDUCT.md
 !/SECURITY.md
 !/bin/
 !/lib/
 !/package.json
+!/release-please-config.json
 
 .npmrc
 ========================================

@@ -19,6 +19,9 @@ const pkgWithName = (name, defName) => {
   if (!pkg.name) {
     pkg.name = defName
   }
+  if (!pkg.version) {
+    pkg.version = '1.0.0'
+  }
   return pkg
 }
 

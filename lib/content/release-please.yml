@@ -1,56 +1,47 @@
-name: Release Please {{~#if isWorkspace}} - {{pkgName}}{{/if}}
+name: Release Please
 
 on:
   push:
-    {{#if pkgRelPath}}
-    paths:
-      - {{pkgRelPath}}/**
-    {{/if}}
     branches:
       {{#each branches}}
       - {{.}}
       {{/each}}
 
-{{#if isWorkspace}}
 permissions:
   contents: write
   pull-requests: write
-{{/if}}
 
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    outputs:
+      prs: $\{{ steps.release.outputs.prs }}
     steps:
       - uses: google-github-actions/release-please-action@v3
         id: release
         with:
-          release-type: node
-          {{#if pkgRelPath}}
-          monorepo-tags: true
-          path: {{pkgRelPath}}
-          # name can be removed after this is merged
-          # https://github.com/google-github-actions/release-please-action/pull/459
-          package-name: "{{pkgName}}"
-          {{/if}}
-          changelog-types: >
-            [
-              {{#each changelogTypes}}
-              {{{json .}}}{{#unless @last}},{{/unless}}
-              {{/each}}
-            ]
-      {{#if isWorkspace}}
+          command: manifest
+
+  update-prs:
+    needs: release-please
+    if: needs.release-please.outputs.prs
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        pr: $\{{ fromJSON(needs.release-please.outputs.prs) }}
+    steps:
       {{> setupGit}}
       {{> setupNode}}
-      - name: Update package-lock.json and commit
+      - name: Update PR $\{{ matrix.pr.number }} dependencies and commit
         if: steps.release.outputs.pr
         env:
           GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr checkout $\{{ fromJSON(steps.release.outputs.pr).number }}
+          gh pr checkout $\{{ matrix.pr.number }}
           npm run resetdeps
-          title="$\{{ fromJSON(steps.release.outputs.pr).title }}"
-          # get the version from the pr title
-          # get everything after the last space
-          git commit -am "deps: {{pkgName}}@${title##* }"
+          title="$\{{ matrix.pr.title }}"
+          # get the dependency spec from the pr title
+          # get everything after ': release ' + replace space with @
+          dep_spec=$(echo "${title##*: release }" | tr ' ' @)
+          git commit -am "deps: $dep_spec"
           git push
-      {{/if}}

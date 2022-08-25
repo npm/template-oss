@@ -24,6 +24,8 @@ The following repo files need to be added:
   .github/workflows/post-dependabot.yml
   .github/workflows/pull-request.yml
   .github/workflows/release-please.yml
+  .release-please-manifest.json
+  release-please-config.json
 
 To correct it: npx template-oss-apply --force
 
@@ -104,6 +106,8 @@ The following repo files need to be added:
   .github/workflows/post-dependabot.yml
   .github/workflows/pull-request.yml
   .github/workflows/release-please.yml
+  .release-please-manifest.json
+  release-please-config.json
 
 To correct it: npx template-oss-apply --force
 
@@ -166,7 +170,9 @@ To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @n
 
 The following repo files need to be added:
 
-  .github/workflows/release-please-name-aaaa.yml
+  .github/workflows/release-please.yml
+  .release-please-manifest.json
+  release-please-config.json
   .github/workflows/ci-name-aaaa.yml
 
 To correct it: npx template-oss-apply --force
@@ -227,7 +233,9 @@ To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @n
 
 The following repo files need to be added:
 
-  .github/workflows/release-please-bbb.yml
+  .github/workflows/release-please.yml
+  .release-please-manifest.json
+  release-please-config.json
   .github/workflows/ci-bbb.yml
 
 To correct it: npx template-oss-apply --force

@@ -41,6 +41,7 @@ t.test('with empty content', async (t) => {
   t.strictSame(Object.keys(source), ['package.json'])
   t.strictSame(JSON.parse(source['package.json']), {
     name: 'testpkg',
+    version: '1.0.0',
     templateOSS: {
       version: setup.pkgVersion,
     },
