@@ -465,7 +465,6 @@ jobs:
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
       - name: Update PR \${{ matrix.pr.number }} dependencies and commit
-        if: steps.release.outputs.pr
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -1260,7 +1259,6 @@ jobs:
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
       - name: Update PR \${{ matrix.pr.number }} dependencies and commit
-        if: steps.release.outputs.pr
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
