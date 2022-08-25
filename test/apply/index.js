@@ -83,6 +83,14 @@ t.test('private workspace', async (t) => {
       a: { private: true },
       b: {},
     },
+    testdir: {
+      '.github': {
+        workflows: {
+          'release-please-a.yml': 'old yaml file',
+          'release-please-b.yml': 'old yaml file',
+        },
+      },
+    },
   })
   await s.apply()
 
