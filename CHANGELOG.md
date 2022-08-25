@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.7.1](https://github.com/npm/template-oss/compare/v3.7.0...v3.7.1) (2022-08-25)
+
+
+### Bug Fixes
+
+* add tap matcher to workspaces ([ce977c4](https://github.com/npm/template-oss/commit/ce977c4737476ed84d2d5c5f584daab7d1c780c6))
+* remove unnecessary if statement in release please action ([678cb5a](https://github.com/npm/template-oss/commit/678cb5acb93206568a5b7e07d5bd41a669d7db8b))
+
 ## [3.7.0](https://github.com/npm/template-oss/compare/v3.6.0...v3.7.0) (2022-08-25)
 
 
