@@ -15,32 +15,39 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     outputs:
-      prs: $\{{ steps.release.outputs.prs }}
-    steps:
-      - uses: google-github-actions/release-please-action@v3
-        id: release
-        with:
-          command: manifest
-
-  update-prs:
-    needs: release-please
-    if: needs.release-please.outputs.prs
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        pr: $\{{ fromJSON(needs.release-please.outputs.prs) }}
+      pr: $\{{ steps.release.outputs.pr }}
+      release: $\{{ steps.release.outputs.release }}
     steps:
       {{> setupGit}}
       {{> setupNode}}
-      - name: Update PR $\{{ matrix.pr.number }} dependencies and commit
+      - id: release
+        run: npx --offline template-oss-release-please
+
+  post-pr:
+    needs: release-please
+    if: needs.release-please.outputs.pr
+    runs-on: ubuntu-latest
+    steps:
+      {{> setupGit}}
+      {{> setupNode}}
+      - name: Update dependencies and commit
         env:
           GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr checkout $\{{ matrix.pr.number }}
-          npm run resetdeps
-          title="$\{{ matrix.pr.title }}"
-          # get the dependency spec from the pr title
-          # get everything after ': release ' + replace space with @
-          dep_spec=$(echo "${title##*: release }" | tr ' ' @)
-          git commit -am "deps: $dep_spec"
+          gh pr checkout $\{{ fromJSON(needs.release-please.outputs.pr).number }}
+          npm run rp-pull-request --ignore-scripts --if-present -ws -iwr
+          git commit -am "chore: post pull request" || true
           git push
+
+  post-release:
+    needs: release-please
+    if: needs.release-please.outputs.release
+    runs-on: ubuntu-latest
+    steps:
+      {{> setupGit}}
+      {{> setupNode}}
+      - name: Run post release actions
+        env:
+          GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm run rp-release --ignore-scripts --if-present -ws -iwr

@@ -5,7 +5,8 @@
   "main": "lib/content/index.js",
   "bin": {
     "template-oss-apply": "bin/apply.js",
-    "template-oss-check": "bin/check.js"
+    "template-oss-check": "bin/check.js",
+    "template-oss-release-please": "bin/release-please.js"
   },
   "scripts": {
     "lint": "eslint \"**/*.js\"",
@@ -31,6 +32,7 @@
   "author": "GitHub Inc.",
   "license": "ISC",
   "dependencies": {
+    "@actions/core": "^1.9.1",
     "@npmcli/fs": "^2.0.1",
     "@npmcli/git": "^3.0.0",
     "@npmcli/map-workspaces": "^2.0.2",
@@ -44,6 +46,7 @@
     "lodash": "^4.17.21",
     "npm-package-arg": "^9.0.1",
     "proc-log": "^2.0.0",
+    "release-please": "github:lukekarrys/release-please#lk/node-workspace-root",
     "semver": "^7.3.5",
     "yaml": "2.0.0-11"
   },

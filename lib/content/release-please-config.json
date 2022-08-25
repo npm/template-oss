@@ -1,12 +1,6 @@
 {
-  "separate-pull-requests": true,
-  "changelog-sections":             [
-    {"type":"feat","section":"Features","hidden":false},
-    {"type":"fix","section":"Bug Fixes","hidden":false},
-    {"type":"docs","section":"Documentation","hidden":false},
-    {"type":"deps","section":"Dependencies","hidden":false},
-    {"type":"chore","hidden":true}
-  ],
+  "separate-pull-requests": {{{del}}},
+  "changelog-sections": {{{json changelogTypes}}},
   "packages": {
     "{{#unless pkgRelPath}}.{{/unless}}{{pkgRelPath}}": {
       {{#unless pkgRelPath}}"package-name": ""{{/unless}}
