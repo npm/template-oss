@@ -1,5 +1,113 @@
 # Changelog
 
+## [4.0.0](https://github.com/npm/template-oss/compare/template-oss-v3.6.0...template-oss-v4.0.0) (2022-08-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* bin scripts are now `template-oss-apply` and `template-oss-check` renamed apply props `rootRepo`, `rootModule`, `workspaceRepo`, `workspaceModule`
+
+### Features
+
+* add 16.13.0 as an explicit node version to test ([#10](https://github.com/npm/template-oss/issues/10)) ([b761f09](https://github.com/npm/template-oss/commit/b761f09bc2e6507874b206894f55a4efb1c44cd7))
+* add a problem matcher for tap output ([#160](https://github.com/npm/template-oss/issues/160)) ([8176e44](https://github.com/npm/template-oss/commit/8176e44f9764e09e7d5c52c2aadfc1c0ca228af3))
+* add audit and fund flags to install ([0555d67](https://github.com/npm/template-oss/commit/0555d670b6f4ebc5929e65af28daae1e34599369)), closes [#108](https://github.com/npm/template-oss/issues/108)
+* add bug issue template, and config ([#7](https://github.com/npm/template-oss/issues/7)) ([14f9f28](https://github.com/npm/template-oss/commit/14f9f28005b16fef4fc3b9da1087204df4227611))
+* add CODE_OF_CONDUCT.md ([#146](https://github.com/npm/template-oss/issues/146)) ([ad8c6fc](https://github.com/npm/template-oss/commit/ad8c6fc7bd06bb9edb3b44619d9bf5fc306bcb0b))
+* add CODEOWNERS file ([#17](https://github.com/npm/template-oss/issues/17)) ([38e9c9b](https://github.com/npm/template-oss/commit/38e9c9b7fdcd8043d3e4bbe1d4d75774be4bf5db))
+* add codeql analysis ([68af6f0](https://github.com/npm/template-oss/commit/68af6f0c7811a7cbfb658b6c9d1a9b8788b75067))
+* add gitignore check, update gitignore entries ([#18](https://github.com/npm/template-oss/issues/18)) ([52a7590](https://github.com/npm/template-oss/commit/52a759080d80e830644c962c643d9c4ed2ca86a3))
+* add lockfile option to control npmrc and ci cache ([9ab4497](https://github.com/npm/template-oss/commit/9ab449797deda9d3c02d582def9c8eaec342e943))
+* add npm-template-copy bin ([#37](https://github.com/npm/template-oss/issues/37)) ([a5b17fd](https://github.com/npm/template-oss/commit/a5b17fdde120a5a1f4849fde00573755eaf9c7b4))
+* add release process scripts ([#20](https://github.com/npm/template-oss/issues/20)) ([af7b9f5](https://github.com/npm/template-oss/commit/af7b9f534c2b6ea8bc0c58f3259d8e186ef7d051))
+* add release-please workflow to workspace repo files ([#58](https://github.com/npm/template-oss/issues/58)) ([ad4be0d](https://github.com/npm/template-oss/commit/ad4be0d5100fa688a1181579f4146f075cded8d0))
+* add SECURITY.md file ([#9](https://github.com/npm/template-oss/issues/9)) ([d832811](https://github.com/npm/template-oss/commit/d832811fb97698bb38bb197e26e8afff291de5ba))
+* add workspace support ([#21](https://github.com/npm/template-oss/issues/21)) ([1294318](https://github.com/npm/template-oss/commit/12943181f1de8fe6162b6f5d683c322a143a3f6c))
+* allow option to set npm bin in package.json ([32f7f7c](https://github.com/npm/template-oss/commit/32f7f7c3df80b40a7536182e72b883d77ba46e64))
+* delete other license files in target ([#13](https://github.com/npm/template-oss/issues/13)) ([ef40095](https://github.com/npm/template-oss/commit/ef40095445a42ae121c18dfb4e96522451299142))
+* **eslint:** support glob for windows ([#79](https://github.com/npm/template-oss/issues/79)) ([9a28510](https://github.com/npm/template-oss/commit/9a285107ef044ecc3d1fad68a036d3701adc549b))
+* ignore scripts for all ci installs ([#106](https://github.com/npm/template-oss/issues/106)) ([b9c9c95](https://github.com/npm/template-oss/commit/b9c9c95f0b922a8a163ebc6b7a3faf772dc05c23))
+* make cron workflows run early PT ([#159](https://github.com/npm/template-oss/issues/159)) ([6f571eb](https://github.com/npm/template-oss/commit/6f571eb93c2c101926a8dae7b7160e981c208ab7))
+* remove standard from package.json ([72520ff](https://github.com/npm/template-oss/commit/72520ffd34acc61d30db10530a9f414d086763c7))
+* require this packaged to be a pinned dep ([ea04dfb](https://github.com/npm/template-oss/commit/ea04dfbd55e41fd4c241aa3302339fec2d0671ea)), closes [#88](https://github.com/npm/template-oss/issues/88) [#93](https://github.com/npm/template-oss/issues/93)
+* rewrite to make it more extensible ([#81](https://github.com/npm/template-oss/issues/81)) ([605ccbd](https://github.com/npm/template-oss/commit/605ccbd7ef0a2c36b7e1750a045cd390b226db46))
+* skip postinstall steps when templateVersion has not changed ([2386051](https://github.com/npm/template-oss/commit/23860518d5d21dc9f15c9118dff805abf860338e))
+* update root package-lock after workspace releases ([#125](https://github.com/npm/template-oss/issues/125)) ([bd3da0e](https://github.com/npm/template-oss/commit/bd3da0ebda3f7fa7c424379e07aa2863fc831feb))
+* use release please manifest configuration ([#164](https://github.com/npm/template-oss/issues/164)) ([95118ec](https://github.com/npm/template-oss/commit/95118ec0704162c1c25f3ccc0099ac972bfd752a))
+* windowsCI ([#30](https://github.com/npm/template-oss/issues/30)) ([38cf7b4](https://github.com/npm/template-oss/commit/38cf7b4b2484f4662098e7e8c4df1e41dcef99af))
+
+
+### Bug Fixes
+
+* add 'use strict' to .eslintrc.js ([#141](https://github.com/npm/template-oss/issues/141)) ([6486967](https://github.com/npm/template-oss/commit/64869675f597eaf96e491b19edb8718db9939352))
+* add back postinstall script ([#101](https://github.com/npm/template-oss/issues/101)) ([5d52140](https://github.com/npm/template-oss/commit/5d521408df8acdf61c699a0d072bb267195de698))
+* add headers to copied files ([#6](https://github.com/npm/template-oss/issues/6)) ([674753a](https://github.com/npm/template-oss/commit/674753af3519a5325062af1bdca27dc72c733a0f))
+* add name to issue template ([badeac7](https://github.com/npm/template-oss/commit/badeac72d5df6605b088c019fadd72054533c7ee))
+* add platform to prompt ([aa50eeb](https://github.com/npm/template-oss/commit/aa50eeb2803c376a2e2f47fbd88aac0ff163e693))
+* add pull requests permissions to release please ([#129](https://github.com/npm/template-oss/issues/129)) ([82064ff](https://github.com/npm/template-oss/commit/82064ff6f7cacaa2c5fb9ebad0eaee1209963f8e))
+* add root: true to eslint configs ([bd24358](https://github.com/npm/template-oss/commit/bd24358330d9c7ab672acccf5d9167bd62a11ee6))
+* allow post-dependabot action to edit workflows ([#103](https://github.com/npm/template-oss/issues/103)) ([0ca9a9e](https://github.com/npm/template-oss/commit/0ca9a9ee6ee5493112395d313c3e5632b3d5d8f7))
+* bare git push for post-dependabot action ([#56](https://github.com/npm/template-oss/issues/56)) ([176440e](https://github.com/npm/template-oss/commit/176440ebf9c20ae9f3aebd10bee231dc423957ed))
+* change dependabot to increase-if-necessary ([#91](https://github.com/npm/template-oss/issues/91)) ([f20fb37](https://github.com/npm/template-oss/commit/f20fb375bc79a455133650dd94420fda6e4e97fb))
+* **changelog:** Capitalize Dependencies ([55c26a7](https://github.com/npm/template-oss/commit/55c26a7decebd846b3c427cceb5296737ceae4d9))
+* **commitlint:** don't lint subject-case ([75cb7e6](https://github.com/npm/template-oss/commit/75cb7e670640ddf103534b4b59af9dea57e2368d))
+* compare to \n instead of os.EOL ([#157](https://github.com/npm/template-oss/issues/157)) ([5517e9e](https://github.com/npm/template-oss/commit/5517e9eb0f081217423a2c193eabe2496c08eaab))
+* correct path key for workspace release ([a4ae34f](https://github.com/npm/template-oss/commit/a4ae34f85500747e66666891dde8c3e9acf5485c))
+* correctly set git user and email ([eb55928](https://github.com/npm/template-oss/commit/eb55928ada5db8657c57a568057aa886fa8dae4b))
+* default root component to empty string to match previous behavior ([ff5b7fd](https://github.com/npm/template-oss/commit/ff5b7fd35f9894e9f39465ad80bfe21e8394c0c6))
+* dependabot permissions ([#71](https://github.com/npm/template-oss/issues/71)) ([28396cf](https://github.com/npm/template-oss/commit/28396cfa6cbbddc375bd9da49d685b9c4dc2b790))
+* **dependabot:** always increase deps ([fb441b1](https://github.com/npm/template-oss/commit/fb441b1243e26a4758f2abda091c1c9163034ce8))
+* dont create release please for private root pkg ([2f7dcfa](https://github.com/npm/template-oss/commit/2f7dcfa8c8f00677ad24ad15dd059556f1dfa1e8))
+* dont write release please file for private workspace ([15c19c1](https://github.com/npm/template-oss/commit/15c19c179a79a79e9785bfcf5818cd4f6631480a))
+* drop bash and powershell from windows CI ([#34](https://github.com/npm/template-oss/issues/34)) ([a77cec5](https://github.com/npm/template-oss/commit/a77cec536ab3a99d1b748a3c72eb11c6364780e8))
+* drop node 10 support ([#1](https://github.com/npm/template-oss/issues/1)) ([6c0477a](https://github.com/npm/template-oss/commit/6c0477a56f64f0939b7ac27cddd9e164fe91a626))
+* empty commit for eslint-config from [#24](https://github.com/npm/template-oss/issues/24) ([cc6bdea](https://github.com/npm/template-oss/commit/cc6bdea0a76059d66bee12fffb03ba5a1026fe75))
+* explicitly set package-name for release please workspaces ([f6aa844](https://github.com/npm/template-oss/commit/f6aa84473c2fc70676ea4b2da356ea9e5a23d5b5))
+* **gitignore:** include .eslintrc* ([6cdfd80](https://github.com/npm/template-oss/commit/6cdfd802ffcb7e9f5cbf14f9eeaa7a474b1a4573))
+* lint after post dependabot install ([da74ad9](https://github.com/npm/template-oss/commit/da74ad966ec5d0d000014258738772d3074d82f5))
+* lockfile setting adds lockfile to allowed gitignore ([c808c4f](https://github.com/npm/template-oss/commit/c808c4ffd8ed7d1c198736a815df15e9a68ebb9c))
+* move non-windows ci.yml to correct location ([#32](https://github.com/npm/template-oss/issues/32)) ([0503263](https://github.com/npm/template-oss/commit/0503263444dd780b9fef72e1ffada1954ee05c77))
+* namespaced workspaces create workflows ([#28](https://github.com/npm/template-oss/issues/28)) ([cf6924e](https://github.com/npm/template-oss/commit/cf6924ed7076c1e2d8e5bf8fe79dfc78a9eca9de))
+* only lint in ubuntu and in node 14.x ([4c7d05f](https://github.com/npm/template-oss/commit/4c7d05f5d6d975b67465f602b0dfffe032a6d0d0))
+* only reference matrix in relavent actions ([f951c95](https://github.com/npm/template-oss/commit/f951c95d7a8a499d6a3f2dc1a44857a35902061e))
+* pin yaml to 2.0.0-11 ([#161](https://github.com/npm/template-oss/issues/161)) ([e095275](https://github.com/npm/template-oss/commit/e095275f229c66d8820f4edc5b801ceee60538df))
+* properly allow package-lock when lockfile=true ([c613429](https://github.com/npm/template-oss/commit/c613429d2b46d94561aa20a8d39ca969a30f4391))
+* properly apply file changes and version update ([fa0b173](https://github.com/npm/template-oss/commit/fa0b1739bfd61c4911aac2a9888888a44e5be15c))
+* properly install and use glob ([9bf3126](https://github.com/npm/template-oss/commit/9bf3126b03c8fa8629004ceb0fe0de480fc451f9))
+* race conditiion when saving package.json ([cd3fee9](https://github.com/npm/template-oss/commit/cd3fee91d8bf54d6bd9b71406b9282c19aae0689))
+* release-please workspace path ([#74](https://github.com/npm/template-oss/issues/74)) ([53365b1](https://github.com/npm/template-oss/commit/53365b1b403f490f255f7982f12da861136595db))
+* remove actions permission from post-dependabot ([a245bbc](https://github.com/npm/template-oss/commit/a245bbcb0f476b7e4426387af4e453c91e2ff97e))
+* remove more usage of os.EOL ([#162](https://github.com/npm/template-oss/issues/162)) ([4dde648](https://github.com/npm/template-oss/commit/4dde648deb0d880d12f8810914309a9aa0947010))
+* remove npm ls -a from ci ([#19](https://github.com/npm/template-oss/issues/19)) ([30a2d19](https://github.com/npm/template-oss/commit/30a2d1920b204452ce6add84063533f9efc6aa10))
+* remove unsupported changelog-type option ([#89](https://github.com/npm/template-oss/issues/89)) ([38585d1](https://github.com/npm/template-oss/commit/38585d18ec5742755bf2a14f2a6b1a7317110e67))
+* rm security.md files from workspaces ([43f0d25](https://github.com/npm/template-oss/commit/43f0d259ec2013725adb88a061bcfd1fc7dcc070))
+* run install when dependabot updates us ([5b49817](https://github.com/npm/template-oss/commit/5b49817ee15863e613d82bcb265f2f11246ec268))
+* sanitize env before spawning npm subprocess ([d8ac68c](https://github.com/npm/template-oss/commit/d8ac68c90c3bb6f4be2538dba9ca551721656c84))
+* totally rework package installation to peer deps ([d1380df](https://github.com/npm/template-oss/commit/d1380df4a5b07bca73a9300bb932dc5211f89781))
+* try to workaround old npm not being able to update in windows ([#36](https://github.com/npm/template-oss/issues/36)) ([194c434](https://github.com/npm/template-oss/commit/194c434fae3c7b63ac5f5d6b3524e9c01e2efe84))
+* update bot account information ([#147](https://github.com/npm/template-oss/issues/147)) ([f802204](https://github.com/npm/template-oss/commit/f802204efa59a30a138d2338c478e357562b7fb1))
+* update comment link to github permissions ([#117](https://github.com/npm/template-oss/issues/117)) ([ba5907b](https://github.com/npm/template-oss/commit/ba5907b96343bec8059544736fa154c951353de5))
+* updated workspace ci template to run correct tests ([#26](https://github.com/npm/template-oss/issues/26)) ([92764e1](https://github.com/npm/template-oss/commit/92764e16733cc4531bbcf7f7ecbc0ecda59321a5))
+* use commitlint config via rc file only ([#95](https://github.com/npm/template-oss/issues/95)) ([dd84416](https://github.com/npm/template-oss/commit/dd84416ae973cb8ab43cda14cbbe4d7d612605b1))
+* use new env vars from @npmcli/config ([205c8c3](https://github.com/npm/template-oss/commit/205c8c3e7f60a1b68cd7f95fa8dd45b0273dbfbf))
+* use node in postinstall script ([737bef7](https://github.com/npm/template-oss/commit/737bef7ccb7f341c4b908fee51aa98076e21cf93))
+* use npm-template-copy ([#76](https://github.com/npm/template-oss/issues/76)) ([9af2ad3](https://github.com/npm/template-oss/commit/9af2ad39ff2cd0b1928fa8ac23abd0bfd7ebb56f))
+* use ops+robot as git user for all ci ([aeb0162](https://github.com/npm/template-oss/commit/aeb0162f68358f5783f63868a0c7c79d327f87fe))
+* use proper path and node version in actions ([d5d546e](https://github.com/npm/template-oss/commit/d5d546e46d746e4380c905c2d1d725ef9b10163f))
+* yaml newlines in release please action ([#127](https://github.com/npm/template-oss/issues/127)) ([a64af5d](https://github.com/npm/template-oss/commit/a64af5de1e340ff12ce833b9b0cf6b06615ec6cd))
+
+
+### Dependencies
+
+* bump @npmcli/fs from 1.1.1 to 2.0.1 ([#60](https://github.com/npm/template-oss/issues/60)) ([ecee70c](https://github.com/npm/template-oss/commit/ecee70cbd59541c580f76720cc2dfefb1f417603))
+* bump @npmcli/package-json from 1.0.1 to 2.0.0 ([#122](https://github.com/npm/template-oss/issues/122)) ([afe6fb1](https://github.com/npm/template-oss/commit/afe6fb17c31629751dfa512767a7a84739a2511c))
+* bump hosted-git-info from 4.1.0 to 5.0.0 ([#87](https://github.com/npm/template-oss/issues/87)) ([dbda2cd](https://github.com/npm/template-oss/commit/dbda2cd9bc1bf4e85c50b8115e3275ec6ee69c06))
+* update @npmcli/fs requirement from ^1.0.0 to ^1.1.0 ([aa3f37e](https://github.com/npm/template-oss/commit/aa3f37ee6b1f243140e3aec36ac96de7cb1ce981))
+* update @npmcli/fs requirement from ^1.1.0 to ^1.1.1 ([7207aaf](https://github.com/npm/template-oss/commit/7207aaf27003071057084b6cb1deebb09a51725a))
+* update @npmcli/map-workspaces requirement from ^2.0.0 to ^2.0.1 ([#55](https://github.com/npm/template-oss/issues/55)) ([b957fa7](https://github.com/npm/template-oss/commit/b957fa75b20c0073e87bf6952419af59bc79714c))
+* update @npmcli/map-workspaces requirement from ^2.0.1 to ^2.0.2 ([#82](https://github.com/npm/template-oss/issues/82)) ([666ac23](https://github.com/npm/template-oss/commit/666ac238681aea52875f56814a168873407000c0))
+* yaml@2.0.0-11 ([a1e3c57](https://github.com/npm/template-oss/commit/a1e3c57a146238bda04ee80f50c8306b4aab36c3))
+
 ## [3.6.0](https://github.com/npm/template-oss/compare/v3.5.0...v3.6.0) (2022-08-22)
 
 
