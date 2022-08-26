@@ -1,5 +1,4 @@
 {
-  "separate-pull-requests": true,
   "changelog-sections": [
     {
       "type": "feat",
