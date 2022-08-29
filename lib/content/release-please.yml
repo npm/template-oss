@@ -32,7 +32,7 @@ jobs:
     if: needs.release-please.outputs.pr
     runs-on: ubuntu-latest
     steps:
-      {{> setupGit with=(obj ref="${{ fromJSON(needs.release-please.outputs.pr).sha }}")}}
+      {{> setupGit with=(obj ref="${{ fromJSON(needs.release-please.outputs.pr).headRefName }}")}}
       {{> setupNode}}
       {{> setupDeps}}
       - name: Post pull request actions
