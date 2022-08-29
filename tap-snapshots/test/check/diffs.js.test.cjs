@@ -255,6 +255,25 @@ To correct it: npx template-oss-apply --force
 
 -------------------------------------------------------------------
 
+The repo file release-test.yml needs to be updated:
+
+  .github/workflows/release-test.yml
+  ========================================
+  @@ -33,8 +33,9 @@
+       strategy:
+         fail-fast: false
+         matrix:
+           node-version:
+  +          - 10
+             - 12.13.0
+             - 12.x
+             - 14.15.0
+             - 14.x
+
+To correct it: npx template-oss-apply --force
+
+-------------------------------------------------------------------
+
 The module file package.json needs to be updated:
 
   package.json

@@ -462,10 +462,15 @@ jobs:
     needs: release-please
     if: needs.release-please.outputs.pr
     runs-on: ubuntu-latest
+    outputs:
+      ref: \${{ steps.ref.outputs.branch }}
     steps:
+      - name: Output ref
+        id: ref
+        run: echo "::set-output name=branch::\${{ fromJSON(needs.release-please.outputs.pr).headBranchName }}"
       - uses: actions/checkout@v3
         with:
-          ref: \${{ fromJSON(needs.release-please.outputs.pr).headBranchName }}
+          ref: \${{ steps.ref.outputs.branch }}
       - name: Setup git user
         run: |
           git config --global user.email "npm-cli+bot@github.com"
@@ -484,6 +489,13 @@ jobs:
           npm run rp-pull-request --ignore-scripts --if-present -ws -iwr
           git commit -am "chore: post pull request" || true
           git push
+
+  release-test:
+    needs: post-pr
+    if: needs.post-pr.outputs.ref
+    uses: ./.github/workflows/release-test.yml
+    with:
+      ref: \${{ needs.post-pr.outputs.ref }}
 
   post-release:
     needs: release-please
@@ -507,6 +519,95 @@ jobs:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
           npm run rp-release --ignore-scripts --if-present -ws -iwr
+
+.github/workflows/release-test.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Release
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+
+jobs:
+  lint-all:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: \${{ inputs.ref }}
+      - name: Setup git user
+        run: |
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - name: Update npm to latest
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+      - run: npm -v
+      - run: npm i --ignore-scripts --no-audit --no-fund
+      - run: npm run lint --if-present --workspaces --include-workspace-root
+
+  test-all:
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version:
+          - 12.13.0
+          - 12.x
+          - 14.15.0
+          - 14.x
+          - 16.0.0
+          - 16.x
+        platform:
+          - os: ubuntu-latest
+            shell: bash
+          - os: macos-latest
+            shell: bash
+          - os: windows-latest
+            shell: cmd
+    runs-on: \${{ matrix.platform.os }}
+    defaults:
+      run:
+        shell: \${{ matrix.platform.shell }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: \${{ inputs.ref }}
+      - name: Setup git user
+        run: |
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - uses: actions/setup-node@v3
+        with:
+          node-version: \${{ matrix.node-version }}
+      - name: Update to workable npm (windows)
+        # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
+        if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
+        run: |
+          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
+          tar xf npm-7.5.4.tgz
+          cd package
+          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
+          cd ..
+          rmdir /s /q package
+      - name: Update npm to 7
+        # If we do test on npm 10 it needs npm7
+        if: startsWith(matrix.node-version, '10.')
+        run: npm i --prefer-online --no-fund --no-audit -g npm@7
+      - name: Update npm to latest
+        if: \${{ !startsWith(matrix.node-version, '10.') }}
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+      - run: npm -v
+      - run: npm i --ignore-scripts --no-audit --no-fund
+      - name: add tap problem matcher
+        run: echo "::add-matcher::.github/matchers/tap.json"
+      - run: npm run test --if-present --workspaces --include-workspace-root
 
 .gitignore
 ========================================
@@ -1290,10 +1391,15 @@ jobs:
     needs: release-please
     if: needs.release-please.outputs.pr
     runs-on: ubuntu-latest
+    outputs:
+      ref: \${{ steps.ref.outputs.branch }}
     steps:
+      - name: Output ref
+        id: ref
+        run: echo "::set-output name=branch::\${{ fromJSON(needs.release-please.outputs.pr).headBranchName }}"
       - uses: actions/checkout@v3
         with:
-          ref: \${{ fromJSON(needs.release-please.outputs.pr).headBranchName }}
+          ref: \${{ steps.ref.outputs.branch }}
       - name: Setup git user
         run: |
           git config --global user.email "npm-cli+bot@github.com"
@@ -1312,6 +1418,13 @@ jobs:
           npm run rp-pull-request --ignore-scripts --if-present -ws -iwr
           git commit -am "chore: post pull request" || true
           git push
+
+  release-test:
+    needs: post-pr
+    if: needs.post-pr.outputs.ref
+    uses: ./.github/workflows/release-test.yml
+    with:
+      ref: \${{ needs.post-pr.outputs.ref }}
 
   post-release:
     needs: release-please
@@ -1335,6 +1448,95 @@ jobs:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
           npm run rp-release --ignore-scripts --if-present -ws -iwr
+
+.github/workflows/release-test.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Release
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+
+jobs:
+  lint-all:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: \${{ inputs.ref }}
+      - name: Setup git user
+        run: |
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - name: Update npm to latest
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+      - run: npm -v
+      - run: npm i --ignore-scripts --no-audit --no-fund
+      - run: npm run lint --if-present --workspaces --include-workspace-root
+
+  test-all:
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version:
+          - 12.13.0
+          - 12.x
+          - 14.15.0
+          - 14.x
+          - 16.0.0
+          - 16.x
+        platform:
+          - os: ubuntu-latest
+            shell: bash
+          - os: macos-latest
+            shell: bash
+          - os: windows-latest
+            shell: cmd
+    runs-on: \${{ matrix.platform.os }}
+    defaults:
+      run:
+        shell: \${{ matrix.platform.shell }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: \${{ inputs.ref }}
+      - name: Setup git user
+        run: |
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - uses: actions/setup-node@v3
+        with:
+          node-version: \${{ matrix.node-version }}
+      - name: Update to workable npm (windows)
+        # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
+        if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
+        run: |
+          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
+          tar xf npm-7.5.4.tgz
+          cd package
+          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
+          cd ..
+          rmdir /s /q package
+      - name: Update npm to 7
+        # If we do test on npm 10 it needs npm7
+        if: startsWith(matrix.node-version, '10.')
+        run: npm i --prefer-online --no-fund --no-audit -g npm@7
+      - name: Update npm to latest
+        if: \${{ !startsWith(matrix.node-version, '10.') }}
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+      - run: npm -v
+      - run: npm i --ignore-scripts --no-audit --no-fund
+      - name: add tap problem matcher
+        run: echo "::add-matcher::.github/matchers/tap.json"
+      - run: npm run test --if-present --workspaces --include-workspace-root
 
 .gitignore
 ========================================

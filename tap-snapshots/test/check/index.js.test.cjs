@@ -24,6 +24,7 @@ The following repo files need to be added:
   .github/workflows/post-dependabot.yml
   .github/workflows/pull-request.yml
   .github/workflows/release-please.yml
+  .github/workflows/release-test.yml
   .release-please-manifest.json
   release-please-config.json
 
@@ -106,6 +107,7 @@ The following repo files need to be added:
   .github/workflows/post-dependabot.yml
   .github/workflows/pull-request.yml
   .github/workflows/release-please.yml
+  .github/workflows/release-test.yml
   .release-please-manifest.json
   release-please-config.json
 
@@ -171,6 +173,7 @@ To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @n
 The following repo files need to be added:
 
   .github/workflows/release-please.yml
+  .github/workflows/release-test.yml
   .release-please-manifest.json
   release-please-config.json
   .github/matchers/tap.json
@@ -235,6 +238,7 @@ To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @n
 The following repo files need to be added:
 
   .github/workflows/release-please.yml
+  .github/workflows/release-test.yml
   .release-please-manifest.json
   release-please-config.json
   .github/matchers/tap.json

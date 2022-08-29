@@ -31,8 +31,13 @@ jobs:
     needs: release-please
     if: needs.release-please.outputs.pr
     runs-on: ubuntu-latest
+    outputs:
+      ref: $\{{ steps.ref.outputs.branch }}
     steps:
-      {{> setupGit with=(obj ref="${{ fromJSON(needs.release-please.outputs.pr).headBranchName }}")}}
+      - name: Output ref
+        id: ref
+        run: echo "::set-output name=branch::$\{{ fromJSON(needs.release-please.outputs.pr).headBranchName }}"
+      {{> setupGit with=(obj ref="${{ steps.ref.outputs.branch }}")}}
       {{> setupNode}}
       {{> setupDeps}}
       - name: Post pull request actions
@@ -42,6 +47,13 @@ jobs:
           npm run rp-pull-request --ignore-scripts --if-present -ws -iwr
           git commit -am "chore: post pull request" || true
           git push
+  
+  release-test:
+    needs: post-pr
+    if: needs.post-pr.outputs.ref
+    uses: ./.github/workflows/{{releaseTest}}
+    with:
+      ref: $\{{ needs.post-pr.outputs.ref }}
 
   post-release:
     needs: release-please
