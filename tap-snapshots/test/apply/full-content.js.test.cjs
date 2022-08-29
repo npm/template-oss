@@ -465,7 +465,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: \${{ fromJSON(needs.release-please.outputs.pr).headRefName }}
+          ref: \${{ fromJSON(needs.release-please.outputs.pr).headBranchName }}
       - name: Setup git user
         run: |
           git config --global user.email "npm-cli+bot@github.com"
@@ -1292,7 +1292,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: \${{ fromJSON(needs.release-please.outputs.pr).headRefName }}
+          ref: \${{ fromJSON(needs.release-please.outputs.pr).headBranchName }}
       - name: Setup git user
         run: |
           git config --global user.email "npm-cli+bot@github.com"
