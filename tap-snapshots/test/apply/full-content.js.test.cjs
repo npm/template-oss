@@ -604,6 +604,7 @@ release-please-config.json
   "plugins": [
     "node-workspace"
   ],
+  "exclude-packages-from-root": true,
   "changelog-sections": [
     {
       "type": "feat",
@@ -1438,6 +1439,7 @@ release-please-config.json
   "plugins": [
     "node-workspace"
   ],
+  "exclude-packages-from-root": true,
   "changelog-sections": [
     {
       "type": "feat",

@@ -48,7 +48,7 @@
     "lodash": "^4.17.21",
     "npm-package-arg": "^9.0.1",
     "proc-log": "^2.0.0",
-    "release-please": "github:lukekarrys/release-please#lk/node-workspace-root",
+    "release-please": "github:lukekarrys/release-please#template-oss",
     "semver": "^7.3.5",
     "yaml": "2.0.0-11"
   },

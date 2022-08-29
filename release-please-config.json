@@ -32,5 +32,6 @@
     ".": {
       "package-name": ""
     }
-  }
+  },
+  "exclude-packages-from-root": true
 }

@@ -1,6 +1,7 @@
 {
   "separate-pull-requests": {{{del}}},
   "plugins": ["node-workspace"],
+  "exclude-packages-from-root": true,
   "changelog-sections": {{{json changelogTypes}}},
   "packages": {
     "{{#unless pkgRelPath}}.{{/unless}}{{pkgRelPath}}": {
