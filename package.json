@@ -61,6 +61,9 @@
     "@npmcli/template-oss": "file:./",
     "tap": "^16.0.0"
   },
+  "tap": {
+    "timeout": 600
+  },
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten."
   },
