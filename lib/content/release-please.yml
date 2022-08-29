@@ -20,6 +20,7 @@ jobs:
     steps:
       {{> setupGit}}
       {{> setupNode}}
+      {{> setupDeps}}
       - id: release
         run: npx --offline template-oss-release-please
 
@@ -28,13 +29,13 @@ jobs:
     if: needs.release-please.outputs.pr
     runs-on: ubuntu-latest
     steps:
-      {{> setupGit}}
+      {{> setupGit with=(obj ref="${{ fromJSON(needs.release-please.outputs.pr).sha }}")}}
       {{> setupNode}}
-      - name: Update dependencies and commit
+      {{> setupDeps}}
+      - name: Post pull request actions
         env:
           GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr checkout $\{{ fromJSON(needs.release-please.outputs.pr).number }}
           npm run rp-pull-request --ignore-scripts --if-present -ws -iwr
           git commit -am "chore: post pull request" || true
           git push
@@ -46,7 +47,8 @@ jobs:
     steps:
       {{> setupGit}}
       {{> setupNode}}
-      - name: Run post release actions
+      {{> setupDeps}}
+      - name: Post release actions
         env:
           GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}
         run: |

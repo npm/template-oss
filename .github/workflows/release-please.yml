@@ -30,6 +30,7 @@ jobs:
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
+      - run: npm i --ignore-scripts --no-audit --no-fund
       - id: release
         run: npx --offline template-oss-release-please
 
@@ -39,6 +40,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ fromJSON(needs.release-please.outputs.pr).sha }}
       - name: Setup git user
         run: |
           git config --global user.email "npm-cli+bot@github.com"
@@ -49,11 +52,11 @@ jobs:
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
-      - name: Update dependencies and commit
+      - run: npm i --ignore-scripts --no-audit --no-fund
+      - name: Post pull request actions
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr checkout ${{ fromJSON(needs.release-please.outputs.pr).number }}
           npm run rp-pull-request --ignore-scripts --if-present -ws -iwr
           git commit -am "chore: post pull request" || true
           git push
@@ -74,7 +77,8 @@ jobs:
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
-      - name: Run post release actions
+      - run: npm i --ignore-scripts --no-audit --no-fund
+      - name: Post release actions
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |

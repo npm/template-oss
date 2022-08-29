@@ -279,9 +279,9 @@ jobs:
         if: \${{ !startsWith(matrix.node-version, '10.') }}
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
+      - run: npm i --ignore-scripts --no-audit --no-fund
       - name: add tap problem matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
-      - run: npm i --ignore-scripts --no-audit --no-fund
       - run: npm test --ignore-scripts
 
 .github/workflows/codeql-analysis.yml
@@ -349,6 +349,8 @@ jobs:
     if: github.actor == 'dependabot[bot]'
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: \${{ github.event.pull_request.head.sha }}
       - name: Setup git user
         run: |
           git config --global user.email "npm-cli+bot@github.com"
@@ -359,20 +361,18 @@ jobs:
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
+      - run: npm i --ignore-scripts --no-audit --no-fund
       - name: Dependabot metadata
         id: metadata
         uses: dependabot/fetch-metadata@v1.1.1
         with:
           github-token: "\${{ secrets.GITHUB_TOKEN }}"
-      - name: npm install and commit
+      - name: Apply @npmcli/template-oss changes and lint
         if: contains(steps.metadata.outputs.dependency-names, '@npmcli/template-oss')
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr checkout \${{ github.event.pull_request.number }}
-          npm install --ignore-scripts --no-audit --no-fund
-          npm run template-oss-apply
-          git add .
+          npm run template-oss-apply --ignore-scripts
           git commit -am "chore: postinstall for dependabot template-oss PR"
           git push
           npm run lint
@@ -451,6 +451,7 @@ jobs:
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
+      - run: npm i --ignore-scripts --no-audit --no-fund
       - id: release
         run: npx --offline template-oss-release-please
 
@@ -460,6 +461,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: \${{ fromJSON(needs.release-please.outputs.pr).sha }}
       - name: Setup git user
         run: |
           git config --global user.email "npm-cli+bot@github.com"
@@ -470,11 +473,11 @@ jobs:
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
-      - name: Update dependencies and commit
+      - run: npm i --ignore-scripts --no-audit --no-fund
+      - name: Post pull request actions
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr checkout \${{ fromJSON(needs.release-please.outputs.pr).number }}
           npm run rp-pull-request --ignore-scripts --if-present -ws -iwr
           git commit -am "chore: post pull request" || true
           git push
@@ -495,7 +498,8 @@ jobs:
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
-      - name: Run post release actions
+      - run: npm i --ignore-scripts --no-audit --no-fund
+      - name: Post release actions
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -910,9 +914,9 @@ jobs:
         if: \${{ !startsWith(matrix.node-version, '10.') }}
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
+      - run: npm i --ignore-scripts --no-audit --no-fund
       - name: add tap problem matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
-      - run: npm i --ignore-scripts --no-audit --no-fund
       - run: npm test --ignore-scripts -w bbb
 
 .github/workflows/ci-name-aaaa.yml
@@ -1005,9 +1009,9 @@ jobs:
         if: \${{ !startsWith(matrix.node-version, '10.') }}
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
+      - run: npm i --ignore-scripts --no-audit --no-fund
       - name: add tap problem matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
-      - run: npm i --ignore-scripts --no-audit --no-fund
       - run: npm test --ignore-scripts -w @name/aaaa
 
 .github/workflows/ci.yml
@@ -1096,9 +1100,9 @@ jobs:
         if: \${{ !startsWith(matrix.node-version, '10.') }}
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
+      - run: npm i --ignore-scripts --no-audit --no-fund
       - name: add tap problem matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
-      - run: npm i --ignore-scripts --no-audit --no-fund
       - run: npm test --ignore-scripts
 
 .github/workflows/codeql-analysis.yml
@@ -1166,6 +1170,8 @@ jobs:
     if: github.actor == 'dependabot[bot]'
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: \${{ github.event.pull_request.head.sha }}
       - name: Setup git user
         run: |
           git config --global user.email "npm-cli+bot@github.com"
@@ -1176,20 +1182,18 @@ jobs:
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
+      - run: npm i --ignore-scripts --no-audit --no-fund
       - name: Dependabot metadata
         id: metadata
         uses: dependabot/fetch-metadata@v1.1.1
         with:
           github-token: "\${{ secrets.GITHUB_TOKEN }}"
-      - name: npm install and commit
+      - name: Apply @npmcli/template-oss changes and lint
         if: contains(steps.metadata.outputs.dependency-names, '@npmcli/template-oss')
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr checkout \${{ github.event.pull_request.number }}
-          npm install --ignore-scripts --no-audit --no-fund
-          npm run template-oss-apply
-          git add .
+          npm run template-oss-apply --ignore-scripts
           git commit -am "chore: postinstall for dependabot template-oss PR"
           git push
           npm run lint
@@ -1268,6 +1272,7 @@ jobs:
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
+      - run: npm i --ignore-scripts --no-audit --no-fund
       - id: release
         run: npx --offline template-oss-release-please
 
@@ -1277,6 +1282,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: \${{ fromJSON(needs.release-please.outputs.pr).sha }}
       - name: Setup git user
         run: |
           git config --global user.email "npm-cli+bot@github.com"
@@ -1287,11 +1294,11 @@ jobs:
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
-      - name: Update dependencies and commit
+      - run: npm i --ignore-scripts --no-audit --no-fund
+      - name: Post pull request actions
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr checkout \${{ fromJSON(needs.release-please.outputs.pr).number }}
           npm run rp-pull-request --ignore-scripts --if-present -ws -iwr
           git commit -am "chore: post pull request" || true
           git push
@@ -1312,7 +1319,8 @@ jobs:
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
-      - name: Run post release actions
+      - run: npm i --ignore-scripts --no-audit --no-fund
+      - name: Post release actions
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |

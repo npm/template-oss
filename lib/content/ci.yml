@@ -55,7 +55,7 @@ jobs:
     steps:
       {{> setupGit}}
       {{> setupNode useMatrix=true}}
+      {{> setupDeps}}
       - name: add tap problem matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
-      {{> setupDeps}}
       - run: npm test --ignore-scripts {{~#if isWorkspace}} -w {{pkgName}}{{/if}}

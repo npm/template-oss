@@ -336,9 +336,9 @@ The repo file ci.yml needs to be updated:
   +        if: \${{ !startsWith(matrix.node-version, '10.') }}
   +        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
   +      - run: npm -v
+  +      - run: npm i --ignore-scripts --no-audit --no-fund
   +      - name: add tap problem matcher
   +        run: echo "::add-matcher::.github/matchers/tap.json"
-  +      - run: npm i --ignore-scripts --no-audit --no-fund
   +      - run: npm test --ignore-scripts
 
 To correct it: npx template-oss-apply --force
