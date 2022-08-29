@@ -15,9 +15,8 @@ jobs:
     steps:
       {{> setupGit with=(obj fetch-depth=0)}}
       {{> setupNode}}
-      - name: Install deps
-        run: npm i -D @commitlint/cli @commitlint/config-conventional
-      - name: Check commits OR PR title
+      {{> setupDeps}}
+      - name: Check commits or PR title
         env:
           PR_TITLE: $\{{ github.event.pull_request.title }}
         run: |

@@ -1,0 +1,1 @@
+- run: npm i --ignore-scripts --no-audit --no-fund {{~#if flags}} --{{flags}}{{/if}}
