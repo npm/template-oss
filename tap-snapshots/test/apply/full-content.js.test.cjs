@@ -372,7 +372,7 @@ jobs:
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm run template-oss-apply --ignore-scripts
+          npm run template-oss-apply
           git commit -am "chore: postinstall for dependabot template-oss PR"
           git push
           npm run lint
@@ -452,8 +452,11 @@ jobs:
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
       - run: npm i --ignore-scripts --no-audit --no-fund
-      - id: release
+      - name: Release Please
+        id: release
         run: npx --offline template-oss-release-please
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
 
   post-pr:
     needs: release-please
@@ -1193,7 +1196,7 @@ jobs:
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm run template-oss-apply --ignore-scripts
+          npm run template-oss-apply
           git commit -am "chore: postinstall for dependabot template-oss PR"
           git push
           npm run lint
@@ -1273,8 +1276,11 @@ jobs:
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
       - run: npm i --ignore-scripts --no-audit --no-fund
-      - id: release
+      - name: Release Please
+        id: release
         run: npx --offline template-oss-release-please
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
 
   post-pr:
     needs: release-please
