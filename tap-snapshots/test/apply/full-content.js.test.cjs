@@ -601,6 +601,9 @@ package.json
 release-please-config.json
 ========================================
 {
+  "plugins": [
+    "node-workspace"
+  ],
   "changelog-sections": [
     {
       "type": "feat",
@@ -1432,6 +1435,9 @@ package.json
 release-please-config.json
 ========================================
 {
+  "plugins": [
+    "node-workspace"
+  ],
   "changelog-sections": [
     {
       "type": "feat",

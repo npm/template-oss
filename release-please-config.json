@@ -1,4 +1,7 @@
 {
+  "plugins": [
+    "node-workspace"
+  ],
   "changelog-sections": [
     {
       "type": "feat",
