@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.actor == 'dependabot[bot]'
     steps:
-      {{> setupGit with=(obj ref="${{ github.event.pull_request.head.sha }}")}}
+      {{> setupGit with=(obj ref="${{ github.event.pull_request.head_ref }}")}}
       {{> setupNode}}
       {{> setupDeps}}
       - name: Dependabot metadata
