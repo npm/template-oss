@@ -12,22 +12,20 @@ jobs:
     runs-on: ubuntu-latest
     if: github.actor == 'dependabot[bot]'
     steps:
-      {{> setupGit}}
+      {{> setupGit with=(obj ref="${{ github.event.pull_request.head_ref }}")}}
       {{> setupNode}}
+      {{> setupDeps}}
       - name: Dependabot metadata
         id: metadata
         uses: dependabot/fetch-metadata@v1.1.1
         with:
           github-token: "$\{{ secrets.GITHUB_TOKEN }}"
-      - name: npm install and commit
+      - name: Apply {{__NAME__}} changes and lint
         if: contains(steps.metadata.outputs.dependency-names, '{{__NAME__}}')
         env:
           GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr checkout $\{{ github.event.pull_request.number }}
-          npm install --ignore-scripts --no-audit --no-fund
           npm run template-oss-apply
-          git add .
           git commit -am "chore: postinstall for dependabot template-oss PR"
           git push
           npm run lint

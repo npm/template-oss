@@ -1,37 +1,22 @@
-name: CI {{~#if isWorkspace}} - {{pkgName}}{{/if}}
+name: Release
 
 on:
-  workflow_dispatch:
-  pull_request:
-    branches:
-      - '*'
-    {{#if pkgRelPath}}
-    paths:
-      - {{pkgRelPath}}/**
-    {{/if}}
-  push:
-    branches:
-      {{#each branches}}
-      - {{.}}
-      {{/each}}
-    {{#if pkgRelPath}}
-    paths:
-      - {{pkgRelPath}}/**
-    {{/if}}
-  schedule:
-    # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
-    - cron: "0 9 * * 1"
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
 
 jobs:
-  lint:
+  lint-all:
     runs-on: ubuntu-latest
     steps:
-      {{> setupGit}}
+      {{> setupGit with=(obj ref="${{ inputs.ref }}")}}
       {{> setupNode}}
       {{> setupDeps}}
-      - run: npm run lint {{~#if isWorkspace}} -w {{pkgName}}{{/if}}
+      - run: npm run lint --if-present --workspaces --include-workspace-root
 
-  test:
+  test-all:
     strategy:
       fail-fast: false
       matrix:
@@ -53,9 +38,9 @@ jobs:
       run:
         shell: $\{{ matrix.platform.shell }}
     steps:
-      {{> setupGit}}
+      {{> setupGit with=(obj ref="${{ inputs.ref }}")}}
       {{> setupNode useMatrix=true}}
       {{> setupDeps}}
       - name: add tap problem matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
-      - run: npm test --ignore-scripts {{~#if isWorkspace}} -w {{pkgName}}{{/if}}
+      - run: npm run test --if-present --workspaces --include-workspace-root

@@ -1,25 +1,21 @@
 # This file is automatically added by @npmcli/template-oss. Do not edit.
 
-name: CI
+name: Release
 
 on:
-  workflow_dispatch:
-  pull_request:
-    branches:
-      - '*'
-  push:
-    branches:
-      - main
-      - latest
-  schedule:
-    # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
-    - cron: "0 9 * * 1"
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
 
 jobs:
-  lint:
+  lint-all:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
       - name: Setup git user
         run: |
           git config --global user.email "npm-cli+bot@github.com"
@@ -31,9 +27,9 @@ jobs:
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
       - run: npm i --ignore-scripts --no-audit --no-fund
-      - run: npm run lint
+      - run: npm run lint --if-present --workspaces --include-workspace-root
 
-  test:
+  test-all:
     strategy:
       fail-fast: false
       matrix:
@@ -57,6 +53,8 @@ jobs:
         shell: ${{ matrix.platform.shell }}
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
       - name: Setup git user
         run: |
           git config --global user.email "npm-cli+bot@github.com"
@@ -85,4 +83,4 @@ jobs:
       - run: npm i --ignore-scripts --no-audit --no-fund
       - name: add tap problem matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
-      - run: npm test --ignore-scripts
+      - run: npm run test --if-present --workspaces --include-workspace-root

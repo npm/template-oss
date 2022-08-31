@@ -1,5 +1,8 @@
 {
-  "separate-pull-requests": true,
+  "plugins": [
+    "node-workspace",
+    "workspace-deps"
+  ],
   "changelog-sections": [
     {
       "type": "feat",
@@ -30,5 +33,8 @@
     ".": {
       "package-name": ""
     }
-  }
+  },
+  "exclude-packages-from-root": true,
+  "group-pull-request-title-pattern": "chore: release ${version}",
+  "pull-request-title-pattern": "chore: release${component} ${version}"
 }

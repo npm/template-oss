@@ -255,6 +255,25 @@ To correct it: npx template-oss-apply --force
 
 -------------------------------------------------------------------
 
+The repo file release-test.yml needs to be updated:
+
+  .github/workflows/release-test.yml
+  ========================================
+  @@ -33,8 +33,9 @@
+       strategy:
+         fail-fast: false
+         matrix:
+           node-version:
+  +          - 10
+             - 12.13.0
+             - 12.x
+             - 14.15.0
+             - 14.x
+
+To correct it: npx template-oss-apply --force
+
+-------------------------------------------------------------------
+
 The module file package.json needs to be updated:
 
   package.json
@@ -336,9 +355,9 @@ The repo file ci.yml needs to be updated:
   +        if: \${{ !startsWith(matrix.node-version, '10.') }}
   +        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
   +      - run: npm -v
+  +      - run: npm i --ignore-scripts --no-audit --no-fund
   +      - name: add tap problem matcher
   +        run: echo "::add-matcher::.github/matchers/tap.json"
-  +      - run: npm i --ignore-scripts --no-audit --no-fund
   +      - run: npm test --ignore-scripts
 
 To correct it: npx template-oss-apply --force
