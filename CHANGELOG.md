@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.8.0](https://github.com/npm/template-oss/compare/v3.7.1...v3.8.0) (2022-08-31)
+
+### Features
+
+  * [`7562777`](https://github.com/npm/template-oss/commit/75627773c0afd3e9dbe5c176a797f363d81208f3) [#174](https://github.com/npm/template-oss/pull/174) feat: use custom release please script (@lukekarrys)
+
+### Bug Fixes
+
+  * [`0f44075`](https://github.com/npm/template-oss/commit/0f440750cbe55c02df5c2b8a479d51bd895ce17f) [#175](https://github.com/npm/template-oss/pull/175) fix: only add release please workspace plugins to monorepos (@lukekarrys)
+
 ## [3.7.1](https://github.com/npm/template-oss/compare/v3.7.0...v3.7.1) (2022-08-25)
 
 
