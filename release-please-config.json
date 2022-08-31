@@ -1,6 +1,7 @@
 {
   "plugins": [
-    "node-workspace"
+    "node-workspace",
+    "workspace-deps"
   ],
   "changelog-sections": [
     {
@@ -33,5 +34,6 @@
       "package-name": ""
     }
   },
-  "exclude-packages-from-root": true
+  "exclude-packages-from-root": true,
+  "group-pull-request-title-pattern": "Release ${version}"
 }

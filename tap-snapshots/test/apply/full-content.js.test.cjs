@@ -703,9 +703,11 @@ release-please-config.json
 ========================================
 {
   "plugins": [
-    "node-workspace"
+    "node-workspace",
+    "workspace-deps"
   ],
   "exclude-packages-from-root": true,
+  "group-pull-request-title-pattern": "Release \${version}",
   "changelog-sections": [
     {
       "type": "feat",
@@ -1639,9 +1641,11 @@ release-please-config.json
 ========================================
 {
   "plugins": [
-    "node-workspace"
+    "node-workspace",
+    "workspace-deps"
   ],
   "exclude-packages-from-root": true,
+  "group-pull-request-title-pattern": "Release \${version}",
   "changelog-sections": [
     {
       "type": "feat",
