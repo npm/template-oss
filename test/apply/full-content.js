@@ -34,6 +34,20 @@ t.test('workspaces + everything', async (t) => {
   await t.resolveMatchSnapshot(s.readdirSource())
 })
 
+t.test('workspaces only', async (t) => {
+  const s = await setup(t, {
+    package: {
+      templateOSS: {
+        rootRepo: false,
+        rootModule: false,
+      },
+    },
+    workspaces: { a: 'a', b: 'b' },
+  })
+  await s.apply()
+  await t.resolveMatchSnapshot(s.readdirSource())
+})
+
 t.test('with empty content', async (t) => {
   const s = await setup(t, { content: {} })
   await s.apply()

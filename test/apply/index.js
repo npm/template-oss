@@ -74,6 +74,20 @@ t.test('workspaces', async (t) => {
   await t.resolveMatchSnapshot(s.readdir())
 })
 
+t.test('workspaces only (like npm/cli)', async (t) => {
+  const s = await setup(t, {
+    package: {
+      templateOSS: {
+        rootRepo: false,
+        rootModule: false,
+      },
+    },
+    workspaces: { a: 'a', b: 'b' },
+  })
+  await s.apply()
+  await t.resolveMatchSnapshot(s.readdir())
+})
+
 t.test('private workspace', async (t) => {
   const s = await setup(t, {
     package: {

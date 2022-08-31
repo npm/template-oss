@@ -56,3 +56,20 @@ workspaces/d/.eslintrc.js
 workspaces/d/.gitignore
 workspaces/d/package.json
 `
+
+exports[`test/apply/index.js TAP workspaces only (like npm/cli) > expect resolving Promise 1`] = `
+.github/matchers/tap.json
+.github/workflows/ci-a.yml
+.github/workflows/ci-b.yml
+.github/workflows/release-please.yml
+.github/workflows/release-test.yml
+.release-please-manifest.json
+package.json
+release-please-config.json
+workspaces/a/.eslintrc.js
+workspaces/a/.gitignore
+workspaces/a/package.json
+workspaces/b/.eslintrc.js
+workspaces/b/.gitignore
+workspaces/b/package.json
+`

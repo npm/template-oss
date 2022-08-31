@@ -702,10 +702,6 @@ package.json
 release-please-config.json
 ========================================
 {
-  "plugins": [
-    "node-workspace",
-    "workspace-deps"
-  ],
   "exclude-packages-from-root": true,
   "group-pull-request-title-pattern": "chore: release \${version}",
   "pull-request-title-pattern": "chore: release\${component} \${version}",
@@ -1814,6 +1810,640 @@ workspaces/b/package.json
 ========================================
 {
   "name": "bbb",
+  "version": "1.0.0",
+  "scripts": {
+    "lint": "eslint /"**/*.js/"",
+    "postlint": "template-oss-check",
+    "template-oss-apply": "template-oss-apply --force",
+    "lintfix": "npm run lint -- --fix",
+    "preversion": "npm test",
+    "postversion": "npm publish",
+    "prepublishOnly": "git push origin --follow-tags",
+    "snap": "tap",
+    "test": "tap",
+    "posttest": "npm run lint"
+  },
+  "author": "GitHub Inc.",
+  "files": [
+    "bin/",
+    "lib/"
+  ],
+  "engines": {
+    "node": "^12.13.0 || ^14.15.0 || >=16.0.0"
+  },
+  "templateOSS": {
+    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
+    "version": "{{VERSION}}"
+  }
+}
+`
+
+exports[`test/apply/full-content.js TAP workspaces only > expect resolving Promise 1`] = `
+.github/matchers/tap.json
+========================================
+{
+  "//@npmcli/template-oss": "This file is automatically added by @npmcli/template-oss. Do not edit.",
+  "problemMatcher": [
+    {
+      "owner": "tap",
+      "pattern": [
+        {
+          "regexp": "^/s*not ok /d+ - (.*)",
+          "message": 1
+        },
+        {
+          "regexp": "^/s*---"
+        },
+        {
+          "regexp": "^/s*at:"
+        },
+        {
+          "regexp": "^/s*line:/s*(/d+)",
+          "line": 1
+        },
+        {
+          "regexp": "^/s*column:/s*(/d+)",
+          "column": 1
+        },
+        {
+          "regexp": "^/s*file:/s*(.*)",
+          "file": 1
+        }
+      ]
+    }
+  ]
+}
+
+.github/workflows/ci-a.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: CI - a
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - '*'
+    paths:
+      - workspaces/a/**
+  push:
+    branches:
+      - main
+      - latest
+    paths:
+      - workspaces/a/**
+  schedule:
+    # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
+    - cron: "0 9 * * 1"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup git user
+        run: |
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - name: Update npm to latest
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+      - run: npm -v
+      - run: npm i --ignore-scripts --no-audit --no-fund
+      - run: npm run lint -w a
+
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version:
+          - 12.13.0
+          - 12.x
+          - 14.15.0
+          - 14.x
+          - 16.0.0
+          - 16.x
+        platform:
+          - os: ubuntu-latest
+            shell: bash
+          - os: macos-latest
+            shell: bash
+          - os: windows-latest
+            shell: cmd
+    runs-on: \${{ matrix.platform.os }}
+    defaults:
+      run:
+        shell: \${{ matrix.platform.shell }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup git user
+        run: |
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - uses: actions/setup-node@v3
+        with:
+          node-version: \${{ matrix.node-version }}
+      - name: Update to workable npm (windows)
+        # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
+        if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
+        run: |
+          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
+          tar xf npm-7.5.4.tgz
+          cd package
+          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
+          cd ..
+          rmdir /s /q package
+      - name: Update npm to 7
+        # If we do test on npm 10 it needs npm7
+        if: startsWith(matrix.node-version, '10.')
+        run: npm i --prefer-online --no-fund --no-audit -g npm@7
+      - name: Update npm to latest
+        if: \${{ !startsWith(matrix.node-version, '10.') }}
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+      - run: npm -v
+      - run: npm i --ignore-scripts --no-audit --no-fund
+      - name: add tap problem matcher
+        run: echo "::add-matcher::.github/matchers/tap.json"
+      - run: npm test --ignore-scripts -w a
+
+.github/workflows/ci-b.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: CI - b
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - '*'
+    paths:
+      - workspaces/b/**
+  push:
+    branches:
+      - main
+      - latest
+    paths:
+      - workspaces/b/**
+  schedule:
+    # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
+    - cron: "0 9 * * 1"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup git user
+        run: |
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - name: Update npm to latest
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+      - run: npm -v
+      - run: npm i --ignore-scripts --no-audit --no-fund
+      - run: npm run lint -w b
+
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version:
+          - 12.13.0
+          - 12.x
+          - 14.15.0
+          - 14.x
+          - 16.0.0
+          - 16.x
+        platform:
+          - os: ubuntu-latest
+            shell: bash
+          - os: macos-latest
+            shell: bash
+          - os: windows-latest
+            shell: cmd
+    runs-on: \${{ matrix.platform.os }}
+    defaults:
+      run:
+        shell: \${{ matrix.platform.shell }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup git user
+        run: |
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - uses: actions/setup-node@v3
+        with:
+          node-version: \${{ matrix.node-version }}
+      - name: Update to workable npm (windows)
+        # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
+        if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
+        run: |
+          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
+          tar xf npm-7.5.4.tgz
+          cd package
+          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
+          cd ..
+          rmdir /s /q package
+      - name: Update npm to 7
+        # If we do test on npm 10 it needs npm7
+        if: startsWith(matrix.node-version, '10.')
+        run: npm i --prefer-online --no-fund --no-audit -g npm@7
+      - name: Update npm to latest
+        if: \${{ !startsWith(matrix.node-version, '10.') }}
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+      - run: npm -v
+      - run: npm i --ignore-scripts --no-audit --no-fund
+      - name: add tap problem matcher
+        run: echo "::add-matcher::.github/matchers/tap.json"
+      - run: npm test --ignore-scripts -w b
+
+.github/workflows/release-please.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Release Please
+
+on:
+  push:
+    branches:
+      - main
+      - latest
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      pr: \${{ steps.release.outputs.pr }}
+      release: \${{ steps.release.outputs.release }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup git user
+        run: |
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - name: Update npm to latest
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+      - run: npm -v
+      - run: npm i --ignore-scripts --no-audit --no-fund
+      - name: Release Please
+        id: release
+        run: npx --offline template-oss-release-please
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+
+  post-pr:
+    needs: release-please
+    if: needs.release-please.outputs.pr
+    runs-on: ubuntu-latest
+    outputs:
+      ref: \${{ steps.ref.outputs.branch }}
+    steps:
+      - name: Output ref
+        id: ref
+        run: echo "::set-output name=branch::\${{ fromJSON(needs.release-please.outputs.pr).headBranchName }}"
+      - uses: actions/checkout@v3
+        with:
+          ref: \${{ steps.ref.outputs.branch }}
+      - name: Setup git user
+        run: |
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - name: Update npm to latest
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+      - run: npm -v
+      - run: npm i --ignore-scripts --no-audit --no-fund
+      - name: Post pull request actions
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm run rp-pull-request --ignore-scripts --if-present -ws -iwr
+          git commit -am "chore: post pull request" || true
+          git push
+
+  release-test:
+    needs: post-pr
+    if: needs.post-pr.outputs.ref
+    uses: ./.github/workflows/release-test.yml
+    with:
+      ref: \${{ needs.post-pr.outputs.ref }}
+
+  post-release:
+    needs: release-please
+    if: needs.release-please.outputs.release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup git user
+        run: |
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - name: Update npm to latest
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+      - run: npm -v
+      - run: npm i --ignore-scripts --no-audit --no-fund
+      - name: Post release actions
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm run rp-release --ignore-scripts --if-present -ws -iwr
+
+.github/workflows/release-test.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Release
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+
+jobs:
+  lint-all:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: \${{ inputs.ref }}
+      - name: Setup git user
+        run: |
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - name: Update npm to latest
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+      - run: npm -v
+      - run: npm i --ignore-scripts --no-audit --no-fund
+      - run: npm run lint --if-present --workspaces --include-workspace-root
+
+  test-all:
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version:
+          - 12.13.0
+          - 12.x
+          - 14.15.0
+          - 14.x
+          - 16.0.0
+          - 16.x
+        platform:
+          - os: ubuntu-latest
+            shell: bash
+          - os: macos-latest
+            shell: bash
+          - os: windows-latest
+            shell: cmd
+    runs-on: \${{ matrix.platform.os }}
+    defaults:
+      run:
+        shell: \${{ matrix.platform.shell }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: \${{ inputs.ref }}
+      - name: Setup git user
+        run: |
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - uses: actions/setup-node@v3
+        with:
+          node-version: \${{ matrix.node-version }}
+      - name: Update to workable npm (windows)
+        # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
+        if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
+        run: |
+          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
+          tar xf npm-7.5.4.tgz
+          cd package
+          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
+          cd ..
+          rmdir /s /q package
+      - name: Update npm to 7
+        # If we do test on npm 10 it needs npm7
+        if: startsWith(matrix.node-version, '10.')
+        run: npm i --prefer-online --no-fund --no-audit -g npm@7
+      - name: Update npm to latest
+        if: \${{ !startsWith(matrix.node-version, '10.') }}
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+      - run: npm -v
+      - run: npm i --ignore-scripts --no-audit --no-fund
+      - name: add tap problem matcher
+        run: echo "::add-matcher::.github/matchers/tap.json"
+      - run: npm run test --if-present --workspaces --include-workspace-root
+
+.release-please-manifest.json
+========================================
+{
+  "workspaces/a": "1.0.0",
+  "workspaces/b": "1.0.0"
+}
+
+package.json
+========================================
+{
+  "templateOSS": {
+    "rootRepo": false,
+    "rootModule": false,
+    "version": "{{VERSION}}"
+  },
+  "name": "testpkg",
+  "version": "1.0.0",
+  "workspaces": [
+    "workspaces/a",
+    "workspaces/b"
+  ]
+}
+
+release-please-config.json
+========================================
+{
+  "plugins": [
+    "node-workspace",
+    "workspace-deps"
+  ],
+  "exclude-packages-from-root": true,
+  "group-pull-request-title-pattern": "chore: release \${version}",
+  "pull-request-title-pattern": "chore: release\${component} \${version}",
+  "changelog-sections": [
+    {
+      "type": "feat",
+      "section": "Features",
+      "hidden": false
+    },
+    {
+      "type": "fix",
+      "section": "Bug Fixes",
+      "hidden": false
+    },
+    {
+      "type": "docs",
+      "section": "Documentation",
+      "hidden": false
+    },
+    {
+      "type": "deps",
+      "section": "Dependencies",
+      "hidden": false
+    },
+    {
+      "type": "chore",
+      "hidden": true
+    }
+  ],
+  "packages": {
+    "workspaces/a": {},
+    "workspaces/b": {}
+  }
+}
+
+workspaces/a/.eslintrc.js
+========================================
+/* This file is automatically added by @npmcli/template-oss. Do not edit. */
+
+'use strict'
+
+const { readdirSync: readdir } = require('fs')
+
+const localConfigs = readdir(__dirname)
+  .filter((file) => file.startsWith('.eslintrc.local.'))
+  .map((file) => \`./\${file}\`)
+
+module.exports = {
+  root: true,
+  extends: [
+    '@npmcli',
+    ...localConfigs,
+  ],
+}
+
+workspaces/a/.gitignore
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+# ignore everything in the root
+/*
+
+# keep these
+!/.eslintrc.local.*
+!**/.gitignore
+!/docs/
+!/tap-snapshots/
+!/test/
+!/map.js
+!/scripts/
+!/README*
+!/LICENSE*
+!/CHANGELOG*
+!/.eslintrc.js
+!/.gitignore
+!/bin/
+!/lib/
+!/package.json
+
+workspaces/a/package.json
+========================================
+{
+  "name": "a",
+  "version": "1.0.0",
+  "scripts": {
+    "lint": "eslint /"**/*.js/"",
+    "postlint": "template-oss-check",
+    "template-oss-apply": "template-oss-apply --force",
+    "lintfix": "npm run lint -- --fix",
+    "preversion": "npm test",
+    "postversion": "npm publish",
+    "prepublishOnly": "git push origin --follow-tags",
+    "snap": "tap",
+    "test": "tap",
+    "posttest": "npm run lint"
+  },
+  "author": "GitHub Inc.",
+  "files": [
+    "bin/",
+    "lib/"
+  ],
+  "engines": {
+    "node": "^12.13.0 || ^14.15.0 || >=16.0.0"
+  },
+  "templateOSS": {
+    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
+    "version": "{{VERSION}}"
+  }
+}
+
+workspaces/b/.eslintrc.js
+========================================
+/* This file is automatically added by @npmcli/template-oss. Do not edit. */
+
+'use strict'
+
+const { readdirSync: readdir } = require('fs')
+
+const localConfigs = readdir(__dirname)
+  .filter((file) => file.startsWith('.eslintrc.local.'))
+  .map((file) => \`./\${file}\`)
+
+module.exports = {
+  root: true,
+  extends: [
+    '@npmcli',
+    ...localConfigs,
+  ],
+}
+
+workspaces/b/.gitignore
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+# ignore everything in the root
+/*
+
+# keep these
+!/.eslintrc.local.*
+!**/.gitignore
+!/docs/
+!/tap-snapshots/
+!/test/
+!/map.js
+!/scripts/
+!/README*
+!/LICENSE*
+!/CHANGELOG*
+!/.eslintrc.js
+!/.gitignore
+!/bin/
+!/lib/
+!/package.json
+
+workspaces/b/package.json
+========================================
+{
+  "name": "b",
   "version": "1.0.0",
   "scripts": {
     "lint": "eslint /"**/*.js/"",
