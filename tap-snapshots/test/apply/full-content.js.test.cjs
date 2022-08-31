@@ -707,7 +707,8 @@ release-please-config.json
     "workspace-deps"
   ],
   "exclude-packages-from-root": true,
-  "group-pull-request-title-pattern": "Release \${version}",
+  "group-pull-request-title-pattern": "chore: release \${version}",
+  "pull-request-title-pattern": "chore: release\${component} \${version}",
   "changelog-sections": [
     {
       "type": "feat",
@@ -1645,7 +1646,8 @@ release-please-config.json
     "workspace-deps"
   ],
   "exclude-packages-from-root": true,
-  "group-pull-request-title-pattern": "Release \${version}",
+  "group-pull-request-title-pattern": "chore: release \${version}",
+  "pull-request-title-pattern": "chore: release\${component} \${version}",
   "changelog-sections": [
     {
       "type": "feat",
