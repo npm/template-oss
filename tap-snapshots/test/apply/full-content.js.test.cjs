@@ -470,6 +470,7 @@ jobs:
         run: echo "::set-output name=branch::\${{ fromJSON(needs.release-please.outputs.pr).headBranchName }}"
       - uses: actions/checkout@v3
         with:
+          fetch-depth: 0
           ref: \${{ steps.ref.outputs.branch }}
       - name: Setup git user
         run: |
@@ -678,9 +679,6 @@ package.json
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
     "lintfix": "npm run lint -- --fix",
-    "preversion": "npm test",
-    "postversion": "npm publish",
-    "prepublishOnly": "git push origin --follow-tags",
     "snap": "tap",
     "test": "tap",
     "posttest": "npm run lint"
@@ -1398,6 +1396,7 @@ jobs:
         run: echo "::set-output name=branch::\${{ fromJSON(needs.release-please.outputs.pr).headBranchName }}"
       - uses: actions/checkout@v3
         with:
+          fetch-depth: 0
           ref: \${{ steps.ref.outputs.branch }}
       - name: Setup git user
         run: |
@@ -1613,9 +1612,6 @@ package.json
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
     "lintfix": "npm run lint -- --fix",
-    "preversion": "npm test",
-    "postversion": "npm publish",
-    "prepublishOnly": "git push origin --follow-tags",
     "snap": "tap",
     "test": "tap",
     "posttest": "npm run lint"
@@ -1737,9 +1733,6 @@ workspaces/a/package.json
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
     "lintfix": "npm run lint -- --fix",
-    "preversion": "npm test",
-    "postversion": "npm publish",
-    "prepublishOnly": "git push origin --follow-tags",
     "snap": "tap",
     "test": "tap",
     "posttest": "npm run lint"
@@ -1816,9 +1809,6 @@ workspaces/b/package.json
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
     "lintfix": "npm run lint -- --fix",
-    "preversion": "npm test",
-    "postversion": "npm publish",
-    "prepublishOnly": "git push origin --follow-tags",
     "snap": "tap",
     "test": "tap",
     "posttest": "npm run lint"
@@ -2117,6 +2107,7 @@ jobs:
         run: echo "::set-output name=branch::\${{ fromJSON(needs.release-please.outputs.pr).headBranchName }}"
       - uses: actions/checkout@v3
         with:
+          fetch-depth: 0
           ref: \${{ steps.ref.outputs.branch }}
       - name: Setup git user
         run: |
@@ -2375,9 +2366,6 @@ workspaces/a/package.json
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
     "lintfix": "npm run lint -- --fix",
-    "preversion": "npm test",
-    "postversion": "npm publish",
-    "prepublishOnly": "git push origin --follow-tags",
     "snap": "tap",
     "test": "tap",
     "posttest": "npm run lint"
@@ -2450,9 +2438,6 @@ workspaces/b/package.json
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
     "lintfix": "npm run lint -- --fix",
-    "preversion": "npm test",
-    "postversion": "npm publish",
-    "prepublishOnly": "git push origin --follow-tags",
     "snap": "tap",
     "test": "tap",
     "posttest": "npm run lint"

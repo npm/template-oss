@@ -61,9 +61,6 @@ The module file package.json needs to be updated:
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
     "lintfix": "npm run lint -- --fix",
-    "preversion": "npm test",
-    "postversion": "npm publish",
-    "prepublishOnly": "git push origin --follow-tags",
     "snap": "tap",
     "test": "tap",
     "posttest": "npm run lint"
@@ -144,9 +141,6 @@ The module file package.json needs to be updated:
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
     "lintfix": "npm run lint -- --fix",
-    "preversion": "npm test",
-    "postversion": "npm publish",
-    "prepublishOnly": "git push origin --follow-tags",
     "snap": "tap",
     "test": "tap",
     "posttest": "npm run lint"
@@ -209,9 +203,6 @@ The module file package.json needs to be updated:
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
     "lintfix": "npm run lint -- --fix",
-    "preversion": "npm test",
-    "postversion": "npm publish",
-    "prepublishOnly": "git push origin --follow-tags",
     "snap": "tap",
     "test": "tap",
     "posttest": "npm run lint"
@@ -274,9 +265,6 @@ The module file package.json needs to be updated:
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
     "lintfix": "npm run lint -- --fix",
-    "preversion": "npm test",
-    "postversion": "npm publish",
-    "prepublishOnly": "git push origin --follow-tags",
     "snap": "tap",
     "test": "tap",
     "posttest": "npm run lint"

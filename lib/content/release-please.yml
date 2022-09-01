@@ -37,7 +37,7 @@ jobs:
       - name: Output ref
         id: ref
         run: echo "::set-output name=branch::$\{{ fromJSON(needs.release-please.outputs.pr).headBranchName }}"
-      {{> setupGit with=(obj ref="${{ steps.ref.outputs.branch }}")}}
+      {{> setupGit with=(obj ref="${{ steps.ref.outputs.branch }}" fetch-depth=0)}}
       {{> setupNode}}
       {{> setupDeps}}
       - name: Post pull request actions
