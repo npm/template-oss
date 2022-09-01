@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.8.1](https://github.com/npm/template-oss/compare/v3.8.0...v3.8.1) (2022-09-01)
+
+### Bug Fixes
+
+  * [`70782b3`](https://github.com/npm/template-oss/commit/70782b3677e40472260853df92d3ca8b805af422) [#179](https://github.com/npm/template-oss/pull/179) fix: update a few release nits after trying it on the cli (@lukekarrys)
+
 ## [3.8.0](https://github.com/npm/template-oss/compare/v3.7.1...v3.8.0) (2022-08-31)
 
 ### Features
