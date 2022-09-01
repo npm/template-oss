@@ -6,13 +6,9 @@
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
     "lintfix": "{{npmBin}} run lint -- --fix",
-    "preversion": "{{npmBin}} test",
-    {{#if pkgPrivate}}
-    "postversion": "git push origin --follow-tags",
-    {{else}}
-    "postversion": "{{npmBin}} publish",
-    "prepublishOnly": "git push origin --follow-tags",
-    {{/if}}
+    "preversion": {{{del}}},
+    "postversion": {{{del}}},
+    "prepublishOnly": {{{del}}},
     "snap": "tap",
     "test": "tap",
     "posttest": "{{npmBin}} run lint",

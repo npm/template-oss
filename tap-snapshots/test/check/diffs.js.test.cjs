@@ -434,7 +434,7 @@ The module file package.json needs to be updated:
   "author" is "heynow", expected "GitHub Inc."
   "files[1]" is "x", expected "lib/"
   "scripts.lint:fix" is "x", expected to be removed
-  "scripts.preversion" is "x", expected "npm test"
+  "scripts.preversion" is "x", expected to be removed
   "standard" is {
     "config": "x "
   }, expected to be removed

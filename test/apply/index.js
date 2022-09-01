@@ -113,13 +113,10 @@ t.test('private workspace', async (t) => {
   const rpManifest = await s.readJson('.release-please-manifest.json')
   const rpConfig = await s.readJson('release-please-config.json')
 
-  t.ok(pkg.scripts.prepublishOnly)
-  t.ok(pkg.scripts.postversion)
-
+  t.notOk(pkg.scripts.prepublishOnly)
+  t.notOk(pkg.scripts.postversion)
   t.notOk(privatePkg.scripts.prepublishOnly)
-  t.ok(privatePkg.scripts.postversion)
-
-  t.equal(pkg.scripts.prepublishOnly, privatePkg.scripts.postversion)
+  t.notOk(privatePkg.scripts.postversion)
 
   t.equal(rpManifest['.'], '1.0.0')
   t.equal(rpManifest['workspaces/b'], '1.0.0')
