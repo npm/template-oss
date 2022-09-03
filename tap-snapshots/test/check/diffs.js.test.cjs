@@ -24,7 +24,6 @@ To correct it: npx template-oss-apply --force
 exports[`test/check/diffs.js TAP different headers > source after apply 1`] = `
 content/index.js
 ========================================
-
 module.exports = {
   rootRepo: {
     add: {

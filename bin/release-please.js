@@ -9,7 +9,18 @@ const [branch] = process.argv.slice(2)
 const setOutput = (key, val) => {
   if (val && (!Array.isArray(val) || val.length)) {
     if (dryRun) {
-      console.log(key, JSON.stringify(val, null, 2))
+      if (key === 'pr') {
+        console.log('PR:', val.title.toString())
+        console.log('='.repeat(40))
+        console.log(val.body.toString())
+        console.log('='.repeat(40))
+        for (const update of val.updates.filter(u => u.updater.changelogEntry)) {
+          console.log('CHANGELOG:', update.path)
+          console.log('-'.repeat(40))
+          console.log(update.updater.changelogEntry)
+          console.log('-'.repeat(40))
+        }
+      }
     } else {
       core.setOutput(key, JSON.stringify(val))
     }
@@ -27,5 +38,9 @@ main({
   setOutput('release', release)
   return null
 }).catch(err => {
-  core.setFailed(`failed: ${err}`)
+  if (dryRun) {
+    console.error(err)
+  } else {
+    core.setFailed(`failed: ${err}`)
+  }
 })
