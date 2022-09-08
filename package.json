@@ -42,6 +42,7 @@
     "handlebars": "^4.7.7",
     "hosted-git-info": "^5.0.0",
     "json-parse-even-better-errors": "^2.3.1",
+    "just-deep-map-values": "^1.1.1",
     "just-diff": "^5.0.1",
     "lodash": "^4.17.21",
     "npm-package-arg": "^9.0.1",
@@ -60,7 +61,11 @@
     "tap": "^16.0.0"
   },
   "tap": {
-    "timeout": 600
+    "timeout": 600,
+    "nyc-arg": [
+      "--exclude",
+      "tap-snapshots/**"
+    ]
   },
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten."

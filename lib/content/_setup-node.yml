@@ -4,6 +4,7 @@
     {{#if lockfile}}
     cache: npm
     {{/if}}
+{{#if updateNpm}}
 {{#if useMatrix}}
 - name: Update to workable npm (windows)
   # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
@@ -26,3 +27,4 @@
 {{/if}}
   run: npm i --prefer-online --no-fund --no-audit -g npm@latest
 - run: npm -v
+{{/if}}

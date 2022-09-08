@@ -1,21 +1,12 @@
 const t = require('tap')
 const setup = require('../setup.js')
 
-t.cleanSnapshot = setup.clean
-t.formatSnapshot = setup.format.checks
-
 t.test('ok with required', async (t) => {
   const s = await setup(t, {
     ok: true,
   })
   await s.apply()
   t.strictSame(await s.check(), [])
-})
-
-t.test('not ok without required', async (t) => {
-  const s = await setup(t)
-  await s.apply()
-  await t.resolveMatchSnapshot(s.check())
 })
 
 t.test('required in each location', async (t) => {

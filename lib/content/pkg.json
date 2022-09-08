@@ -5,23 +5,40 @@
     "lint": "eslint \"**/*.js\"",
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
-    "lintfix": "{{npmBin}} run lint -- --fix",
+    "lintfix": "{{localNpmPath}} run lint -- --fix",
     "preversion": {{{del}}},
     "postversion": {{{del}}},
     "prepublishOnly": {{{del}}},
     "snap": "tap",
     "test": "tap",
-    "posttest": "{{npmBin}} run lint",
+    "posttest": "{{localNpmPath}} run lint",
+    {{#if isRootMono}}
+    "test-all": "{{localNpmPath}} run test -ws -iwr --if-present",
+    "lint-all": "{{localNpmPath}} run lint -ws -iwr --if-present",
+    {{/if}}
     "template-copy": {{{del}}},
     "lint:fix": {{{del}}}
   },
   "repository": {{#if repository}}{{{json repository}}}{{else}}{{{del}}}{{/if}},
   "engines": {
+    {{#if engines}}
     "node": {{{json engines}}}
+    {{/if}}
   },
   {{{json __CONFIG_KEY__}}}: {
     "version": {{#if isDogFood}}{{{del}}}{{else}}{{{json __VERSION__}}}{{/if}}
   },
   "templateVersion": {{{del}}},
-  "standard": {{{del}}}
+  "standard": {{{del}}},
+  "tap": {
+    {{#if isRootMono}}
+    "test-ignore": "^({{#each workspaceGlobs}}{{this}}{{#unless @last}}|{{/unless}}{{/each}})/",
+    {{/if}}
+    "nyc-arg": [
+      {{#if isRootMono}}
+      {{#each workspaceGlobs}}"--exclude", "{{this}}/**",{{/each}}
+      {{/if}}
+      "--exclude", "tap-snapshots/**"
+    ]
+  }
 }

@@ -5,7 +5,7 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
-exports[`test/apply/full-content.js TAP default > expect resolving Promise 1`] = `
+exports[`test/apply/source-snapshots.js TAP root only > expect resolving Promise 1`] = `
 .commitlintrc.js
 ========================================
 /* This file is automatically added by @npmcli/template-oss. Do not edit. */
@@ -44,6 +44,26 @@ module.exports = {
 # This file is automatically added by @npmcli/template-oss. Do not edit.
 
 * @npm/cli-team
+
+.github/dependabot.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: daily
+    allow:
+      - dependency-type: direct
+    versioning-strategy: increase-if-necessary
+    commit-message:
+      prefix: deps
+      prefix-development: chore
+    labels:
+      - "Dependencies"
 
 .github/ISSUE_TEMPLATE/bug.yml
 ========================================
@@ -107,26 +127,6 @@ body:
 # This file is automatically added by @npmcli/template-oss. Do not edit.
 
 blank_issues_enabled: true
-
-.github/dependabot.yml
-========================================
-# This file is automatically added by @npmcli/template-oss. Do not edit.
-
-version: 2
-
-updates:
-  - package-ecosystem: npm
-    directory: "/"
-    schedule:
-      interval: daily
-    allow:
-      - dependency-type: direct
-    versioning-strategy: increase-if-necessary
-    commit-message:
-      prefix: deps
-      prefix-development: chore
-    labels:
-      - "Dependencies"
 
 .github/matchers/tap.json
 ========================================
@@ -435,10 +435,10 @@ permissions:
 
 jobs:
   release-please:
-    runs-on: ubuntu-latest
     outputs:
       pr: \${{ steps.release.outputs.pr }}
       release: \${{ steps.release.outputs.release }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Setup git user
@@ -494,7 +494,7 @@ jobs:
   release-test:
     needs: post-pr
     if: needs.post-pr.outputs.ref
-    uses: ./.github/workflows/release-test.yml
+    uses: ./.github/workflows/release.yml
     with:
       ref: \${{ needs.post-pr.outputs.ref }}
 
@@ -521,7 +521,7 @@ jobs:
         run: |
           npm run rp-release --ignore-scripts --if-present -ws -iwr
 
-.github/workflows/release-test.yml
+.github/workflows/release.yml
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
 
@@ -552,7 +552,7 @@ jobs:
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
       - run: npm i --ignore-scripts --no-audit --no-fund
-      - run: npm run lint --if-present --workspaces --include-workspace-root
+      - run: npm run lint -ws -iwr --if-present
 
   test-all:
     strategy:
@@ -608,7 +608,7 @@ jobs:
       - run: npm i --ignore-scripts --no-audit --no-fund
       - name: add tap problem matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
-      - run: npm run test --if-present --workspaces --include-workspace-root
+      - run: npm run test -ws -iwr --if-present
 
 .gitignore
 ========================================
@@ -618,28 +618,28 @@ jobs:
 /*
 
 # keep these
-!/.eslintrc.local.*
 !**/.gitignore
-!/docs/
-!/tap-snapshots/
-!/test/
-!/map.js
-!/scripts/
-!/README*
-!/LICENSE*
-!/CHANGELOG*
 !/.commitlintrc.js
 !/.eslintrc.js
+!/.eslintrc.local.*
 !/.github/
 !/.gitignore
 !/.npmrc
 !/.release-please-manifest.json
-!/CODE_OF_CONDUCT.md
-!/SECURITY.md
 !/bin/
+!/CHANGELOG*
+!/CODE_OF_CONDUCT.md
+!/docs/
 !/lib/
+!/LICENSE*
+!/map.js
 !/package.json
+!/README*
 !/release-please-config.json
+!/scripts/
+!/SECURITY.md
+!/tap-snapshots/
+!/test/
 
 .npmrc
 ========================================
@@ -662,12 +662,6 @@ Conduct](https://docs.npmjs.com/policies/conduct)
 
 The npm cli team may, at its own discretion, moderate, remove, or edit
 any interactions such as pull requests, issues, and comments.
-
-SECURITY.md
-========================================
-<!-- This file is automatically added by @npmcli/template-oss. Do not edit. -->
-
-Please send vulnerability reports through [hackerone](https://hackerone.com/github).
 
 package.json
 ========================================
@@ -694,6 +688,12 @@ package.json
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
     "version": "{{VERSION}}"
+  },
+  "tap": {
+    "nyc-arg": [
+      "--exclude",
+      "tap-snapshots/**"
+    ]
   }
 }
 
@@ -735,9 +735,33 @@ release-please-config.json
     }
   }
 }
+
+SECURITY.md
+========================================
+<!-- This file is automatically added by @npmcli/template-oss. Do not edit. -->
+
+Please send vulnerability reports through [hackerone](https://hackerone.com/github).
 `
 
-exports[`test/apply/full-content.js TAP workspaces + everything > expect resolving Promise 1`] = `
+exports[`test/apply/source-snapshots.js TAP with content path > expect resolving Promise 1`] = `
+content_dir/index.js
+========================================
+module.exports={}
+
+package.json
+========================================
+{
+  "templateOSS": {
+    "content": "content_dir",
+    "defaultContent": false,
+    "version": "{{VERSION}}"
+  },
+  "name": "testpkg",
+  "version": "1.0.0"
+}
+`
+
+exports[`test/apply/source-snapshots.js TAP with workspaces > expect resolving Promise 1`] = `
 .commitlintrc.js
 ========================================
 /* This file is automatically added by @npmcli/template-oss. Do not edit. */
@@ -765,21 +789,67 @@ const localConfigs = readdir(__dirname)
 
 module.exports = {
   root: true,
+  ignorePatterns: [
+    'workspaces/a',
+    'workspaces/b',
+  ],
   extends: [
     '@npmcli',
     ...localConfigs,
   ],
 }
 
-.eslintrc.local.yml
-========================================
-KEEP
-
 .github/CODEOWNERS
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
 
 * @npm/cli-team
+
+.github/dependabot.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: daily
+    allow:
+      - dependency-type: direct
+    versioning-strategy: increase-if-necessary
+    commit-message:
+      prefix: deps
+      prefix-development: chore
+    labels:
+      - "Dependencies"
+
+  - package-ecosystem: npm
+    directory: "workspaces/a/"
+    schedule:
+      interval: daily
+    allow:
+      - dependency-type: direct
+    versioning-strategy: increase-if-necessary
+    commit-message:
+      prefix: deps
+      prefix-development: chore
+    labels:
+      - "Dependencies"
+
+  - package-ecosystem: npm
+    directory: "workspaces/b/"
+    schedule:
+      interval: daily
+    allow:
+      - dependency-type: direct
+    versioning-strategy: increase-if-necessary
+    commit-message:
+      prefix: deps
+      prefix-development: chore
+    labels:
+      - "Dependencies"
 
 .github/ISSUE_TEMPLATE/bug.yml
 ========================================
@@ -843,26 +913,6 @@ body:
 # This file is automatically added by @npmcli/template-oss. Do not edit.
 
 blank_issues_enabled: true
-
-.github/dependabot.yml
-========================================
-# This file is automatically added by @npmcli/template-oss. Do not edit.
-
-version: 2
-
-updates:
-  - package-ecosystem: npm
-    directory: "/"
-    schedule:
-      interval: daily
-    allow:
-      - dependency-type: direct
-    versioning-strategy: increase-if-necessary
-    commit-message:
-      prefix: deps
-      prefix-development: chore
-    labels:
-      - "Dependencies"
 
 .github/matchers/tap.json
 ========================================
@@ -929,11 +979,11 @@ jobs:
       - run: npm i --ignore-scripts --no-audit --no-fund --package-lock
       - run: npm audit
 
-.github/workflows/ci-bbb.yml
+.github/workflows/ci-a.yml
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
 
-name: CI - bbb
+name: CI - a
 
 on:
   workflow_dispatch:
@@ -941,13 +991,13 @@ on:
     branches:
       - '*'
     paths:
-      - workspaces/b/**
+      - workspaces/a/**
   push:
     branches:
       - main
       - latest
     paths:
-      - workspaces/b/**
+      - workspaces/a/**
   schedule:
     # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
     - cron: "0 9 * * 1"
@@ -968,7 +1018,7 @@ jobs:
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
       - run: npm i --ignore-scripts --no-audit --no-fund
-      - run: npm run lint -w bbb
+      - run: npm run lint -w a
 
   test:
     strategy:
@@ -1022,13 +1072,13 @@ jobs:
       - run: npm i --ignore-scripts --no-audit --no-fund
       - name: add tap problem matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
-      - run: npm test --ignore-scripts -w bbb
+      - run: npm test --ignore-scripts -w a
 
-.github/workflows/ci-name-aaaa.yml
+.github/workflows/ci-b.yml
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
 
-name: CI - @name/aaaa
+name: CI - b
 
 on:
   workflow_dispatch:
@@ -1036,13 +1086,13 @@ on:
     branches:
       - '*'
     paths:
-      - workspaces/a/**
+      - workspaces/b/**
   push:
     branches:
       - main
       - latest
     paths:
-      - workspaces/a/**
+      - workspaces/b/**
   schedule:
     # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
     - cron: "0 9 * * 1"
@@ -1063,7 +1113,7 @@ jobs:
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
       - run: npm i --ignore-scripts --no-audit --no-fund
-      - run: npm run lint -w @name/aaaa
+      - run: npm run lint -w b
 
   test:
     strategy:
@@ -1117,7 +1167,7 @@ jobs:
       - run: npm i --ignore-scripts --no-audit --no-fund
       - name: add tap problem matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
-      - run: npm test --ignore-scripts -w @name/aaaa
+      - run: npm test --ignore-scripts -w b
 
 .github/workflows/ci.yml
 ========================================
@@ -1130,10 +1180,16 @@ on:
   pull_request:
     branches:
       - '*'
+    paths-ignore:
+      - workspaces/a/**
+      - workspaces/b/**
   push:
     branches:
       - main
       - latest
+    paths-ignore:
+      - workspaces/a/**
+      - workspaces/b/**
   schedule:
     # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
     - cron: "0 9 * * 1"
@@ -1361,10 +1417,10 @@ permissions:
 
 jobs:
   release-please:
-    runs-on: ubuntu-latest
     outputs:
       pr: \${{ steps.release.outputs.pr }}
       release: \${{ steps.release.outputs.release }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Setup git user
@@ -1420,7 +1476,7 @@ jobs:
   release-test:
     needs: post-pr
     if: needs.post-pr.outputs.ref
-    uses: ./.github/workflows/release-test.yml
+    uses: ./.github/workflows/release.yml
     with:
       ref: \${{ needs.post-pr.outputs.ref }}
 
@@ -1447,7 +1503,7 @@ jobs:
         run: |
           npm run rp-release --ignore-scripts --if-present -ws -iwr
 
-.github/workflows/release-test.yml
+.github/workflows/release.yml
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
 
@@ -1478,7 +1534,7 @@ jobs:
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
       - run: npm i --ignore-scripts --no-audit --no-fund
-      - run: npm run lint --if-present --workspaces --include-workspace-root
+      - run: npm run lint -ws -iwr --if-present
 
   test-all:
     strategy:
@@ -1534,7 +1590,7 @@ jobs:
       - run: npm i --ignore-scripts --no-audit --no-fund
       - name: add tap problem matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
-      - run: npm run test --if-present --workspaces --include-workspace-root
+      - run: npm run test -ws -iwr --if-present
 
 .gitignore
 ========================================
@@ -1544,29 +1600,32 @@ jobs:
 /*
 
 # keep these
-!/.eslintrc.local.*
 !**/.gitignore
-!/docs/
-!/tap-snapshots/
-!/test/
-!/map.js
-!/scripts/
-!/README*
-!/LICENSE*
-!/CHANGELOG*
 !/.commitlintrc.js
 !/.eslintrc.js
+!/.eslintrc.local.*
 !/.github/
 !/.gitignore
 !/.npmrc
 !/.release-please-manifest.json
-!/CODE_OF_CONDUCT.md
-!/SECURITY.md
 !/bin/
+!/CHANGELOG*
+!/CODE_OF_CONDUCT.md
+!/docs/
 !/lib/
+!/LICENSE*
+!/map.js
 !/package.json
+!/README*
 !/release-please-config.json
+!/scripts/
+!/SECURITY.md
+!/tap-snapshots/
+!/test/
 !/workspaces/
+/workspaces/*
+!/workspaces/a/
+!/workspaces/b/
 
 .npmrc
 ========================================
@@ -1592,12 +1651,6 @@ Conduct](https://docs.npmjs.com/policies/conduct)
 The npm cli team may, at its own discretion, moderate, remove, or edit
 any interactions such as pull requests, issues, and comments.
 
-SECURITY.md
-========================================
-<!-- This file is automatically added by @npmcli/template-oss. Do not edit. -->
-
-Please send vulnerability reports through [hackerone](https://hackerone.com/github).
-
 package.json
 ========================================
 {
@@ -1614,7 +1667,9 @@ package.json
     "lintfix": "npm run lint -- --fix",
     "snap": "tap",
     "test": "tap",
-    "posttest": "npm run lint"
+    "posttest": "npm run lint",
+    "test-all": "npm run test -ws -iwr --if-present",
+    "lint-all": "npm run lint -ws -iwr --if-present"
   },
   "author": "GitHub Inc.",
   "files": [
@@ -1627,6 +1682,17 @@ package.json
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
     "version": "{{VERSION}}"
+  },
+  "tap": {
+    "test-ignore": "^(workspaces/a|workspaces/b)/",
+    "nyc-arg": [
+      "--exclude",
+      "workspaces/a/**",
+      "--exclude",
+      "workspaces/b/**",
+      "--exclude",
+      "tap-snapshots/**"
+    ]
   }
 }
 
@@ -1674,6 +1740,12 @@ release-please-config.json
   }
 }
 
+SECURITY.md
+========================================
+<!-- This file is automatically added by @npmcli/template-oss. Do not edit. -->
+
+Please send vulnerability reports through [hackerone](https://hackerone.com/github).
+
 workspaces/a/.eslintrc.js
 ========================================
 /* This file is automatically added by @npmcli/template-oss. Do not edit. */
@@ -1694,10 +1766,6 @@ module.exports = {
   ],
 }
 
-workspaces/a/.eslintrc.local.yml
-========================================
-KEEP
-
 workspaces/a/.gitignore
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
@@ -1706,26 +1774,26 @@ workspaces/a/.gitignore
 /*
 
 # keep these
-!/.eslintrc.local.*
 !**/.gitignore
-!/docs/
-!/tap-snapshots/
-!/test/
-!/map.js
-!/scripts/
-!/README*
-!/LICENSE*
-!/CHANGELOG*
 !/.eslintrc.js
+!/.eslintrc.local.*
 !/.gitignore
 !/bin/
+!/CHANGELOG*
+!/docs/
 !/lib/
+!/LICENSE*
+!/map.js
 !/package.json
+!/README*
+!/scripts/
+!/tap-snapshots/
+!/test/
 
 workspaces/a/package.json
 ========================================
 {
-  "name": "@name/aaaa",
+  "name": "a",
   "version": "1.0.0",
   "scripts": {
     "lint": "eslint /"**/*.js/"",
@@ -1747,6 +1815,12 @@ workspaces/a/package.json
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
     "version": "{{VERSION}}"
+  },
+  "tap": {
+    "nyc-arg": [
+      "--exclude",
+      "tap-snapshots/**"
+    ]
   }
 }
 
@@ -1770,10 +1844,6 @@ module.exports = {
   ],
 }
 
-workspaces/b/.eslintrc.local.yml
-========================================
-KEEP
-
 workspaces/b/.gitignore
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
@@ -1782,26 +1852,26 @@ workspaces/b/.gitignore
 /*
 
 # keep these
-!/.eslintrc.local.*
 !**/.gitignore
-!/docs/
-!/tap-snapshots/
-!/test/
-!/map.js
-!/scripts/
-!/README*
-!/LICENSE*
-!/CHANGELOG*
 !/.eslintrc.js
+!/.eslintrc.local.*
 !/.gitignore
 !/bin/
+!/CHANGELOG*
+!/docs/
 !/lib/
+!/LICENSE*
+!/map.js
 !/package.json
+!/README*
+!/scripts/
+!/tap-snapshots/
+!/test/
 
 workspaces/b/package.json
 ========================================
 {
-  "name": "bbb",
+  "name": "b",
   "version": "1.0.0",
   "scripts": {
     "lint": "eslint /"**/*.js/"",
@@ -1823,11 +1893,17 @@ workspaces/b/package.json
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
     "version": "{{VERSION}}"
+  },
+  "tap": {
+    "nyc-arg": [
+      "--exclude",
+      "tap-snapshots/**"
+    ]
   }
 }
 `
 
-exports[`test/apply/full-content.js TAP workspaces only > expect resolving Promise 1`] = `
+exports[`test/apply/source-snapshots.js TAP workspaces only > expect resolving Promise 1`] = `
 .github/matchers/tap.json
 ========================================
 {
@@ -2071,10 +2147,10 @@ permissions:
 
 jobs:
   release-please:
-    runs-on: ubuntu-latest
     outputs:
       pr: \${{ steps.release.outputs.pr }}
       release: \${{ steps.release.outputs.release }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Setup git user
@@ -2130,7 +2206,7 @@ jobs:
   release-test:
     needs: post-pr
     if: needs.post-pr.outputs.ref
-    uses: ./.github/workflows/release-test.yml
+    uses: ./.github/workflows/release.yml
     with:
       ref: \${{ needs.post-pr.outputs.ref }}
 
@@ -2157,7 +2233,7 @@ jobs:
         run: |
           npm run rp-release --ignore-scripts --if-present -ws -iwr
 
-.github/workflows/release-test.yml
+.github/workflows/release.yml
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
 
@@ -2188,7 +2264,7 @@ jobs:
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
       - run: npm i --ignore-scripts --no-audit --no-fund
-      - run: npm run lint --if-present --workspaces --include-workspace-root
+      - run: npm run lint -ws -iwr --if-present
 
   test-all:
     strategy:
@@ -2244,7 +2320,7 @@ jobs:
       - run: npm i --ignore-scripts --no-audit --no-fund
       - name: add tap problem matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
-      - run: npm run test --if-present --workspaces --include-workspace-root
+      - run: npm run test -ws -iwr --if-present
 
 .release-please-manifest.json
 ========================================
@@ -2338,21 +2414,21 @@ workspaces/a/.gitignore
 /*
 
 # keep these
-!/.eslintrc.local.*
 !**/.gitignore
-!/docs/
-!/tap-snapshots/
-!/test/
-!/map.js
-!/scripts/
-!/README*
-!/LICENSE*
-!/CHANGELOG*
 !/.eslintrc.js
+!/.eslintrc.local.*
 !/.gitignore
 !/bin/
+!/CHANGELOG*
+!/docs/
 !/lib/
+!/LICENSE*
+!/map.js
 !/package.json
+!/README*
+!/scripts/
+!/tap-snapshots/
+!/test/
 
 workspaces/a/package.json
 ========================================
@@ -2379,6 +2455,12 @@ workspaces/a/package.json
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
     "version": "{{VERSION}}"
+  },
+  "tap": {
+    "nyc-arg": [
+      "--exclude",
+      "tap-snapshots/**"
+    ]
   }
 }
 
@@ -2410,21 +2492,21 @@ workspaces/b/.gitignore
 /*
 
 # keep these
-!/.eslintrc.local.*
 !**/.gitignore
-!/docs/
-!/tap-snapshots/
-!/test/
-!/map.js
-!/scripts/
-!/README*
-!/LICENSE*
-!/CHANGELOG*
 !/.eslintrc.js
+!/.eslintrc.local.*
 !/.gitignore
 !/bin/
+!/CHANGELOG*
+!/docs/
 !/lib/
+!/LICENSE*
+!/map.js
 !/package.json
+!/README*
+!/scripts/
+!/tap-snapshots/
+!/test/
 
 workspaces/b/package.json
 ========================================
@@ -2451,6 +2533,48 @@ workspaces/b/package.json
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
     "version": "{{VERSION}}"
+  },
+  "tap": {
+    "nyc-arg": [
+      "--exclude",
+      "tap-snapshots/**"
+    ]
   }
+}
+`
+
+exports[`test/apply/source-snapshots.js TAP workspaces with nested content path > expect resolving Promise 1`] = `
+content_dir/index.js
+========================================
+module.exports={}
+
+content_dir2/index.js
+========================================
+module.exports={}
+
+package.json
+========================================
+{
+  "templateOSS": {
+    "content": "content_dir",
+    "defaultContent": false,
+    "version": "{{VERSION}}"
+  },
+  "name": "testpkg",
+  "version": "1.0.0",
+  "workspaces": [
+    "workspaces/a"
+  ]
+}
+
+workspaces/a/package.json
+========================================
+{
+  "templateOSS": {
+    "content": "../../content_dir2",
+    "version": "{{VERSION}}"
+  },
+  "name": "a",
+  "version": "1.0.0"
 }
 `
