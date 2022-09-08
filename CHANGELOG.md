@@ -1,5 +1,15 @@
 # Changelog
 
+## [4.0.0](https://github.com/npm/template-oss/compare/v3.8.1...v4.0.0) (2022-09-08)
+
+### ⚠ BREAKING CHANGES
+
+* this updates this package and the templated engines for node to `^14.17.0 || ^16.13.0 || >=18.0.0`
+
+### Features
+
+  * [`a72774a`](https://github.com/npm/template-oss/commit/a72774aa4cd4ad74df5f85b2793d8408688507da) [#184](https://github.com/npm/template-oss/pull/184) feat: update engines to `^14.17.0 || ^16.13.0 || >=18.0.0` (@lukekarrys)
+
 ## [3.8.1](https://github.com/npm/template-oss/compare/v3.8.0...v3.8.1) (2022-09-01)
 
 ### Bug Fixes
