@@ -246,10 +246,10 @@ The repo file ci.yml needs to be updated:
          matrix:
            node-version:
   +          - 10
-             - 12.13.0
-             - 12.x
-             - 14.15.0
+             - 14.17.0
              - 14.x
+             - 16.13.0
+             - 16.x
 
 To correct it: npx template-oss-apply --force
 
@@ -265,10 +265,10 @@ The repo file release-test.yml needs to be updated:
          matrix:
            node-version:
   +          - 10
-             - 12.13.0
-             - 12.x
-             - 14.15.0
+             - 14.17.0
              - 14.x
+             - 16.13.0
+             - 16.x
 
 To correct it: npx template-oss-apply --force
 
@@ -278,7 +278,7 @@ The module file package.json needs to be updated:
 
   package.json
   ========================================
-  "engines.node" is "^12.13.0 || ^14.15.0 || >=16.0.0", expected "^10.0.0 || ^12.13.0 || ^14.15.0 || >=16.0.0"
+  "engines.node" is "^14.17.0 || ^16.13.0 || >=18.0.0", expected "^10.0.0 || ^14.17.0 || ^16.13.0 || >=18.0.0"
 
 To correct it: npx template-oss-apply --force
 
@@ -393,7 +393,7 @@ The repo file audit.yml needs to be updated:
             git config --global user.name "npm CLI robot"
         - uses: actions/setup-node@v3
           with:
-            node-version: 16.x
+            node-version: 18.x
         - name: Update npm to latest
           run: npm i --prefer-online --no-fund --no-audit -g npm@latest
         - run: npm -v

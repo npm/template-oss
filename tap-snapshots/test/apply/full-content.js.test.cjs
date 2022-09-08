@@ -186,7 +186,7 @@ jobs:
           git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
@@ -223,7 +223,7 @@ jobs:
           git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
@@ -235,12 +235,12 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - 12.13.0
-          - 12.x
-          - 14.15.0
+          - 14.17.0
           - 14.x
-          - 16.0.0
+          - 16.13.0
           - 16.x
+          - 18.0.0
+          - 18.x
         platform:
           - os: ubuntu-latest
             shell: bash
@@ -357,7 +357,7 @@ jobs:
           git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
@@ -405,7 +405,7 @@ jobs:
           git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
@@ -447,7 +447,7 @@ jobs:
           git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
@@ -478,7 +478,7 @@ jobs:
           git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
@@ -510,7 +510,7 @@ jobs:
           git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
@@ -547,7 +547,7 @@ jobs:
           git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
@@ -559,12 +559,12 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - 12.13.0
-          - 12.x
-          - 14.15.0
+          - 14.17.0
           - 14.x
-          - 16.0.0
+          - 16.13.0
           - 16.x
+          - 18.0.0
+          - 18.x
         platform:
           - os: ubuntu-latest
             shell: bash
@@ -689,7 +689,7 @@ package.json
     "lib/"
   ],
   "engines": {
-    "node": "^12.13.0 || ^14.15.0 || >=16.0.0"
+    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
   },
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
@@ -922,7 +922,7 @@ jobs:
           git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
@@ -963,7 +963,7 @@ jobs:
           git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
@@ -975,12 +975,12 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - 12.13.0
-          - 12.x
-          - 14.15.0
+          - 14.17.0
           - 14.x
-          - 16.0.0
+          - 16.13.0
           - 16.x
+          - 18.0.0
+          - 18.x
         platform:
           - os: ubuntu-latest
             shell: bash
@@ -1058,7 +1058,7 @@ jobs:
           git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
@@ -1070,12 +1070,12 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - 12.13.0
-          - 12.x
-          - 14.15.0
+          - 14.17.0
           - 14.x
-          - 16.0.0
+          - 16.13.0
           - 16.x
+          - 18.0.0
+          - 18.x
         platform:
           - os: ubuntu-latest
             shell: bash
@@ -1149,7 +1149,7 @@ jobs:
           git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
@@ -1161,12 +1161,12 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - 12.13.0
-          - 12.x
-          - 14.15.0
+          - 14.17.0
           - 14.x
-          - 16.0.0
+          - 16.13.0
           - 16.x
+          - 18.0.0
+          - 18.x
         platform:
           - os: ubuntu-latest
             shell: bash
@@ -1283,7 +1283,7 @@ jobs:
           git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
@@ -1331,7 +1331,7 @@ jobs:
           git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
@@ -1373,7 +1373,7 @@ jobs:
           git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
@@ -1404,7 +1404,7 @@ jobs:
           git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
@@ -1436,7 +1436,7 @@ jobs:
           git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
@@ -1473,7 +1473,7 @@ jobs:
           git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
@@ -1485,12 +1485,12 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - 12.13.0
-          - 12.x
-          - 14.15.0
+          - 14.17.0
           - 14.x
-          - 16.0.0
+          - 16.13.0
           - 16.x
+          - 18.0.0
+          - 18.x
         platform:
           - os: ubuntu-latest
             shell: bash
@@ -1622,7 +1622,7 @@ package.json
     "lib/"
   ],
   "engines": {
-    "node": "^12.13.0 || ^14.15.0 || >=16.0.0"
+    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
   },
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
@@ -1743,7 +1743,7 @@ workspaces/a/package.json
     "lib/"
   ],
   "engines": {
-    "node": "^12.13.0 || ^14.15.0 || >=16.0.0"
+    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
   },
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
@@ -1819,7 +1819,7 @@ workspaces/b/package.json
     "lib/"
   ],
   "engines": {
-    "node": "^12.13.0 || ^14.15.0 || >=16.0.0"
+    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
   },
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
@@ -1898,7 +1898,7 @@ jobs:
           git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
@@ -1910,12 +1910,12 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - 12.13.0
-          - 12.x
-          - 14.15.0
+          - 14.17.0
           - 14.x
-          - 16.0.0
+          - 16.13.0
           - 16.x
+          - 18.0.0
+          - 18.x
         platform:
           - os: ubuntu-latest
             shell: bash
@@ -1993,7 +1993,7 @@ jobs:
           git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
@@ -2005,12 +2005,12 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - 12.13.0
-          - 12.x
-          - 14.15.0
+          - 14.17.0
           - 14.x
-          - 16.0.0
+          - 16.13.0
           - 16.x
+          - 18.0.0
+          - 18.x
         platform:
           - os: ubuntu-latest
             shell: bash
@@ -2084,7 +2084,7 @@ jobs:
           git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
@@ -2115,7 +2115,7 @@ jobs:
           git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
@@ -2147,7 +2147,7 @@ jobs:
           git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
@@ -2184,7 +2184,7 @@ jobs:
           git config --global user.name "npm CLI robot"
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - name: Update npm to latest
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
@@ -2196,12 +2196,12 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - 12.13.0
-          - 12.x
-          - 14.15.0
+          - 14.17.0
           - 14.x
-          - 16.0.0
+          - 16.13.0
           - 16.x
+          - 18.0.0
+          - 18.x
         platform:
           - os: ubuntu-latest
             shell: bash
@@ -2376,7 +2376,7 @@ workspaces/a/package.json
     "lib/"
   ],
   "engines": {
-    "node": "^12.13.0 || ^14.15.0 || >=16.0.0"
+    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
   },
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
@@ -2448,7 +2448,7 @@ workspaces/b/package.json
     "lib/"
   ],
   "engines": {
-    "node": "^12.13.0 || ^14.15.0 || >=16.0.0"
+    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
   },
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",

@@ -50,7 +50,7 @@ The module file package.json needs to be updated:
   ========================================
   "author" is missing, expected "GitHub Inc."
   "engines" is missing, expected {
-    "node": "^12.13.0 || ^14.15.0 || >=16.0.0"
+    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
   }
   "files" is missing, expected [
     "bin/",
@@ -130,7 +130,7 @@ The module file package.json needs to be updated:
   ========================================
   "author" is missing, expected "GitHub Inc."
   "engines" is missing, expected {
-    "node": "^12.13.0 || ^14.15.0 || >=16.0.0"
+    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
   }
   "files" is missing, expected [
     "bin/",
@@ -192,7 +192,7 @@ The module file package.json needs to be updated:
   ========================================
   "author" is missing, expected "GitHub Inc."
   "engines" is missing, expected {
-    "node": "^12.13.0 || ^14.15.0 || >=16.0.0"
+    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
   }
   "files" is missing, expected [
     "bin/",
@@ -254,7 +254,7 @@ The module file package.json needs to be updated:
   ========================================
   "author" is missing, expected "GitHub Inc."
   "engines" is missing, expected {
-    "node": "^12.13.0 || ^14.15.0 || >=16.0.0"
+    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
   }
   "files" is missing, expected [
     "bin/",
