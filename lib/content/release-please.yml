@@ -16,14 +16,10 @@ permissions:
 
 jobs:
   release-please:
-    runs-on: ubuntu-latest
     outputs:
       pr: $\{{ steps.release.outputs.pr }}
       release: $\{{ steps.release.outputs.release }}
-    steps:
-      {{> setupGit}}
-      {{> setupNode}}
-      {{> setupDeps}}
+    {{> setupJob }}
       - name: Release Please
         id: release
         run: npx --offline template-oss-release-please $\{{ github.ref_name }}
@@ -40,34 +36,30 @@ jobs:
       - name: Output ref
         id: ref
         run: echo "::set-output name=branch::$\{{ fromJSON(needs.release-please.outputs.pr).headBranchName }}"
-      {{> setupGit with=(obj ref="${{ steps.ref.outputs.branch }}" fetch-depth=0)}}
+      {{> setupGit checkout=(obj ref="${{ steps.ref.outputs.branch }}" fetch-depth=0)}}
       {{> setupNode}}
       {{> setupDeps}}
       - name: Post pull request actions
         env:
           GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}
         run: |
-          npm run rp-pull-request --ignore-scripts --if-present -ws -iwr
+          {{rootNpmPath}} run rp-pull-request --ignore-scripts --if-present -ws -iwr
           git commit -am "chore: post pull request" || true
           git push
   
   release-test:
     needs: post-pr
     if: needs.post-pr.outputs.ref
-    uses: ./.github/workflows/{{releaseTest}}
+    uses: ./.github/workflows/release.yml
     with:
       ref: $\{{ needs.post-pr.outputs.ref }}
 
   post-release:
     needs: release-please
     if: needs.release-please.outputs.release
-    runs-on: ubuntu-latest
-    steps:
-      {{> setupGit}}
-      {{> setupNode}}
-      {{> setupDeps}}
+    {{> setupJob }}
       - name: Post release actions
         env:
           GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}
         run: |
-          npm run rp-release --ignore-scripts --if-present -ws -iwr
+          {{rootNpmPath}} run rp-release --ignore-scripts --if-present -ws -iwr

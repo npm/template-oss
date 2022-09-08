@@ -1,0 +1,26 @@
+strategy:
+  fail-fast: false
+  matrix:
+    node-version:
+      {{#each ciVersions}}
+      - {{.}}
+      {{/each}}
+    platform:
+      - os: ubuntu-latest
+        shell: bash
+      {{#if macCI}}
+      - os: macos-latest
+        shell: bash
+      {{/if}}
+      {{#if windowsCI}}
+      - os: windows-latest
+        shell: cmd
+      {{/if}}
+runs-on: $\{{ matrix.platform.os }}
+defaults:
+  run:
+    shell: $\{{ matrix.platform.shell }}
+steps:
+  {{> setupGit}}
+  {{> setupNode useMatrix=true}}
+  {{> setupDeps}}

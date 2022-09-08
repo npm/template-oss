@@ -27,7 +27,7 @@ jobs:
         run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - run: npm -v
       - run: npm i --ignore-scripts --no-audit --no-fund
-      - run: npm run lint --if-present --workspaces --include-workspace-root
+      - run: npm run lint -ws -iwr --if-present
 
   test-all:
     strategy:
@@ -83,4 +83,4 @@ jobs:
       - run: npm i --ignore-scripts --no-audit --no-fund
       - name: add tap problem matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
-      - run: npm run test --if-present --workspaces --include-workspace-root
+      - run: npm run test -ws -iwr --if-present

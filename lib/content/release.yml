@@ -1,0 +1,24 @@
+
+name: Release
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+
+jobs:
+  lint-all:
+    runs-on: ubuntu-latest
+    steps:
+      {{> setupGit checkout=(obj ref="${{ inputs.ref }}")}}
+      {{> setupNode}}
+      {{> setupDeps}}
+      - run: {{rootNpmPath}} run lint -ws -iwr --if-present
+
+  test-all:
+    {{> setupJobMatrix checkout=(obj ref="${{ inputs.ref }}")}}
+      - name: add tap problem matcher
+        run: echo "::add-matcher::.github/matchers/tap.json"
+      - run: {{rootNpmPath}} run test -ws -iwr --if-present

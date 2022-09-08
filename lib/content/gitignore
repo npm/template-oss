@@ -2,19 +2,6 @@
 /*
 
 # keep these
-!/.eslintrc.local.*
-!**/.gitignore
-!/docs/
-!/tap-snapshots/
-!/test/
-!/map.js
-!/scripts/
-!/README*
-!/LICENSE*
-!/CHANGELOG*
 {{#each ignorePaths}}
 {{.}}
 {{/each}}
-{{#if lockfile}}
-!/package-lock.json
-{{/if}}

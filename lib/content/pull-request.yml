@@ -13,12 +13,12 @@ jobs:
     name: Check PR Title or Commits
     runs-on: ubuntu-latest
     steps:
-      {{> setupGit with=(obj fetch-depth=0)}}
+      {{> setupGit checkout=(obj fetch-depth=0)}}
       {{> setupNode}}
       {{> setupDeps}}
       - name: Check commits or PR title
         env:
           PR_TITLE: $\{{ github.event.pull_request.title }}
         run: |
-          npx --offline commitlint -V --from origin/{{defaultBranch}} --to $\{{ github.event.pull_request.head.sha }} \
+          {{rootNpxPath}} --offline commitlint -V --from origin/{{defaultBranch}} --to $\{{ github.event.pull_request.head.sha }} \
             || echo $PR_TITLE | npx --offline commitlint -V

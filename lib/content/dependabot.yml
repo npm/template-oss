@@ -13,3 +13,21 @@ updates:
       prefix-development: chore
     labels:
       - "Dependencies"
+
+  {{#if workspaces}}
+  {{#each workspaces}}
+  - package-ecosystem: npm
+    directory: "{{.}}/"
+    schedule:
+      interval: daily
+    allow:
+      - dependency-type: direct
+    versioning-strategy: increase-if-necessary
+    commit-message:
+      prefix: deps
+      prefix-development: chore
+    labels:
+      - "Dependencies"
+
+  {{/each}}
+  {{/if}}

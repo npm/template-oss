@@ -13,4 +13,4 @@ jobs:
       {{> setupGit}}
       {{> setupNode}}
       {{> setupDeps flags="--package-lock"}}
-      - run: npm audit
+      - run: {{rootNpmPath}} audit
