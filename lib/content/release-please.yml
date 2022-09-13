@@ -6,6 +6,9 @@ on:
       {{#each branches}}
       - {{.}}
       {{/each}}
+      {{#each releaseBranches}}
+      - {{.}}
+      {{/each}}
 
 permissions:
   contents: write
