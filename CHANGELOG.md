@@ -1,5 +1,15 @@
 # Changelog
 
+## [4.1.0](https://github.com/npm/template-oss/compare/v4.0.0...v4.1.0) (2022-09-13)
+
+### Features
+
+* [`352d332`](https://github.com/npm/template-oss/commit/352d33210a89deee6b85ce6e8d9650054177e10f) [#187](https://github.com/npm/template-oss/pull/187) add release branches config to release-please workflow (#187) (@lukekarrys)
+
+### Bug Fixes
+
+* [`b58d86a`](https://github.com/npm/template-oss/commit/b58d86adc26d3d6fc07c682391a597398dd3a5b3) [#183](https://github.com/npm/template-oss/pull/183) use conventional commits from release-please for changelog (#183) (@lukekarrys)
+
 ## [4.0.0](https://github.com/npm/template-oss/compare/v3.8.1...v4.0.0) (2022-09-08)
 
 ### ⚠ BREAKING CHANGES
