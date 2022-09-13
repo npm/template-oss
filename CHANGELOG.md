@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.1.1](https://github.com/npm/template-oss/compare/v4.1.0...v4.1.1) (2022-09-13)
+
+### Bug Fixes
+
+* [`78a05fe`](https://github.com/npm/template-oss/commit/78a05fe8393dbf9e4d3bd43f2eff4db12921cde5) [#190](https://github.com/npm/template-oss/pull/190) pass current github ref to release please (#190) (@lukekarrys)
+
 ## [4.1.0](https://github.com/npm/template-oss/compare/v4.0.0...v4.1.0) (2022-09-13)
 
 ### Features
