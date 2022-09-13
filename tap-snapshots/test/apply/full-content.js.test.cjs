@@ -454,7 +454,7 @@ jobs:
       - run: npm i --ignore-scripts --no-audit --no-fund
       - name: Release Please
         id: release
-        run: npx --offline template-oss-release-please
+        run: npx --offline template-oss-release-please \${{ github.ref_name }}
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
 
@@ -1380,7 +1380,7 @@ jobs:
       - run: npm i --ignore-scripts --no-audit --no-fund
       - name: Release Please
         id: release
-        run: npx --offline template-oss-release-please
+        run: npx --offline template-oss-release-please \${{ github.ref_name }}
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
 
@@ -2090,7 +2090,7 @@ jobs:
       - run: npm i --ignore-scripts --no-audit --no-fund
       - name: Release Please
         id: release
-        run: npx --offline template-oss-release-please
+        run: npx --offline template-oss-release-please \${{ github.ref_name }}
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
 
