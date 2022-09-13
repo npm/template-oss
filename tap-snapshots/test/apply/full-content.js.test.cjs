@@ -1634,8 +1634,7 @@ release-please-config.json
 ========================================
 {
   "plugins": [
-    "node-workspace",
-    "workspace-deps"
+    "node-workspace"
   ],
   "exclude-packages-from-root": true,
   "group-pull-request-title-pattern": "chore: release \${version}",
@@ -2274,8 +2273,7 @@ release-please-config.json
 ========================================
 {
   "plugins": [
-    "node-workspace",
-    "workspace-deps"
+    "node-workspace"
   ],
   "exclude-packages-from-root": true,
   "group-pull-request-title-pattern": "chore: release \${version}",
