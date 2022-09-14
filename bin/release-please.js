@@ -20,6 +20,13 @@ const setOutput = (key, val) => {
           console.log(update.updater.changelogEntry)
           console.log('-'.repeat(40))
         }
+        for (const update of val.updates.filter(u => u.updater.rawContent)) {
+          console.log('package:', update.path)
+          console.log('-'.repeat(40))
+          console.log(JSON.parse(update.updater.rawContent).name)
+          console.log(JSON.parse(update.updater.rawContent).version)
+          console.log('-'.repeat(40))
+        }
       }
     } else {
       core.setOutput(key, JSON.stringify(val))
