@@ -9,12 +9,7 @@ permissions:
 
 jobs:
   template-oss-apply:
-    runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]'
-    steps:
-      {{> setupGit checkout=(obj ref="${{ github.event.pull_request.head_ref }}")}}
-      {{> setupNode}}
-      {{> setupDeps}}
+    {{> setupJob jobIf="github.actor == 'dependabot[bot]'" checkout=(obj ref="${{ github.event.pull_request.head_ref }}")}}
       - name: Dependabot metadata
         id: metadata
         uses: dependabot/fetch-metadata@v1.1.1

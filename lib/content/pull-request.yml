@@ -11,11 +11,7 @@ on:
 jobs:
   check:
     name: Check PR Title or Commits
-    runs-on: ubuntu-latest
-    steps:
-      {{> setupGit checkout=(obj fetch-depth=0)}}
-      {{> setupNode}}
-      {{> setupDeps}}
+    {{> setupJob checkout=(obj fetch-depth=0)}}
       - name: Check commits or PR title
         env:
           PR_TITLE: $\{{ github.event.pull_request.title }}
