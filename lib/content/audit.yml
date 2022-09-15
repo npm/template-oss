@@ -8,9 +8,5 @@ on:
 
 jobs:
   audit:
-    runs-on: ubuntu-latest
-    steps:
-      {{> setupGit}}
-      {{> setupNode}}
-      {{> setupDeps flags="--package-lock"}}
+    {{> setupJob flags="--package-lock"}}
       - run: {{rootNpmPath}} audit

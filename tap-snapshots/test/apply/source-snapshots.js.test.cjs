@@ -177,6 +177,7 @@ on:
 
 jobs:
   audit:
+    if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -214,6 +215,7 @@ on:
 
 jobs:
   lint:
+    if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -231,6 +233,7 @@ jobs:
       - run: npm run lint
 
   test:
+    if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
       matrix:
@@ -345,8 +348,8 @@ permissions:
 
 jobs:
   template-oss-apply:
+    if: github.repository_owner == 'npm' && github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]'
     steps:
       - uses: actions/checkout@v3
         with:
@@ -394,6 +397,7 @@ on:
 jobs:
   check:
     name: Check PR Title or Commits
+    if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -438,6 +442,7 @@ jobs:
     outputs:
       pr: \${{ steps.release.outputs.pr }}
       release: \${{ steps.release.outputs.release }}
+    if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -500,7 +505,7 @@ jobs:
 
   post-release:
     needs: release-please
-    if: needs.release-please.outputs.release
+    if: github.repository_owner == 'npm' && needs.release-please.outputs.release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -536,6 +541,7 @@ on:
 
 jobs:
   lint-all:
+    if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -555,6 +561,7 @@ jobs:
       - run: npm run lint -ws -iwr --if-present
 
   test-all:
+    if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
       matrix:
@@ -963,6 +970,7 @@ on:
 
 jobs:
   audit:
+    if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -1004,6 +1012,7 @@ on:
 
 jobs:
   lint:
+    if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -1021,6 +1030,7 @@ jobs:
       - run: npm run lint -w a
 
   test:
+    if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
       matrix:
@@ -1099,6 +1109,7 @@ on:
 
 jobs:
   lint:
+    if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -1116,6 +1127,7 @@ jobs:
       - run: npm run lint -w b
 
   test:
+    if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
       matrix:
@@ -1196,6 +1208,7 @@ on:
 
 jobs:
   lint:
+    if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -1213,6 +1226,7 @@ jobs:
       - run: npm run lint
 
   test:
+    if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
       matrix:
@@ -1327,8 +1341,8 @@ permissions:
 
 jobs:
   template-oss-apply:
+    if: github.repository_owner == 'npm' && github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]'
     steps:
       - uses: actions/checkout@v3
         with:
@@ -1376,6 +1390,7 @@ on:
 jobs:
   check:
     name: Check PR Title or Commits
+    if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -1420,6 +1435,7 @@ jobs:
     outputs:
       pr: \${{ steps.release.outputs.pr }}
       release: \${{ steps.release.outputs.release }}
+    if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -1482,7 +1498,7 @@ jobs:
 
   post-release:
     needs: release-please
-    if: needs.release-please.outputs.release
+    if: github.repository_owner == 'npm' && needs.release-please.outputs.release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -1518,6 +1534,7 @@ on:
 
 jobs:
   lint-all:
+    if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -1537,6 +1554,7 @@ jobs:
       - run: npm run lint -ws -iwr --if-present
 
   test-all:
+    if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
       matrix:
@@ -1964,6 +1982,7 @@ on:
 
 jobs:
   lint:
+    if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -1981,6 +2000,7 @@ jobs:
       - run: npm run lint -w a
 
   test:
+    if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
       matrix:
@@ -2059,6 +2079,7 @@ on:
 
 jobs:
   lint:
+    if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -2076,6 +2097,7 @@ jobs:
       - run: npm run lint -w b
 
   test:
+    if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
       matrix:
@@ -2150,6 +2172,7 @@ jobs:
     outputs:
       pr: \${{ steps.release.outputs.pr }}
       release: \${{ steps.release.outputs.release }}
+    if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -2212,7 +2235,7 @@ jobs:
 
   post-release:
     needs: release-please
-    if: needs.release-please.outputs.release
+    if: github.repository_owner == 'npm' && needs.release-please.outputs.release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -2248,6 +2271,7 @@ on:
 
 jobs:
   lint-all:
+    if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -2267,6 +2291,7 @@ jobs:
       - run: npm run lint -ws -iwr --if-present
 
   test-all:
+    if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
       matrix:

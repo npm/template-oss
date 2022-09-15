@@ -56,8 +56,7 @@ jobs:
 
   post-release:
     needs: release-please
-    if: needs.release-please.outputs.release
-    {{> setupJob }}
+    {{> setupJob jobIf="needs.release-please.outputs.release" }}
       - name: Post release actions
         env:
           GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}
