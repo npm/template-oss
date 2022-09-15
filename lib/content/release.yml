@@ -10,11 +10,7 @@ on:
 
 jobs:
   lint-all:
-    runs-on: ubuntu-latest
-    steps:
-      {{> setupGit checkout=(obj ref="${{ inputs.ref }}")}}
-      {{> setupNode}}
-      {{> setupDeps}}
+    {{> setupJob checkout=(obj ref="${{ inputs.ref }}")}}
       - run: {{rootNpmPath}} run lint -ws -iwr --if-present
 
   test-all:

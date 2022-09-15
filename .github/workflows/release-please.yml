@@ -17,6 +17,7 @@ jobs:
     outputs:
       pr: ${{ steps.release.outputs.pr }}
       release: ${{ steps.release.outputs.release }}
+    if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -79,7 +80,7 @@ jobs:
 
   post-release:
     needs: release-please
-    if: needs.release-please.outputs.release
+    if: github.repository_owner == 'npm' && needs.release-please.outputs.release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

@@ -11,6 +11,7 @@ on:
 
 jobs:
   lint-all:
+    if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -30,6 +31,7 @@ jobs:
       - run: npm run lint -ws -iwr --if-present
 
   test-all:
+    if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
       matrix:
