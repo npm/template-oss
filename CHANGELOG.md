@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.2.0](https://github.com/npm/template-oss/compare/v4.1.2...v4.2.0) (2022-09-15)
+
+### Features
+
+* [`849cecc`](https://github.com/npm/template-oss/commit/849cecce6851d644d8a0e1a153ce3d245d967d44) add `content` config option to allow a module to set own content (@lukekarrys)
+* [`423450f`](https://github.com/npm/template-oss/commit/423450f9802a676a035143a1fd503403c305e79d) [#195](https://github.com/npm/template-oss/pull/195) remove postpublish from package.json (#195) (@lukekarrys)
+
+### Bug Fixes
+
+* [`ffa2c08`](https://github.com/npm/template-oss/commit/ffa2c08267d0807c1e341e907e1eef8b179d880b) [#189](https://github.com/npm/template-oss/pull/189) dont run workflows outside of npm org (#194) (@lukekarrys)
+
 ## [4.1.2](https://github.com/npm/template-oss/compare/v4.1.1...v4.1.2) (2022-09-14)
 
 ### Bug Fixes
