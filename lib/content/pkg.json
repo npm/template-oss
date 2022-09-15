@@ -9,6 +9,7 @@
     "preversion": {{{del}}},
     "postversion": {{{del}}},
     "prepublishOnly": {{{del}}},
+    "postpublish": {{{del}}},
     "snap": "tap",
     "test": "tap",
     "posttest": "{{npmBin}} run lint",
