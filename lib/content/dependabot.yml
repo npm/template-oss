@@ -2,32 +2,14 @@ version: 2
 
 updates:
   - package-ecosystem: npm
-    directory: "/"
+    directory: {{pkgDir}}
     schedule:
       interval: daily
     allow:
       - dependency-type: direct
-    versioning-strategy: increase-if-necessary
+    versioning-strategy: {{dependabot}}
     commit-message:
       prefix: deps
       prefix-development: chore
     labels:
       - "Dependencies"
-
-  {{#if workspaces}}
-  {{#each workspaces}}
-  - package-ecosystem: npm
-    directory: "{{.}}/"
-    schedule:
-      interval: daily
-    allow:
-      - dependency-type: direct
-    versioning-strategy: increase-if-necessary
-    commit-message:
-      prefix: deps
-      prefix-development: chore
-    labels:
-      - "Dependencies"
-
-  {{/each}}
-  {{/if}}

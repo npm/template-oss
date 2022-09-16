@@ -138,7 +138,7 @@ The repo file ci.yml needs to be updated:
 
   .github/workflows/ci.yml
   ========================================
-  @@ -67,4 +67,24 @@
+  @@ -65,4 +65,24 @@
            with:
              node-version: \${{ matrix.node-version }}
          - name: Update to workable npm (windows)

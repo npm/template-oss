@@ -4,7 +4,6 @@ name: Post Dependabot Actions
 
 on: pull_request
 
-# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#permissions
 permissions:
   contents: write
 
@@ -29,15 +28,51 @@ jobs:
       - run: npm i --ignore-scripts --no-audit --no-fund
       - name: Dependabot metadata
         id: metadata
-        uses: dependabot/fetch-metadata@v1.1.1
+        uses: dependabot/fetch-metadata@v1
         with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-      - name: Apply @npmcli/template-oss changes and lint
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get command flags
         if: contains(steps.metadata.outputs.dependency-names, '@npmcli/template-oss')
+        id: flags
+        run: |
+          if [[ "${{steps.metadata.outputs.directory}}" == "/" ]]; then
+            echo "::set-output name=workspace::-iwr"
+          else
+            echo "::set-output name=workspace::-w ${{ steps.metadata.outputs.directory }}"
+          fi
+
+      - name: Apply changes
+        if: steps.flags.outputs.workspace
+        id: apply
+        run: |
+          npm run template-oss-apply ${{steps.flags.outputs.workspace}}
+          if [[ `git status --porcelain` ]]; then
+            echo "::set-output name=changes::true"
+          fi
+
+      - name: Push all changes
+        if: steps.apply.outputs.changes
+        id: push
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm run template-oss-apply
           git commit -am "chore: postinstall for dependabot template-oss PR"
           git push
-          npm run lint
+
+      - name: Push all except workflows
+        if: steps.push.outcome == 'failure'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git reset HEAD~
+          git checkout HEAD -- .github/workflows/
+          git clean -fd .github/workflows/
+          git commit -am "chore: postinstall for dependabot template-oss PR"
+          git push
+
+      - name: Verify changes
+        if: steps.apply.outputs.changes
+        run: |
+          npm exec --offline ${{steps.flags.outputs.workspace}} -- template-oss-check

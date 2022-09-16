@@ -32,14 +32,16 @@
   "templateVersion": {{{del}}},
   "standard": {{{del}}},
   "tap": {
-    {{#if isRootMono}}
-    "test-ignore": "^({{#each workspaceGlobs}}{{this}}{{#unless @last}}|{{/unless}}{{/each}})/",
+    {{#if workspacePaths}}
+    "test-ignore": "^({{join workspacePaths "|"}})/**",
     {{/if}}
     "nyc-arg": [
-      {{#if isRootMono}}
-      {{#each workspaceGlobs}}"--exclude", "{{this}}/**",{{/each}}
-      {{/if}}
-      "--exclude", "tap-snapshots/**"
+      {{#each workspaceGlobs}}
+      "--exclude",
+      "{{this}}",
+      {{/each}}
+      "--exclude",
+      "tap-snapshots/**"
     ]
   }
 }

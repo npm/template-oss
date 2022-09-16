@@ -6,8 +6,8 @@
   "pull-request-title-pattern": "chore: release${component} ${version}",
   "changelog-sections": {{{json changelogTypes}}},
   "packages": {
-    "{{#unless pkgRelPath}}.{{/unless}}{{pkgRelPath}}": {
-      {{#unless pkgRelPath}}"package-name": ""{{/unless}}
+    "{{pkgPath}}": {
+      {{#if isRoot}}"package-name": ""{{/if}}
     }
   }
 }

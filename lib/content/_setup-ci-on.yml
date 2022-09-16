@@ -1,15 +1,13 @@
 workflow_dispatch:
 pull_request:
-  branches:
-    - '*'
-  {{#if pkgRelPath}}
+  {{#if isWorkspace}}
   paths:
-    - {{pkgRelPath}}/**
+    - {{pkgGlob}}
   {{/if}}
-  {{#if workspaceGlobs}}
+  {{#if isRootMono}}
   paths-ignore:
     {{#each workspaceGlobs}}
-    - {{.}}/**
+    - {{.}}
     {{/each}}
   {{/if}}
 push:
@@ -17,14 +15,14 @@ push:
     {{#each branches}}
     - {{.}}
     {{/each}}
-  {{#if pkgRelPath}}
+  {{#if isWorkspace}}
   paths:
-    - {{pkgRelPath}}/**
+    - {{pkgGlob}}
   {{/if}}
-  {{#if workspaceGlobs}}
+  {{# if isRootMono}}
   paths-ignore:
     {{#each workspaceGlobs}}
-    - {{.}}/**
+    - {{.}}
     {{/each}}
   {{/if}}
 schedule:
