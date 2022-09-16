@@ -12,6 +12,15 @@ t.test('apply and check multiple is ok', async (t) => {
   t.same(await s.runAll(), [])
 })
 
+t.test('apply and check workspaces are ok', async (t) => {
+  const s = await setup(t, {
+    ok: true,
+    workspaces: { a: 'a', b: 'b', c: 'c' },
+  })
+  t.same(await s.runAll(), [])
+  t.same(await s.runAll(), [])
+})
+
 t.test('empty content is ok', async (t) => {
   const s = await setup(t, {
     package: {

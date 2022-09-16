@@ -332,7 +332,7 @@ The module file package.json needs to be updated:
     "lint-all": "npm run lint -ws -iwr --if-present"
   }
   "tap" is missing, expected {
-    "test-ignore": "^(workspaces/a|workspaces/b)/",
+    "test-ignore": "^(workspaces/a|workspaces/b)/**",
     "nyc-arg": [
       "--exclude",
       "workspaces/a/**",
@@ -363,8 +363,10 @@ To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @n
 
 The following repo files need to be added:
 
+  .github/dependabot.yml
   .github/matchers/tap.json
   .github/workflows/ci-name-aaaa.yml
+  .github/workflows/post-dependabot.yml
   .github/workflows/release-please.yml
   .github/workflows/release.yml
   .release-please-manifest.json
@@ -431,8 +433,10 @@ To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @n
 
 The following repo files need to be added:
 
+  .github/dependabot.yml
   .github/matchers/tap.json
   .github/workflows/ci-bbb.yml
+  .github/workflows/post-dependabot.yml
   .github/workflows/release-please.yml
   .github/workflows/release.yml
   .release-please-manifest.json

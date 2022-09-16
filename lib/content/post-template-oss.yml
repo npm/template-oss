@@ -1,0 +1,64 @@
+name: Post Dependabot Actions
+
+on:
+  pull_request
+
+permissions:
+  contents: write
+
+jobs:
+  template-oss-apply:
+    {{> setupJob jobIf="github.actor == 'dependabot[bot]'" checkout=(obj ref="${{ github.event.pull_request.head_ref }}")}}
+      - name: Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v1
+        with:
+          github-token: $\{{ secrets.GITHUB_TOKEN }}
+
+      - name: Get command flags
+        if: contains(steps.metadata.outputs.dependency-names, '{{__NAME__}}')
+        id: flags
+        run: |
+          if [[ "$\{{steps.metadata.outputs.directory}}" == "/" ]]; then
+            echo "::set-output name=workspace::-iwr"
+          else
+            echo "::set-output name=workspace::-w $\{{ steps.metadata.outputs.directory }}"
+          fi
+
+      - name: Apply changes
+        if: steps.flags.outputs.workspace
+        id: apply
+        run: |
+          {{rootNpmPath}} run template-oss-apply $\{{steps.flags.outputs.workspace}}
+          if [[ `git status --porcelain` ]]; then
+            echo "::set-output name=changes::true"
+          fi
+
+      # This step will fail if template-oss has made any workflow updates. It is impossible
+      # for a workflow to update other workflows. In the case it does fail, we continue
+      # and then try to apply only a portion of the changes in the next step
+      - name: Push all changes
+        if: steps.apply.outputs.changes
+        id: push
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}
+        run: |
+          git commit -am "chore: postinstall for dependabot template-oss PR"
+          git push
+
+      - name: Push all except workflows
+        if: steps.push.outcome == 'failure'
+        env:
+          GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}
+        run: |
+          git reset HEAD~
+          git checkout HEAD -- .github/workflows/
+          git clean -fd .github/workflows/
+          git commit -am "chore: postinstall for dependabot template-oss PR"
+          git push
+
+      - name: Verify changes
+        if: steps.apply.outputs.changes
+        run: |
+          {{rootNpmPath}} exec --offline $\{{steps.flags.outputs.workspace}} -- template-oss-check

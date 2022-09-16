@@ -1,4 +1,5 @@
-- uses: actions/checkout@v3
+- name: Checkout
+  uses: actions/checkout@v3
 {{#if checkout}}
   with:
   {{#each checkout}}

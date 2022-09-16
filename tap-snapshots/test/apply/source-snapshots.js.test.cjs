@@ -53,7 +53,7 @@ version: 2
 
 updates:
   - package-ecosystem: npm
-    directory: "/"
+    directory: /
     schedule:
       interval: daily
     allow:
@@ -203,8 +203,6 @@ name: CI
 on:
   workflow_dispatch:
   pull_request:
-    branches:
-      - '*'
   push:
     branches:
       - main
@@ -335,7 +333,6 @@ name: Post Dependabot Actions
 
 on: pull_request
 
-# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#permissions
 permissions:
   contents: write
 
@@ -360,18 +357,54 @@ jobs:
       - run: npm i --ignore-scripts --no-audit --no-fund
       - name: Dependabot metadata
         id: metadata
-        uses: dependabot/fetch-metadata@v1.1.1
+        uses: dependabot/fetch-metadata@v1
         with:
-          github-token: "\${{ secrets.GITHUB_TOKEN }}"
-      - name: Apply @npmcli/template-oss changes and lint
+          github-token: \${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get command flags
         if: contains(steps.metadata.outputs.dependency-names, '@npmcli/template-oss')
+        id: flags
+        run: |
+          if [[ "\${{steps.metadata.outputs.directory}}" == "/" ]]; then
+            echo "::set-output name=workspace::-iwr"
+          else
+            echo "::set-output name=workspace::-w \${{ steps.metadata.outputs.directory }}"
+          fi
+
+      - name: Apply changes
+        if: steps.flags.outputs.workspace
+        id: apply
+        run: |
+          npm run template-oss-apply \${{steps.flags.outputs.workspace}}
+          if [[ \`git status --porcelain\` ]]; then
+            echo "::set-output name=changes::true"
+          fi
+
+      - name: Push all changes
+        if: steps.apply.outputs.changes
+        id: push
+        continue-on-error: true
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm run template-oss-apply
           git commit -am "chore: postinstall for dependabot template-oss PR"
           git push
-          npm run lint
+
+      - name: Push all except workflows
+        if: steps.push.outcome == 'failure'
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git reset HEAD~
+          git checkout HEAD -- .github/workflows/
+          git clean -fd .github/workflows/
+          git commit -am "chore: postinstall for dependabot template-oss PR"
+          git push
+
+      - name: Verify changes
+        if: steps.apply.outputs.changes
+        run: |
+          npm exec --offline \${{steps.flags.outputs.workspace}} -- template-oss-check
 
 .github/workflows/pull-request.yml
 ========================================
@@ -790,8 +823,8 @@ const localConfigs = readdir(__dirname)
 module.exports = {
   root: true,
   ignorePatterns: [
-    'workspaces/a',
-    'workspaces/b',
+    'workspaces/a/**',
+    'workspaces/b/**',
   ],
   extends: [
     '@npmcli',
@@ -813,7 +846,7 @@ version: 2
 
 updates:
   - package-ecosystem: npm
-    directory: "/"
+    directory: /
     schedule:
       interval: daily
     allow:
@@ -824,9 +857,8 @@ updates:
       prefix-development: chore
     labels:
       - "Dependencies"
-
   - package-ecosystem: npm
-    directory: "workspaces/a/"
+    directory: workspaces/a/
     schedule:
       interval: daily
     allow:
@@ -837,9 +869,8 @@ updates:
       prefix-development: chore
     labels:
       - "Dependencies"
-
   - package-ecosystem: npm
-    directory: "workspaces/b/"
+    directory: workspaces/b/
     schedule:
       interval: daily
     allow:
@@ -989,8 +1020,6 @@ name: CI - a
 on:
   workflow_dispatch:
   pull_request:
-    branches:
-      - '*'
     paths:
       - workspaces/a/**
   push:
@@ -1086,8 +1115,6 @@ name: CI - b
 on:
   workflow_dispatch:
   pull_request:
-    branches:
-      - '*'
     paths:
       - workspaces/b/**
   push:
@@ -1183,8 +1210,6 @@ name: CI
 on:
   workflow_dispatch:
   pull_request:
-    branches:
-      - '*'
     paths-ignore:
       - workspaces/a/**
       - workspaces/b/**
@@ -1321,7 +1346,6 @@ name: Post Dependabot Actions
 
 on: pull_request
 
-# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#permissions
 permissions:
   contents: write
 
@@ -1346,18 +1370,54 @@ jobs:
       - run: npm i --ignore-scripts --no-audit --no-fund
       - name: Dependabot metadata
         id: metadata
-        uses: dependabot/fetch-metadata@v1.1.1
+        uses: dependabot/fetch-metadata@v1
         with:
-          github-token: "\${{ secrets.GITHUB_TOKEN }}"
-      - name: Apply @npmcli/template-oss changes and lint
+          github-token: \${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get command flags
         if: contains(steps.metadata.outputs.dependency-names, '@npmcli/template-oss')
+        id: flags
+        run: |
+          if [[ "\${{steps.metadata.outputs.directory}}" == "/" ]]; then
+            echo "::set-output name=workspace::-iwr"
+          else
+            echo "::set-output name=workspace::-w \${{ steps.metadata.outputs.directory }}"
+          fi
+
+      - name: Apply changes
+        if: steps.flags.outputs.workspace
+        id: apply
+        run: |
+          npm run template-oss-apply \${{steps.flags.outputs.workspace}}
+          if [[ \`git status --porcelain\` ]]; then
+            echo "::set-output name=changes::true"
+          fi
+
+      - name: Push all changes
+        if: steps.apply.outputs.changes
+        id: push
+        continue-on-error: true
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm run template-oss-apply
           git commit -am "chore: postinstall for dependabot template-oss PR"
           git push
-          npm run lint
+
+      - name: Push all except workflows
+        if: steps.push.outcome == 'failure'
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git reset HEAD~
+          git checkout HEAD -- .github/workflows/
+          git clean -fd .github/workflows/
+          git commit -am "chore: postinstall for dependabot template-oss PR"
+          git push
+
+      - name: Verify changes
+        if: steps.apply.outputs.changes
+        run: |
+          npm exec --offline \${{steps.flags.outputs.workspace}} -- template-oss-check
 
 .github/workflows/pull-request.yml
 ========================================
@@ -1688,7 +1748,7 @@ package.json
     "version": "{{VERSION}}"
   },
   "tap": {
-    "test-ignore": "^(workspaces/a|workspaces/b)/",
+    "test-ignore": "^(workspaces/a|workspaces/b)/**",
     "nyc-arg": [
       "--exclude",
       "workspaces/a/**",
@@ -1908,6 +1968,38 @@ workspaces/b/package.json
 `
 
 exports[`test/apply/source-snapshots.js TAP workspaces only > expect resolving Promise 1`] = `
+.github/dependabot.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: workspaces/a/
+    schedule:
+      interval: daily
+    allow:
+      - dependency-type: direct
+    versioning-strategy: increase-if-necessary
+    commit-message:
+      prefix: deps
+      prefix-development: chore
+    labels:
+      - "Dependencies"
+  - package-ecosystem: npm
+    directory: workspaces/b/
+    schedule:
+      interval: daily
+    allow:
+      - dependency-type: direct
+    versioning-strategy: increase-if-necessary
+    commit-message:
+      prefix: deps
+      prefix-development: chore
+    labels:
+      - "Dependencies"
+
 .github/matchers/tap.json
 ========================================
 {
@@ -1952,8 +2044,6 @@ name: CI - a
 on:
   workflow_dispatch:
   pull_request:
-    branches:
-      - '*'
     paths:
       - workspaces/a/**
   push:
@@ -2049,8 +2139,6 @@ name: CI - b
 on:
   workflow_dispatch:
   pull_request:
-    branches:
-      - '*'
     paths:
       - workspaces/b/**
   push:
@@ -2136,6 +2224,87 @@ jobs:
       - name: add tap problem matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
       - run: npm test --ignore-scripts -w b
+
+.github/workflows/post-dependabot.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Post Dependabot Actions
+
+on: pull_request
+
+permissions:
+  contents: write
+
+jobs:
+  template-oss-apply:
+    if: github.repository_owner == 'npm' && github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: \${{ github.event.pull_request.head_ref }}
+      - name: Setup git user
+        run: |
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+      - name: Update npm to latest
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+      - run: npm -v
+      - run: npm i --ignore-scripts --no-audit --no-fund
+      - name: Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v1
+        with:
+          github-token: \${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get command flags
+        if: contains(steps.metadata.outputs.dependency-names, '@npmcli/template-oss')
+        id: flags
+        run: |
+          if [[ "\${{steps.metadata.outputs.directory}}" == "/" ]]; then
+            echo "::set-output name=workspace::-iwr"
+          else
+            echo "::set-output name=workspace::-w \${{ steps.metadata.outputs.directory }}"
+          fi
+
+      - name: Apply changes
+        if: steps.flags.outputs.workspace
+        id: apply
+        run: |
+          npm run template-oss-apply \${{steps.flags.outputs.workspace}}
+          if [[ \`git status --porcelain\` ]]; then
+            echo "::set-output name=changes::true"
+          fi
+
+      - name: Push all changes
+        if: steps.apply.outputs.changes
+        id: push
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git commit -am "chore: postinstall for dependabot template-oss PR"
+          git push
+
+      - name: Push all except workflows
+        if: steps.push.outcome == 'failure'
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git reset HEAD~
+          git checkout HEAD -- .github/workflows/
+          git clean -fd .github/workflows/
+          git commit -am "chore: postinstall for dependabot template-oss PR"
+          git push
+
+      - name: Verify changes
+        if: steps.apply.outputs.changes
+        run: |
+          npm exec --offline \${{steps.flags.outputs.workspace}} -- template-oss-check
 
 .github/workflows/release-please.yml
 ========================================

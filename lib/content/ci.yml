@@ -5,11 +5,17 @@ on:
 
 jobs:
   lint:
+    name: Lint
     {{> setupJob }}
-      - run: {{rootNpmPath}} run lint {{~#if isWorkspace}} -w {{pkgName}}{{/if}}
+      - name: npm run lint {{~#if isWorkspace}} -w {{pkgName}}{{/if}}
+        run: {{rootNpmPath}} run lint --ignore-scripts {{~#if isWorkspace}} -w {{pkgName}}{{/if}}
+      - name: npm run postlint {{~#if isWorkspace}} -w {{pkgName}}{{/if}}
+        run: {{rootNpmPath}} run postlint --ignore-scripts {{~#if isWorkspace}} -w {{pkgName}}{{/if}}
 
   test:
+    name: Test
     {{> setupJobMatrix }}
-      - name: add tap problem matcher
+      - name: Add tap Problem Matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
-      - run: {{rootNpmPath}} test --ignore-scripts {{~#if isWorkspace}} -w {{pkgName}}{{/if}}
+      - name: npm test {{~#if isWorkspace}} -w {{pkgName}}{{/if}}
+        run: {{rootNpmPath}} test --ignore-scripts {{~#if isWorkspace}} -w {{pkgName}}{{/if}}

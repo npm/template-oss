@@ -1,6 +1,7 @@
+- name: Setup Node {{#if useMatrix}}$\{{ matrix.node-version }}{{else}}{{last ciVersions}}{{/if}}
 - uses: actions/setup-node@v3
   with:
-    node-version: {{#if useMatrix}}$\{{ matrix.node-version }}{{else}}{{#each ciVersions}}{{#if @last}}{{.}}{{/if}}{{/each}}{{/if}}
+    node-version: {{#if useMatrix}}$\{{ matrix.node-version }}{{else}}{{last ciVersions}}{{/if}}
     {{#if lockfile}}
     cache: npm
     {{/if}}
@@ -16,15 +17,16 @@
     node lib/npm.js install --no-fund --no-audit -g ..\npm-7.5.4.tgz
     cd ..
     rmdir /s /q package
-- name: Update npm to 7
+- name: npm@7
   # If we do test on npm 10 it needs npm7
   if: startsWith(matrix.node-version, '10.')
   run: npm i --prefer-online --no-fund --no-audit -g npm@7
-- name: Update npm to latest
+- name: npm@latest
   if: $\{{ !startsWith(matrix.node-version, '10.') }}
 {{else}}
-- name: Update npm to latest
+- name: npm@latest
 {{/if}}
   run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-- run: npm -v
+- name: npm Version
+  run: npm -v
 {{/if}}

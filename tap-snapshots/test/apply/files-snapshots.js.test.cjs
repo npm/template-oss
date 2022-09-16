@@ -113,8 +113,10 @@ SECURITY.md
 `
 
 exports[`test/apply/files-snapshots.js TAP workspaces > expect resolving Promise 1`] = `
+.github/dependabot.yml
 .github/matchers/tap.json
 .github/workflows/ci-d.yml
+.github/workflows/post-dependabot.yml
 .github/workflows/release-please.yml
 .github/workflows/release.yml
 .release-please-manifest.json
@@ -133,9 +135,11 @@ workspaces/d/package.json
 `
 
 exports[`test/apply/files-snapshots.js TAP workspaces only (like npm/cli) > expect resolving Promise 1`] = `
+.github/dependabot.yml
 .github/matchers/tap.json
 .github/workflows/ci-a.yml
 .github/workflows/ci-b.yml
+.github/workflows/post-dependabot.yml
 .github/workflows/release-please.yml
 .github/workflows/release.yml
 .release-please-manifest.json
