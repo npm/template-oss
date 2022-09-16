@@ -3,5 +3,5 @@
 
 # keep these
 {{#each ignorePaths}}
-{{.}}
+{{ . }}
 {{/each}}

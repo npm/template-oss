@@ -2,26 +2,29 @@ if: github.repository_owner == 'npm'
 strategy:
   fail-fast: false
   matrix:
-    node-version:
-      {{#each ciVersions}}
-      - {{.}}
-      {{/each}}
     platform:
-      - os: ubuntu-latest
+      - name: Linux
+        os: ubuntu-latest
         shell: bash
       {{#if macCI}}
-      - os: macos-latest
+      - name: macOS
+        os: macos-latest
         shell: bash
       {{/if}}
       {{#if windowsCI}}
-      - os: windows-latest
+      - name: Windows
+        os: windows-latest
         shell: cmd
       {{/if}}
+    node-version:
+      {{#each ciVersions}}
+      - {{ . }}
+      {{/each}}
 runs-on: $\{{ matrix.platform.os }}
 defaults:
   run:
     shell: $\{{ matrix.platform.shell }}
 steps:
-  {{> setupGit}}
-  {{> setupNode useMatrix=true}}
-  {{> setupDeps}}
+  {{> setupGit }}
+  {{> setupNode jobUseMatrix=true }}
+  {{> setupDeps }}

@@ -1,12 +1,12 @@
 - name: Checkout
   uses: actions/checkout@v3
-{{#if checkout}}
+{{#if jobCheckout}}
   with:
-  {{#each checkout}}
-    {{@key}}: {{this}}
+  {{#each jobCheckout}}
+    {{ @key }}: {{ this }}
   {{/each}}
 {{/if}}
-- name: Setup git user
+- name: Setup Git User
   run: |
     git config --global user.email "npm-cli+bot@github.com"
     git config --global user.name "npm CLI robot"

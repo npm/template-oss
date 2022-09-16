@@ -9,6 +9,6 @@ on:
 jobs:
   audit:
     name: Audit
-    {{> setupJob flags="--package-lock"}}
-      - name: npm audit
-        run: {{rootNpmPath}} audit
+    {{> setupJob jobDepFlags="--package-lock" }}
+      - name: Run Audit
+        run: {{ rootNpmPath }} audit

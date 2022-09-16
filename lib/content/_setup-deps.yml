@@ -1,2 +1,2 @@
 - name: Install Dependencies
-  run: {{rootNpmPath}} i --ignore-scripts --no-audit --no-fund {{~#if flags}} {{flags}}{{/if}}
+  run: {{ rootNpmPath }} i --ignore-scripts --no-audit --no-fund {{~#if jobDepFlags}} {{ jobDepFlags }}{{/if}}

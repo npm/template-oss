@@ -1,6 +1,6 @@
-if: github.repository_owner == 'npm' {{~#if jobIf}} && {{{jobIf}}}{{/if}}
+if: github.repository_owner == 'npm' {{~#if jobIf}} && {{{ jobIf }}}{{/if}}
 runs-on: ubuntu-latest
 steps:
-  {{> setupGit}}
-  {{> setupNode}}
-  {{> setupDeps}}
+  {{> setupGit }}
+  {{> setupNode }}
+  {{> setupDeps }}

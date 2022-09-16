@@ -1,13 +1,13 @@
-name: Release Please
+name: Release
 
 on:
   push:
     branches:
       {{#each branches}}
-      - {{.}}
+      - {{ . }}
       {{/each}}
-      {{#each releaseBranches}}
-      - {{.}}
+      {{#each releaseBranches }}
+      - {{ . }}
       {{/each}}
 
 permissions:
@@ -16,49 +16,52 @@ permissions:
 
 jobs:
   release-please:
+    name: Release Please
     outputs:
       pr: $\{{ steps.release.outputs.pr }}
       release: $\{{ steps.release.outputs.release }}
     {{> setupJob }}
-      - name: Release Please
+      - name: npx template-oss-release-please $\{{ github.ref_name }}
         id: release
-        run: npx --offline template-oss-release-please $\{{ github.ref_name }}
         env:
           GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}
+        run: {{ rootNpxPath }} --offline template-oss-release-please $\{{ github.ref_name }}
 
   post-pr:
+    name: Post Pull Request
     needs: release-please
     if: needs.release-please.outputs.pr
     runs-on: ubuntu-latest
     outputs:
       ref: $\{{ steps.ref.outputs.branch }}
     steps:
-      - name: Output ref
+      - name: Output PR Head Branch
         id: ref
         run: echo "::set-output name=branch::$\{{ fromJSON(needs.release-please.outputs.pr).headBranchName }}"
-      {{> setupGit checkout=(obj ref="${{ steps.ref.outputs.branch }}" fetch-depth=0)}}
-      {{> setupNode}}
-      {{> setupDeps}}
-      - name: Post pull request actions
+      {{> setupGit jobCheckout=(obj ref="${{ steps.ref.outputs.branch }}" fetch-depth=0) }}
+      {{> setupNode }}
+      {{> setupDeps }}
+      - name: Run Post Pull Request Actions
+        run: {{ rootNpmPath }} run rp-pull-request --ignore-scripts {{ allFlags }}
+      - name: Commit and Push
         env:
           GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}
         run: |
-          {{rootNpmPath}} run rp-pull-request --ignore-scripts --if-present -ws -iwr
           git commit -am "chore: post pull request" || true
           git push
   
   release-test:
+    name: Test
     needs: post-pr
     if: needs.post-pr.outputs.ref
-    uses: ./.github/workflows/release.yml
+    uses: ./.github/workflows/ci-release.yml
     with:
       ref: $\{{ needs.post-pr.outputs.ref }}
 
   post-release:
+    name: Post Release
     needs: release-please
     {{> setupJob jobIf="needs.release-please.outputs.release" }}
-      - name: Post release actions
-        env:
-          GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}
+      - name: Run Post Release Actions
         run: |
-          {{rootNpmPath}} run rp-release --ignore-scripts --if-present -ws -iwr
+          {{ rootNpmPath }} run rp-release --ignore-scripts {{ allFlags }}

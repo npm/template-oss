@@ -1,26 +1,24 @@
 # This file is automatically added by @npmcli/template-oss. Do not edit.
 
-name: CI
+name: CI - Release
 
 on:
-  workflow_dispatch:
-  pull_request:
-  push:
-    branches:
-      - main
-      - latest
-  schedule:
-    # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
-    - cron: "0 9 * * 1"
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
 
 jobs:
-  lint:
-    name: Lint
+  lint-all:
+    name: Lint All
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
@@ -40,8 +38,8 @@ jobs:
       - name: Post Lint
         run: npm run postlint --ignore-scripts
 
-  test:
-    name: Test - ${{ matrix.platform.name }} - Node ${{ matrix.node-version }}
+  test-all:
+    name: Test All - ${{ matrix.platform.name }} - Node ${{ matrix.node-version }}
     if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
@@ -70,6 +68,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
@@ -101,4 +101,4 @@ jobs:
       - name: Add Problem Matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
       - name: Test
-        run: npm test --ignore-scripts -iwr
+        run: npm test --ignore-scripts -ws -iwr --if-present
