@@ -291,7 +291,7 @@ jobs:
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
 
-name: "CodeQL"
+name: CodeQL
 
 on:
   push:
@@ -299,7 +299,6 @@ on:
       - main
       - latest
   pull_request:
-    # The branches below must be a subset of the branches above
     branches:
       - main
       - latest
@@ -315,12 +314,6 @@ jobs:
       actions: read
       contents: read
       security-events: write
-
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [ javascript ]
-
     steps:
       - uses: actions/checkout@v3
       - name: Setup git user
@@ -328,11 +321,11 @@ jobs:
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v1
+        uses: github/codeql-action/init@v2
         with:
-          languages: \${{ matrix.language }}
+          languages: javascript
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v1
+        uses: github/codeql-action/analyze@v2
 
 .github/workflows/post-dependabot.yml
 ========================================
@@ -1284,7 +1277,7 @@ jobs:
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
 
-name: "CodeQL"
+name: CodeQL
 
 on:
   push:
@@ -1292,7 +1285,6 @@ on:
       - main
       - latest
   pull_request:
-    # The branches below must be a subset of the branches above
     branches:
       - main
       - latest
@@ -1308,12 +1300,6 @@ jobs:
       actions: read
       contents: read
       security-events: write
-
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [ javascript ]
-
     steps:
       - uses: actions/checkout@v3
       - name: Setup git user
@@ -1321,11 +1307,11 @@ jobs:
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v1
+        uses: github/codeql-action/init@v2
         with:
-          languages: \${{ matrix.language }}
+          languages: javascript
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v1
+        uses: github/codeql-action/analyze@v2
 
 .github/workflows/post-dependabot.yml
 ========================================
