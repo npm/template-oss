@@ -112,22 +112,28 @@ The repo file audit.yml needs to be updated:
   
   jobs:
     audit:
+      name: Audit
       if: github.repository_owner == 'npm'
       runs-on: ubuntu-latest
       steps:
-        - uses: actions/checkout@v3
-        - name: Setup git user
+        - name: Checkout
+          uses: actions/checkout@v3
+        - name: Setup Git User
           run: |
             git config --global user.email "npm-cli+bot@github.com"
             git config --global user.name "npm CLI robot"
-        - uses: actions/setup-node@v3
+        - name: Setup Node
+          uses: actions/setup-node@v3
           with:
             node-version: 18.x
-        - name: Update npm to latest
+        - name: Install npm@latest
           run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-        - run: npm -v
-        - run: npm i --ignore-scripts --no-audit --no-fund --package-lock
-        - run: npm audit
+        - name: npm Version
+          run: npm -v
+        - name: Install Dependencies
+          run: npm i --ignore-scripts --no-audit --no-fund --package-lock
+        - name: Run Audit
+          run: npm audit
   
 
 To correct it: npx template-oss-apply --force
@@ -138,12 +144,12 @@ The repo file ci.yml needs to be updated:
 
   .github/workflows/ci.yml
   ========================================
-  @@ -65,4 +65,24 @@
-           with:
+  @@ -80,5 +80,25 @@
              node-version: \${{ matrix.node-version }}
-         - name: Update to workable npm (windows)
+         - name: Update Windows npm
            # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
-  +        if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
+           if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
+  -        run: ""
   +        run: |
   +          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
   +          tar xf npm-7.5.4.tgz
@@ -151,18 +157,20 @@ The repo file ci.yml needs to be updated:
   +          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
   +          cd ..
   +          rmdir /s /q package
-  +      - name: Update npm to 7
-  +        # If we do test on npm 10 it needs npm7
+  +      - name: Install npm@7
   +        if: startsWith(matrix.node-version, '10.')
   +        run: npm i --prefer-online --no-fund --no-audit -g npm@7
-  +      - name: Update npm to latest
+  +      - name: Install npm@latest
   +        if: \${{ !startsWith(matrix.node-version, '10.') }}
   +        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-  +      - run: npm -v
-  +      - run: npm i --ignore-scripts --no-audit --no-fund
-  +      - name: add tap problem matcher
+  +      - name: npm Version
+  +        run: npm -v
+  +      - name: Install Dependencies
+  +        run: npm i --ignore-scripts --no-audit --no-fund
+  +      - name: Add Problem Matcher
   +        run: echo "::add-matcher::.github/matchers/tap.json"
-  +      - run: npm test --ignore-scripts
+  +      - name: Test
+  +        run: npm test --ignore-scripts -iwr
 
 To correct it: npx template-oss-apply --force
 

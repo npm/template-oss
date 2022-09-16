@@ -1,12 +1,12 @@
 {
-  "separate-pull-requests": {{{del}}},
-  "plugins": {{#if isMono}}["node-workspace"]{{else}}{{{del}}}{{/if}},
+  "separate-pull-requests": {{{ del }}},
+  "plugins": {{#if isMono }}["node-workspace"]{{ else }}{{{ del }}}{{/if}},
   "exclude-packages-from-root": true,
   "group-pull-request-title-pattern": "chore: release ${version}",
   "pull-request-title-pattern": "chore: release${component} ${version}",
-  "changelog-sections": {{{json changelogTypes}}},
+  "changelog-sections": {{{ json changelogTypes }}},
   "packages": {
-    "{{pkgPath}}": {
+    "{{ pkgPath }}": {
       {{#if isRoot}}"package-name": ""{{/if}}
     }
   }

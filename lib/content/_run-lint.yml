@@ -1,0 +1,4 @@
+- name: Lint
+  run: {{ rootNpmPath }} run lint --ignore-scripts
+- name: Post Lint
+  run: {{ rootNpmPath }} run postlint --ignore-scripts

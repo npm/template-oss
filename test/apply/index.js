@@ -240,7 +240,7 @@ t.test('content can extend files', async (t) => {
       content_dir: {
         // eslint-disable-next-line max-len
         'index.js': 'module.exports={rootRepo:{add:{".github/workflows/release.yml": "release.yml"}}}',
-        'release.yml': '{{> release}}\n  smoke-publish:\n    runs-on: ubuntu-latest',
+        'release.yml': '{{> ciRelease}}\n  smoke-publish:\n    runs-on: ubuntu-latest',
       },
     },
   })
@@ -269,13 +269,13 @@ t.test('config via multiple locations', async (t) => {
     },
     testdir: {
       'root-content': {
-        root: '{{defaultBranch}}-{{a}}-{{b}}-{{c}}',
+        root: '{{rootNpmPath}}-{{a}}-{{b}}-{{c}}',
         'index.js': 'module.exports={rootRepo:{add:{"root.txt":"root"}},c:"root-c"}',
       },
       workspaces: {
         a: {
           'ws-content': {
-            ws: '{{defaultBranch}}-{{a}}-{{b}}-{{c}}',
+            ws: '{{rootNpmPath}}-{{a}}-{{b}}-{{c}}',
             'index.js': 'module.exports={workspaceRepo:{add:{"ws.txt":"ws"}},c:"ws-c"}',
           },
         },
@@ -287,8 +287,8 @@ t.test('config via multiple locations', async (t) => {
   const root = await s.readFile('root.txt')
   const ws = await s.readFile(join('ws.txt'))
 
-  t.equal(root.split('\n').slice(-1)[0], 'main-root-a-root-b-root-c')
-  t.equal(ws.split('\n').slice(-1)[0], 'main-ws-a-ws-b-ws-c')
+  t.equal(root.split('\n').slice(-1)[0], 'npm-root-a-root-b-root-c')
+  t.equal(ws.split('\n').slice(-1)[0], 'npm-ws-a-ws-b-ws-c')
 })
 
 t.test('private workspace', async (t) => {
@@ -329,7 +329,7 @@ t.test('private workspace', async (t) => {
   t.notOk(rpConfig.packages['workspaces/a'])
 
   const rp = s.join('.github', 'workflows')
-  t.ok(fs.existsSync(join(rp, 'release-please.yml')))
+  t.ok(fs.existsSync(join(rp, 'release.yml')))
   t.notOk(fs.existsSync(join(rp, 'release-please-b.yml')))
   t.notOk(fs.existsSync(join(rp, 'release-please-a.yml')))
 })

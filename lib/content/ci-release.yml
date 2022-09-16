@@ -1,0 +1,20 @@
+
+name: CI - Release
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+
+jobs:
+  lint-all:
+    name: Lint All
+    {{> setupJob jobCheckout=(obj ref="${{ inputs.ref }}") }}
+      {{> runLint jobRunFlags=allFlags }}
+
+  test-all:
+    name: Test All - $\{{ matrix.platform.name }} - Node $\{{ matrix.node-version }}
+    {{> setupJobMatrix jobCheckout=(obj ref="${{ inputs.ref }}") }}
+      {{> runTest jobRunFlags=allFlags }}

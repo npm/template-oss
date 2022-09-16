@@ -2,27 +2,27 @@ workflow_dispatch:
 pull_request:
   {{#if isWorkspace}}
   paths:
-    - {{pkgGlob}}
+    - {{ pkgGlob }}
   {{/if}}
   {{#if isRootMono}}
   paths-ignore:
-    {{#each workspaceGlobs}}
-    - {{.}}
+    {{#each workspaceGlob}}
+    - {{ . }}
     {{/each}}
   {{/if}}
 push:
   branches:
     {{#each branches}}
-    - {{.}}
+    - {{ . }}
     {{/each}}
   {{#if isWorkspace}}
   paths:
-    - {{pkgGlob}}
+    - {{ pkgGlob }}
   {{/if}}
-  {{# if isRootMono}}
+  {{#if isRootMono}}
   paths-ignore:
-    {{#each workspaceGlobs}}
-    - {{.}}
+    {{#each workspaceGlob}}
+    - {{ . }}
     {{/each}}
   {{/if}}
 schedule:
