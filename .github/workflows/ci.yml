@@ -18,6 +18,9 @@ jobs:
     name: Lint
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -41,7 +44,7 @@ jobs:
         run: npm run postlint --ignore-scripts
 
   test:
-    name: Test - ${{ matrix.platform.name }} - Node ${{ matrix.node-version }}
+    name: Test All - ${{ matrix.platform.name }} - Node ${{ matrix.node-version }}
     if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false

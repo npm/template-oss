@@ -219,7 +219,7 @@ t.test('content can override partials', async (t) => {
     },
     testdir: {
       content_dir: {
-        '_setup-deps.yml': '- run: INSTALL\n',
+        '_step-deps.yml': '- run: INSTALL\n',
       },
     },
   })

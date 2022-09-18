@@ -97,7 +97,31 @@ The repo file audit.yml needs to be updated:
   .github/workflows/audit.yml
   ========================================
   [@npmcli/template-oss ERROR] There was an erroring getting the target file
-  [@npmcli/template-oss ERROR] Error: Document with errors cannot be stringified
+  [@npmcli/template-oss ERROR] Error: {{ROOT}}/test/check/tap-testdir-diff-snapshots-update-and-remove-errors/.github/workflows/audit.yml
+  
+  YAMLParseError: Implicit keys need to be on a single line at line 38, column 1:
+  
+          run: npm audit
+  >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
+  ^
+  
+  YAMLParseError: Block scalar header includes extra characters: >>>>I at line 38, column 2:
+  
+  >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
+   ^
+  
+  YAMLParseError: Not a YAML token: HOPE THIS IS NOT VALID YAML<<<<<<<<<<< at line 38, column 7:
+  
+  >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  
+  YAMLParseError: Implicit map keys need to be followed by map values at line 38, column 1:
+  
+          run: npm audit
+  >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  
+  Document with errors cannot be stringified
   [@npmcli/template-oss ERROR] It will be overwritten with the following source:
   ----------------------------------------
   # This file is automatically added by @npmcli/template-oss. Do not edit.
@@ -112,9 +136,12 @@ The repo file audit.yml needs to be updated:
   
   jobs:
     audit:
-      name: Audit
+      name: Audit Dependencies
       if: github.repository_owner == 'npm'
       runs-on: ubuntu-latest
+      defaults:
+        run:
+          shell: bash
       steps:
         - name: Checkout
           uses: actions/checkout@v3
@@ -144,7 +171,7 @@ The repo file ci.yml needs to be updated:
 
   .github/workflows/ci.yml
   ========================================
-  @@ -80,5 +80,25 @@
+  @@ -83,5 +83,25 @@
              node-version: \${{ matrix.node-version }}
          - name: Update Windows npm
            # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows

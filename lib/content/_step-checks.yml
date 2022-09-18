@@ -1,0 +1,24 @@
+- name: {{#if jobCheck.sha}}Create{{else}}Conclude{{/if}} Check
+  uses: LouisBrunner/checks-action@v1.3.1
+  {{#if jobCheck.sha}}
+  id: check
+  {{#if jobCheck.if}}if: {{ jobCheck.if }}{{/if}}
+  {{else}}
+  if: always()
+  {{/if}}
+  with:
+    token: $\{{ secrets.GITHUB_TOKEN }}
+    {{#if jobCheck.sha}}
+    status: {{#if jobCheck.status}}{{ jobCheck.status }}{{else}}in_progress{{/if}} 
+    name: {{#if jobCheck.name}}{{ jobCheck.name }}{{else}}{{ jobName }}{{/if}}
+    sha: {{ jobCheck.sha }}
+    # XXX: this does not work when using the default GITHUB_TOKEN.
+    # Instead we post the main job url to the PR as a comment which
+    # will link to all the other checks. To work around this we would
+    # need to create a GitHub that would create on-demand tokens.
+    # https://github.com/LouisBrunner/checks-action/issues/18
+    # details_url:
+    {{else}}
+    conclusion: {{#if jobCheck.status}}{{ jobCheck.status }}{{else}}$\{{ job.status }}{{/if}}
+    check_id: {{#if jobCheck.id}}{{ jobCheck.id }}{{else}}$\{{ steps.check.outputs.check_id }}{{/if}}
+    {{/if}}
