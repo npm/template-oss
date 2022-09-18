@@ -1,15 +1,13 @@
 name: CI {{~#if isWorkspace}} - {{ pkgName }}{{/if}}
 
 on:
-  {{> setupCiOn }}
+  {{> onCi }}
 
 jobs:
   lint:
-    name: Lint
-    {{> setupJob }}
-      {{> runLint jobRunFlags=pkgFlags }}
+    {{> job jobName="Lint" }}
+      {{> stepLint jobRunFlags=pkgFlags }}
 
   test:
-    name: Test - $\{{ matrix.platform.name }} - Node $\{{ matrix.node-version }}
-    {{> setupJobMatrix }}
-      {{> runTest jobRunFlags=pkgFlags }}
+    {{> jobMatrix jobName="Test All - ${{ matrix.platform.name }} - Node ${{ matrix.node-version }}" }}
+      {{> stepTest jobRunFlags=pkgFlags }}

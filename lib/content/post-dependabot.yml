@@ -8,8 +8,11 @@ permissions:
 
 jobs:
   template-oss:
-    name: "{{ __NAME__ }}"
-    {{> setupJob jobIf="github.actor == 'dependabot[bot]'" jobCheckout=(obj ref="${{ github.event.pull_request.head_ref }}") }}
+    {{> job
+      jobName="template-oss"
+      jobIf="github.actor == 'dependabot[bot]'"
+      jobCheckout=(obj ref="${{ github.event.pull_request.head_ref }}")
+    }}
       - name: Fetch Dependabot Metadata
         id: metadata
         uses: dependabot/fetch-metadata@v1

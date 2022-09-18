@@ -165,6 +165,7 @@ const setupGit = async (...args) => {
 }
 
 const cleanSnapshot = (str) => str
+  .replace(resolve(), '{{ROOT}}')
   .replace(/\\+/g, '/')
   .replace(/\r\n/g, '\n')
   .replace(new RegExp(`("version": "|${esc(NAME)}@)${esc(VERSION)}`, 'g'), '$1{{VERSION}}')
