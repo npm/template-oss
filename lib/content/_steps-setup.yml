@@ -1,0 +1,4 @@
+{{> stepChecks }}
+{{> stepGit }}
+{{> stepNode }}
+{{> stepDeps }}

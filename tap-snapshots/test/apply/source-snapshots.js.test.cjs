@@ -177,9 +177,12 @@ on:
 
 jobs:
   audit:
-    name: Audit
+    name: Audit Dependencies
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -212,13 +215,27 @@ on:
       ref:
         required: true
         type: string
+      check_sha:
+        required: true
+        type: string
 
 jobs:
   lint-all:
     name: Lint All
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
+      - name: Create Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        id: check
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          status: in_progress
+          name: Lint All
+          sha: \${{ inputs.check_sha }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -241,6 +258,29 @@ jobs:
         run: npm run lint --ignore-scripts
       - name: Post Lint
         run: npm run postlint --ignore-scripts
+      - name: Get Current Job
+        uses: actions/github-script@v6
+        id: job
+        env:
+          JOB_NAME: Lint All
+        with:
+          result-encoding: string
+          script: |
+            const jobs = await octokit.paginate(octokit.rest.actions.listJobsForWorkflowRun, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            })
+            const { JOB_NAME } = process.env
+            return jobs.find((job) => job.name === JOB_NAME)?.html_url
+      - name: Conclude Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        if: always()
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          details_url: \${{ steps.job.outputs.result }}
+          id: \${{ steps.check.outputs.check_id }}
 
   test-all:
     name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
@@ -270,6 +310,14 @@ jobs:
       run:
         shell: \${{ matrix.platform.shell }}
     steps:
+      - name: Create Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        id: check
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          status: in_progress
+          name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+          sha: \${{ inputs.check_sha }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -306,6 +354,29 @@ jobs:
         run: echo "::add-matcher::.github/matchers/tap.json"
       - name: Test
         run: npm test --ignore-scripts -ws -iwr --if-present
+      - name: Get Current Job
+        uses: actions/github-script@v6
+        id: job
+        env:
+          JOB_NAME: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+        with:
+          result-encoding: string
+          script: |
+            const jobs = await octokit.paginate(octokit.rest.actions.listJobsForWorkflowRun, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            })
+            const { JOB_NAME } = process.env
+            return jobs.find((job) => job.name === JOB_NAME)?.html_url
+      - name: Conclude Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        if: always()
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          details_url: \${{ steps.job.outputs.result }}
+          id: \${{ steps.check.outputs.check_id }}
 
 .github/workflows/ci.yml
 ========================================
@@ -329,6 +400,9 @@ jobs:
     name: Lint
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -352,7 +426,7 @@ jobs:
         run: npm run postlint --ignore-scripts
 
   test:
-    name: Test - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+    name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
     if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
@@ -468,9 +542,12 @@ permissions:
 
 jobs:
   template-oss:
-    name: "@npmcli/template-oss"
+    name: template-oss
     if: github.repository_owner == 'npm' && github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -565,6 +642,9 @@ jobs:
     name: Lint Commits
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -611,13 +691,16 @@ permissions:
   pull-requests: write
 
 jobs:
-  release-please:
-    name: Release Please
+  release:
     outputs:
-      pr: \${{ steps.release.outputs.pr }}
-      release: \${{ steps.release.outputs.release }}
+      ref: \${{ steps.outputs.outputs.ref }}
+      sha: \${{ steps.outputs.outputs.sha }}
+    name: Release
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -635,29 +718,41 @@ jobs:
         run: npm -v
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
-      - name: npx template-oss-release-please \${{ github.ref_name }}
+      - name: Release Please
         id: release
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: npx --offline template-oss-release-please \${{ github.ref_name }}
+      - name: Set Outputs
+        id: outputs
+        run: |
+          echo "::set-output name=ref::\${{ fromJSON(steps.release.outputs.pr).headBranchName }}"
+          echo "::set-output name=sha::\${{ fromJSON(steps.release.outputs.pr).sha }}"
 
-  post-pr:
-    name: Post Pull Request
-    needs: release-please
-    if: needs.release-please.outputs.pr
-    runs-on: ubuntu-latest
+  pull-request:
+    needs: release
     outputs:
-      ref: \${{ steps.ref.outputs.branch }}
       sha: \${{ steps.commit.outputs.sha }}
+    name: Pull Request
+    if: github.repository_owner == 'npm' && needs.release.outputs.ref
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
-      - name: Output PR Head Branch
-        id: ref
-        run: echo "::set-output name=branch::\${{ fromJSON(needs.release-please.outputs.pr).headBranchName }}"
+      - name: Create Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        id: check
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          status: in_progress
+          name: Pull Request
+          sha: \${{ needs.release.outputs.sha }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          ref: \${{ steps.ref.outputs.branch }}
+          ref: \${{ needs.release.outputs.ref }}
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
@@ -682,41 +777,37 @@ jobs:
           git commit -am "chore: post pull request" || true
           echo "::set-output sha=$(git rev-parse HEAD)"
           git push
+      - name: Get Current Job
+        uses: actions/github-script@v6
+        id: job
+        env:
+          JOB_NAME: Pull Request
+        with:
+          result-encoding: string
+          script: |
+            const jobs = await octokit.paginate(octokit.rest.actions.listJobsForWorkflowRun, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            })
+            const { JOB_NAME } = process.env
+            return jobs.find((job) => job.name === JOB_NAME)?.html_url
+      - name: Conclude Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        if: always()
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          details_url: \${{ steps.job.outputs.result }}
+          id: \${{ steps.check.outputs.check_id }}
 
-  release-test:
-    name: Test
-    needs: post-pr
-    if: needs.post-pr.outputs.ref
+  ci:
+    name: CI - Release
+    needs: [ release, pull-request ]
     uses: ./.github/workflows/ci-release.yml
     with:
-      ref: \${{ needs.post-pr.outputs.ref }}
-      sha: \${{ needs.post-pr.outputs.sha }}
-
-  post-release:
-    name: Post Release
-    needs: release-please
-    if: github.repository_owner == 'npm' && needs.release-please.outputs.release
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Run Post Release Actions
-        run: |
-          npm run rp-release --ignore-scripts -ws -iwr --if-present
+      ref: \${{ needs.release.outputs.ref }}
+      check_sha: \${{ needs.pull-request.outputs.sha }}
 
 .gitignore
 ========================================
@@ -1069,9 +1160,12 @@ on:
 
 jobs:
   audit:
-    name: Audit
+    name: Audit Dependencies
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -1118,6 +1212,9 @@ jobs:
     name: Lint
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -1141,7 +1238,7 @@ jobs:
         run: npm run postlint --ignore-scripts
 
   test:
-    name: Test - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+    name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
     if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
@@ -1229,6 +1326,9 @@ jobs:
     name: Lint
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -1252,7 +1352,7 @@ jobs:
         run: npm run postlint --ignore-scripts
 
   test:
-    name: Test - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+    name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
     if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
@@ -1326,13 +1426,27 @@ on:
       ref:
         required: true
         type: string
+      check_sha:
+        required: true
+        type: string
 
 jobs:
   lint-all:
     name: Lint All
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
+      - name: Create Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        id: check
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          status: in_progress
+          name: Lint All
+          sha: \${{ inputs.check_sha }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -1355,6 +1469,29 @@ jobs:
         run: npm run lint --ignore-scripts
       - name: Post Lint
         run: npm run postlint --ignore-scripts
+      - name: Get Current Job
+        uses: actions/github-script@v6
+        id: job
+        env:
+          JOB_NAME: Lint All
+        with:
+          result-encoding: string
+          script: |
+            const jobs = await octokit.paginate(octokit.rest.actions.listJobsForWorkflowRun, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            })
+            const { JOB_NAME } = process.env
+            return jobs.find((job) => job.name === JOB_NAME)?.html_url
+      - name: Conclude Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        if: always()
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          details_url: \${{ steps.job.outputs.result }}
+          id: \${{ steps.check.outputs.check_id }}
 
   test-all:
     name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
@@ -1384,6 +1521,14 @@ jobs:
       run:
         shell: \${{ matrix.platform.shell }}
     steps:
+      - name: Create Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        id: check
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          status: in_progress
+          name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+          sha: \${{ inputs.check_sha }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -1420,6 +1565,29 @@ jobs:
         run: echo "::add-matcher::.github/matchers/tap.json"
       - name: Test
         run: npm test --ignore-scripts -ws -iwr --if-present
+      - name: Get Current Job
+        uses: actions/github-script@v6
+        id: job
+        env:
+          JOB_NAME: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+        with:
+          result-encoding: string
+          script: |
+            const jobs = await octokit.paginate(octokit.rest.actions.listJobsForWorkflowRun, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            })
+            const { JOB_NAME } = process.env
+            return jobs.find((job) => job.name === JOB_NAME)?.html_url
+      - name: Conclude Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        if: always()
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          details_url: \${{ steps.job.outputs.result }}
+          id: \${{ steps.check.outputs.check_id }}
 
 .github/workflows/ci.yml
 ========================================
@@ -1445,6 +1613,9 @@ jobs:
     name: Lint
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -1468,7 +1639,7 @@ jobs:
         run: npm run postlint --ignore-scripts
 
   test:
-    name: Test - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+    name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
     if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
@@ -1584,9 +1755,12 @@ permissions:
 
 jobs:
   template-oss:
-    name: "@npmcli/template-oss"
+    name: template-oss
     if: github.repository_owner == 'npm' && github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -1681,6 +1855,9 @@ jobs:
     name: Lint Commits
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -1727,13 +1904,16 @@ permissions:
   pull-requests: write
 
 jobs:
-  release-please:
-    name: Release Please
+  release:
     outputs:
-      pr: \${{ steps.release.outputs.pr }}
-      release: \${{ steps.release.outputs.release }}
+      ref: \${{ steps.outputs.outputs.ref }}
+      sha: \${{ steps.outputs.outputs.sha }}
+    name: Release
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -1751,29 +1931,41 @@ jobs:
         run: npm -v
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
-      - name: npx template-oss-release-please \${{ github.ref_name }}
+      - name: Release Please
         id: release
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: npx --offline template-oss-release-please \${{ github.ref_name }}
+      - name: Set Outputs
+        id: outputs
+        run: |
+          echo "::set-output name=ref::\${{ fromJSON(steps.release.outputs.pr).headBranchName }}"
+          echo "::set-output name=sha::\${{ fromJSON(steps.release.outputs.pr).sha }}"
 
-  post-pr:
-    name: Post Pull Request
-    needs: release-please
-    if: needs.release-please.outputs.pr
-    runs-on: ubuntu-latest
+  pull-request:
+    needs: release
     outputs:
-      ref: \${{ steps.ref.outputs.branch }}
       sha: \${{ steps.commit.outputs.sha }}
+    name: Pull Request
+    if: github.repository_owner == 'npm' && needs.release.outputs.ref
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
-      - name: Output PR Head Branch
-        id: ref
-        run: echo "::set-output name=branch::\${{ fromJSON(needs.release-please.outputs.pr).headBranchName }}"
+      - name: Create Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        id: check
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          status: in_progress
+          name: Pull Request
+          sha: \${{ needs.release.outputs.sha }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          ref: \${{ steps.ref.outputs.branch }}
+          ref: \${{ needs.release.outputs.ref }}
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
@@ -1798,41 +1990,37 @@ jobs:
           git commit -am "chore: post pull request" || true
           echo "::set-output sha=$(git rev-parse HEAD)"
           git push
+      - name: Get Current Job
+        uses: actions/github-script@v6
+        id: job
+        env:
+          JOB_NAME: Pull Request
+        with:
+          result-encoding: string
+          script: |
+            const jobs = await octokit.paginate(octokit.rest.actions.listJobsForWorkflowRun, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            })
+            const { JOB_NAME } = process.env
+            return jobs.find((job) => job.name === JOB_NAME)?.html_url
+      - name: Conclude Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        if: always()
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          details_url: \${{ steps.job.outputs.result }}
+          id: \${{ steps.check.outputs.check_id }}
 
-  release-test:
-    name: Test
-    needs: post-pr
-    if: needs.post-pr.outputs.ref
+  ci:
+    name: CI - Release
+    needs: [ release, pull-request ]
     uses: ./.github/workflows/ci-release.yml
     with:
-      ref: \${{ needs.post-pr.outputs.ref }}
-      sha: \${{ needs.post-pr.outputs.sha }}
-
-  post-release:
-    name: Post Release
-    needs: release-please
-    if: github.repository_owner == 'npm' && needs.release-please.outputs.release
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Run Post Release Actions
-        run: |
-          npm run rp-release --ignore-scripts -ws -iwr --if-present
+      ref: \${{ needs.release.outputs.ref }}
+      check_sha: \${{ needs.pull-request.outputs.sha }}
 
 .gitignore
 ========================================
@@ -2239,6 +2427,9 @@ jobs:
     name: Lint
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -2262,7 +2453,7 @@ jobs:
         run: npm run postlint --ignore-scripts
 
   test:
-    name: Test - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+    name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
     if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
@@ -2350,6 +2541,9 @@ jobs:
     name: Lint
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -2373,7 +2567,7 @@ jobs:
         run: npm run postlint --ignore-scripts
 
   test:
-    name: Test - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+    name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
     if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
@@ -2447,13 +2641,27 @@ on:
       ref:
         required: true
         type: string
+      check_sha:
+        required: true
+        type: string
 
 jobs:
   lint-all:
     name: Lint All
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
+      - name: Create Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        id: check
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          status: in_progress
+          name: Lint All
+          sha: \${{ inputs.check_sha }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -2476,6 +2684,29 @@ jobs:
         run: npm run lint --ignore-scripts
       - name: Post Lint
         run: npm run postlint --ignore-scripts
+      - name: Get Current Job
+        uses: actions/github-script@v6
+        id: job
+        env:
+          JOB_NAME: Lint All
+        with:
+          result-encoding: string
+          script: |
+            const jobs = await octokit.paginate(octokit.rest.actions.listJobsForWorkflowRun, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            })
+            const { JOB_NAME } = process.env
+            return jobs.find((job) => job.name === JOB_NAME)?.html_url
+      - name: Conclude Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        if: always()
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          details_url: \${{ steps.job.outputs.result }}
+          id: \${{ steps.check.outputs.check_id }}
 
   test-all:
     name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
@@ -2505,6 +2736,14 @@ jobs:
       run:
         shell: \${{ matrix.platform.shell }}
     steps:
+      - name: Create Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        id: check
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          status: in_progress
+          name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+          sha: \${{ inputs.check_sha }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -2541,6 +2780,29 @@ jobs:
         run: echo "::add-matcher::.github/matchers/tap.json"
       - name: Test
         run: npm test --ignore-scripts -ws -iwr --if-present
+      - name: Get Current Job
+        uses: actions/github-script@v6
+        id: job
+        env:
+          JOB_NAME: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+        with:
+          result-encoding: string
+          script: |
+            const jobs = await octokit.paginate(octokit.rest.actions.listJobsForWorkflowRun, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            })
+            const { JOB_NAME } = process.env
+            return jobs.find((job) => job.name === JOB_NAME)?.html_url
+      - name: Conclude Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        if: always()
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          details_url: \${{ steps.job.outputs.result }}
+          id: \${{ steps.check.outputs.check_id }}
 
 .github/workflows/post-dependabot.yml
 ========================================
@@ -2555,9 +2817,12 @@ permissions:
 
 jobs:
   template-oss:
-    name: "@npmcli/template-oss"
+    name: template-oss
     if: github.repository_owner == 'npm' && github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -2650,13 +2915,16 @@ permissions:
   pull-requests: write
 
 jobs:
-  release-please:
-    name: Release Please
+  release:
     outputs:
-      pr: \${{ steps.release.outputs.pr }}
-      release: \${{ steps.release.outputs.release }}
+      ref: \${{ steps.outputs.outputs.ref }}
+      sha: \${{ steps.outputs.outputs.sha }}
+    name: Release
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -2674,29 +2942,41 @@ jobs:
         run: npm -v
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
-      - name: npx template-oss-release-please \${{ github.ref_name }}
+      - name: Release Please
         id: release
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: npx --offline template-oss-release-please \${{ github.ref_name }}
+      - name: Set Outputs
+        id: outputs
+        run: |
+          echo "::set-output name=ref::\${{ fromJSON(steps.release.outputs.pr).headBranchName }}"
+          echo "::set-output name=sha::\${{ fromJSON(steps.release.outputs.pr).sha }}"
 
-  post-pr:
-    name: Post Pull Request
-    needs: release-please
-    if: needs.release-please.outputs.pr
-    runs-on: ubuntu-latest
+  pull-request:
+    needs: release
     outputs:
-      ref: \${{ steps.ref.outputs.branch }}
       sha: \${{ steps.commit.outputs.sha }}
+    name: Pull Request
+    if: github.repository_owner == 'npm' && needs.release.outputs.ref
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
-      - name: Output PR Head Branch
-        id: ref
-        run: echo "::set-output name=branch::\${{ fromJSON(needs.release-please.outputs.pr).headBranchName }}"
+      - name: Create Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        id: check
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          status: in_progress
+          name: Pull Request
+          sha: \${{ needs.release.outputs.sha }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          ref: \${{ steps.ref.outputs.branch }}
+          ref: \${{ needs.release.outputs.ref }}
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
@@ -2721,41 +3001,37 @@ jobs:
           git commit -am "chore: post pull request" || true
           echo "::set-output sha=$(git rev-parse HEAD)"
           git push
+      - name: Get Current Job
+        uses: actions/github-script@v6
+        id: job
+        env:
+          JOB_NAME: Pull Request
+        with:
+          result-encoding: string
+          script: |
+            const jobs = await octokit.paginate(octokit.rest.actions.listJobsForWorkflowRun, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            })
+            const { JOB_NAME } = process.env
+            return jobs.find((job) => job.name === JOB_NAME)?.html_url
+      - name: Conclude Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        if: always()
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          details_url: \${{ steps.job.outputs.result }}
+          id: \${{ steps.check.outputs.check_id }}
 
-  release-test:
-    name: Test
-    needs: post-pr
-    if: needs.post-pr.outputs.ref
+  ci:
+    name: CI - Release
+    needs: [ release, pull-request ]
     uses: ./.github/workflows/ci-release.yml
     with:
-      ref: \${{ needs.post-pr.outputs.ref }}
-      sha: \${{ needs.post-pr.outputs.sha }}
-
-  post-release:
-    name: Post Release
-    needs: release-please
-    if: github.repository_owner == 'npm' && needs.release-please.outputs.release
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Run Post Release Actions
-        run: |
-          npm run rp-release --ignore-scripts -ws -iwr --if-present
+      ref: \${{ needs.release.outputs.ref }}
+      check_sha: \${{ needs.pull-request.outputs.sha }}
 
 .release-please-manifest.json
 ========================================

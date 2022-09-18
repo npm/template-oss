@@ -1,0 +1,33 @@
+{{#if jobCheck}}
+{{#if jobCheck.name}}
+- name: Get Current Job
+  uses: actions/github-script@v6
+  id: job
+  env:
+    JOB_NAME: {{ jobCheck.name }}
+  with:
+    result-encoding: string
+    script: |
+      const jobs = await octokit.paginate(octokit.rest.actions.listJobsForWorkflowRun, {
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        run_id: context.runId
+      })
+      const { JOB_NAME } = process.env
+      return jobs.find((job) => job.name === JOB_NAME)?.html_url
+{{/if}}
+- name: {{#if jobCheck.sha}}Create{{else}}Conclude{{/if}} Check
+  uses: LouisBrunner/checks-action@v1.3.1
+  {{#if jobCheck.sha}}id: check{{else}}if: always(){{/if}}
+  with:
+    token: $\{{ secrets.GITHUB_TOKEN }}
+    {{#if jobCheck.sha}}
+    status: in_progress
+    name: {{ jobName }}
+    sha: {{ jobCheck.sha }}
+    {{else}}
+    conclusion: $\{{ job.status }}
+    details_url: $\{{ steps.job.outputs.result }}
+    id: $\{{ steps.check.outputs.check_id }}
+    {{/if}}
+{{/if}}

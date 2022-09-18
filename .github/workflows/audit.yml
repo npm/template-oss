@@ -10,9 +10,12 @@ on:
 
 jobs:
   audit:
-    name: Audit
+    name: Audit Dependencies
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3

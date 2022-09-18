@@ -15,33 +15,32 @@ permissions:
   pull-requests: write
 
 jobs:
-  release-please:
-    name: Release Please
+  release:
     outputs:
-      pr: $\{{ steps.release.outputs.pr }}
-      release: $\{{ steps.release.outputs.release }}
-    {{> setupJob }}
-      - name: npx template-oss-release-please $\{{ github.ref_name }}
+      ref: $\{{ steps.outputs.outputs.ref }}
+      sha: $\{{ steps.outputs.outputs.sha }}
+    {{> job jobName="Release" }}
+      - name: Release Please
         id: release
         env:
           GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}
         run: {{ rootNpxPath }} --offline template-oss-release-please $\{{ github.ref_name }}
+      - name: Set Outputs
+        id: outputs
+        run: |
+          echo "::set-output name=ref::$\{{ fromJSON(steps.release.outputs.pr).headBranchName }}"
+          echo "::set-output name=sha::$\{{ fromJSON(steps.release.outputs.pr).sha }}"
 
-  post-pr:
-    name: Post Pull Request
-    needs: release-please
-    if: needs.release-please.outputs.pr
-    runs-on: ubuntu-latest
+  pull-request:
+    needs: release
     outputs:
-      ref: $\{{ steps.ref.outputs.branch }}
       sha: $\{{ steps.commit.outputs.sha }}
-    steps:
-      - name: Output PR Head Branch
-        id: ref
-        run: echo "::set-output name=branch::$\{{ fromJSON(needs.release-please.outputs.pr).headBranchName }}"
-      {{> setupGit jobCheckout=(obj ref="${{ steps.ref.outputs.branch }}" fetch-depth=0) }}
-      {{> setupNode }}
-      {{> setupDeps }}
+    {{> job
+      jobName="Pull Request"
+      jobIf="needs.release.outputs.ref"
+      jobCheck=(obj sha="${{ needs.release.outputs.sha }}")
+      jobCheckout=(obj ref="${{ needs.release.outputs.ref }}" fetch-depth=0)
+    }}
       - name: Run Post Pull Request Actions
         run: {{ rootNpmPath }} run rp-pull-request --ignore-scripts {{ allFlags }}
       - name: Commit and Push
@@ -52,21 +51,12 @@ jobs:
           git commit -am "chore: post pull request" || true
           echo "::set-output sha=$(git rev-parse HEAD)"
           git push
+      {{> stepChecks jobCheck=(obj name="Pull Request") }}
 
-  
-  release-test:
-    name: Test
-    needs: post-pr
-    if: needs.post-pr.outputs.ref
+  ci:
+    name: CI - Release
+    needs: [release, pull-request]
     uses: ./.github/workflows/ci-release.yml
     with:
-      ref: $\{{ needs.post-pr.outputs.ref }}
-      sha: $\{{ needs.post-pr.outputs.sha }}
-
-  post-release:
-    name: Post Release
-    needs: release-please
-    {{> setupJob jobIf="needs.release-please.outputs.release" }}
-      - name: Run Post Release Actions
-        run: |
-          {{ rootNpmPath }} run rp-release --ignore-scripts {{ allFlags }}
+      ref: $\{{ needs.release.outputs.ref }}
+      check_sha: $\{{ needs.pull-request.outputs.sha }}

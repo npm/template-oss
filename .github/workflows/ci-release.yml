@@ -8,13 +8,27 @@ on:
       ref:
         required: true
         type: string
+      check_sha:
+        required: true
+        type: string
 
 jobs:
   lint-all:
     name: Lint All
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
+      - name: Create Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        id: check
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: in_progress
+          name: Lint All
+          sha: ${{ inputs.check_sha }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -37,6 +51,29 @@ jobs:
         run: npm run lint --ignore-scripts
       - name: Post Lint
         run: npm run postlint --ignore-scripts
+      - name: Get Current Job
+        uses: actions/github-script@v6
+        id: job
+        env:
+          JOB_NAME: Lint All
+        with:
+          result-encoding: string
+          script: |
+            const jobs = await octokit.paginate(octokit.rest.actions.listJobsForWorkflowRun, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            })
+            const { JOB_NAME } = process.env
+            return jobs.find((job) => job.name === JOB_NAME)?.html_url
+      - name: Conclude Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        if: always()
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          conclusion: ${{ job.status }}
+          details_url: ${{ steps.job.outputs.result }}
+          id: ${{ steps.check.outputs.check_id }}
 
   test-all:
     name: Test All - ${{ matrix.platform.name }} - Node ${{ matrix.node-version }}
@@ -66,6 +103,14 @@ jobs:
       run:
         shell: ${{ matrix.platform.shell }}
     steps:
+      - name: Create Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        id: check
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: in_progress
+          name: Test All - ${{ matrix.platform.name }} - Node ${{ matrix.node-version }}
+          sha: ${{ inputs.check_sha }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -102,3 +147,26 @@ jobs:
         run: echo "::add-matcher::.github/matchers/tap.json"
       - name: Test
         run: npm test --ignore-scripts -ws -iwr --if-present
+      - name: Get Current Job
+        uses: actions/github-script@v6
+        id: job
+        env:
+          JOB_NAME: Test All - ${{ matrix.platform.name }} - Node ${{ matrix.node-version }}
+        with:
+          result-encoding: string
+          script: |
+            const jobs = await octokit.paginate(octokit.rest.actions.listJobsForWorkflowRun, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            })
+            const { JOB_NAME } = process.env
+            return jobs.find((job) => job.name === JOB_NAME)?.html_url
+      - name: Conclude Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        if: always()
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          conclusion: ${{ job.status }}
+          details_url: ${{ steps.job.outputs.result }}
+          id: ${{ steps.check.outputs.check_id }}

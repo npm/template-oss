@@ -1,3 +1,4 @@
+{{#if jobName}}name: {{ jobName }}{{/if}}
 if: github.repository_owner == 'npm'
 strategy:
   fail-fast: false
@@ -25,6 +26,4 @@ defaults:
   run:
     shell: $\{{ matrix.platform.shell }}
 steps:
-  {{> setupGit }}
-  {{> setupNode jobUseMatrix=true }}
-  {{> setupDeps }}
+  {{> stepsSetup jobNodeMatrix=true }}
