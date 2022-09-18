@@ -13,60 +13,113 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  checks: write
 
 jobs:
-  release-please:
-    name: Release Please
+  release:
     outputs:
       pr: $\{{ steps.release.outputs.pr }}
-      release: $\{{ steps.release.outputs.release }}
-    {{> setupJob }}
-      - name: npx template-oss-release-please $\{{ github.ref_name }}
+      releases: $\{{ steps.release.outputs.releases }}
+      release-flags: $\{{ steps.release.outputs.release-flags }}
+      branch: $\{{ steps.release.outputs.pr-branch }}
+      pr-number: $\{{ steps.release.outputs.pr-number }}
+      comment-id: $\{{ steps.pr-comment.outputs.result }}
+      check-id: $\{{ steps.check.outputs.check_id }}
+    {{> job jobName="Release" }}
+      - name: Release Please
         id: release
         env:
           GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}
-        run: {{ rootNpxPath }} --offline template-oss-release-please $\{{ github.ref_name }}
+        run: |
+          {{ rootNpxPath }} --offline template-oss-release-please $\{{ github.ref_name }}
+      - name: Post Pull Request Comment
+        if: steps.release.outputs.pr-number
+        uses: actions/github-script@v6
+        id: pr-comment
+        env:
+          PR_NUMBER: $\{{ steps.release.outputs.pr-number }}
+        with:
+          script: |
+            const repo = { owner: context.repo.owner, repo: context.repo.repo }
+            const issue = { ...repo, issue_number: process.env.PR_NUMBER }
 
-  post-pr:
-    name: Post Pull Request
-    needs: release-please
-    if: needs.release-please.outputs.pr
-    runs-on: ubuntu-latest
+            const { data: workflow } = await github.rest.actions.getWorkflowRun({ ...repo, run_id: context.runId })
+
+            let body = '## Release Manager\n\n'
+
+            const comments = await github.paginate(github.rest.issues.listComments, issue)
+            let commentId = comments?.find(c => c.user.login === 'github-actions[bot]' && c.body.startsWith(body))?.id
+
+            body += `- Release workflow run: ${workflow.html_url}`
+            if (commentId) {
+              await github.rest.issues.updateComment({ ...repo, comment_id: commentId, body })
+            } else {
+              const { data: comment } = await github.rest.issues.createComment({ ...issue, body })
+              commentId = comment?.id
+            }
+
+            return commentId
+      {{> stepChecks jobCheck=(obj name="Release" sha="${{ steps.release.outputs.pr-sha }}" if="steps.release.outputs.pr-number") }}
+
+  update:
+    needs: release
     outputs:
-      ref: $\{{ steps.ref.outputs.branch }}
       sha: $\{{ steps.commit.outputs.sha }}
-    steps:
-      - name: Output PR Head Branch
-        id: ref
-        run: echo "::set-output name=branch::$\{{ fromJSON(needs.release-please.outputs.pr).headBranchName }}"
-      {{> setupGit jobCheckout=(obj ref="${{ steps.ref.outputs.branch }}" fetch-depth=0) }}
-      {{> setupNode }}
-      {{> setupDeps }}
+      check-id: $\{{ steps.check.outputs.check_id }}
+    {{> job
+      jobName="Update - Release"
+      jobIf="needs.release.outputs.pr"
+      jobCheckout=(obj ref="${{ needs.release.outputs.branch }}" fetch-depth=0)
+    }}
       - name: Run Post Pull Request Actions
-        run: {{ rootNpmPath }} run rp-pull-request --ignore-scripts {{ allFlags }}
-      - name: Commit and Push
+        env:
+          RELEASE_PR_NUMBER: $\{{ needs.release.outputs.pr-number }}
+          RELEASE_COMMENT_ID: $\{{ needs.release.outputs.comment-id }}
+          GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}
+        run: |
+          {{ rootNpmPath }} run rp-pull-request --ignore-scripts {{ allFlags }}
+      - name: Commit
         id: commit
         env:
           GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}
         run: |
-          git commit -am "chore: post pull request" || true
-          echo "::set-output sha=$(git rev-parse HEAD)"
-          git push
+          git commit --all --amend --no-edit || true
+          git push --force-with-lease
+          echo "::set-output  name=sha::$(git rev-parse HEAD)"
+      {{> stepChecks jobCheck=(obj sha="${{ steps.commit.outputs.sha }}" name="Release" )}}
+      {{> stepChecks jobCheck=(obj id="${{ needs.release.outputs.check-id }}" )}}
 
-  
-  release-test:
-    name: Test
-    needs: post-pr
-    if: needs.post-pr.outputs.ref
+  ci:
+    name: CI - Release
+    needs: [release, update]
+    if: needs.release.outputs.pr
     uses: ./.github/workflows/ci-release.yml
     with:
-      ref: $\{{ needs.post-pr.outputs.ref }}
-      sha: $\{{ needs.post-pr.outputs.sha }}
+      ref: $\{{ needs.release.outputs.branch }}
+      check-sha: $\{{ needs.update.outputs.sha }}
+
+  post-ci:
+    needs: [release, update, ci]
+    {{> job jobName="Post CI - Release" jobIf="needs.release.outputs.pr && always()" jobSkipSetup=true }}
+      - name: Get Needs Result
+        id: needs-result
+        run: |
+          result=""
+          if [[ "$\{{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
+            result="failure"
+          elif [[ "$\{{ contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
+            result="cancelled"
+          else
+            result="success"
+          fi
+          echo "::set-output name=result::$result"
+      {{> stepChecks jobCheck=(obj id="${{ needs.update.outputs.check-id }}" status="${{ steps.needs-result.outputs.result }}") }}
 
   post-release:
-    name: Post Release
-    needs: release-please
-    {{> setupJob jobIf="needs.release-please.outputs.release" }}
+    needs: release
+    {{> job jobName="Post Release - Release" jobIf="needs.release.outputs.releases" }}
       - name: Run Post Release Actions
+        env:
+          RELEASES: $\{{ needs.release.outputs.releases }}
         run: |
-          {{ rootNpmPath }} run rp-release --ignore-scripts {{ allFlags }}
+          {{ rootNpmPath }} run rp-release --ignore-scripts --if-present $\{{ join(needs.release.outputs.release-flags, ' ') }}
