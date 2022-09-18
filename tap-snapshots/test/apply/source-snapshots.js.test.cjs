@@ -177,9 +177,12 @@ on:
 
 jobs:
   audit:
-    name: Audit
+    name: Audit Dependencies
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -212,13 +215,33 @@ on:
       ref:
         required: true
         type: string
+      check-sha:
+        required: true
+        type: string
 
 jobs:
   lint-all:
     name: Lint All
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
+      - name: Create Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        id: check
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          status: in_progress
+          name: Lint All
+          sha: \${{ inputs.check-sha }}
+          # XXX: this does not work when using the default GITHUB_TOKEN.
+          # Instead we post the main job url to the PR as a comment which
+          # will link to all the other checks. To work around this we would
+          # need to create a GitHub that would create on-demand tokens.
+          # https://github.com/LouisBrunner/checks-action/issues/18
+          # details_url:
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -241,6 +264,13 @@ jobs:
         run: npm run lint --ignore-scripts
       - name: Post Lint
         run: npm run postlint --ignore-scripts
+      - name: Conclude Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        if: always()
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check_id: \${{ steps.check.outputs.check_id }}
 
   test-all:
     name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
@@ -270,6 +300,20 @@ jobs:
       run:
         shell: \${{ matrix.platform.shell }}
     steps:
+      - name: Create Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        id: check
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          status: in_progress
+          name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+          sha: \${{ inputs.check-sha }}
+          # XXX: this does not work when using the default GITHUB_TOKEN.
+          # Instead we post the main job url to the PR as a comment which
+          # will link to all the other checks. To work around this we would
+          # need to create a GitHub that would create on-demand tokens.
+          # https://github.com/LouisBrunner/checks-action/issues/18
+          # details_url:
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -306,6 +350,13 @@ jobs:
         run: echo "::add-matcher::.github/matchers/tap.json"
       - name: Test
         run: npm test --ignore-scripts -ws -iwr --if-present
+      - name: Conclude Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        if: always()
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check_id: \${{ steps.check.outputs.check_id }}
 
 .github/workflows/ci.yml
 ========================================
@@ -329,6 +380,9 @@ jobs:
     name: Lint
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -352,7 +406,7 @@ jobs:
         run: npm run postlint --ignore-scripts
 
   test:
-    name: Test - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+    name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
     if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
@@ -468,9 +522,12 @@ permissions:
 
 jobs:
   template-oss:
-    name: "@npmcli/template-oss"
+    name: template-oss
     if: github.repository_owner == 'npm' && github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -565,6 +622,9 @@ jobs:
     name: Lint Commits
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -609,15 +669,22 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  checks: write
 
 jobs:
-  release-please:
-    name: Release Please
+  release:
     outputs:
-      pr: \${{ steps.release.outputs.pr }}
-      release: \${{ steps.release.outputs.release }}
+      pr: steps.release.outputs.pr
+      branch: \${{ fromJSON(steps.release.outputs.pr).headBranchName }}
+      pr-number: \${{ fromJSON(steps.release.outputs.pr).number }}
+      comment-id: \${{ fromJSON(steps.pr-metadata.outputs.result).commentId }}
+      check-id: \${{ steps.check.outputs.check_id }}
+    name: Release
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -635,29 +702,72 @@ jobs:
         run: npm -v
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
-      - name: npx template-oss-release-please \${{ github.ref_name }}
+      - name: Release Please
         id: release
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: npx --offline template-oss-release-please \${{ github.ref_name }}
+      - name: Post Workflow URL Comment
+        if: steps.release.outputs.pr
+        uses: actions/github-script@v6
+        id: pr-metadata
+        env:
+          PR_NUMBER: \${{ fromJSON(steps.release.outputs.pr).number }}
+        with:
+          script: |
+            const repo = { owner: context.repo.owner, repo: context.repo.repo }
+            const pull = { ...repo, pull_number: process.env.PR_NUMBER }
+            const issue = { ...repo, issue_number: process.env.PR_NUMBER }
 
-  post-pr:
-    name: Post Pull Request
-    needs: release-please
-    if: needs.release-please.outputs.pr
-    runs-on: ubuntu-latest
+            const { data: workflow } = await github.rest.actions.getWorkflowRun({ ...repo, run_id: context.runId })
+
+            let body = '## Release Manager/n/n- Release workflow run: '
+
+            const comments = await github.paginate(github.rest.issues.listComments, issue)
+            let commentId = comments?.find(c => c.user.login === 'github-actions[bot]' && c.body.startsWith(body))?.id
+
+            body += workflow.html_url
+            if (commentId) {
+              await github.rest.issues.updateComment({ ...repo, comment_id: commentId, body })
+            } else {
+              const comment = await github.rest.issues.createComment({ ...issue, body })
+              commentId = comment?.id
+            }
+
+            const commits = await github.paginate(github.rest.pulls.listCommits, pull)
+            return { commentId, sha: commits?.[commits.length - 1]?.sha }
+      - name: Create Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        id: check
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          status: in_progress
+          name: Release
+          sha: \${{ fromJSON(steps.pr-metadata.outputs.result).sha }}
+          # XXX: this does not work when using the default GITHUB_TOKEN.
+          # Instead we post the main job url to the PR as a comment which
+          # will link to all the other checks. To work around this we would
+          # need to create a GitHub that would create on-demand tokens.
+          # https://github.com/LouisBrunner/checks-action/issues/18
+          # details_url:
+
+  update:
+    needs: release
     outputs:
-      ref: \${{ steps.ref.outputs.branch }}
       sha: \${{ steps.commit.outputs.sha }}
+      check-id: \${{ steps.check.outputs.check_id }}
+    name: Update Release
+    if: github.repository_owner == 'npm' && needs.release.outputs.pr
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
-      - name: Output PR Head Branch
-        id: ref
-        run: echo "::set-output name=branch::\${{ fromJSON(needs.release-please.outputs.pr).headBranchName }}"
       - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          ref: \${{ steps.ref.outputs.branch }}
+          ref: \${{ needs.release.outputs.branch }}
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
@@ -673,50 +783,76 @@ jobs:
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Run Post Pull Request Actions
+        env:
+          RELEASE_PR_NUMBER: \${{ needs.release.outputs.pr-number }}
+          RELEASE_COMMENT_ID: \${{ needs.release.outputs.comment-id }}
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: npm run rp-pull-request --ignore-scripts -ws -iwr --if-present
-      - name: Commit and Push
+      - name: Commit
         id: commit
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
-          git commit -am "chore: post pull request" || true
-          echo "::set-output sha=$(git rev-parse HEAD)"
-          git push
+          git commit --all --amend --no-edit || true
+          git push --force-with-lease
+          echo "::set-output  name=sha::$(git rev-parse HEAD)"
+      - name: Create Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        id: check
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          status: in_progress
+          name: Release
+          sha: \${{ steps.commit.outputs.sha }}
+          # XXX: this does not work when using the default GITHUB_TOKEN.
+          # Instead we post the main job url to the PR as a comment which
+          # will link to all the other checks. To work around this we would
+          # need to create a GitHub that would create on-demand tokens.
+          # https://github.com/LouisBrunner/checks-action/issues/18
+          # details_url:
+      - name: Conclude Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        if: always()
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check_id: \${{ needs.release.outputs.check-id }}
 
-  release-test:
-    name: Test
-    needs: post-pr
-    if: needs.post-pr.outputs.ref
+  ci:
+    name: CI - Release
+    needs: [ release, update ]
+    if: needs.release.outputs.pr
     uses: ./.github/workflows/ci-release.yml
     with:
-      ref: \${{ needs.post-pr.outputs.ref }}
-      sha: \${{ needs.post-pr.outputs.sha }}
+      ref: \${{ needs.release.outputs.branch }}
+      check-sha: \${{ needs.update.outputs.sha }}
 
-  post-release:
-    name: Post Release
-    needs: release-please
-    if: github.repository_owner == 'npm' && needs.release-please.outputs.release
+  post-ci:
+    needs: [ release, update, ci ]
+    name: Post CI - Release
+    if: github.repository_owner == 'npm' && needs.release.outputs.pr && always()
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Git User
+      - name: Get Needs Result
+        id: needs-result
         run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
+          if [[ "\${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
+            echo "::set-output name=result::failure"
+          elif [[ "\${{ contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
+            echo "::set-output name=result::cancelled"
+          else
+            echo "::set-output name=result::success"
+          fi
+      - name: Conclude Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        if: always()
         with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Run Post Release Actions
-        run: |
-          npm run rp-release --ignore-scripts -ws -iwr --if-present
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ steps.needs-result.outputs.result }}
+          check_id: \${{ needs.update.outputs.check-id }}
 
 .gitignore
 ========================================
@@ -1069,9 +1205,12 @@ on:
 
 jobs:
   audit:
-    name: Audit
+    name: Audit Dependencies
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -1118,6 +1257,9 @@ jobs:
     name: Lint
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -1141,7 +1283,7 @@ jobs:
         run: npm run postlint --ignore-scripts
 
   test:
-    name: Test - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+    name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
     if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
@@ -1229,6 +1371,9 @@ jobs:
     name: Lint
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -1252,7 +1397,7 @@ jobs:
         run: npm run postlint --ignore-scripts
 
   test:
-    name: Test - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+    name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
     if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
@@ -1326,13 +1471,33 @@ on:
       ref:
         required: true
         type: string
+      check-sha:
+        required: true
+        type: string
 
 jobs:
   lint-all:
     name: Lint All
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
+      - name: Create Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        id: check
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          status: in_progress
+          name: Lint All
+          sha: \${{ inputs.check-sha }}
+          # XXX: this does not work when using the default GITHUB_TOKEN.
+          # Instead we post the main job url to the PR as a comment which
+          # will link to all the other checks. To work around this we would
+          # need to create a GitHub that would create on-demand tokens.
+          # https://github.com/LouisBrunner/checks-action/issues/18
+          # details_url:
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -1355,6 +1520,13 @@ jobs:
         run: npm run lint --ignore-scripts
       - name: Post Lint
         run: npm run postlint --ignore-scripts
+      - name: Conclude Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        if: always()
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check_id: \${{ steps.check.outputs.check_id }}
 
   test-all:
     name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
@@ -1384,6 +1556,20 @@ jobs:
       run:
         shell: \${{ matrix.platform.shell }}
     steps:
+      - name: Create Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        id: check
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          status: in_progress
+          name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+          sha: \${{ inputs.check-sha }}
+          # XXX: this does not work when using the default GITHUB_TOKEN.
+          # Instead we post the main job url to the PR as a comment which
+          # will link to all the other checks. To work around this we would
+          # need to create a GitHub that would create on-demand tokens.
+          # https://github.com/LouisBrunner/checks-action/issues/18
+          # details_url:
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -1420,6 +1606,13 @@ jobs:
         run: echo "::add-matcher::.github/matchers/tap.json"
       - name: Test
         run: npm test --ignore-scripts -ws -iwr --if-present
+      - name: Conclude Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        if: always()
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check_id: \${{ steps.check.outputs.check_id }}
 
 .github/workflows/ci.yml
 ========================================
@@ -1445,6 +1638,9 @@ jobs:
     name: Lint
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -1468,7 +1664,7 @@ jobs:
         run: npm run postlint --ignore-scripts
 
   test:
-    name: Test - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+    name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
     if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
@@ -1584,9 +1780,12 @@ permissions:
 
 jobs:
   template-oss:
-    name: "@npmcli/template-oss"
+    name: template-oss
     if: github.repository_owner == 'npm' && github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -1681,6 +1880,9 @@ jobs:
     name: Lint Commits
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -1725,15 +1927,22 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  checks: write
 
 jobs:
-  release-please:
-    name: Release Please
+  release:
     outputs:
-      pr: \${{ steps.release.outputs.pr }}
-      release: \${{ steps.release.outputs.release }}
+      pr: steps.release.outputs.pr
+      branch: \${{ fromJSON(steps.release.outputs.pr).headBranchName }}
+      pr-number: \${{ fromJSON(steps.release.outputs.pr).number }}
+      comment-id: \${{ fromJSON(steps.pr-metadata.outputs.result).commentId }}
+      check-id: \${{ steps.check.outputs.check_id }}
+    name: Release
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -1751,29 +1960,72 @@ jobs:
         run: npm -v
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
-      - name: npx template-oss-release-please \${{ github.ref_name }}
+      - name: Release Please
         id: release
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: npx --offline template-oss-release-please \${{ github.ref_name }}
+      - name: Post Workflow URL Comment
+        if: steps.release.outputs.pr
+        uses: actions/github-script@v6
+        id: pr-metadata
+        env:
+          PR_NUMBER: \${{ fromJSON(steps.release.outputs.pr).number }}
+        with:
+          script: |
+            const repo = { owner: context.repo.owner, repo: context.repo.repo }
+            const pull = { ...repo, pull_number: process.env.PR_NUMBER }
+            const issue = { ...repo, issue_number: process.env.PR_NUMBER }
 
-  post-pr:
-    name: Post Pull Request
-    needs: release-please
-    if: needs.release-please.outputs.pr
-    runs-on: ubuntu-latest
+            const { data: workflow } = await github.rest.actions.getWorkflowRun({ ...repo, run_id: context.runId })
+
+            let body = '## Release Manager/n/n- Release workflow run: '
+
+            const comments = await github.paginate(github.rest.issues.listComments, issue)
+            let commentId = comments?.find(c => c.user.login === 'github-actions[bot]' && c.body.startsWith(body))?.id
+
+            body += workflow.html_url
+            if (commentId) {
+              await github.rest.issues.updateComment({ ...repo, comment_id: commentId, body })
+            } else {
+              const comment = await github.rest.issues.createComment({ ...issue, body })
+              commentId = comment?.id
+            }
+
+            const commits = await github.paginate(github.rest.pulls.listCommits, pull)
+            return { commentId, sha: commits?.[commits.length - 1]?.sha }
+      - name: Create Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        id: check
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          status: in_progress
+          name: Release
+          sha: \${{ fromJSON(steps.pr-metadata.outputs.result).sha }}
+          # XXX: this does not work when using the default GITHUB_TOKEN.
+          # Instead we post the main job url to the PR as a comment which
+          # will link to all the other checks. To work around this we would
+          # need to create a GitHub that would create on-demand tokens.
+          # https://github.com/LouisBrunner/checks-action/issues/18
+          # details_url:
+
+  update:
+    needs: release
     outputs:
-      ref: \${{ steps.ref.outputs.branch }}
       sha: \${{ steps.commit.outputs.sha }}
+      check-id: \${{ steps.check.outputs.check_id }}
+    name: Update Release
+    if: github.repository_owner == 'npm' && needs.release.outputs.pr
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
-      - name: Output PR Head Branch
-        id: ref
-        run: echo "::set-output name=branch::\${{ fromJSON(needs.release-please.outputs.pr).headBranchName }}"
       - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          ref: \${{ steps.ref.outputs.branch }}
+          ref: \${{ needs.release.outputs.branch }}
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
@@ -1789,50 +2041,76 @@ jobs:
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Run Post Pull Request Actions
+        env:
+          RELEASE_PR_NUMBER: \${{ needs.release.outputs.pr-number }}
+          RELEASE_COMMENT_ID: \${{ needs.release.outputs.comment-id }}
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: npm run rp-pull-request --ignore-scripts -ws -iwr --if-present
-      - name: Commit and Push
+      - name: Commit
         id: commit
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
-          git commit -am "chore: post pull request" || true
-          echo "::set-output sha=$(git rev-parse HEAD)"
-          git push
+          git commit --all --amend --no-edit || true
+          git push --force-with-lease
+          echo "::set-output  name=sha::$(git rev-parse HEAD)"
+      - name: Create Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        id: check
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          status: in_progress
+          name: Release
+          sha: \${{ steps.commit.outputs.sha }}
+          # XXX: this does not work when using the default GITHUB_TOKEN.
+          # Instead we post the main job url to the PR as a comment which
+          # will link to all the other checks. To work around this we would
+          # need to create a GitHub that would create on-demand tokens.
+          # https://github.com/LouisBrunner/checks-action/issues/18
+          # details_url:
+      - name: Conclude Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        if: always()
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check_id: \${{ needs.release.outputs.check-id }}
 
-  release-test:
-    name: Test
-    needs: post-pr
-    if: needs.post-pr.outputs.ref
+  ci:
+    name: CI - Release
+    needs: [ release, update ]
+    if: needs.release.outputs.pr
     uses: ./.github/workflows/ci-release.yml
     with:
-      ref: \${{ needs.post-pr.outputs.ref }}
-      sha: \${{ needs.post-pr.outputs.sha }}
+      ref: \${{ needs.release.outputs.branch }}
+      check-sha: \${{ needs.update.outputs.sha }}
 
-  post-release:
-    name: Post Release
-    needs: release-please
-    if: github.repository_owner == 'npm' && needs.release-please.outputs.release
+  post-ci:
+    needs: [ release, update, ci ]
+    name: Post CI - Release
+    if: github.repository_owner == 'npm' && needs.release.outputs.pr && always()
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Git User
+      - name: Get Needs Result
+        id: needs-result
         run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
+          if [[ "\${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
+            echo "::set-output name=result::failure"
+          elif [[ "\${{ contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
+            echo "::set-output name=result::cancelled"
+          else
+            echo "::set-output name=result::success"
+          fi
+      - name: Conclude Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        if: always()
         with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Run Post Release Actions
-        run: |
-          npm run rp-release --ignore-scripts -ws -iwr --if-present
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ steps.needs-result.outputs.result }}
+          check_id: \${{ needs.update.outputs.check-id }}
 
 .gitignore
 ========================================
@@ -2239,6 +2517,9 @@ jobs:
     name: Lint
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -2262,7 +2543,7 @@ jobs:
         run: npm run postlint --ignore-scripts
 
   test:
-    name: Test - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+    name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
     if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
@@ -2350,6 +2631,9 @@ jobs:
     name: Lint
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -2373,7 +2657,7 @@ jobs:
         run: npm run postlint --ignore-scripts
 
   test:
-    name: Test - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+    name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
     if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
@@ -2447,13 +2731,33 @@ on:
       ref:
         required: true
         type: string
+      check-sha:
+        required: true
+        type: string
 
 jobs:
   lint-all:
     name: Lint All
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
+      - name: Create Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        id: check
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          status: in_progress
+          name: Lint All
+          sha: \${{ inputs.check-sha }}
+          # XXX: this does not work when using the default GITHUB_TOKEN.
+          # Instead we post the main job url to the PR as a comment which
+          # will link to all the other checks. To work around this we would
+          # need to create a GitHub that would create on-demand tokens.
+          # https://github.com/LouisBrunner/checks-action/issues/18
+          # details_url:
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -2476,6 +2780,13 @@ jobs:
         run: npm run lint --ignore-scripts
       - name: Post Lint
         run: npm run postlint --ignore-scripts
+      - name: Conclude Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        if: always()
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check_id: \${{ steps.check.outputs.check_id }}
 
   test-all:
     name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
@@ -2505,6 +2816,20 @@ jobs:
       run:
         shell: \${{ matrix.platform.shell }}
     steps:
+      - name: Create Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        id: check
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          status: in_progress
+          name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+          sha: \${{ inputs.check-sha }}
+          # XXX: this does not work when using the default GITHUB_TOKEN.
+          # Instead we post the main job url to the PR as a comment which
+          # will link to all the other checks. To work around this we would
+          # need to create a GitHub that would create on-demand tokens.
+          # https://github.com/LouisBrunner/checks-action/issues/18
+          # details_url:
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -2541,6 +2866,13 @@ jobs:
         run: echo "::add-matcher::.github/matchers/tap.json"
       - name: Test
         run: npm test --ignore-scripts -ws -iwr --if-present
+      - name: Conclude Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        if: always()
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check_id: \${{ steps.check.outputs.check_id }}
 
 .github/workflows/post-dependabot.yml
 ========================================
@@ -2555,9 +2887,12 @@ permissions:
 
 jobs:
   template-oss:
-    name: "@npmcli/template-oss"
+    name: template-oss
     if: github.repository_owner == 'npm' && github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -2648,15 +2983,22 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  checks: write
 
 jobs:
-  release-please:
-    name: Release Please
+  release:
     outputs:
-      pr: \${{ steps.release.outputs.pr }}
-      release: \${{ steps.release.outputs.release }}
+      pr: steps.release.outputs.pr
+      branch: \${{ fromJSON(steps.release.outputs.pr).headBranchName }}
+      pr-number: \${{ fromJSON(steps.release.outputs.pr).number }}
+      comment-id: \${{ fromJSON(steps.pr-metadata.outputs.result).commentId }}
+      check-id: \${{ steps.check.outputs.check_id }}
+    name: Release
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -2674,29 +3016,72 @@ jobs:
         run: npm -v
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
-      - name: npx template-oss-release-please \${{ github.ref_name }}
+      - name: Release Please
         id: release
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: npx --offline template-oss-release-please \${{ github.ref_name }}
+      - name: Post Workflow URL Comment
+        if: steps.release.outputs.pr
+        uses: actions/github-script@v6
+        id: pr-metadata
+        env:
+          PR_NUMBER: \${{ fromJSON(steps.release.outputs.pr).number }}
+        with:
+          script: |
+            const repo = { owner: context.repo.owner, repo: context.repo.repo }
+            const pull = { ...repo, pull_number: process.env.PR_NUMBER }
+            const issue = { ...repo, issue_number: process.env.PR_NUMBER }
 
-  post-pr:
-    name: Post Pull Request
-    needs: release-please
-    if: needs.release-please.outputs.pr
-    runs-on: ubuntu-latest
+            const { data: workflow } = await github.rest.actions.getWorkflowRun({ ...repo, run_id: context.runId })
+
+            let body = '## Release Manager/n/n- Release workflow run: '
+
+            const comments = await github.paginate(github.rest.issues.listComments, issue)
+            let commentId = comments?.find(c => c.user.login === 'github-actions[bot]' && c.body.startsWith(body))?.id
+
+            body += workflow.html_url
+            if (commentId) {
+              await github.rest.issues.updateComment({ ...repo, comment_id: commentId, body })
+            } else {
+              const comment = await github.rest.issues.createComment({ ...issue, body })
+              commentId = comment?.id
+            }
+
+            const commits = await github.paginate(github.rest.pulls.listCommits, pull)
+            return { commentId, sha: commits?.[commits.length - 1]?.sha }
+      - name: Create Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        id: check
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          status: in_progress
+          name: Release
+          sha: \${{ fromJSON(steps.pr-metadata.outputs.result).sha }}
+          # XXX: this does not work when using the default GITHUB_TOKEN.
+          # Instead we post the main job url to the PR as a comment which
+          # will link to all the other checks. To work around this we would
+          # need to create a GitHub that would create on-demand tokens.
+          # https://github.com/LouisBrunner/checks-action/issues/18
+          # details_url:
+
+  update:
+    needs: release
     outputs:
-      ref: \${{ steps.ref.outputs.branch }}
       sha: \${{ steps.commit.outputs.sha }}
+      check-id: \${{ steps.check.outputs.check_id }}
+    name: Update Release
+    if: github.repository_owner == 'npm' && needs.release.outputs.pr
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
-      - name: Output PR Head Branch
-        id: ref
-        run: echo "::set-output name=branch::\${{ fromJSON(needs.release-please.outputs.pr).headBranchName }}"
       - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          ref: \${{ steps.ref.outputs.branch }}
+          ref: \${{ needs.release.outputs.branch }}
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
@@ -2712,50 +3097,76 @@ jobs:
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Run Post Pull Request Actions
+        env:
+          RELEASE_PR_NUMBER: \${{ needs.release.outputs.pr-number }}
+          RELEASE_COMMENT_ID: \${{ needs.release.outputs.comment-id }}
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: npm run rp-pull-request --ignore-scripts -ws -iwr --if-present
-      - name: Commit and Push
+      - name: Commit
         id: commit
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
-          git commit -am "chore: post pull request" || true
-          echo "::set-output sha=$(git rev-parse HEAD)"
-          git push
+          git commit --all --amend --no-edit || true
+          git push --force-with-lease
+          echo "::set-output  name=sha::$(git rev-parse HEAD)"
+      - name: Create Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        id: check
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          status: in_progress
+          name: Release
+          sha: \${{ steps.commit.outputs.sha }}
+          # XXX: this does not work when using the default GITHUB_TOKEN.
+          # Instead we post the main job url to the PR as a comment which
+          # will link to all the other checks. To work around this we would
+          # need to create a GitHub that would create on-demand tokens.
+          # https://github.com/LouisBrunner/checks-action/issues/18
+          # details_url:
+      - name: Conclude Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        if: always()
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check_id: \${{ needs.release.outputs.check-id }}
 
-  release-test:
-    name: Test
-    needs: post-pr
-    if: needs.post-pr.outputs.ref
+  ci:
+    name: CI - Release
+    needs: [ release, update ]
+    if: needs.release.outputs.pr
     uses: ./.github/workflows/ci-release.yml
     with:
-      ref: \${{ needs.post-pr.outputs.ref }}
-      sha: \${{ needs.post-pr.outputs.sha }}
+      ref: \${{ needs.release.outputs.branch }}
+      check-sha: \${{ needs.update.outputs.sha }}
 
-  post-release:
-    name: Post Release
-    needs: release-please
-    if: github.repository_owner == 'npm' && needs.release-please.outputs.release
+  post-ci:
+    needs: [ release, update, ci ]
+    name: Post CI - Release
+    if: github.repository_owner == 'npm' && needs.release.outputs.pr && always()
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Git User
+      - name: Get Needs Result
+        id: needs-result
         run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
+          if [[ "\${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
+            echo "::set-output name=result::failure"
+          elif [[ "\${{ contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
+            echo "::set-output name=result::cancelled"
+          else
+            echo "::set-output name=result::success"
+          fi
+      - name: Conclude Check
+        uses: LouisBrunner/checks-action@v1.3.1
+        if: always()
         with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Run Post Release Actions
-        run: |
-          npm run rp-release --ignore-scripts -ws -iwr --if-present
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ steps.needs-result.outputs.result }}
+          check_id: \${{ needs.update.outputs.check-id }}
 
 .release-please-manifest.json
 ========================================
