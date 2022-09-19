@@ -44,7 +44,7 @@ jobs:
         run: npm run postlint --ignore-scripts
 
   test:
-    name: Test All - ${{ matrix.platform.name }} - Node ${{ matrix.node-version }}
+    name: Test - ${{ matrix.platform.name }} - ${{ matrix.node-version }}
     if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false

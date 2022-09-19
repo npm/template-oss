@@ -1,4 +1,4 @@
-name: {{ jobName }}
+name: {{ jobName }} - $\{{ matrix.platform.name }} - $\{{ matrix.node-version }}
 if: github.repository_owner == 'npm'
 strategy:
   fail-fast: false
@@ -26,4 +26,4 @@ defaults:
   run:
     shell: $\{{ matrix.platform.shell }}
 steps:
-  {{> stepsSetup jobNodeMatrix=true }}
+  {{> stepsSetup jobIsMatrix=true }}

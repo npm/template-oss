@@ -9,5 +9,5 @@ jobs:
       {{> stepLint jobRunFlags=pkgFlags }}
 
   test:
-    {{> jobMatrix jobName="Test All - ${{ matrix.platform.name }} - Node ${{ matrix.node-version }}" }}
+    {{> jobMatrix jobName="Test" }}
       {{> stepTest jobRunFlags=pkgFlags }}

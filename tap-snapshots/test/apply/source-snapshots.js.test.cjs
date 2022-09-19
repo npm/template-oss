@@ -274,7 +274,7 @@ jobs:
           check_id: \${{ steps.check.outputs.check_id }}
 
   test-all:
-    name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+    name: Test All - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
     if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
@@ -308,7 +308,7 @@ jobs:
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           status: in_progress
-          name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+          name: Test All - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
           sha: \${{ inputs.check-sha }}
           # XXX: this does not work when using the default GITHUB_TOKEN.
           # Instead we post the main job url to the PR as a comment which
@@ -408,7 +408,7 @@ jobs:
         run: npm run postlint --ignore-scripts
 
   test:
-    name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+    name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
     if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
@@ -1322,7 +1322,7 @@ jobs:
         run: npm run postlint --ignore-scripts
 
   test:
-    name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+    name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
     if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
@@ -1436,7 +1436,7 @@ jobs:
         run: npm run postlint --ignore-scripts
 
   test:
-    name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+    name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
     if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
@@ -1569,7 +1569,7 @@ jobs:
           check_id: \${{ steps.check.outputs.check_id }}
 
   test-all:
-    name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+    name: Test All - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
     if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
@@ -1603,7 +1603,7 @@ jobs:
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           status: in_progress
-          name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+          name: Test All - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
           sha: \${{ inputs.check-sha }}
           # XXX: this does not work when using the default GITHUB_TOKEN.
           # Instead we post the main job url to the PR as a comment which
@@ -1705,7 +1705,7 @@ jobs:
         run: npm run postlint --ignore-scripts
 
   test:
-    name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+    name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
     if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
@@ -2621,7 +2621,7 @@ jobs:
         run: npm run postlint --ignore-scripts
 
   test:
-    name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+    name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
     if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
@@ -2735,7 +2735,7 @@ jobs:
         run: npm run postlint --ignore-scripts
 
   test:
-    name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+    name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
     if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
@@ -2868,7 +2868,7 @@ jobs:
           check_id: \${{ steps.check.outputs.check_id }}
 
   test-all:
-    name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+    name: Test All - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
     if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
@@ -2902,7 +2902,7 @@ jobs:
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           status: in_progress
-          name: Test All - \${{ matrix.platform.name }} - Node \${{ matrix.node-version }}
+          name: Test All - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
           sha: \${{ inputs.check-sha }}
           # XXX: this does not work when using the default GITHUB_TOKEN.
           # Instead we post the main job url to the PR as a comment which

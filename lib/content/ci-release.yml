@@ -23,7 +23,7 @@ jobs:
 
   test-all:
     {{> jobMatrix
-      jobName="Test All - ${{ matrix.platform.name }} - Node ${{ matrix.node-version }}"
+      jobName="Test All"
       jobCheck=(obj sha="${{ inputs.check-sha }}")
       jobCheckout=(obj ref="${{ inputs.ref }}")
     }}

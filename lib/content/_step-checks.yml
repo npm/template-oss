@@ -10,7 +10,7 @@
     token: $\{{ secrets.GITHUB_TOKEN }}
     {{#if jobCheck.sha}}
     status: {{#if jobCheck.status}}{{ jobCheck.status }}{{else}}in_progress{{/if}} 
-    name: {{#if jobCheck.name}}{{ jobCheck.name }}{{else}}{{ jobName }}{{/if}}
+    name: {{#if jobCheck.name}}{{ jobCheck.name }}{{else}}{{ jobName }}{{/if}}{{#if jobIsMatrix}} - $\{{ matrix.platform.name }} - $\{{ matrix.node-version }}{{/if}}
     sha: {{ jobCheck.sha }}
     # XXX: this does not work when using the default GITHUB_TOKEN.
     # Instead we post the main job url to the PR as a comment which
