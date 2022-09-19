@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.3.1](https://github.com/npm/template-oss/compare/v4.3.0...v4.3.1) (2022-09-19)
+
+### Bug Fixes
+
+* [`817d49e`](https://github.com/npm/template-oss/commit/817d49e3d64f76ce2fd6d1d765044908bd2af022) [#205](https://github.com/npm/template-oss/pull/205) remove 'All' from regular test job name (@lukekarrys)
+
 ## [4.3.0](https://github.com/npm/template-oss/compare/v4.2.0...v4.3.0) (2022-09-19)
 
 ### Features
