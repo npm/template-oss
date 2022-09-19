@@ -1,5 +1,14 @@
 # Changelog
 
+## [4.3.0](https://github.com/npm/template-oss/compare/v4.2.0...v4.3.0) (2022-09-19)
+
+### Features
+
+* [`41e7e16`](https://github.com/npm/template-oss/commit/41e7e16d74706a5dab757682116dfdd2d423bdfb) add checks to release pull request (@lukekarrys)
+* [`5b65537`](https://github.com/npm/template-oss/commit/5b655374771b62c572800dd56f44c102f863ba73) add names to all jobs and steps (@lukekarrys)
+* [`caf393c`](https://github.com/npm/template-oss/commit/caf393c6d01b7608eeafe4503fb73fd47d21193c) add dependabot configuration for workspaces (@lukekarrys)
+* [`e43ee70`](https://github.com/npm/template-oss/commit/e43ee70c03e41c6bc25b1938a360ccfc33a30319) [#198](https://github.com/npm/template-oss/pull/198) update codeql actions to v2 (@lukekarrys)
+
 ## [4.2.0](https://github.com/npm/template-oss/compare/v4.1.2...v4.2.0) (2022-09-15)
 
 ### Features
