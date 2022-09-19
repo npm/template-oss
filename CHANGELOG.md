@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.3.2](https://github.com/npm/template-oss/compare/v4.3.1...v4.3.2) (2022-09-19)
+
+### Bug Fixes
+
+* [`5fededb`](https://github.com/npm/template-oss/commit/5fededb16da81db88b56db663466d968471df973) [#207](https://github.com/npm/template-oss/pull/207) workspace can use only latest ci version of root (@lukekarrys)
+
 ## [4.3.1](https://github.com/npm/template-oss/compare/v4.3.0...v4.3.1) (2022-09-19)
 
 ### Bug Fixes
