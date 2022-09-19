@@ -1,12 +1,12 @@
 - name: Setup Node
   uses: actions/setup-node@v3
   with:
-    node-version: {{#if jobNodeMatrix}}$\{{ matrix.node-version }}{{else}}{{ last ciVersions }}{{/if}}
+    node-version: {{#if jobIsMatrix}}$\{{ matrix.node-version }}{{else}}{{ last ciVersions }}{{/if}}
     {{#if lockfile}}
     cache: npm
     {{/if}}
 {{#if updateNpm}}
-{{#if jobNodeMatrix}}
+{{#if jobIsMatrix}}
 - name: Update Windows npm
   # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
   if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
