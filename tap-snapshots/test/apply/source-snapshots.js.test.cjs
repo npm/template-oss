@@ -2282,7 +2282,7 @@ package.json
     "version": "{{VERSION}}"
   },
   "tap": {
-    "test-ignore": "^(workspaces/a|workspaces/b)/**",
+    "test-ignore": "^(workspaces/a|workspaces/b)/",
     "nyc-arg": [
       "--exclude",
       "workspaces/a/**",

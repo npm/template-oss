@@ -332,7 +332,7 @@ The module file package.json needs to be updated:
     "lint-all": "npm run lint -ws -iwr --if-present"
   }
   "tap" is missing, expected {
-    "test-ignore": "^(workspaces/a|workspaces/b)/**",
+    "test-ignore": "^(workspaces/a|workspaces/b)/",
     "nyc-arg": [
       "--exclude",
       "workspaces/a/**",
