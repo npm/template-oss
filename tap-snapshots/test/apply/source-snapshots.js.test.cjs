@@ -1665,11 +1665,15 @@ on:
   workflow_dispatch:
   pull_request:
     paths-ignore:
+      - workspaces/a/**
+      - workspaces/b/**
   push:
     branches:
       - main
       - latest
     paths-ignore:
+      - workspaces/a/**
+      - workspaces/b/**
   schedule:
     # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
     - cron: "0 9 * * 1"

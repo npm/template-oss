@@ -6,7 +6,7 @@ pull_request:
   {{/if}}
   {{#if isRootMono}}
   paths-ignore:
-    {{#each workspaceGlob}}
+    {{#each workspaceGlobs}}
     - {{ . }}
     {{/each}}
   {{/if}}
@@ -21,7 +21,7 @@ push:
   {{/if}}
   {{#if isRootMono}}
   paths-ignore:
-    {{#each workspaceGlob}}
+    {{#each workspaceGlobs}}
     - {{ . }}
     {{/each}}
   {{/if}}
