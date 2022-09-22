@@ -1,5 +1,19 @@
 # Changelog
 
+## [4.4.0](https://github.com/npm/template-oss/compare/v4.3.2...v4.4.0) (2022-09-22)
+
+### Features
+
+* [`d4ddfca`](https://github.com/npm/template-oss/commit/d4ddfca7d1c9077dedbf0e751bb133b9c79ed1b6) [#213](https://github.com/npm/template-oss/pull/213) allow extending partials (#213) (@lukekarrys)
+* [`88f8387`](https://github.com/npm/template-oss/commit/88f8387ee90d7ee964ad40b4b90570c18b602ce5) [#212](https://github.com/npm/template-oss/pull/212) add a strict engines check to ci (#212) (@lukekarrys)
+* [`2fdcddd`](https://github.com/npm/template-oss/commit/2fdcddd615066178cd1e84e2cd2144e9b4c566ef) [#180](https://github.com/npm/template-oss/pull/180) make template-oss postinstall commit a breaking change for majors (#180) (@lukekarrys)
+
+### Bug Fixes
+
+* [`0e95298`](https://github.com/npm/template-oss/commit/0e952980f78b72097123b157cb220bd6c44b5199) [#214](https://github.com/npm/template-oss/pull/214) properly quote strings with exclamation marks (#214) (@lukekarrys)
+* [`99f3945`](https://github.com/npm/template-oss/commit/99f394564552d43cd97becb5431daef0c3c0e464) [#210](https://github.com/npm/template-oss/pull/210) make tap test-ignore a regex instead of a glob (#210) (@lukekarrys)
+* [`e19ebc3`](https://github.com/npm/template-oss/commit/e19ebc3270f3e563e206e474c9e0cff3c7dcd742) [#209](https://github.com/npm/template-oss/pull/209) properly ignore workspace paths from root during ci (#209) (@lukekarrys)
+
 ## [4.3.2](https://github.com/npm/template-oss/compare/v4.3.1...v4.3.2) (2022-09-19)
 
 ### Bug Fixes
