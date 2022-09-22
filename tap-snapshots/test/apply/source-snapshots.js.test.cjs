@@ -611,10 +611,13 @@ jobs:
         if: contains(steps.metadata.outputs.dependency-names, '@npmcli/template-oss')
         id: flags
         run: |
-          if [[ "\${{ steps.metadata.outputs.directory }}" == "/" ]]; then
+          dependabot_dir="\${{ steps.metadata.outputs.directory }}"
+          if [[ "$dependabot_dir" == "/" ]]; then
             echo "::set-output name=workspace::-iwr"
           else
-            echo "::set-output name=workspace::-w \${{ steps.metadata.outputs.directory }}"
+            # strip leading slash from directory so it works as a
+            # a path to the workspace flag
+            echo "::set-output name=workspace::-w \${dependabot_dir#/}"
           fi
 
       - name: Apply Changes
@@ -651,7 +654,7 @@ jobs:
       # If the previous step failed, then reset the commit and remove any workflow changes
       # and attempt to commit and push again. This is helpful because we will have a commit
       # with the correct prefix that we can then --amend with @npmcli/stafftools later.
-      - name: Commit and push all changes except workflows
+      - name: Push All Changes Except Workflows
         if: steps.apply.outputs.changes && steps.push-all.outcome == 'failure'
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
@@ -2089,10 +2092,13 @@ jobs:
         if: contains(steps.metadata.outputs.dependency-names, '@npmcli/template-oss')
         id: flags
         run: |
-          if [[ "\${{ steps.metadata.outputs.directory }}" == "/" ]]; then
+          dependabot_dir="\${{ steps.metadata.outputs.directory }}"
+          if [[ "$dependabot_dir" == "/" ]]; then
             echo "::set-output name=workspace::-iwr"
           else
-            echo "::set-output name=workspace::-w \${{ steps.metadata.outputs.directory }}"
+            # strip leading slash from directory so it works as a
+            # a path to the workspace flag
+            echo "::set-output name=workspace::-w \${dependabot_dir#/}"
           fi
 
       - name: Apply Changes
@@ -2129,7 +2135,7 @@ jobs:
       # If the previous step failed, then reset the commit and remove any workflow changes
       # and attempt to commit and push again. This is helpful because we will have a commit
       # with the correct prefix that we can then --amend with @npmcli/stafftools later.
-      - name: Commit and push all changes except workflows
+      - name: Push All Changes Except Workflows
         if: steps.apply.outputs.changes && steps.push-all.outcome == 'failure'
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
@@ -3362,10 +3368,13 @@ jobs:
         if: contains(steps.metadata.outputs.dependency-names, '@npmcli/template-oss')
         id: flags
         run: |
-          if [[ "\${{ steps.metadata.outputs.directory }}" == "/" ]]; then
+          dependabot_dir="\${{ steps.metadata.outputs.directory }}"
+          if [[ "$dependabot_dir" == "/" ]]; then
             echo "::set-output name=workspace::-iwr"
           else
-            echo "::set-output name=workspace::-w \${{ steps.metadata.outputs.directory }}"
+            # strip leading slash from directory so it works as a
+            # a path to the workspace flag
+            echo "::set-output name=workspace::-w \${dependabot_dir#/}"
           fi
 
       - name: Apply Changes
@@ -3402,7 +3411,7 @@ jobs:
       # If the previous step failed, then reset the commit and remove any workflow changes
       # and attempt to commit and push again. This is helpful because we will have a commit
       # with the correct prefix that we can then --amend with @npmcli/stafftools later.
-      - name: Commit and push all changes except workflows
+      - name: Push All Changes Except Workflows
         if: steps.apply.outputs.changes && steps.push-all.outcome == 'failure'
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
