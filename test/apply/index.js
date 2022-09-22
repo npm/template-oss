@@ -219,6 +219,12 @@ t.test('content can override partials', async (t) => {
     },
     testdir: {
       content_dir: {
+        'index.js': `module.exports={
+          rootRepo:{
+            add:{'.github/workflows/ci-release.yml': 'ci-release.yml'}
+          }
+        }`,
+        'ci-release.yml': '{{> ciRelease }}\n  job: 1',
         '_step-deps.yml': '- run: INSTALL\n',
         '_step-test.yml': '- run: TEST\n{{> defaultStepTest }}\n',
       },
@@ -226,10 +232,12 @@ t.test('content can override partials', async (t) => {
   })
   await s.apply()
   const ci = await s.readFile(join('.github', 'workflows', 'ci.yml'))
+  const release = await s.readFile(join('.github', 'workflows', 'ci-release.yml'))
   t.ok(ci.includes('- run: INSTALL'))
   t.ok(ci.includes('- run: TEST'))
   t.notOk(ci.includes('npm i --ignore-scripts --no-audit --no-fund'))
   t.ok(ci.includes('npm test --ignore-scripts'))
+  t.ok(release.includes('job: 1'))
 })
 
 t.test('content can extend files', async (t) => {
