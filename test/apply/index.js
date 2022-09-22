@@ -220,13 +220,16 @@ t.test('content can override partials', async (t) => {
     testdir: {
       content_dir: {
         '_step-deps.yml': '- run: INSTALL\n',
+        '_step-test.yml': '- run: TEST\n{{> defaultStepTest }}\n',
       },
     },
   })
   await s.apply()
   const ci = await s.readFile(join('.github', 'workflows', 'ci.yml'))
   t.ok(ci.includes('- run: INSTALL'))
+  t.ok(ci.includes('- run: TEST'))
   t.notOk(ci.includes('npm i --ignore-scripts --no-audit --no-fund'))
+  t.ok(ci.includes('npm test --ignore-scripts'))
 })
 
 t.test('content can extend files', async (t) => {
