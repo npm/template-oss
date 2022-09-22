@@ -378,6 +378,56 @@ on:
     - cron: "0 9 * * 1"
 
 jobs:
+  engines:
+    name: Engines - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
+    if: github.repository_owner == 'npm'
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - name: Linux
+            os: ubuntu-latest
+            shell: bash
+        node-version:
+          - 14.17.0
+          - 16.13.0
+          - 18.0.0
+    runs-on: \${{ matrix.platform.os }}
+    defaults:
+      run:
+        shell: \${{ matrix.platform.shell }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Git User
+        run: |
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: \${{ matrix.node-version }}
+      - name: Update Windows npm
+        # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
+        if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
+        run: |
+          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
+          tar xf npm-7.5.4.tgz
+          cd package
+          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
+          cd ..
+          rmdir /s /q package
+      - name: Install npm@7
+        if: startsWith(matrix.node-version, '10.')
+        run: npm i --prefer-online --no-fund --no-audit -g npm@7
+      - name: Install npm@latest
+        if: \${{ !startsWith(matrix.node-version, '10.') }}
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+      - name: npm Version
+        run: npm -v
+      - name: Install Dependencies
+        run: npm i --ignore-scripts --no-audit --no-fund --engines-strict
+
   lint:
     name: Lint
     if: github.repository_owner == 'npm'
@@ -1319,6 +1369,56 @@ on:
     - cron: "0 9 * * 1"
 
 jobs:
+  engines:
+    name: Engines - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
+    if: github.repository_owner == 'npm'
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - name: Linux
+            os: ubuntu-latest
+            shell: bash
+        node-version:
+          - 14.17.0
+          - 16.13.0
+          - 18.0.0
+    runs-on: \${{ matrix.platform.os }}
+    defaults:
+      run:
+        shell: \${{ matrix.platform.shell }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Git User
+        run: |
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: \${{ matrix.node-version }}
+      - name: Update Windows npm
+        # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
+        if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
+        run: |
+          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
+          tar xf npm-7.5.4.tgz
+          cd package
+          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
+          cd ..
+          rmdir /s /q package
+      - name: Install npm@7
+        if: startsWith(matrix.node-version, '10.')
+        run: npm i --prefer-online --no-fund --no-audit -g npm@7
+      - name: Install npm@latest
+        if: \${{ !startsWith(matrix.node-version, '10.') }}
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+      - name: npm Version
+        run: npm -v
+      - name: Install Dependencies
+        run: npm i --ignore-scripts --no-audit --no-fund --engines-strict
+
   lint:
     name: Lint
     if: github.repository_owner == 'npm'
@@ -1433,6 +1533,56 @@ on:
     - cron: "0 9 * * 1"
 
 jobs:
+  engines:
+    name: Engines - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
+    if: github.repository_owner == 'npm'
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - name: Linux
+            os: ubuntu-latest
+            shell: bash
+        node-version:
+          - 14.17.0
+          - 16.13.0
+          - 18.0.0
+    runs-on: \${{ matrix.platform.os }}
+    defaults:
+      run:
+        shell: \${{ matrix.platform.shell }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Git User
+        run: |
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: \${{ matrix.node-version }}
+      - name: Update Windows npm
+        # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
+        if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
+        run: |
+          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
+          tar xf npm-7.5.4.tgz
+          cd package
+          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
+          cd ..
+          rmdir /s /q package
+      - name: Install npm@7
+        if: startsWith(matrix.node-version, '10.')
+        run: npm i --prefer-online --no-fund --no-audit -g npm@7
+      - name: Install npm@latest
+        if: \${{ !startsWith(matrix.node-version, '10.') }}
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+      - name: npm Version
+        run: npm -v
+      - name: Install Dependencies
+        run: npm i --ignore-scripts --no-audit --no-fund --engines-strict
+
   lint:
     name: Lint
     if: github.repository_owner == 'npm'
@@ -1706,6 +1856,56 @@ on:
     - cron: "0 9 * * 1"
 
 jobs:
+  engines:
+    name: Engines - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
+    if: github.repository_owner == 'npm'
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - name: Linux
+            os: ubuntu-latest
+            shell: bash
+        node-version:
+          - 14.17.0
+          - 16.13.0
+          - 18.0.0
+    runs-on: \${{ matrix.platform.os }}
+    defaults:
+      run:
+        shell: \${{ matrix.platform.shell }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Git User
+        run: |
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: \${{ matrix.node-version }}
+      - name: Update Windows npm
+        # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
+        if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
+        run: |
+          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
+          tar xf npm-7.5.4.tgz
+          cd package
+          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
+          cd ..
+          rmdir /s /q package
+      - name: Install npm@7
+        if: startsWith(matrix.node-version, '10.')
+        run: npm i --prefer-online --no-fund --no-audit -g npm@7
+      - name: Install npm@latest
+        if: \${{ !startsWith(matrix.node-version, '10.') }}
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+      - name: npm Version
+        run: npm -v
+      - name: Install Dependencies
+        run: npm i --ignore-scripts --no-audit --no-fund --engines-strict
+
   lint:
     name: Lint
     if: github.repository_owner == 'npm'
@@ -2649,6 +2849,56 @@ on:
     - cron: "0 9 * * 1"
 
 jobs:
+  engines:
+    name: Engines - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
+    if: github.repository_owner == 'npm'
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - name: Linux
+            os: ubuntu-latest
+            shell: bash
+        node-version:
+          - 14.17.0
+          - 16.13.0
+          - 18.0.0
+    runs-on: \${{ matrix.platform.os }}
+    defaults:
+      run:
+        shell: \${{ matrix.platform.shell }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Git User
+        run: |
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: \${{ matrix.node-version }}
+      - name: Update Windows npm
+        # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
+        if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
+        run: |
+          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
+          tar xf npm-7.5.4.tgz
+          cd package
+          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
+          cd ..
+          rmdir /s /q package
+      - name: Install npm@7
+        if: startsWith(matrix.node-version, '10.')
+        run: npm i --prefer-online --no-fund --no-audit -g npm@7
+      - name: Install npm@latest
+        if: \${{ !startsWith(matrix.node-version, '10.') }}
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+      - name: npm Version
+        run: npm -v
+      - name: Install Dependencies
+        run: npm i --ignore-scripts --no-audit --no-fund --engines-strict
+
   lint:
     name: Lint
     if: github.repository_owner == 'npm'
@@ -2763,6 +3013,56 @@ on:
     - cron: "0 9 * * 1"
 
 jobs:
+  engines:
+    name: Engines - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
+    if: github.repository_owner == 'npm'
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - name: Linux
+            os: ubuntu-latest
+            shell: bash
+        node-version:
+          - 14.17.0
+          - 16.13.0
+          - 18.0.0
+    runs-on: \${{ matrix.platform.os }}
+    defaults:
+      run:
+        shell: \${{ matrix.platform.shell }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Git User
+        run: |
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: \${{ matrix.node-version }}
+      - name: Update Windows npm
+        # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
+        if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
+        run: |
+          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
+          tar xf npm-7.5.4.tgz
+          cd package
+          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
+          cd ..
+          rmdir /s /q package
+      - name: Install npm@7
+        if: startsWith(matrix.node-version, '10.')
+        run: npm i --prefer-online --no-fund --no-audit -g npm@7
+      - name: Install npm@latest
+        if: \${{ !startsWith(matrix.node-version, '10.') }}
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+      - name: npm Version
+        run: npm -v
+      - name: Install Dependencies
+        run: npm i --ignore-scripts --no-audit --no-fund --engines-strict
+
   lint:
     name: Lint
     if: github.repository_owner == 'npm'
