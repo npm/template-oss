@@ -33,7 +33,7 @@
   "standard": {{{ del }}},
   "tap": {
     {{#if workspacePaths}}
-    "test-ignore": "^({{ join workspacePaths "|" }})/**",
+    "test-ignore": "^({{ join workspacePaths "|" }})/",
     {{/if}}
     "nyc-arg": [
       {{#each workspaceGlobs}}
