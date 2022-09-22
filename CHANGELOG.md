@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.4.1](https://github.com/npm/template-oss/compare/v4.4.0...v4.4.1) (2022-09-22)
+
+### Bug Fixes
+
+* [`1649552`](https://github.com/npm/template-oss/commit/1649552c86016ae422407610f9be848b0dfd8bae) only extend underscore partial files (@lukekarrys)
+
 ## [4.4.0](https://github.com/npm/template-oss/compare/v4.3.2...v4.4.0) (2022-09-22)
 
 ### Features
