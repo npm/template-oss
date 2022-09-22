@@ -676,7 +676,7 @@ jobs:
           npm exec --offline \${{ steps.flags.outputs.workspace }} -- template-oss-check
 
       - name: Fail on Breaking Change
-        if: steps.apply.outputs.changes && startsWith(steps.apply.outputs.message, "feat!")
+        if: steps.apply.outputs.changes && startsWith(steps.apply.outputs.message, 'feat!')
         run: |
           echo "This PR has a breaking change. Run 'npx -p @npmcli/stafftools gh template-oss-fix'"
           echo "for more information on how to fix this with a BREAKING CHANGE footer."
@@ -2154,7 +2154,7 @@ jobs:
           npm exec --offline \${{ steps.flags.outputs.workspace }} -- template-oss-check
 
       - name: Fail on Breaking Change
-        if: steps.apply.outputs.changes && startsWith(steps.apply.outputs.message, "feat!")
+        if: steps.apply.outputs.changes && startsWith(steps.apply.outputs.message, 'feat!')
         run: |
           echo "This PR has a breaking change. Run 'npx -p @npmcli/stafftools gh template-oss-fix'"
           echo "for more information on how to fix this with a BREAKING CHANGE footer."
@@ -3427,7 +3427,7 @@ jobs:
           npm exec --offline \${{ steps.flags.outputs.workspace }} -- template-oss-check
 
       - name: Fail on Breaking Change
-        if: steps.apply.outputs.changes && startsWith(steps.apply.outputs.message, "feat!")
+        if: steps.apply.outputs.changes && startsWith(steps.apply.outputs.message, 'feat!')
         run: |
           echo "This PR has a breaking change. Run 'npx -p @npmcli/stafftools gh template-oss-fix'"
           echo "for more information on how to fix this with a BREAKING CHANGE footer."
