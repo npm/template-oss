@@ -1,5 +1,15 @@
 # Changelog
 
+## [4.4.2](https://github.com/npm/template-oss/compare/v4.4.1...v4.4.2) (2022-09-23)
+
+### Bug Fixes
+
+* [`8e16dc7`](https://github.com/npm/template-oss/commit/8e16dc76d9a469dd9caa73062e0983bef6792c82) [#216](https://github.com/npm/template-oss/pull/216) remove leading slash from dependabot metadata dir (@lukekarrys)
+
+### Dependencies
+
+* [`53bb928`](https://github.com/npm/template-oss/commit/53bb928258aa271c65a9b6d77c8e4cf6d60bbebe) `@npmcli/release-please@14.2.5`
+
 ## [4.4.1](https://github.com/npm/template-oss/compare/v4.4.0...v4.4.1) (2022-09-22)
 
 ### Bug Fixes
