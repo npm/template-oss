@@ -11,7 +11,7 @@ jobs:
     {{> job
       jobName="template-oss"
       jobIf="github.actor == 'dependabot[bot]'"
-      jobCheckout=(obj ref="${{ github.event.pull_request.head_ref }}")
+      jobCheckout=(obj ref="${{ github.event.pull_request.head.ref }}")
     }}
       - name: Fetch Dependabot Metadata
         id: metadata
