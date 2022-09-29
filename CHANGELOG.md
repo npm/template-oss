@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.4.3](https://github.com/npm/template-oss/compare/v4.4.2...v4.4.3) (2022-09-29)
+
+### Bug Fixes
+
+* [`e21239e`](https://github.com/npm/template-oss/commit/e21239e0dea2dae585102878a4fc13e8ae7cae7a) [#218](https://github.com/npm/template-oss/pull/218) checkout head ref name in post dependabot (@lukekarrys)
+
 ## [4.4.2](https://github.com/npm/template-oss/compare/v4.4.1...v4.4.2) (2022-09-23)
 
 ### Bug Fixes
