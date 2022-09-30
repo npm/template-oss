@@ -6,7 +6,8 @@
   "bin": {
     "template-oss-apply": "bin/apply.js",
     "template-oss-check": "bin/check.js",
-    "template-oss-release-please": "bin/release-please.js"
+    "template-oss-release-please": "bin/release-please.js",
+    "template-oss-release-manager": "bin/release-manager.js"
   },
   "scripts": {
     "lint": "eslint \"**/*.js\"",
@@ -37,6 +38,7 @@
     "@npmcli/git": "^3.0.0",
     "@npmcli/map-workspaces": "^2.0.2",
     "@npmcli/package-json": "^2.0.0",
+    "@octokit/rest": "^19.0.4",
     "diff": "^5.0.0",
     "glob": "^8.0.1",
     "handlebars": "^4.7.7",
