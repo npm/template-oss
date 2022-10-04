@@ -10,7 +10,7 @@ jobs:
       jobDepFlags="--engines-strict"
       macCI=false
       windowsCI=false
-      ciVersions=(reject ciVersions '\.x$')
+      ciVersions=baseCiVersions
     }}
 
   lint:
