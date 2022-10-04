@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.4.5](https://github.com/npm/template-oss/compare/v4.4.4...v4.4.5) (2022-10-04)
+
+### Bug Fixes
+
+* [`6ecdea4`](https://github.com/npm/template-oss/commit/6ecdea4580e00bb3fe80ca4765f055521c51d4ce) [#222](https://github.com/npm/template-oss/pull/222) fallback to lower bound of range for engines check (@lukekarrys)
+
 ## [4.4.4](https://github.com/npm/template-oss/compare/v4.4.3...v4.4.4) (2022-09-30)
 
 ### Bug Fixes
