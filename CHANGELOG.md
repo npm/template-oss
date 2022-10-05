@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.5.0](https://github.com/npm/template-oss/compare/v4.4.5...v4.5.0) (2022-10-05)
+
+### Features
+
+* [`aef199e`](https://github.com/npm/template-oss/commit/aef199e300b3bb00d7631b86ca09d6d3d1b86386) [#221](https://github.com/npm/template-oss/pull/221) add default release-manager script (#221) (@lukekarrys)
+
+### Bug Fixes
+
+* [`b313218`](https://github.com/npm/template-oss/commit/b313218153e55d83713c8d8830e74a1d0d412098) [#226](https://github.com/npm/template-oss/pull/226) dont use -ws flags in release workflow when not necessary (#226) (@lukekarrys)
+* [`f6a0268`](https://github.com/npm/template-oss/commit/f6a02684cd5742274ac33efc6efa89707d013bcc) [#225](https://github.com/npm/template-oss/pull/225) bump workspace dev deps with a deps commit (#225) (@lukekarrys)
+* [`298600d`](https://github.com/npm/template-oss/commit/298600db3509f5bab469caa95fd73ceedc42cde4) [#224](https://github.com/npm/template-oss/pull/224) use head.ref for post dependabot checkout (#224) (@lukekarrys)
+
 ## [4.4.5](https://github.com/npm/template-oss/compare/v4.4.4...v4.4.5) (2022-10-04)
 
 ### Bug Fixes
