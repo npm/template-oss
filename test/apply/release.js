@@ -8,8 +8,8 @@ t.test('no workspace flags in commands', async (t) => {
 
   const release = await s.readFile(join('.github', 'workflows', 'release.yml'))
 
-  t.match(release, '--ignore-scripts -iwr --if-present')
-  t.notMatch(release, '--ignore-scripts -ws -iwr --if-present')
+  t.match(release, '--ignore-scripts --if-present\n')
+  t.notMatch(release, '--ignore-scripts -ws -iwr --if-present\n')
 })
 
 t.test('uses workspace flags in commands', async (t) => {
@@ -22,6 +22,6 @@ t.test('uses workspace flags in commands', async (t) => {
 
   const release = await s.readFile(join('.github', 'workflows', 'release.yml'))
 
-  t.notMatch(release, '--ignore-scripts -iwr --if-present')
-  t.match(release, '--ignore-scripts -ws -iwr --if-present')
+  t.notMatch(release, '--ignore-scripts --if-present\n')
+  t.match(release, '--ignore-scripts -ws -iwr --if-present\n')
 })
