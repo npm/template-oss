@@ -73,7 +73,6 @@ const getReleaseProcess = async ({ owner, repo }) => {
         })
         .on('error', reject)
     })
-    console.log(releaseProcess)
   } catch (e) {
     log('Release wiki not found', e.message)
     log('Using default release process')
@@ -239,7 +238,7 @@ const main = async (env) => {
     .replace(/<X\.Y\.Z>/g, release.version)
     .replace(/<GITHUB-RELEASE-LINK>/g, release.url)
     .replace(/<PUBLISH-FLAGS>/g, release.flags)
-    .replace(/^\s+([\w].*)-w <WS-PKG-N>$/g, workspaces.map(w => `$1${w.flags}`).join(''))
+    .replace(/^(\s*\S.*)(-w <WS-PKG-N>)$/gm, workspaces.map(w => `$1${w.flags}`).join('\n'))
     .trim()
 
   await appendToComment({
