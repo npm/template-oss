@@ -77,6 +77,7 @@ jobs:
           RELEASE_COMMENT_ID: $\{{ needs.release.outputs.comment-id }}
           GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}
         run: |
+          {{ rootNpmPath }} exec --offline -- template-oss-release-manager
           {{ rootNpmPath }} run rp-pull-request --ignore-scripts {{ allFlags }}
       - name: Commit
         id: commit
