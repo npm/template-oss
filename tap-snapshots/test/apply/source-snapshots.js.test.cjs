@@ -351,7 +351,7 @@ jobs:
       - name: Add Problem Matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
       - name: Test
-        run: npm test --ignore-scripts -ws -iwr --if-present
+        run: npm test --ignore-scripts -iwr --if-present
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
         if: always()
@@ -872,8 +872,12 @@ jobs:
           RELEASE_COMMENT_ID: \${{ needs.release.outputs.comment-id }}
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
+<<<<<<< HEAD
           npm exec --offline -- template-oss-release-manager
           npm run rp-pull-request --ignore-scripts -ws -iwr --if-present
+=======
+          npm run rp-pull-request --ignore-scripts -iwr --if-present
+>>>>>>> 0c22420 (fix: dont use -ws flags in release workflow when not necessary)
       - name: Commit
         id: commit
         env:
