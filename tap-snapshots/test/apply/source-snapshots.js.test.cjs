@@ -584,7 +584,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: \${{ github.ref_name }}
+          ref: \${{ github.event.pull_request.head.ref }}
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
@@ -2066,7 +2066,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: \${{ github.ref_name }}
+          ref: \${{ github.event.pull_request.head.ref }}
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
@@ -3343,7 +3343,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: \${{ github.ref_name }}
+          ref: \${{ github.event.pull_request.head.ref }}
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
