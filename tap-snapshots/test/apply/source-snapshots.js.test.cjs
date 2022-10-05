@@ -351,7 +351,7 @@ jobs:
       - name: Add Problem Matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
       - name: Test
-        run: npm test --ignore-scripts -ws -iwr --if-present
+        run: npm test --ignore-scripts --if-present
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
         if: always()
@@ -873,7 +873,7 @@ jobs:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
           npm exec --offline -- template-oss-release-manager
-          npm run rp-pull-request --ignore-scripts -ws -iwr --if-present
+          npm run rp-pull-request --ignore-scripts --if-present
       - name: Commit
         id: commit
         env:
