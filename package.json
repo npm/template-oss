@@ -49,7 +49,7 @@
     "lodash": "^4.17.21",
     "npm-package-arg": "^9.0.1",
     "proc-log": "^2.0.0",
-    "release-please": "npm:@npmcli/release-please@^14.2.5",
+    "release-please": "npm:@npmcli/release-please@^14.2.6",
     "semver": "^7.3.5",
     "yaml": "^2.1.1"
   },
