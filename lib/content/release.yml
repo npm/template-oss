@@ -78,7 +78,7 @@ jobs:
           GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}
         run: |
           {{ rootNpmPath }} exec --offline -- template-oss-release-manager
-          {{ rootNpmPath }} run rp-pull-request --ignore-scripts {{ allFlags }}
+          {{ rootNpmPath }} run rp-pull-request --ignore-scripts {{~#if allFlags}} {{ allFlags }}{{else}} --if-present{{/if}}
       - name: Commit
         id: commit
         env:
