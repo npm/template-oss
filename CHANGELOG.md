@@ -1,5 +1,15 @@
 # Changelog
 
+## [4.5.1](https://github.com/npm/template-oss/compare/v4.5.0...v4.5.1) (2022-10-08)
+
+### Bug Fixes
+
+* [`bc72b05`](https://github.com/npm/template-oss/commit/bc72b05884dc59cd5f45b6f29f3308aad0456e7a) [#230](https://github.com/npm/template-oss/pull/230) add individual workspace flag to lint step (@lukekarrys)
+
+### Dependencies
+
+* [`0ccfc17`](https://github.com/npm/template-oss/commit/0ccfc17f1c4033575cc66c67513baf85a9f2b047) [#228](https://github.com/npm/template-oss/pull/228) `@npmcli/release-please@14.2.6`
+
 ## [4.5.0](https://github.com/npm/template-oss/compare/v4.4.5...v4.5.0) (2022-10-05)
 
 ### Features
