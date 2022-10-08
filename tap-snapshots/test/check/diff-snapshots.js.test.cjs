@@ -197,7 +197,7 @@ The repo file ci.yml needs to be updated:
   +      - name: Add Problem Matcher
   +        run: echo "::add-matcher::.github/matchers/tap.json"
   +      - name: Test
-  +        run: npm test --ignore-scripts -iwr
+  +        run: npm test --ignore-scripts
 
 To correct it: npx template-oss-apply --force
 

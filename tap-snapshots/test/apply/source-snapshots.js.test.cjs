@@ -351,7 +351,7 @@ jobs:
       - name: Add Problem Matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
       - name: Test
-        run: npm test --ignore-scripts --if-present
+        run: npm test --ignore-scripts
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
         if: always()
@@ -518,7 +518,7 @@ jobs:
       - name: Add Problem Matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
       - name: Test
-        run: npm test --ignore-scripts -iwr
+        run: npm test --ignore-scripts
 
 .github/workflows/codeql-analysis.yml
 ========================================
@@ -1448,9 +1448,9 @@ jobs:
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
-        run: npm run lint --ignore-scripts
+        run: npm run lint --ignore-scripts -w a
       - name: Post Lint
-        run: npm run postlint --ignore-scripts
+        run: npm run postlint --ignore-scripts -w a
 
   test:
     name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
@@ -1612,9 +1612,9 @@ jobs:
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
-        run: npm run lint --ignore-scripts
+        run: npm run lint --ignore-scripts -w b
       - name: Post Lint
-        run: npm run postlint --ignore-scripts
+        run: npm run postlint --ignore-scripts -w b
 
   test:
     name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
@@ -1738,9 +1738,9 @@ jobs:
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
-        run: npm run lint --ignore-scripts
+        run: npm run lint --ignore-scripts -ws -iwr --if-present
       - name: Post Lint
-        run: npm run postlint --ignore-scripts
+        run: npm run postlint --ignore-scripts -ws -iwr --if-present
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
         if: always()
@@ -2000,7 +2000,7 @@ jobs:
       - name: Add Problem Matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
       - name: Test
-        run: npm test --ignore-scripts -iwr
+        run: npm test --ignore-scripts
 
 .github/workflows/codeql-analysis.yml
 ========================================
@@ -2932,9 +2932,9 @@ jobs:
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
-        run: npm run lint --ignore-scripts
+        run: npm run lint --ignore-scripts -w a
       - name: Post Lint
-        run: npm run postlint --ignore-scripts
+        run: npm run postlint --ignore-scripts -w a
 
   test:
     name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
@@ -3096,9 +3096,9 @@ jobs:
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
-        run: npm run lint --ignore-scripts
+        run: npm run lint --ignore-scripts -w b
       - name: Post Lint
-        run: npm run postlint --ignore-scripts
+        run: npm run postlint --ignore-scripts -w b
 
   test:
     name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
@@ -3222,9 +3222,9 @@ jobs:
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
-        run: npm run lint --ignore-scripts
+        run: npm run lint --ignore-scripts -ws -iwr --if-present
       - name: Post Lint
-        run: npm run postlint --ignore-scripts
+        run: npm run postlint --ignore-scripts -ws -iwr --if-present
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
         if: always()
