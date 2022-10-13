@@ -42,7 +42,7 @@
     "diff": "^5.0.0",
     "glob": "^8.0.1",
     "handlebars": "^4.7.7",
-    "hosted-git-info": "^5.0.0",
+    "hosted-git-info": "^6.0.0",
     "json-parse-even-better-errors": "^3.0.0",
     "just-deep-map-values": "^1.1.1",
     "just-diff": "^5.0.1",
