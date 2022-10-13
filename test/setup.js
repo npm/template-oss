@@ -1,7 +1,7 @@
 const t = require('tap')
 const { join, resolve, posix } = require('path')
 const { merge, defaults, escapeRegExp: esc } = require('lodash')
-const fs = require('@npmcli/fs')
+const fs = require('fs/promises')
 const Git = require('@npmcli/git')
 const localeCompare = require('@isaacs/string-locale-compare')('en')
 const npa = require('npm-package-arg')

@@ -1,4 +1,4 @@
-const fs = require('@npmcli/fs')
+const fs = require('fs/promises')
 const t = require('tap')
 const path = require('path')
 const hasPackage = require('../../lib/util/has-package.js')
