@@ -1,5 +1,25 @@
 # Changelog
 
+## [4.6.0](https://github.com/npm/template-oss/compare/v4.5.1...v4.6.0) (2022-10-14)
+
+### Features
+
+* [`2175b67`](https://github.com/npm/template-oss/commit/2175b67268e56f8e1d2ceb1892d61c378883f606) [#237](https://github.com/npm/template-oss/pull/237) add workflow dispatch to rerun release ci (@lukekarrys)
+
+### Bug Fixes
+
+* [`09bcd64`](https://github.com/npm/template-oss/commit/09bcd6486133d4cb9ab5396868de839649de00be) [#236](https://github.com/npm/template-oss/pull/236) remove npmcli/fs dep (@lukekarrys)
+* [`2fef1e8`](https://github.com/npm/template-oss/commit/2fef1e81c993646eaf903a7b8999c2bad124111b) [#235](https://github.com/npm/template-oss/pull/235) refactor audit command into a separate file for overriding (@lukekarrys)
+
+### Dependencies
+
+* [`47eae35`](https://github.com/npm/template-oss/commit/47eae35c2fe41b5445f7404fe7b6ce1eb6d97e40) [#242](https://github.com/npm/template-oss/pull/242) bump @npmcli/git from 3.0.2 to 4.0.0 (#242)
+* [`243a23f`](https://github.com/npm/template-oss/commit/243a23f829b07530c5245096431d6776cf27e20b) [#241](https://github.com/npm/template-oss/pull/241) bump @npmcli/map-workspaces from 2.0.4 to 3.0.0 (#241)
+* [`179f02a`](https://github.com/npm/template-oss/commit/179f02aa170671466df8f11656f64858f3c20b25) [#240](https://github.com/npm/template-oss/pull/240) bump proc-log from 2.0.1 to 3.0.0 (#240)
+* [`faf1ba0`](https://github.com/npm/template-oss/commit/faf1ba0bd465d8ac118c61a412e7a68f795d016c) [#238](https://github.com/npm/template-oss/pull/238) bump @npmcli/package-json from 2.0.0 to 3.0.0 (#238)
+* [`eaaf3d9`](https://github.com/npm/template-oss/commit/eaaf3d9f79ef4979f2495a806bd4f03f35a5d037) [#234](https://github.com/npm/template-oss/pull/234) bump hosted-git-info from 5.1.0 to 6.0.0
+* [`f499ac5`](https://github.com/npm/template-oss/commit/f499ac5b4bf907d72421c0eebe3f62074412f40c) [#231](https://github.com/npm/template-oss/pull/231) bump json-parse-even-better-errors from 2.3.1 to 3.0.0
+
 ## [4.5.1](https://github.com/npm/template-oss/compare/v4.5.0...v4.5.1) (2022-10-08)
 
 ### Bug Fixes
