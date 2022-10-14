@@ -36,7 +36,7 @@
     "@isaacs/string-locale-compare": "^1.1.0",
     "@npmcli/git": "^3.0.0",
     "@npmcli/map-workspaces": "^2.0.2",
-    "@npmcli/package-json": "^2.0.0",
+    "@npmcli/package-json": "^3.0.0",
     "@octokit/rest": "^19.0.4",
     "diff": "^5.0.0",
     "glob": "^8.0.1",
