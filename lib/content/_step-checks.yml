@@ -1,3 +1,38 @@
+{{#if jobCheck.sha}}
+- name: Get Workflow Job
+  uses: actions/github-script@v6
+  {{#if jobCheck.if}}if: {{ jobCheck.if }}{{/if}}
+  id: check-output
+  env:
+    JOB_NAME: "{{#if jobName}}{{ jobName }}{{else}}{{ jobCheck.name }}{{/if}}"
+    MATRIX_NAME: "{{#if jobIsMatrix}} - $\{{ matrix.platform.name }} - $\{{ matrix.node-version }}{{/if}}"
+  with:
+    script: |
+      const { owner, repo } = context.repo
+
+      const { data } = await github.rest.actions.listJobsForWorkflowRun({
+        owner,
+        repo,
+        run_id: context.runId,
+        per_page: 100
+      })
+
+      const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
+      const job = data.jobs.find(j => j.name.endsWith(jobName))
+      const jobUrl = job?.html_url
+
+      const shaUrl = `${context.serverUrl}/${owner}/${repo}/commit/{{ jobCheck.sha }}`
+
+      let summary = `This check is assosciated with ${shaUrl}\n\n`
+
+      if (jobUrl) {
+        summary += `For run logs, click here: ${jobUrl}`
+      } else {
+        summary += `Run logs could not be found for a job with name: "${jobName}"`
+      }
+
+      return { summary }
+{{/if}}
 - name: {{#if jobCheck.sha}}Create{{else}}Conclude{{/if}} Check
   uses: LouisBrunner/checks-action@v1.3.1
   {{#if jobCheck.sha}}
@@ -12,12 +47,7 @@
     status: {{#if jobCheck.status}}{{ jobCheck.status }}{{else}}in_progress{{/if}} 
     name: {{#if jobCheck.name}}{{ jobCheck.name }}{{else}}{{ jobName }}{{/if}}{{#if jobIsMatrix}} - $\{{ matrix.platform.name }} - $\{{ matrix.node-version }}{{/if}}
     sha: {{ jobCheck.sha }}
-    # XXX: this does not work when using the default GITHUB_TOKEN.
-    # Instead we post the main job url to the PR as a comment which
-    # will link to all the other checks. To work around this we would
-    # need to create a GitHub that would create on-demand tokens.
-    # https://github.com/LouisBrunner/checks-action/issues/18
-    # details_url:
+    output: $\{{ steps.check-output.outputs.result }}
     {{else}}
     conclusion: {{#if jobCheck.status}}{{ jobCheck.status }}{{else}}$\{{ job.status }}{{/if}}
     check_id: {{#if jobCheck.id}}{{ jobCheck.id }}{{else}}$\{{ steps.check.outputs.check_id }}{{/if}}

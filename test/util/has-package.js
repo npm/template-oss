@@ -23,6 +23,7 @@ const checks = [
   [{ a: 'npm/cli#abc' }, 'a', false],
   [{ [NAME]: 'npm/cli#abc' }, NAME, true],
   [{ a: 'https://test.com/npm/cli.tgz' }, 'a', false],
+  [{ a: 'file:../path/to/cli.tgz' }, 'a', true],
   [{ a: '^1.0.0' }, 'a@sometag', false],
 ]
 
