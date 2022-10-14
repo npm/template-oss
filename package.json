@@ -34,7 +34,7 @@
     "@commitlint/cli": "^17.1.1",
     "@commitlint/config-conventional": "^17.1.0",
     "@isaacs/string-locale-compare": "^1.1.0",
-    "@npmcli/git": "^3.0.0",
+    "@npmcli/git": "^4.0.0",
     "@npmcli/map-workspaces": "^3.0.0",
     "@npmcli/package-json": "^3.0.0",
     "@octokit/rest": "^19.0.4",
