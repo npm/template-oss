@@ -1,6 +1,7 @@
 name: Release
 
 on:
+  workflow_dispatch:
   push:
     branches:
       {{#each branches}}
@@ -31,17 +32,19 @@ jobs:
         env:
           GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}
         run: |
-          {{ rootNpxPath }} --offline template-oss-release-please $\{{ github.ref_name }}
+          {{ rootNpxPath }} --offline template-oss-release-please $\{{ github.ref_name }} $\{{ github.event_name }}
       - name: Post Pull Request Comment
         if: steps.release.outputs.pr-number
         uses: actions/github-script@v6
         id: pr-comment
         env:
           PR_NUMBER: $\{{ steps.release.outputs.pr-number }}
+          REF_NAME: $\{{ github.ref_name }}
         with:
           script: |
+            const { REF_NAME, PR_NUMBER } = process.env
             const repo = { owner: context.repo.owner, repo: context.repo.repo }
-            const issue = { ...repo, issue_number: process.env.PR_NUMBER }
+            const issue = { ...repo, issue_number: PR_NUMBER }
 
             const { data: workflow } = await github.rest.actions.getWorkflowRun({ ...repo, run_id: context.runId })
 
@@ -50,7 +53,11 @@ jobs:
             const comments = await github.paginate(github.rest.issues.listComments, issue)
             let commentId = comments?.find(c => c.user.login === 'github-actions[bot]' && c.body.startsWith(body))?.id
 
-            body += `- Release workflow run: ${workflow.html_url}`
+            body += `Release workflow run: ${workflow.html_url}\n\n#### Force CI to Rerun for This Release\n\n`
+            body += `This PR will be updated and CI will run for every non-\`chore:\` commit that is pushed to \`main\`. `
+            body += `To force CI to rerun, run this command:\n\n`
+            body += `\`\`\`\ngh workflow run release.yml -r ${REF_NAME}\n\`\`\``
+
             if (commentId) {
               await github.rest.issues.updateComment({ ...repo, comment_id: commentId, body })
             } else {
@@ -87,7 +94,7 @@ jobs:
           git commit --all --amend --no-edit || true
           git push --force-with-lease
           echo "::set-output  name=sha::$(git rev-parse HEAD)"
-      {{> stepChecks jobCheck=(obj sha="${{ steps.commit.outputs.sha }}" name="Release" )}}
+      {{> stepChecks jobName="Update - Release" jobCheck=(obj sha="${{ steps.commit.outputs.sha }}" name="Release" )}}
       {{> stepChecks jobCheck=(obj id="${{ needs.release.outputs.check-id }}" )}}
 
   ci:

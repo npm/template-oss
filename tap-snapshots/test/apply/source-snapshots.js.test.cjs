@@ -228,6 +228,39 @@ jobs:
       run:
         shell: bash
     steps:
+      - name: Get Workflow Job
+        uses: actions/github-script@v6
+
+        id: check-output
+        env:
+          JOB_NAME: "Lint All"
+          MATRIX_NAME: ""
+        with:
+          script: |
+            const { owner, repo } = context.repo
+
+            const { data } = await github.rest.actions.listJobsForWorkflowRun({
+              owner,
+              repo,
+              run_id: context.runId,
+              per_page: 100
+            })
+
+            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
+            const job = data.jobs.find(j => j.name.endsWith(jobName))
+            const jobUrl = job?.html_url
+
+            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ inputs.check-sha }}\`
+
+            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
+
+            if (jobUrl) {
+              summary += \`For run logs, click here: \${jobUrl}\`
+            } else {
+              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
+            }
+
+            return { summary }
       - name: Create Check
         uses: LouisBrunner/checks-action@v1.3.1
         id: check
@@ -237,12 +270,7 @@ jobs:
           status: in_progress
           name: Lint All
           sha: \${{ inputs.check-sha }}
-          # XXX: this does not work when using the default GITHUB_TOKEN.
-          # Instead we post the main job url to the PR as a comment which
-          # will link to all the other checks. To work around this we would
-          # need to create a GitHub that would create on-demand tokens.
-          # https://github.com/LouisBrunner/checks-action/issues/18
-          # details_url:
+          output: \${{ steps.check-output.outputs.result }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -301,6 +329,39 @@ jobs:
       run:
         shell: \${{ matrix.platform.shell }}
     steps:
+      - name: Get Workflow Job
+        uses: actions/github-script@v6
+
+        id: check-output
+        env:
+          JOB_NAME: "Test All"
+          MATRIX_NAME: " - \${{ matrix.platform.name }} - \${{ matrix.node-version }}"
+        with:
+          script: |
+            const { owner, repo } = context.repo
+
+            const { data } = await github.rest.actions.listJobsForWorkflowRun({
+              owner,
+              repo,
+              run_id: context.runId,
+              per_page: 100
+            })
+
+            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
+            const job = data.jobs.find(j => j.name.endsWith(jobName))
+            const jobUrl = job?.html_url
+
+            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ inputs.check-sha }}\`
+
+            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
+
+            if (jobUrl) {
+              summary += \`For run logs, click here: \${jobUrl}\`
+            } else {
+              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
+            }
+
+            return { summary }
       - name: Create Check
         uses: LouisBrunner/checks-action@v1.3.1
         id: check
@@ -310,12 +371,7 @@ jobs:
           status: in_progress
           name: Test All - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
           sha: \${{ inputs.check-sha }}
-          # XXX: this does not work when using the default GITHUB_TOKEN.
-          # Instead we post the main job url to the PR as a comment which
-          # will link to all the other checks. To work around this we would
-          # need to create a GitHub that would create on-demand tokens.
-          # https://github.com/LouisBrunner/checks-action/issues/18
-          # details_url:
+          output: \${{ steps.check-output.outputs.result }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -743,6 +799,7 @@ jobs:
 name: Release
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -791,17 +848,19 @@ jobs:
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
-          npx --offline template-oss-release-please \${{ github.ref_name }}
+          npx --offline template-oss-release-please \${{ github.ref_name }} \${{ github.event_name }}
       - name: Post Pull Request Comment
         if: steps.release.outputs.pr-number
         uses: actions/github-script@v6
         id: pr-comment
         env:
           PR_NUMBER: \${{ steps.release.outputs.pr-number }}
+          REF_NAME: \${{ github.ref_name }}
         with:
           script: |
+            const { REF_NAME, PR_NUMBER } = process.env
             const repo = { owner: context.repo.owner, repo: context.repo.repo }
-            const issue = { ...repo, issue_number: process.env.PR_NUMBER }
+            const issue = { ...repo, issue_number: PR_NUMBER }
 
             const { data: workflow } = await github.rest.actions.getWorkflowRun({ ...repo, run_id: context.runId })
 
@@ -810,7 +869,11 @@ jobs:
             const comments = await github.paginate(github.rest.issues.listComments, issue)
             let commentId = comments?.find(c => c.user.login === 'github-actions[bot]' && c.body.startsWith(body))?.id
 
-            body += \`- Release workflow run: \${workflow.html_url}\`
+            body += \`Release workflow run: \${workflow.html_url}/n/n#### Force CI to Rerun for This Release/n/n\`
+            body += \`This PR will be updated and CI will run for every non-/\`chore:/\` commit that is pushed to /\`main/\`. \`
+            body += \`To force CI to rerun, run this command:/n/n\`
+            body += \`/\`/\`/\`/ngh workflow run release.yml -r \${REF_NAME}/n/\`/\`/\`\`
+
             if (commentId) {
               await github.rest.issues.updateComment({ ...repo, comment_id: commentId, body })
             } else {
@@ -819,6 +882,39 @@ jobs:
             }
 
             return commentId
+      - name: Get Workflow Job
+        uses: actions/github-script@v6
+        if: steps.release.outputs.pr-number
+        id: check-output
+        env:
+          JOB_NAME: "Release"
+          MATRIX_NAME: ""
+        with:
+          script: |
+            const { owner, repo } = context.repo
+
+            const { data } = await github.rest.actions.listJobsForWorkflowRun({
+              owner,
+              repo,
+              run_id: context.runId,
+              per_page: 100
+            })
+
+            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
+            const job = data.jobs.find(j => j.name.endsWith(jobName))
+            const jobUrl = job?.html_url
+
+            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ steps.release.outputs.pr-sha }}\`
+
+            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
+
+            if (jobUrl) {
+              summary += \`For run logs, click here: \${jobUrl}\`
+            } else {
+              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
+            }
+
+            return { summary }
       - name: Create Check
         uses: LouisBrunner/checks-action@v1.3.1
         id: check
@@ -828,12 +924,7 @@ jobs:
           status: in_progress
           name: Release
           sha: \${{ steps.release.outputs.pr-sha }}
-          # XXX: this does not work when using the default GITHUB_TOKEN.
-          # Instead we post the main job url to the PR as a comment which
-          # will link to all the other checks. To work around this we would
-          # need to create a GitHub that would create on-demand tokens.
-          # https://github.com/LouisBrunner/checks-action/issues/18
-          # details_url:
+          output: \${{ steps.check-output.outputs.result }}
 
   update:
     needs: release
@@ -882,6 +973,39 @@ jobs:
           git commit --all --amend --no-edit || true
           git push --force-with-lease
           echo "::set-output  name=sha::$(git rev-parse HEAD)"
+      - name: Get Workflow Job
+        uses: actions/github-script@v6
+
+        id: check-output
+        env:
+          JOB_NAME: "Update - Release"
+          MATRIX_NAME: ""
+        with:
+          script: |
+            const { owner, repo } = context.repo
+
+            const { data } = await github.rest.actions.listJobsForWorkflowRun({
+              owner,
+              repo,
+              run_id: context.runId,
+              per_page: 100
+            })
+
+            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
+            const job = data.jobs.find(j => j.name.endsWith(jobName))
+            const jobUrl = job?.html_url
+
+            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ steps.commit.outputs.sha }}\`
+
+            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
+
+            if (jobUrl) {
+              summary += \`For run logs, click here: \${jobUrl}\`
+            } else {
+              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
+            }
+
+            return { summary }
       - name: Create Check
         uses: LouisBrunner/checks-action@v1.3.1
         id: check
@@ -891,12 +1015,7 @@ jobs:
           status: in_progress
           name: Release
           sha: \${{ steps.commit.outputs.sha }}
-          # XXX: this does not work when using the default GITHUB_TOKEN.
-          # Instead we post the main job url to the PR as a comment which
-          # will link to all the other checks. To work around this we would
-          # need to create a GitHub that would create on-demand tokens.
-          # https://github.com/LouisBrunner/checks-action/issues/18
-          # details_url:
+          output: \${{ steps.check-output.outputs.result }}
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
         if: always()
@@ -1704,6 +1823,39 @@ jobs:
       run:
         shell: bash
     steps:
+      - name: Get Workflow Job
+        uses: actions/github-script@v6
+
+        id: check-output
+        env:
+          JOB_NAME: "Lint All"
+          MATRIX_NAME: ""
+        with:
+          script: |
+            const { owner, repo } = context.repo
+
+            const { data } = await github.rest.actions.listJobsForWorkflowRun({
+              owner,
+              repo,
+              run_id: context.runId,
+              per_page: 100
+            })
+
+            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
+            const job = data.jobs.find(j => j.name.endsWith(jobName))
+            const jobUrl = job?.html_url
+
+            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ inputs.check-sha }}\`
+
+            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
+
+            if (jobUrl) {
+              summary += \`For run logs, click here: \${jobUrl}\`
+            } else {
+              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
+            }
+
+            return { summary }
       - name: Create Check
         uses: LouisBrunner/checks-action@v1.3.1
         id: check
@@ -1713,12 +1865,7 @@ jobs:
           status: in_progress
           name: Lint All
           sha: \${{ inputs.check-sha }}
-          # XXX: this does not work when using the default GITHUB_TOKEN.
-          # Instead we post the main job url to the PR as a comment which
-          # will link to all the other checks. To work around this we would
-          # need to create a GitHub that would create on-demand tokens.
-          # https://github.com/LouisBrunner/checks-action/issues/18
-          # details_url:
+          output: \${{ steps.check-output.outputs.result }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -1777,6 +1924,39 @@ jobs:
       run:
         shell: \${{ matrix.platform.shell }}
     steps:
+      - name: Get Workflow Job
+        uses: actions/github-script@v6
+
+        id: check-output
+        env:
+          JOB_NAME: "Test All"
+          MATRIX_NAME: " - \${{ matrix.platform.name }} - \${{ matrix.node-version }}"
+        with:
+          script: |
+            const { owner, repo } = context.repo
+
+            const { data } = await github.rest.actions.listJobsForWorkflowRun({
+              owner,
+              repo,
+              run_id: context.runId,
+              per_page: 100
+            })
+
+            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
+            const job = data.jobs.find(j => j.name.endsWith(jobName))
+            const jobUrl = job?.html_url
+
+            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ inputs.check-sha }}\`
+
+            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
+
+            if (jobUrl) {
+              summary += \`For run logs, click here: \${jobUrl}\`
+            } else {
+              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
+            }
+
+            return { summary }
       - name: Create Check
         uses: LouisBrunner/checks-action@v1.3.1
         id: check
@@ -1786,12 +1966,7 @@ jobs:
           status: in_progress
           name: Test All - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
           sha: \${{ inputs.check-sha }}
-          # XXX: this does not work when using the default GITHUB_TOKEN.
-          # Instead we post the main job url to the PR as a comment which
-          # will link to all the other checks. To work around this we would
-          # need to create a GitHub that would create on-demand tokens.
-          # https://github.com/LouisBrunner/checks-action/issues/18
-          # details_url:
+          output: \${{ steps.check-output.outputs.result }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -2225,6 +2400,7 @@ jobs:
 name: Release
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -2273,17 +2449,19 @@ jobs:
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
-          npx --offline template-oss-release-please \${{ github.ref_name }}
+          npx --offline template-oss-release-please \${{ github.ref_name }} \${{ github.event_name }}
       - name: Post Pull Request Comment
         if: steps.release.outputs.pr-number
         uses: actions/github-script@v6
         id: pr-comment
         env:
           PR_NUMBER: \${{ steps.release.outputs.pr-number }}
+          REF_NAME: \${{ github.ref_name }}
         with:
           script: |
+            const { REF_NAME, PR_NUMBER } = process.env
             const repo = { owner: context.repo.owner, repo: context.repo.repo }
-            const issue = { ...repo, issue_number: process.env.PR_NUMBER }
+            const issue = { ...repo, issue_number: PR_NUMBER }
 
             const { data: workflow } = await github.rest.actions.getWorkflowRun({ ...repo, run_id: context.runId })
 
@@ -2292,7 +2470,11 @@ jobs:
             const comments = await github.paginate(github.rest.issues.listComments, issue)
             let commentId = comments?.find(c => c.user.login === 'github-actions[bot]' && c.body.startsWith(body))?.id
 
-            body += \`- Release workflow run: \${workflow.html_url}\`
+            body += \`Release workflow run: \${workflow.html_url}/n/n#### Force CI to Rerun for This Release/n/n\`
+            body += \`This PR will be updated and CI will run for every non-/\`chore:/\` commit that is pushed to /\`main/\`. \`
+            body += \`To force CI to rerun, run this command:/n/n\`
+            body += \`/\`/\`/\`/ngh workflow run release.yml -r \${REF_NAME}/n/\`/\`/\`\`
+
             if (commentId) {
               await github.rest.issues.updateComment({ ...repo, comment_id: commentId, body })
             } else {
@@ -2301,6 +2483,39 @@ jobs:
             }
 
             return commentId
+      - name: Get Workflow Job
+        uses: actions/github-script@v6
+        if: steps.release.outputs.pr-number
+        id: check-output
+        env:
+          JOB_NAME: "Release"
+          MATRIX_NAME: ""
+        with:
+          script: |
+            const { owner, repo } = context.repo
+
+            const { data } = await github.rest.actions.listJobsForWorkflowRun({
+              owner,
+              repo,
+              run_id: context.runId,
+              per_page: 100
+            })
+
+            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
+            const job = data.jobs.find(j => j.name.endsWith(jobName))
+            const jobUrl = job?.html_url
+
+            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ steps.release.outputs.pr-sha }}\`
+
+            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
+
+            if (jobUrl) {
+              summary += \`For run logs, click here: \${jobUrl}\`
+            } else {
+              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
+            }
+
+            return { summary }
       - name: Create Check
         uses: LouisBrunner/checks-action@v1.3.1
         id: check
@@ -2310,12 +2525,7 @@ jobs:
           status: in_progress
           name: Release
           sha: \${{ steps.release.outputs.pr-sha }}
-          # XXX: this does not work when using the default GITHUB_TOKEN.
-          # Instead we post the main job url to the PR as a comment which
-          # will link to all the other checks. To work around this we would
-          # need to create a GitHub that would create on-demand tokens.
-          # https://github.com/LouisBrunner/checks-action/issues/18
-          # details_url:
+          output: \${{ steps.check-output.outputs.result }}
 
   update:
     needs: release
@@ -2364,6 +2574,39 @@ jobs:
           git commit --all --amend --no-edit || true
           git push --force-with-lease
           echo "::set-output  name=sha::$(git rev-parse HEAD)"
+      - name: Get Workflow Job
+        uses: actions/github-script@v6
+
+        id: check-output
+        env:
+          JOB_NAME: "Update - Release"
+          MATRIX_NAME: ""
+        with:
+          script: |
+            const { owner, repo } = context.repo
+
+            const { data } = await github.rest.actions.listJobsForWorkflowRun({
+              owner,
+              repo,
+              run_id: context.runId,
+              per_page: 100
+            })
+
+            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
+            const job = data.jobs.find(j => j.name.endsWith(jobName))
+            const jobUrl = job?.html_url
+
+            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ steps.commit.outputs.sha }}\`
+
+            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
+
+            if (jobUrl) {
+              summary += \`For run logs, click here: \${jobUrl}\`
+            } else {
+              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
+            }
+
+            return { summary }
       - name: Create Check
         uses: LouisBrunner/checks-action@v1.3.1
         id: check
@@ -2373,12 +2616,7 @@ jobs:
           status: in_progress
           name: Release
           sha: \${{ steps.commit.outputs.sha }}
-          # XXX: this does not work when using the default GITHUB_TOKEN.
-          # Instead we post the main job url to the PR as a comment which
-          # will link to all the other checks. To work around this we would
-          # need to create a GitHub that would create on-demand tokens.
-          # https://github.com/LouisBrunner/checks-action/issues/18
-          # details_url:
+          output: \${{ steps.check-output.outputs.result }}
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
         if: always()
@@ -3188,6 +3426,39 @@ jobs:
       run:
         shell: bash
     steps:
+      - name: Get Workflow Job
+        uses: actions/github-script@v6
+
+        id: check-output
+        env:
+          JOB_NAME: "Lint All"
+          MATRIX_NAME: ""
+        with:
+          script: |
+            const { owner, repo } = context.repo
+
+            const { data } = await github.rest.actions.listJobsForWorkflowRun({
+              owner,
+              repo,
+              run_id: context.runId,
+              per_page: 100
+            })
+
+            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
+            const job = data.jobs.find(j => j.name.endsWith(jobName))
+            const jobUrl = job?.html_url
+
+            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ inputs.check-sha }}\`
+
+            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
+
+            if (jobUrl) {
+              summary += \`For run logs, click here: \${jobUrl}\`
+            } else {
+              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
+            }
+
+            return { summary }
       - name: Create Check
         uses: LouisBrunner/checks-action@v1.3.1
         id: check
@@ -3197,12 +3468,7 @@ jobs:
           status: in_progress
           name: Lint All
           sha: \${{ inputs.check-sha }}
-          # XXX: this does not work when using the default GITHUB_TOKEN.
-          # Instead we post the main job url to the PR as a comment which
-          # will link to all the other checks. To work around this we would
-          # need to create a GitHub that would create on-demand tokens.
-          # https://github.com/LouisBrunner/checks-action/issues/18
-          # details_url:
+          output: \${{ steps.check-output.outputs.result }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -3261,6 +3527,39 @@ jobs:
       run:
         shell: \${{ matrix.platform.shell }}
     steps:
+      - name: Get Workflow Job
+        uses: actions/github-script@v6
+
+        id: check-output
+        env:
+          JOB_NAME: "Test All"
+          MATRIX_NAME: " - \${{ matrix.platform.name }} - \${{ matrix.node-version }}"
+        with:
+          script: |
+            const { owner, repo } = context.repo
+
+            const { data } = await github.rest.actions.listJobsForWorkflowRun({
+              owner,
+              repo,
+              run_id: context.runId,
+              per_page: 100
+            })
+
+            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
+            const job = data.jobs.find(j => j.name.endsWith(jobName))
+            const jobUrl = job?.html_url
+
+            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ inputs.check-sha }}\`
+
+            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
+
+            if (jobUrl) {
+              summary += \`For run logs, click here: \${jobUrl}\`
+            } else {
+              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
+            }
+
+            return { summary }
       - name: Create Check
         uses: LouisBrunner/checks-action@v1.3.1
         id: check
@@ -3270,12 +3569,7 @@ jobs:
           status: in_progress
           name: Test All - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
           sha: \${{ inputs.check-sha }}
-          # XXX: this does not work when using the default GITHUB_TOKEN.
-          # Instead we post the main job url to the PR as a comment which
-          # will link to all the other checks. To work around this we would
-          # need to create a GitHub that would create on-demand tokens.
-          # https://github.com/LouisBrunner/checks-action/issues/18
-          # details_url:
+          output: \${{ steps.check-output.outputs.result }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -3451,6 +3745,7 @@ jobs:
 name: Release
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -3499,17 +3794,19 @@ jobs:
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
-          npx --offline template-oss-release-please \${{ github.ref_name }}
+          npx --offline template-oss-release-please \${{ github.ref_name }} \${{ github.event_name }}
       - name: Post Pull Request Comment
         if: steps.release.outputs.pr-number
         uses: actions/github-script@v6
         id: pr-comment
         env:
           PR_NUMBER: \${{ steps.release.outputs.pr-number }}
+          REF_NAME: \${{ github.ref_name }}
         with:
           script: |
+            const { REF_NAME, PR_NUMBER } = process.env
             const repo = { owner: context.repo.owner, repo: context.repo.repo }
-            const issue = { ...repo, issue_number: process.env.PR_NUMBER }
+            const issue = { ...repo, issue_number: PR_NUMBER }
 
             const { data: workflow } = await github.rest.actions.getWorkflowRun({ ...repo, run_id: context.runId })
 
@@ -3518,7 +3815,11 @@ jobs:
             const comments = await github.paginate(github.rest.issues.listComments, issue)
             let commentId = comments?.find(c => c.user.login === 'github-actions[bot]' && c.body.startsWith(body))?.id
 
-            body += \`- Release workflow run: \${workflow.html_url}\`
+            body += \`Release workflow run: \${workflow.html_url}/n/n#### Force CI to Rerun for This Release/n/n\`
+            body += \`This PR will be updated and CI will run for every non-/\`chore:/\` commit that is pushed to /\`main/\`. \`
+            body += \`To force CI to rerun, run this command:/n/n\`
+            body += \`/\`/\`/\`/ngh workflow run release.yml -r \${REF_NAME}/n/\`/\`/\`\`
+
             if (commentId) {
               await github.rest.issues.updateComment({ ...repo, comment_id: commentId, body })
             } else {
@@ -3527,6 +3828,39 @@ jobs:
             }
 
             return commentId
+      - name: Get Workflow Job
+        uses: actions/github-script@v6
+        if: steps.release.outputs.pr-number
+        id: check-output
+        env:
+          JOB_NAME: "Release"
+          MATRIX_NAME: ""
+        with:
+          script: |
+            const { owner, repo } = context.repo
+
+            const { data } = await github.rest.actions.listJobsForWorkflowRun({
+              owner,
+              repo,
+              run_id: context.runId,
+              per_page: 100
+            })
+
+            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
+            const job = data.jobs.find(j => j.name.endsWith(jobName))
+            const jobUrl = job?.html_url
+
+            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ steps.release.outputs.pr-sha }}\`
+
+            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
+
+            if (jobUrl) {
+              summary += \`For run logs, click here: \${jobUrl}\`
+            } else {
+              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
+            }
+
+            return { summary }
       - name: Create Check
         uses: LouisBrunner/checks-action@v1.3.1
         id: check
@@ -3536,12 +3870,7 @@ jobs:
           status: in_progress
           name: Release
           sha: \${{ steps.release.outputs.pr-sha }}
-          # XXX: this does not work when using the default GITHUB_TOKEN.
-          # Instead we post the main job url to the PR as a comment which
-          # will link to all the other checks. To work around this we would
-          # need to create a GitHub that would create on-demand tokens.
-          # https://github.com/LouisBrunner/checks-action/issues/18
-          # details_url:
+          output: \${{ steps.check-output.outputs.result }}
 
   update:
     needs: release
@@ -3590,6 +3919,39 @@ jobs:
           git commit --all --amend --no-edit || true
           git push --force-with-lease
           echo "::set-output  name=sha::$(git rev-parse HEAD)"
+      - name: Get Workflow Job
+        uses: actions/github-script@v6
+
+        id: check-output
+        env:
+          JOB_NAME: "Update - Release"
+          MATRIX_NAME: ""
+        with:
+          script: |
+            const { owner, repo } = context.repo
+
+            const { data } = await github.rest.actions.listJobsForWorkflowRun({
+              owner,
+              repo,
+              run_id: context.runId,
+              per_page: 100
+            })
+
+            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
+            const job = data.jobs.find(j => j.name.endsWith(jobName))
+            const jobUrl = job?.html_url
+
+            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ steps.commit.outputs.sha }}\`
+
+            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
+
+            if (jobUrl) {
+              summary += \`For run logs, click here: \${jobUrl}\`
+            } else {
+              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
+            }
+
+            return { summary }
       - name: Create Check
         uses: LouisBrunner/checks-action@v1.3.1
         id: check
@@ -3599,12 +3961,7 @@ jobs:
           status: in_progress
           name: Release
           sha: \${{ steps.commit.outputs.sha }}
-          # XXX: this does not work when using the default GITHUB_TOKEN.
-          # Instead we post the main job url to the PR as a comment which
-          # will link to all the other checks. To work around this we would
-          # need to create a GitHub that would create on-demand tokens.
-          # https://github.com/LouisBrunner/checks-action/issues/18
-          # details_url:
+          output: \${{ steps.check-output.outputs.result }}
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
         if: always()
