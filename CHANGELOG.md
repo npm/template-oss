@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.6.1](https://github.com/npm/template-oss/compare/v4.6.0...v4.6.1) (2022-10-17)
+
+### Bug Fixes
+
+* [`98db362`](https://github.com/npm/template-oss/commit/98db362680158124c4da2ad4b56d2db7238de0ed) correct mismatched step ids in post dependabot (@lukekarrys)
+
 ## [4.6.0](https://github.com/npm/template-oss/compare/v4.5.1...v4.6.0) (2022-10-14)
 
 ### Features
