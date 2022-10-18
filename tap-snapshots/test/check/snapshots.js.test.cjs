@@ -103,7 +103,7 @@ The following required devDependencies were not found:
   @npmcli/eslint-config
   tap
 
-To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @npmcli/eslint-config@latest tap@latest --save-dev && npm i @npmcli/template-oss@{{VERSION}} --save-dev --save-exact
+To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @npmcli/eslint-config@* tap@* --save-dev && npm i @npmcli/template-oss@{{VERSION}} --save-dev --save-exact
 
 -------------------------------------------------------------------
 `
@@ -250,7 +250,7 @@ The following required devDependencies were not found:
   @npmcli/eslint-config
   tap
 
-To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @npmcli/eslint-config@latest tap@latest --save-dev && npm i @npmcli/template-oss@{{VERSION}} --save-dev --save-exact
+To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @npmcli/eslint-config@* tap@* --save-dev && npm i @npmcli/template-oss@{{VERSION}} --save-dev --save-exact
 
 -------------------------------------------------------------------
 `
@@ -357,7 +357,7 @@ The following required devDependencies were not found:
   @npmcli/eslint-config
   tap
 
-To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @npmcli/eslint-config@latest tap@latest --save-dev && npm i @npmcli/template-oss@{{VERSION}} --save-dev --save-exact
+To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @npmcli/eslint-config@* tap@* --save-dev && npm i @npmcli/template-oss@{{VERSION}} --save-dev --save-exact
 
 -------------------------------------------------------------------
 
@@ -427,7 +427,7 @@ The following required devDependencies were not found:
   @npmcli/eslint-config
   tap
 
-To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @npmcli/eslint-config@latest tap@latest --save-dev && npm i @npmcli/template-oss@{{VERSION}} --save-dev --save-exact
+To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @npmcli/eslint-config@* tap@* --save-dev && npm i @npmcli/template-oss@{{VERSION}} --save-dev --save-exact
 
 -------------------------------------------------------------------
 
@@ -497,7 +497,7 @@ The following required devDependencies were not found:
   @npmcli/eslint-config
   tap
 
-To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @npmcli/eslint-config@latest tap@latest --save-dev && npm i @npmcli/template-oss@{{VERSION}} --save-dev --save-exact
+To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @npmcli/eslint-config@* tap@* --save-dev && npm i @npmcli/template-oss@{{VERSION}} --save-dev --save-exact
 
 -------------------------------------------------------------------
 `
