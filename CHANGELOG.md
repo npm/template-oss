@@ -1,5 +1,15 @@
 # Changelog
 
+## [4.6.2](https://github.com/npm/template-oss/compare/v4.6.1...v4.6.2) (2022-10-18)
+
+### Bug Fixes
+
+* [`a722962`](https://github.com/npm/template-oss/commit/a722962521b049f45c690d861fe5fccafa91321a) [#244](https://github.com/npm/template-oss/pull/244) account for new npm-package-arg behavior (@wraithgar)
+
+### Dependencies
+
+* [`6fe7663`](https://github.com/npm/template-oss/commit/6fe7663cd7ee5bbb76be672f4936302156242603) bump npm-package-arg from 9.1.2 to 10.0.0
+
 ## [4.6.1](https://github.com/npm/template-oss/compare/v4.6.0...v4.6.1) (2022-10-17)
 
 ### Bug Fixes
