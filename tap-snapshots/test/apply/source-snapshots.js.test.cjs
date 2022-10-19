@@ -690,7 +690,7 @@ jobs:
           if [[ "\${{ steps.metadata.outputs.update-type }}" == "version-update:semver-major" ]]; then
             prefix='feat!'
           else
-            prefix='chore!'
+            prefix='chore'
           fi
           echo "::set-output name=message::$prefix: postinstall for dependabot template-oss PR"
 
@@ -2291,7 +2291,7 @@ jobs:
           if [[ "\${{ steps.metadata.outputs.update-type }}" == "version-update:semver-major" ]]; then
             prefix='feat!'
           else
-            prefix='chore!'
+            prefix='chore'
           fi
           echo "::set-output name=message::$prefix: postinstall for dependabot template-oss PR"
 
@@ -3687,7 +3687,7 @@ jobs:
           if [[ "\${{ steps.metadata.outputs.update-type }}" == "version-update:semver-major" ]]; then
             prefix='feat!'
           else
-            prefix='chore!'
+            prefix='chore'
           fi
           echo "::set-output name=message::$prefix: postinstall for dependabot template-oss PR"
 
