@@ -804,6 +804,7 @@ on:
     branches:
       - main
       - latest
+      - release/v*
 
 permissions:
   contents: write
@@ -2405,6 +2406,7 @@ on:
     branches:
       - main
       - latest
+      - release/v*
 
 permissions:
   contents: write
@@ -3750,6 +3752,7 @@ on:
     branches:
       - main
       - latest
+      - release/v*
 
 permissions:
   contents: write
