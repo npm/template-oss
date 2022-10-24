@@ -10,6 +10,7 @@ on:
       {{#each releaseBranches }}
       - {{ . }}
       {{/each}}
+      - release/v*
 
 permissions:
   contents: write
