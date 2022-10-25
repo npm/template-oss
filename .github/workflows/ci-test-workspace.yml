@@ -1,17 +1,17 @@
 # This file is automatically added by @npmcli/template-oss. Do not edit.
 
-name: CI
+name: CI - test-workspace
 
 on:
   workflow_dispatch:
   pull_request:
-    paths-ignore:
+    paths:
       - workspace/test-workspace/**
   push:
     branches:
       - main
       - latest
-    paths-ignore:
+    paths:
       - workspace/test-workspace/**
   schedule:
     # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
@@ -93,9 +93,9 @@ jobs:
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
-        run: npm run lint --ignore-scripts
+        run: npm run lint --ignore-scripts -w test-workspace
       - name: Post Lint
-        run: npm run postlint --ignore-scripts
+        run: npm run postlint --ignore-scripts -w test-workspace
 
   test:
     name: Test - ${{ matrix.platform.name }} - ${{ matrix.node-version }}
@@ -158,4 +158,4 @@ jobs:
       - name: Add Problem Matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
       - name: Test
-        run: npm test --ignore-scripts
+        run: npm test --ignore-scripts -w test-workspace
