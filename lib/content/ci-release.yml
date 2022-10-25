@@ -2,6 +2,12 @@
 name: CI - Release
 
 on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        required: true
+        type: string
+        default: {{ defaultBranch }}
   workflow_call:
     inputs:
       ref:
@@ -15,7 +21,7 @@ jobs:
   lint-all:
     {{> job
       jobName="Lint All"
-      jobCheck=(obj sha="${{ inputs.check-sha }}")
+      jobCheck=(obj sha="${{ inputs.check-sha }}" if="inputs.check-sha")
       jobCheckout=(obj ref="${{ inputs.ref }}")
     }}
       {{> stepLint jobRunFlags=allFlags }}
@@ -24,7 +30,7 @@ jobs:
   test-all:
     {{> jobMatrix
       jobName="Test All"
-      jobCheck=(obj sha="${{ inputs.check-sha }}")
+      jobCheck=(obj sha="${{ inputs.check-sha }}" if="inputs.check-sha")
       jobCheckout=(obj ref="${{ inputs.ref }}")
     }}
       {{> stepTest jobRunFlags=allFlags }}

@@ -7,9 +7,6 @@ on:
       {{#each branches}}
       - {{ . }}
       {{/each}}
-      {{#each releaseBranches }}
-      - {{ . }}
-      {{/each}}
       - release/v*
 
 permissions:
