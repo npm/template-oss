@@ -39,7 +39,7 @@
   id: check
   {{#if jobCheck.if}}if: {{ jobCheck.if }}{{/if}}
   {{else}}
-  if: always()
+  if: steps.check.outputs.check_id && always()
   {{/if}}
   with:
     token: $\{{ secrets.GITHUB_TOKEN }}

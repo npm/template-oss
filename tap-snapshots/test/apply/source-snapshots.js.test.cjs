@@ -301,7 +301,7 @@ jobs:
         run: npm run postlint --ignore-scripts
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
-        if: always()
+        if: steps.check.outputs.check_id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
@@ -416,7 +416,7 @@ jobs:
         run: npm test --ignore-scripts
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
-        if: always()
+        if: steps.check.outputs.check_id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
@@ -1025,7 +1025,7 @@ jobs:
           output: \${{ steps.check-output.outputs.result }}
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
-        if: always()
+        if: steps.check.outputs.check_id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
@@ -1063,7 +1063,7 @@ jobs:
           echo "::set-output name=result::$result"
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
-        if: always()
+        if: steps.check.outputs.check_id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ steps.needs-result.outputs.result }}
@@ -1903,7 +1903,7 @@ jobs:
         run: npm run postlint --ignore-scripts -ws -iwr --if-present
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
-        if: always()
+        if: steps.check.outputs.check_id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
@@ -2018,7 +2018,7 @@ jobs:
         run: npm test --ignore-scripts -ws -iwr --if-present
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
-        if: always()
+        if: steps.check.outputs.check_id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
@@ -2633,7 +2633,7 @@ jobs:
           output: \${{ steps.check-output.outputs.result }}
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
-        if: always()
+        if: steps.check.outputs.check_id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
@@ -2671,7 +2671,7 @@ jobs:
           echo "::set-output name=result::$result"
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
-        if: always()
+        if: steps.check.outputs.check_id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ steps.needs-result.outputs.result }}
@@ -3513,7 +3513,7 @@ jobs:
         run: npm run postlint --ignore-scripts -ws -iwr --if-present
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
-        if: always()
+        if: steps.check.outputs.check_id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
@@ -3628,7 +3628,7 @@ jobs:
         run: npm test --ignore-scripts -ws -iwr --if-present
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
-        if: always()
+        if: steps.check.outputs.check_id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
@@ -3985,7 +3985,7 @@ jobs:
           output: \${{ steps.check-output.outputs.result }}
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
-        if: always()
+        if: steps.check.outputs.check_id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
@@ -4023,7 +4023,7 @@ jobs:
           echo "::set-output name=result::$result"
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
-        if: always()
+        if: steps.check.outputs.check_id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ steps.needs-result.outputs.result }}
