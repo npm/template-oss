@@ -32,8 +32,5 @@
   },
   "exclude-packages-from-root": true,
   "group-pull-request-title-pattern": "chore: release ${version}",
-  "pull-request-title-pattern": "chore: release${component} ${version}",
-  "plugins": [
-    "node-workspace"
-  ]
+  "pull-request-title-pattern": "chore: release${component} ${version}"
 }

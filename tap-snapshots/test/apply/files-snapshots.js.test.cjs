@@ -118,6 +118,7 @@ exports[`test/apply/files-snapshots.js TAP workspaces > expect resolving Promise
 .github/workflows/ci-d.yml
 .github/workflows/ci-release.yml
 .github/workflows/post-dependabot.yml
+.github/workflows/pull-request.yml
 .github/workflows/release.yml
 .release-please-manifest.json
 package.json
@@ -141,6 +142,7 @@ exports[`test/apply/files-snapshots.js TAP workspaces only (like npm/cli) > expe
 .github/workflows/ci-b.yml
 .github/workflows/ci-release.yml
 .github/workflows/post-dependabot.yml
+.github/workflows/pull-request.yml
 .github/workflows/release.yml
 .release-please-manifest.json
 package.json

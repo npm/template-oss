@@ -368,6 +368,7 @@ The following repo files need to be added:
   .github/workflows/ci-name-aaaa.yml
   .github/workflows/ci-release.yml
   .github/workflows/post-dependabot.yml
+  .github/workflows/pull-request.yml
   .github/workflows/release.yml
   .release-please-manifest.json
   release-please-config.json
@@ -438,6 +439,7 @@ The following repo files need to be added:
   .github/workflows/ci-bbb.yml
   .github/workflows/ci-release.yml
   .github/workflows/post-dependabot.yml
+  .github/workflows/pull-request.yml
   .github/workflows/release.yml
   .release-please-manifest.json
   release-please-config.json
