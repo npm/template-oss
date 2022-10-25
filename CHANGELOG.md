@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.7.1](https://github.com/npm/template-oss/compare/v4.7.0...v4.7.1) (2022-10-25)
+
+### Bug Fixes
+
+* [`2ef9995`](https://github.com/npm/template-oss/commit/2ef9995b07e5fd3662c567349646484f3b08dccc) apply dogfood to this repos workspaces also (@lukekarrys)
+* [`9bdad61`](https://github.com/npm/template-oss/commit/9bdad61c1f73853b5198eea1e744994f286987a8) dont release specific apply changes based on public/private (@lukekarrys)
+* [`3d7e5e8`](https://github.com/npm/template-oss/commit/3d7e5e8e81b1606babcb73dd9dc5713402000f0e) conclude check should only run with a check_id (@lukekarrys)
+
 ## [4.7.0](https://github.com/npm/template-oss/compare/v4.6.2...v4.7.0) (2022-10-25)
 
 ### Features
