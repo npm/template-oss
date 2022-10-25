@@ -210,6 +210,12 @@ jobs:
 name: CI - Release
 
 on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        required: true
+        type: string
+        default: main
   workflow_call:
     inputs:
       ref:
@@ -230,7 +236,7 @@ jobs:
     steps:
       - name: Get Workflow Job
         uses: actions/github-script@v6
-
+        if: inputs.check-sha
         id: check-output
         env:
           JOB_NAME: "Lint All"
@@ -264,7 +270,7 @@ jobs:
       - name: Create Check
         uses: LouisBrunner/checks-action@v1.3.1
         id: check
-
+        if: inputs.check-sha
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           status: in_progress
@@ -331,7 +337,7 @@ jobs:
     steps:
       - name: Get Workflow Job
         uses: actions/github-script@v6
-
+        if: inputs.check-sha
         id: check-output
         env:
           JOB_NAME: "Test All"
@@ -365,7 +371,7 @@ jobs:
       - name: Create Check
         uses: LouisBrunner/checks-action@v1.3.1
         id: check
-
+        if: inputs.check-sha
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           status: in_progress
@@ -1806,6 +1812,12 @@ jobs:
 name: CI - Release
 
 on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        required: true
+        type: string
+        default: main
   workflow_call:
     inputs:
       ref:
@@ -1826,7 +1838,7 @@ jobs:
     steps:
       - name: Get Workflow Job
         uses: actions/github-script@v6
-
+        if: inputs.check-sha
         id: check-output
         env:
           JOB_NAME: "Lint All"
@@ -1860,7 +1872,7 @@ jobs:
       - name: Create Check
         uses: LouisBrunner/checks-action@v1.3.1
         id: check
-
+        if: inputs.check-sha
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           status: in_progress
@@ -1927,7 +1939,7 @@ jobs:
     steps:
       - name: Get Workflow Job
         uses: actions/github-script@v6
-
+        if: inputs.check-sha
         id: check-output
         env:
           JOB_NAME: "Test All"
@@ -1961,7 +1973,7 @@ jobs:
       - name: Create Check
         uses: LouisBrunner/checks-action@v1.3.1
         id: check
-
+        if: inputs.check-sha
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           status: in_progress
@@ -3410,6 +3422,12 @@ jobs:
 name: CI - Release
 
 on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        required: true
+        type: string
+        default: main
   workflow_call:
     inputs:
       ref:
@@ -3430,7 +3448,7 @@ jobs:
     steps:
       - name: Get Workflow Job
         uses: actions/github-script@v6
-
+        if: inputs.check-sha
         id: check-output
         env:
           JOB_NAME: "Lint All"
@@ -3464,7 +3482,7 @@ jobs:
       - name: Create Check
         uses: LouisBrunner/checks-action@v1.3.1
         id: check
-
+        if: inputs.check-sha
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           status: in_progress
@@ -3531,7 +3549,7 @@ jobs:
     steps:
       - name: Get Workflow Job
         uses: actions/github-script@v6
-
+        if: inputs.check-sha
         id: check-output
         env:
           JOB_NAME: "Test All"
@@ -3565,7 +3583,7 @@ jobs:
       - name: Create Check
         uses: LouisBrunner/checks-action@v1.3.1
         id: check
-
+        if: inputs.check-sha
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           status: in_progress
