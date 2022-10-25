@@ -169,7 +169,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npm exec --offline -- template-oss-release-manager
-          npm run rp-pull-request --ignore-scripts --if-present
+          npm run rp-pull-request --ignore-scripts -ws -iwr --if-present
       - name: Commit
         id: commit
         env:
