@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.7.0](https://github.com/npm/template-oss/compare/v4.6.2...v4.7.0) (2022-10-25)
+
+### Features
+
+* [`49a17fe`](https://github.com/npm/template-oss/commit/49a17fe9025cf89ec983a90f0fe7ee88470ce0b6) [#247](https://github.com/npm/template-oss/pull/247) treat all `release/v*` branches as release targets (#247) (@lukekarrys)
+
+### Bug Fixes
+
+* [`b836015`](https://github.com/npm/template-oss/commit/b83601540f93b9b3a83e8dc0367ba1259c6ab93e) [#248](https://github.com/npm/template-oss/pull/248) allow ci-release workflow to be dispatched (@lukekarrys)
+* [`254086a`](https://github.com/npm/template-oss/commit/254086a1e00d50791dcd5ca3060432aaa4f830ae) make post dependabot commit a regular non-breaking chore (@lukekarrys)
+
 ## [4.6.2](https://github.com/npm/template-oss/compare/v4.6.1...v4.6.2) (2022-10-18)
 
 ### Bug Fixes
