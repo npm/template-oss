@@ -1,7 +1,7 @@
 {{#if jobCheck.sha}}
 - name: Get Workflow Job
   uses: actions/github-script@v6
-  {{#if jobCheck.if}}if: {{ jobCheck.if }}{{/if}}
+  if: {{ jobCheck.sha }}
   id: check-output
   env:
     JOB_NAME: "{{#if jobName}}{{ jobName }}{{else}}{{ jobCheck.name }}{{/if}}"
@@ -21,7 +21,7 @@
       const job = data.jobs.find(j => j.name.endsWith(jobName))
       const jobUrl = job?.html_url
 
-      const shaUrl = `${context.serverUrl}/${owner}/${repo}/commit/{{ jobCheck.sha }}`
+      const shaUrl = `${context.serverUrl}/${owner}/${repo}/commit/$\{{ {{ jobCheck.sha }} }}`
 
       let summary = `This check is assosciated with ${shaUrl}\n\n`
 
@@ -37,18 +37,18 @@
   uses: LouisBrunner/checks-action@v1.3.1
   {{#if jobCheck.sha}}
   id: check
-  {{#if jobCheck.if}}if: {{ jobCheck.if }}{{/if}}
+  if: {{ jobCheck.sha }}
   {{else}}
-  if: always()
+  if: {{#if jobCheck.id}}{{ jobCheck.id }}{{else}}steps.check.outputs.check_id{{/if}} && always()
   {{/if}}
   with:
     token: $\{{ secrets.GITHUB_TOKEN }}
     {{#if jobCheck.sha}}
     status: {{#if jobCheck.status}}{{ jobCheck.status }}{{else}}in_progress{{/if}} 
     name: {{#if jobCheck.name}}{{ jobCheck.name }}{{else}}{{ jobName }}{{/if}}{{#if jobIsMatrix}} - $\{{ matrix.platform.name }} - $\{{ matrix.node-version }}{{/if}}
-    sha: {{ jobCheck.sha }}
+    sha: $\{{ {{ jobCheck.sha }} }}
     output: $\{{ steps.check-output.outputs.result }}
     {{else}}
-    conclusion: {{#if jobCheck.status}}{{ jobCheck.status }}{{else}}$\{{ job.status }}{{/if}}
-    check_id: {{#if jobCheck.id}}{{ jobCheck.id }}{{else}}$\{{ steps.check.outputs.check_id }}{{/if}}
+    conclusion: $\{{ {{#if jobCheck.status}}{{ jobCheck.status }}{{else}}job.status{{/if}} }}
+    check_id: $\{{ {{#if jobCheck.id}}{{ jobCheck.id }}{{else}}steps.check.outputs.check_id{{/if}} }}
     {{/if}}

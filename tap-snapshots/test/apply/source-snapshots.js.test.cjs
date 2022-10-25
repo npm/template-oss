@@ -301,7 +301,7 @@ jobs:
         run: npm run postlint --ignore-scripts
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
-        if: always()
+        if: steps.check.outputs.check_id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
@@ -416,7 +416,7 @@ jobs:
         run: npm test --ignore-scripts
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
-        if: always()
+        if: steps.check.outputs.check_id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
@@ -891,7 +891,7 @@ jobs:
             return commentId
       - name: Get Workflow Job
         uses: actions/github-script@v6
-        if: steps.release.outputs.pr-number
+        if: steps.release.outputs.pr-sha
         id: check-output
         env:
           JOB_NAME: "Release"
@@ -925,7 +925,7 @@ jobs:
       - name: Create Check
         uses: LouisBrunner/checks-action@v1.3.1
         id: check
-        if: steps.release.outputs.pr-number
+        if: steps.release.outputs.pr-sha
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           status: in_progress
@@ -982,7 +982,7 @@ jobs:
           echo "::set-output  name=sha::$(git rev-parse HEAD)"
       - name: Get Workflow Job
         uses: actions/github-script@v6
-
+        if: steps.commit.outputs.sha
         id: check-output
         env:
           JOB_NAME: "Update - Release"
@@ -1016,7 +1016,7 @@ jobs:
       - name: Create Check
         uses: LouisBrunner/checks-action@v1.3.1
         id: check
-
+        if: steps.commit.outputs.sha
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           status: in_progress
@@ -1025,7 +1025,7 @@ jobs:
           output: \${{ steps.check-output.outputs.result }}
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
-        if: always()
+        if: needs.release.outputs.check-id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
@@ -1063,7 +1063,7 @@ jobs:
           echo "::set-output name=result::$result"
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
-        if: always()
+        if: needs.update.outputs.check-id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ steps.needs-result.outputs.result }}
@@ -1903,7 +1903,7 @@ jobs:
         run: npm run postlint --ignore-scripts -ws -iwr --if-present
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
-        if: always()
+        if: steps.check.outputs.check_id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
@@ -2018,7 +2018,7 @@ jobs:
         run: npm test --ignore-scripts -ws -iwr --if-present
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
-        if: always()
+        if: steps.check.outputs.check_id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
@@ -2499,7 +2499,7 @@ jobs:
             return commentId
       - name: Get Workflow Job
         uses: actions/github-script@v6
-        if: steps.release.outputs.pr-number
+        if: steps.release.outputs.pr-sha
         id: check-output
         env:
           JOB_NAME: "Release"
@@ -2533,7 +2533,7 @@ jobs:
       - name: Create Check
         uses: LouisBrunner/checks-action@v1.3.1
         id: check
-        if: steps.release.outputs.pr-number
+        if: steps.release.outputs.pr-sha
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           status: in_progress
@@ -2590,7 +2590,7 @@ jobs:
           echo "::set-output  name=sha::$(git rev-parse HEAD)"
       - name: Get Workflow Job
         uses: actions/github-script@v6
-
+        if: steps.commit.outputs.sha
         id: check-output
         env:
           JOB_NAME: "Update - Release"
@@ -2624,7 +2624,7 @@ jobs:
       - name: Create Check
         uses: LouisBrunner/checks-action@v1.3.1
         id: check
-
+        if: steps.commit.outputs.sha
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           status: in_progress
@@ -2633,7 +2633,7 @@ jobs:
           output: \${{ steps.check-output.outputs.result }}
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
-        if: always()
+        if: needs.release.outputs.check-id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
@@ -2671,7 +2671,7 @@ jobs:
           echo "::set-output name=result::$result"
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
-        if: always()
+        if: needs.update.outputs.check-id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ steps.needs-result.outputs.result }}
@@ -3513,7 +3513,7 @@ jobs:
         run: npm run postlint --ignore-scripts -ws -iwr --if-present
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
-        if: always()
+        if: steps.check.outputs.check_id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
@@ -3628,7 +3628,7 @@ jobs:
         run: npm test --ignore-scripts -ws -iwr --if-present
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
-        if: always()
+        if: steps.check.outputs.check_id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
@@ -3851,7 +3851,7 @@ jobs:
             return commentId
       - name: Get Workflow Job
         uses: actions/github-script@v6
-        if: steps.release.outputs.pr-number
+        if: steps.release.outputs.pr-sha
         id: check-output
         env:
           JOB_NAME: "Release"
@@ -3885,7 +3885,7 @@ jobs:
       - name: Create Check
         uses: LouisBrunner/checks-action@v1.3.1
         id: check
-        if: steps.release.outputs.pr-number
+        if: steps.release.outputs.pr-sha
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           status: in_progress
@@ -3942,7 +3942,7 @@ jobs:
           echo "::set-output  name=sha::$(git rev-parse HEAD)"
       - name: Get Workflow Job
         uses: actions/github-script@v6
-
+        if: steps.commit.outputs.sha
         id: check-output
         env:
           JOB_NAME: "Update - Release"
@@ -3976,7 +3976,7 @@ jobs:
       - name: Create Check
         uses: LouisBrunner/checks-action@v1.3.1
         id: check
-
+        if: steps.commit.outputs.sha
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           status: in_progress
@@ -3985,7 +3985,7 @@ jobs:
           output: \${{ steps.check-output.outputs.result }}
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
-        if: always()
+        if: needs.release.outputs.check-id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
@@ -4023,7 +4023,7 @@ jobs:
           echo "::set-output name=result::$result"
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
-        if: always()
+        if: needs.update.outputs.check-id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ steps.needs-result.outputs.result }}

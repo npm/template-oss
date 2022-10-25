@@ -64,7 +64,7 @@ jobs:
             }
 
             return commentId
-      {{> stepChecks jobCheck=(obj name="Release" sha="${{ steps.release.outputs.pr-sha }}" if="steps.release.outputs.pr-number") }}
+      {{> stepChecks jobCheck=(obj name="Release" sha="steps.release.outputs.pr-sha") }}
 
   update:
     needs: release
@@ -92,8 +92,8 @@ jobs:
           git commit --all --amend --no-edit || true
           git push --force-with-lease
           echo "::set-output  name=sha::$(git rev-parse HEAD)"
-      {{> stepChecks jobName="Update - Release" jobCheck=(obj sha="${{ steps.commit.outputs.sha }}" name="Release" )}}
-      {{> stepChecks jobCheck=(obj id="${{ needs.release.outputs.check-id }}" )}}
+      {{> stepChecks jobName="Update - Release" jobCheck=(obj sha="steps.commit.outputs.sha" name="Release" )}}
+      {{> stepChecks jobCheck=(obj id="needs.release.outputs.check-id" )}}
 
   ci:
     name: CI - Release
@@ -119,7 +119,7 @@ jobs:
             result="success"
           fi
           echo "::set-output name=result::$result"
-      {{> stepChecks jobCheck=(obj id="${{ needs.update.outputs.check-id }}" status="${{ steps.needs-result.outputs.result }}") }}
+      {{> stepChecks jobCheck=(obj id="needs.update.outputs.check-id" status="steps.needs-result.outputs.result") }}
 
   post-release:
     needs: release
