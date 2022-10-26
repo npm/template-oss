@@ -4,15 +4,6 @@ on:
   {{> onCi }}
 
 jobs:
-  engines:
-    {{> jobMatrix
-      jobName="Engines"
-      jobDepFlags="--engines-strict"
-      macCI=false
-      windowsCI=false
-      ciVersions=baseCiVersions
-    }}
-
   lint:
     {{> job jobName="Lint" }}
       {{> stepLint jobRunFlags=pkgFlags }}
