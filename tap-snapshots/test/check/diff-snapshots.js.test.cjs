@@ -171,7 +171,7 @@ The repo file ci.yml needs to be updated:
 
   .github/workflows/ci.yml
   ========================================
-  @@ -133,5 +133,25 @@
+  @@ -83,5 +83,25 @@
              node-version: \${{ matrix.node-version }}
          - name: Update Windows npm
            # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows

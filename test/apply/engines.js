@@ -1,9 +1,6 @@
 const t = require('tap')
 const { join } = require('path')
-const yaml = require('yaml')
 const setup = require('../setup.js')
-
-const getEngines = (ci) => yaml.parse(ci).jobs.engines.strategy.matrix['node-version']
 
 t.test('can set engines and ci separately', async (t) => {
   const s = await setup(t, {
@@ -34,10 +31,8 @@ t.test('latest ci versions', async (t) => {
   await s.apply()
 
   const pkg = await s.readJson('package.json')
-  const ci = await s.readFile('.github/workflows/ci.yml')
 
   t.equal(pkg.engines.node, '>=18.0.0')
-  t.strictSame(getEngines(ci), ['18.0.0'])
 })
 
 t.test('latest ci versions in workspace', async (t) => {
@@ -67,15 +62,9 @@ t.test('latest ci versions in workspace', async (t) => {
   })
   await s.apply()
 
-  const ci = await s.readFile('.github/workflows/ci.yml')
-  const ciWorkspace = await s.readFile('.github/workflows/ci-a.yml')
-
   const root = await s.readJson('target.json')
   const workspace = await s.readJson('target-a.json')
 
   t.equal(root.node, '^12.0.0 || ^14.0.0 || >=16.0.0')
   t.equal(workspace.node, '>=16.0.0')
-
-  t.strictSame(getEngines(ci), ['12.0.0', '14.0.0', '16.0.0'])
-  t.strictSame(getEngines(ciWorkspace), ['16.0.0'])
 })
