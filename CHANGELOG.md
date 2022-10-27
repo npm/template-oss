@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.8.0](https://github.com/npm/template-oss/compare/v4.7.1...v4.8.0) (2022-10-27)
+
+### Features
+
+* [`2c9e34c`](https://github.com/npm/template-oss/commit/2c9e34c771eda2d1f33be8defd84f9c7946f012c) [#255](https://github.com/npm/template-oss/pull/255) only fail on production `audit` (@lukekarrys)
+* [`49a0581`](https://github.com/npm/template-oss/commit/49a05818b7e721c223e6187a1f534a7a304f77fa) [#254](https://github.com/npm/template-oss/pull/254) replace --engines-strict check with arborist query (@lukekarrys)
+
 ## [4.7.1](https://github.com/npm/template-oss/compare/v4.7.0...v4.7.1) (2022-10-25)
 
 ### Bug Fixes
