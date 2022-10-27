@@ -200,8 +200,10 @@ jobs:
         run: npm -v
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund --package-lock
-      - name: Run Audit
-        run: npm audit
+      - name: Run Production Audit
+        run: npm audit --omit=dev
+      - name: Run Full Audit
+        run: npm audit --audit-level=none
 
 .github/workflows/ci-release.yml
 ========================================
@@ -1424,8 +1426,10 @@ jobs:
         run: npm -v
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund --package-lock
-      - name: Run Audit
-        run: npm audit
+      - name: Run Production Audit
+        run: npm audit --omit=dev
+      - name: Run Full Audit
+        run: npm audit --audit-level=none
 
 .github/workflows/ci-a.yml
 ========================================

@@ -99,25 +99,25 @@ The repo file audit.yml needs to be updated:
   [@npmcli/template-oss ERROR] There was an erroring getting the target file
   [@npmcli/template-oss ERROR] Error: {{ROOT}}/test/check/tap-testdir-diff-snapshots-update-and-remove-errors/.github/workflows/audit.yml
   
-  YAMLParseError: Implicit keys need to be on a single line at line 38, column 1:
+  YAMLParseError: Implicit keys need to be on a single line at line 40, column 1:
   
-          run: npm audit
+          run: npm audit --audit-level=none
   >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
   ^
   
-  YAMLParseError: Block scalar header includes extra characters: >>>>I at line 38, column 2:
+  YAMLParseError: Block scalar header includes extra characters: >>>>I at line 40, column 2:
   
   >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
    ^
   
-  YAMLParseError: Not a YAML token: HOPE THIS IS NOT VALID YAML<<<<<<<<<<< at line 38, column 7:
+  YAMLParseError: Not a YAML token: HOPE THIS IS NOT VALID YAML<<<<<<<<<<< at line 40, column 7:
   
   >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   
-  YAMLParseError: Implicit map keys need to be followed by map values at line 38, column 1:
+  YAMLParseError: Implicit map keys need to be followed by map values at line 40, column 1:
   
-          run: npm audit
+          run: npm audit --audit-level=none
   >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   
@@ -159,8 +159,10 @@ The repo file audit.yml needs to be updated:
           run: npm -v
         - name: Install Dependencies
           run: npm i --ignore-scripts --no-audit --no-fund --package-lock
-        - name: Run Audit
-          run: npm audit
+        - name: Run Production Audit
+          run: npm audit --omit=dev
+        - name: Run Full Audit
+          run: npm audit --audit-level=none
   
 
 To correct it: npx template-oss-apply --force
