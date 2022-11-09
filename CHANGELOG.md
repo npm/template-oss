@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.9.0](https://github.com/npm/template-oss/compare/v4.8.0...v4.9.0) (2022-11-09)
+
+### Features
+
+* [`1323cdb`](https://github.com/npm/template-oss/commit/1323cdb3328f94c1d8fb161ecbd751a74a4908b4) Updated SECURITY.md (@maclarel)
+
 ## [4.8.0](https://github.com/npm/template-oss/compare/v4.7.1...v4.8.0) (2022-10-27)
 
 ### Features
