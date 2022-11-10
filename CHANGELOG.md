@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.10.0](https://github.com/npm/template-oss/compare/v4.9.0...v4.10.0) (2022-11-10)
+
+### Features
+
+* [`3fcf46c`](https://github.com/npm/template-oss/commit/3fcf46c801d0a86e0de90b235e0daa3f028a828e) add npmSpec config item (@lukekarrys)
+* [`e4465dd`](https://github.com/npm/template-oss/commit/e4465ddbfcafe7d0a3dc890e5f8b8319147d116b) merge npmrc files (@lukekarrys)
+
+### Bug Fixes
+
+* [`110b63a`](https://github.com/npm/template-oss/commit/110b63a4ad3fe48c24cb6db90b7879bfc14408b6) [#262](https://github.com/npm/template-oss/pull/262) use ci or update for release checklist (@lukekarrys)
+* [`dfbdadc`](https://github.com/npm/template-oss/commit/dfbdadcb85f2631f78af05c2abfbaa317b17cbd1) properly recreate release PR when run via workflow_dispatch (@lukekarrys)
+
 ## [4.9.0](https://github.com/npm/template-oss/compare/v4.8.0...v4.9.0) (2022-11-09)
 
 ### Features
