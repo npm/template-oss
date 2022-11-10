@@ -38,7 +38,8 @@
     "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
   },
   "templateOSS": {
-    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten."
+    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
+    "npmSpec": "8"
   },
   "tap": {
     "nyc-arg": [

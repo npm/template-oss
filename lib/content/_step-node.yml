@@ -20,12 +20,12 @@
 - name: Install npm@7
   if: startsWith(matrix.node-version, '10.')
   run: npm i --prefer-online --no-fund --no-audit -g npm@7
-- name: Install npm@latest
+- name: Install npm@{{ npmSpec }}
   if: $\{{ !startsWith(matrix.node-version, '10.') }}
 {{else}}
-- name: Install npm@latest
+- name: Install npm@{{ npmSpec }}
 {{/if}}
-  run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+  run: npm i --prefer-online --no-fund --no-audit -g npm@{{ npmSpec }}
 - name: npm Version
   run: npm -v
 {{/if}}
