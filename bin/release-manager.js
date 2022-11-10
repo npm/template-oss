@@ -10,13 +10,19 @@ const log = (...logs) => console.error('LOG', ...logs)
 const ROOT = process.cwd()
 const pkg = require(join(ROOT, 'package.json'))
 
+const args = process.argv.slice(2).reduce((acc, a) => {
+  const [k, v] = a.replace(/^--/g, '').split('=')
+  acc[k] = v === 'true'
+  return acc
+}, {})
+
 /* eslint-disable max-len */
 const DEFAULT_RELEASE_PROCESS = `
 1. Checkout the release branch and test
 
     \`\`\`sh
     gh pr checkout <PR-NUMBER> --force
-    npm i
+    npm ${args.lockfile ? 'ci' : 'update'}
     npm test
     gh pr checks --watch
     \`\`\`
