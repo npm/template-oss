@@ -36,8 +36,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18.x
-      - name: Install npm@8
-        run: npm i --prefer-online --no-fund --no-audit -g npm@8
+      - name: Install npm@latest
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - name: npm Version
         run: npm -v
       - name: Install Dependencies
@@ -98,9 +98,9 @@ jobs:
       - name: Install npm@7
         if: startsWith(matrix.node-version, '10.')
         run: npm i --prefer-online --no-fund --no-audit -g npm@7
-      - name: Install npm@8
+      - name: Install npm@latest
         if: ${{ !startsWith(matrix.node-version, '10.') }}
-        run: npm i --prefer-online --no-fund --no-audit -g npm@8
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
       - name: npm Version
         run: npm -v
       - name: Install Dependencies
