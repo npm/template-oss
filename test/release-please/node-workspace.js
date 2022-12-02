@@ -106,6 +106,12 @@ t.test('root and ws fixes', async t => {
     .filter(u => u.updater.rawContent)
     .map(u => JSON.parse(u.updater.rawContent))
 
+  t.match(
+    pullRequest.body.releaseData[0].notes,
+    '[Workspace](https://github.com/npm/cli/releases/tag/a-v2.2.3)',
+    'contains release link for workspace'
+  )
+
   t.strictSame(pkgs, [
     {
       name: '@npmcli/a',
