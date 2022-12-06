@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.11.0](https://github.com/npm/template-oss/compare/v4.10.0...v4.11.0) (2022-12-06)
+
+### Features
+
+* [`bf5f727`](https://github.com/npm/template-oss/commit/bf5f727f520e7b1db3f1126886212211f669a098) [#265](https://github.com/npm/template-oss/pull/265) link workspace changelog entries to release (@lukekarrys)
+
 ## [4.10.0](https://github.com/npm/template-oss/compare/v4.9.0...v4.10.0) (2022-11-10)
 
 ### Features
