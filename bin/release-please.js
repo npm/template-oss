@@ -28,6 +28,18 @@ const debugPr = (val) => {
   }
 }
 
+const debugRelease = (val) => {
+  if (dryRun) {
+    console.log('ROOT RELEASE:', JSON.stringify(val, null, 2))
+  }
+}
+
+const debugReleases = (val) => {
+  if (dryRun) {
+    console.log('ALL RELEASES:', JSON.stringify(val, null, 2))
+  }
+}
+
 main({
   token: process.env.GITHUB_TOKEN,
   repo: process.env.GITHUB_REPOSITORY,
@@ -44,18 +56,13 @@ main({
   }
 
   if (release) {
+    debugRelease(release)
     core.setOutput('release', JSON.stringify(release))
-    core.setOutput('release-path', release.path)
-    core.setOutput('release-version', release.version)
-    core.setOutput('release-tag', release.tagName)
-    core.setOutput('release-url', release.url)
   }
 
   if (releases) {
+    debugReleases(releases)
     core.setOutput('releases', JSON.stringify(releases))
-    core.setOutput('release-flags', JSON.stringify(releases.map((r) => {
-      return r.path === '.' ? '-iwr' : `-w ${r.path}`
-    })))
   }
 
   return null
