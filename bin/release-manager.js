@@ -53,7 +53,7 @@ const DEFAULT_RELEASE_PROCESS = `
     Release Please will run on the just pushed release commit and create GitHub releases and tags for each package.
 
     \`\`\`
-    gh run watch \`gh run list -w release -b <BASE-BRANCH> -L 1 --json databaseId -q ".[0].databaseId"\`
+    gh run watch \`gh run list -R {NWO} -w release -b <BASE-BRANCH> -L 1 --json databaseId -q ".[0].databaseId"\`
     \`\`\`
 ` /* eslint-enable max-len */
 
@@ -82,7 +82,7 @@ const getReleaseProcess = async ({ owner, repo }) => {
   } catch (e) {
     log('Release wiki not found', e.message)
     log('Using default release process')
-    releaseProcess = DEFAULT_RELEASE_PROCESS.trim() + '\n'
+    releaseProcess = DEFAULT_RELEASE_PROCESS.replace(/\{NWO\}/g, `${owner}/${repo}`).trim() + '\n'
   }
 
   // XXX: the release steps need to always be the last thing in the doc for this to work

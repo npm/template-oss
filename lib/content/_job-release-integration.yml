@@ -1,0 +1,12 @@
+runs-on: ubuntu-latest
+defaults:
+  run:
+    shell: bash
+steps:
+  {{> stepGit }}
+  {{> stepNode }}
+  - name: View in Registry
+    run: |
+      name=$(cat package.json | jq -r .name) 
+      version="$\{{ fromJSON(needs.release.output.release).version }}"
+      npm view ${name}@${version}
