@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.11.2](https://github.com/npm/template-oss/compare/v4.11.1...v4.11.2) (2023-01-24)
+
+### Bug Fixes
+
+* [`8dac23a`](https://github.com/npm/template-oss/commit/8dac23ab285582afe7cdd2b463a5f1e3b1f3cb00) [#271](https://github.com/npm/template-oss/pull/271) capture exit code from npm view (@lukekarrys)
+
 ## [4.11.1](https://github.com/npm/template-oss/compare/v4.11.0...v4.11.1) (2023-01-24)
 
 ### Bug Fixes
