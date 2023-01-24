@@ -1068,12 +1068,6 @@ jobs:
       run:
         shell: bash
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
@@ -1084,9 +1078,30 @@ jobs:
         run: npm -v
       - name: View in Registry
         run: |
-          name=$(cat package.json | jq -r .name) 
-          version="\${{ fromJSON(needs.release.output.release).version }}"
-          npm view \${name}@\${version}
+          EXIT_CODE=0
+
+          function is_published {
+            if npm view "$@" --loglevel=error > /dev/null; then
+              echo 0
+            else
+              echo 1
+            fi
+          }
+
+          for release in $(echo '\${{ needs.release.outputs.releases }}' | jq -r '.[] | @base64'); do
+            name=$(echo "$release" | base64 --decode | jq -r .pkgName)
+            version=$(echo "$release" | base64 --decode | jq -r .version)
+            spec="$name@$version"
+            status=$(is_published "$spec")
+            if [[ "$status" -eq 1 ]]; then
+              echo "$spec ERROR"
+              EXIT_CODE=$status
+            else
+              echo "$spec OK"
+            fi
+          done
+
+          exit $EXIT_CODE
 
   post-release-integration:
     needs: [ release, release-integration ]
@@ -1124,11 +1139,18 @@ jobs:
 
             if (updateComment) {
               console.log('Found comment to update:', JSON.stringify(updateComment, null, 2))
+              let body = updateComment.body.replace(/Workflow run: :[a-z_]+:/, \`Workflow run: :\${RESULT}:\`)
+              if (RESULT === 'x') {
+                body += \`/n/n:rotating_light:\`
+                body += \` @npm/cli-team: The post-release workflow failed for this release.\`
+                body += \` Manual steps may need to be taken after examining the workflow output\`
+                body += \` from the above workflow run. :rotating_light:\`
+              }
               await github.rest.issues.updateComment({
                 owner,
                 repo,
+                body,
                 comment_id: updateComment.id,
-                body: updateComment.body.replace(/Workflow run: :[a-z_]+:/, \`Workflow run: :\${RESULT}:\`),
               })
             } else {
               console.log('No matching comments found:', JSON.stringify(comments, null, 2))
@@ -2620,12 +2642,6 @@ jobs:
       run:
         shell: bash
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
@@ -2636,9 +2652,30 @@ jobs:
         run: npm -v
       - name: View in Registry
         run: |
-          name=$(cat package.json | jq -r .name) 
-          version="\${{ fromJSON(needs.release.output.release).version }}"
-          npm view \${name}@\${version}
+          EXIT_CODE=0
+
+          function is_published {
+            if npm view "$@" --loglevel=error > /dev/null; then
+              echo 0
+            else
+              echo 1
+            fi
+          }
+
+          for release in $(echo '\${{ needs.release.outputs.releases }}' | jq -r '.[] | @base64'); do
+            name=$(echo "$release" | base64 --decode | jq -r .pkgName)
+            version=$(echo "$release" | base64 --decode | jq -r .version)
+            spec="$name@$version"
+            status=$(is_published "$spec")
+            if [[ "$status" -eq 1 ]]; then
+              echo "$spec ERROR"
+              EXIT_CODE=$status
+            else
+              echo "$spec OK"
+            fi
+          done
+
+          exit $EXIT_CODE
 
   post-release-integration:
     needs: [ release, release-integration ]
@@ -2676,11 +2713,18 @@ jobs:
 
             if (updateComment) {
               console.log('Found comment to update:', JSON.stringify(updateComment, null, 2))
+              let body = updateComment.body.replace(/Workflow run: :[a-z_]+:/, \`Workflow run: :\${RESULT}:\`)
+              if (RESULT === 'x') {
+                body += \`/n/n:rotating_light:\`
+                body += \` @npm/cli-team: The post-release workflow failed for this release.\`
+                body += \` Manual steps may need to be taken after examining the workflow output\`
+                body += \` from the above workflow run. :rotating_light:\`
+              }
               await github.rest.issues.updateComment({
                 owner,
                 repo,
+                body,
                 comment_id: updateComment.id,
-                body: updateComment.body.replace(/Workflow run: :[a-z_]+:/, \`Workflow run: :\${RESULT}:\`),
               })
             } else {
               console.log('No matching comments found:', JSON.stringify(comments, null, 2))
@@ -4015,12 +4059,6 @@ jobs:
       run:
         shell: bash
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
@@ -4031,9 +4069,30 @@ jobs:
         run: npm -v
       - name: View in Registry
         run: |
-          name=$(cat package.json | jq -r .name) 
-          version="\${{ fromJSON(needs.release.output.release).version }}"
-          npm view \${name}@\${version}
+          EXIT_CODE=0
+
+          function is_published {
+            if npm view "$@" --loglevel=error > /dev/null; then
+              echo 0
+            else
+              echo 1
+            fi
+          }
+
+          for release in $(echo '\${{ needs.release.outputs.releases }}' | jq -r '.[] | @base64'); do
+            name=$(echo "$release" | base64 --decode | jq -r .pkgName)
+            version=$(echo "$release" | base64 --decode | jq -r .version)
+            spec="$name@$version"
+            status=$(is_published "$spec")
+            if [[ "$status" -eq 1 ]]; then
+              echo "$spec ERROR"
+              EXIT_CODE=$status
+            else
+              echo "$spec OK"
+            fi
+          done
+
+          exit $EXIT_CODE
 
   post-release-integration:
     needs: [ release, release-integration ]
@@ -4071,11 +4130,18 @@ jobs:
 
             if (updateComment) {
               console.log('Found comment to update:', JSON.stringify(updateComment, null, 2))
+              let body = updateComment.body.replace(/Workflow run: :[a-z_]+:/, \`Workflow run: :\${RESULT}:\`)
+              if (RESULT === 'x') {
+                body += \`/n/n:rotating_light:\`
+                body += \` @npm/cli-team: The post-release workflow failed for this release.\`
+                body += \` Manual steps may need to be taken after examining the workflow output\`
+                body += \` from the above workflow run. :rotating_light:\`
+              }
               await github.rest.issues.updateComment({
                 owner,
                 repo,
+                body,
                 comment_id: updateComment.id,
-                body: updateComment.body.replace(/Workflow run: :[a-z_]+:/, \`Workflow run: :\${RESULT}:\`),
               })
             } else {
               console.log('No matching comments found:', JSON.stringify(comments, null, 2))
