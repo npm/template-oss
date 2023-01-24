@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.11.1](https://github.com/npm/template-oss/compare/v4.11.0...v4.11.1) (2023-01-24)
+
+### Bug Fixes
+
+* [`f4ce7d2`](https://github.com/npm/template-oss/commit/f4ce7d2559437ae10814cbf26986f51367d23f5a) [#269](https://github.com/npm/template-oss/pull/269) add root release and release pr to data (@lukekarrys)
+
 ## [4.11.0](https://github.com/npm/template-oss/compare/v4.10.0...v4.11.0) (2022-12-06)
 
 ### Features
