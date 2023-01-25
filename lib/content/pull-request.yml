@@ -15,8 +15,8 @@ jobs:
         id: commit
         continue-on-error: true
         run: |
-          {{ rootNpxPath }} --offline commitlint -V --from origin/$\{{ github.base_ref }} --to $\{{ github.event.pull_request.head.sha }}
+          {{ rootNpxPath }} --offline commitlint -V --from 'origin/$\{{ github.base_ref }}' --to $\{{ github.event.pull_request.head.sha }}
       - name: Run Commitlint on PR Title
         if: steps.commit.outcome == 'failure'
         run: |
-          echo $\{{ github.event.pull_request.title }} | {{ rootNpxPath }} --offline commitlint -V
+          echo '$\{{ github.event.pull_request.title }}' | {{ rootNpxPath }} --offline commitlint -V
