@@ -744,11 +744,11 @@ jobs:
         id: commit
         continue-on-error: true
         run: |
-          npx --offline commitlint -V --from origin/\${{ github.base_ref }} --to \${{ github.event.pull_request.head.sha }}
+          npx --offline commitlint -V --from 'origin/\${{ github.base_ref }}' --to \${{ github.event.pull_request.head.sha }}
       - name: Run Commitlint on PR Title
         if: steps.commit.outcome == 'failure'
         run: |
-          echo \${{ github.event.pull_request.title }} | npx --offline commitlint -V
+          echo '\${{ github.event.pull_request.title }}' | npx --offline commitlint -V
 
 .github/workflows/release.yml
 ========================================
@@ -2318,11 +2318,11 @@ jobs:
         id: commit
         continue-on-error: true
         run: |
-          npx --offline commitlint -V --from origin/\${{ github.base_ref }} --to \${{ github.event.pull_request.head.sha }}
+          npx --offline commitlint -V --from 'origin/\${{ github.base_ref }}' --to \${{ github.event.pull_request.head.sha }}
       - name: Run Commitlint on PR Title
         if: steps.commit.outcome == 'failure'
         run: |
-          echo \${{ github.event.pull_request.title }} | npx --offline commitlint -V
+          echo '\${{ github.event.pull_request.title }}' | npx --offline commitlint -V
 
 .github/workflows/release.yml
 ========================================
@@ -3735,11 +3735,11 @@ jobs:
         id: commit
         continue-on-error: true
         run: |
-          npx --offline commitlint -V --from origin/\${{ github.base_ref }} --to \${{ github.event.pull_request.head.sha }}
+          npx --offline commitlint -V --from 'origin/\${{ github.base_ref }}' --to \${{ github.event.pull_request.head.sha }}
       - name: Run Commitlint on PR Title
         if: steps.commit.outcome == 'failure'
         run: |
-          echo \${{ github.event.pull_request.title }} | npx --offline commitlint -V
+          echo '\${{ github.event.pull_request.title }}' | npx --offline commitlint -V
 
 .github/workflows/release.yml
 ========================================
