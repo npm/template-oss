@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.11.3](https://github.com/npm/template-oss/compare/v4.11.2...v4.11.3) (2023-01-25)
+
+### Bug Fixes
+
+* [`657286c`](https://github.com/npm/template-oss/commit/657286c4594647141b0dc7b167ae6fd2dfa4eeed) [#273](https://github.com/npm/template-oss/pull/273) wrap pr title and base_ref in quotes (@nlf)
+
 ## [4.11.2](https://github.com/npm/template-oss/compare/v4.11.1...v4.11.2) (2023-01-24)
 
 ### Bug Fixes
