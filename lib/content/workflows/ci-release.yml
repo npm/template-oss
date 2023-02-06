@@ -18,20 +18,20 @@ on:
         type: string
 
 jobs:
-  lint-all:
+  lint:
     {{> job
-      jobName="Lint All"
+      jobName="Lint"
       jobCheck=(obj sha="inputs.check-sha")
       jobCheckout=(obj ref="${{ inputs.ref }}")
     }}
-      {{> stepLint jobRunFlags=allFlags }}
+      {{> stepLint }}
       {{> stepChecks jobCheck=true }}
 
-  test-all:
+  test:
     {{> jobMatrix
-      jobName="Test All"
+      jobName="Test"
       jobCheck=(obj sha="inputs.check-sha")
       jobCheckout=(obj ref="${{ inputs.ref }}")
     }}
-      {{> stepTest jobRunFlags=allFlags }}
+      {{> stepTest }}
       {{> stepChecks jobCheck=true }}

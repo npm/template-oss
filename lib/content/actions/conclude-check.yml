@@ -1,0 +1,24 @@
+name: Conclude Check
+description: Conclude a check run
+
+inputs:
+  token:
+    description: GitHub token to use
+    required: true
+  conclusion:
+    description: Conclusion of the check
+    required: true
+  check-id:
+    description: ID of the check to conclude
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Conclude Check
+      uses: LouisBrunner/checks-action@v1.5.0
+      with:
+        token: $\{{ inputs.token }}
+        conclusion: $\{{ inputs.conclusion }}
+        check_id: $\{{ inputs.check-id }}
+    

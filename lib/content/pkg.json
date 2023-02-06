@@ -10,8 +10,8 @@
     "test": "tap",
     "posttest": "{{ localNpmPath }} run lint",
     {{#if isRootMono}}
-    "test-all": "{{ localNpmPath }} run test {{ allFlags }}",
-    "lint-all": "{{ localNpmPath }} run lint {{ allFlags }}",
+    "test-all": "{{ localNpmPath }} run test -iwr -ws --if-present",
+    "lint-all": "{{ localNpmPath }} run lint -iwr -ws --if-present",
     {{/if}}
     "template-copy": {{{ del }}},
     "lint:fix": {{{ del }}},

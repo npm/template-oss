@@ -1,0 +1,72 @@
+name: Create Check
+description: Create a check and associate it with a sha
+
+inputs:
+  node-version:
+    required: true
+  npm-version:
+    required: false
+  cache:
+    required: false
+  ignore-scripts:
+    default: "true"
+    required: true
+  lockfile:
+    default: "false"
+    required: true
+
+outputs:
+  workspace-flags:
+    description: Flags of the changed workspaces including the root
+    value: $\{{ steps.changed-workspaces.outputs.flags }}
+  
+runs:
+  using: composite
+  steps:
+    - name: Setup Git User
+      run: |
+        git config --global user.email "npm-cli+bot@github.com"
+        git config --global user.name "npm CLI robot"
+
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: $\{{ inputs.node-version }}
+        cache: $\{{ inputs.cache }}
+
+    - name: Update Windows npm
+      # node 14 ships with npm@6, which is known to fail when updating itself in windows
+      if: |
+        inputs.npm-version && inputs.platform == 'windows-latest' &&
+        (startsWith(inputs.node-version, '12.') || startsWith(inputs.node-version, '14.'))
+      run: |
+        curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
+        tar xf npm-7.5.4.tgz
+        cd package
+        node lib/npm.js install --no-fund --no-audit -g ..\npm-7.5.4.tgz
+        cd ..
+        rmdir /s /q package
+
+    - name: Install npm@7
+      if: inputs.npm-version && startsWith(inputs.node-version, '10.')
+      run: npm i --prefer-online --no-fund --no-audit -g npm@7
+
+    - name: Install npm@$\{{ inputs.npm-version }}
+      if: npm.npm-version && !startsWith(matrix.node-version, '10.')
+      run: npm i --prefer-online --no-fund --no-audit -g npm@$\{{ inputs.npm-version }}
+
+    - name: npm Version
+      run: npm -v
+
+    - name: Setup Dependencies
+      run: {{ rootNpmPath }} install --no-audit --no-fund --ignore-scripts=$\{{ inputs.ignore-scripts }} --lockfile=$\{{ inputs.lockfile }}
+
+    - name: Changed Workspaces
+      id: changed-workspaces
+      run: |
+        if [[ "$\{{ github.event_name }}" == "pull_request" || "$\{{ github.event_name }}" == "pull_request_target" ]]; then
+          flags=$({{ rootNpmPath }} exec --offline -- template-oss-changed-workspaces 'origin/$\{{ github.base_ref }}' $\{{ github.event.pull_request.head.sha }})
+        else
+          flags=$({{ rootNpmPath }} exec --offline -- template-oss-changed-workspaces $\{{ github.sha }})
+        fi
+        echo "flags=${flags}" >> $GITHUB_OUTPUT

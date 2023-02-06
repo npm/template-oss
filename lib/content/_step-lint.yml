@@ -1,4 +1,4 @@
 - name: Lint
-  run: {{ rootNpmPath }} run lint --ignore-scripts {{~#if jobRunFlags}} {{ jobRunFlags }}{{/if}}
+  run: {{ rootNpmPath }} run lint --ignore-scripts $\{{ steps.changed-workspaces.outputs.flags }} {{~#if jobRunFlags}} {{ jobRunFlags }}{{/if}}
 - name: Post Lint
-  run: {{ rootNpmPath }} run postlint --ignore-scripts {{~#if jobRunFlags}} {{ jobRunFlags }}{{/if}}
+  run: {{ rootNpmPath }} run postlint --ignore-scripts $\{{ steps.changed-workspaces.outputs.flags }} {{~#if jobRunFlags}} {{ jobRunFlags }}{{/if}}

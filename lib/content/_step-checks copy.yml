@@ -1,0 +1,33 @@
+- name: Get Workflow Job
+  uses: actions/github-script@v6
+  if: {{ jobCheck.sha }}
+  id: check-output
+  env:
+    JOB_NAME: "{{#if jobName}}{{ jobName }}{{else}}{{ jobCheck.name }}{{/if}}"
+    MATRIX_NAME: "{{#if jobIsMatrix}} - $\{{ matrix.platform.name }} - $\{{ matrix.node-version }}{{/if}}"
+  with:
+    script: |
+      const { owner, repo } = context.repo
+
+      const { data } = await github.rest.actions.listJobsForWorkflowRun({
+        owner,
+        repo,
+        run_id: context.runId,
+        per_page: 100
+      })
+
+      const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
+      const job = data.jobs.find(j => j.name.endsWith(jobName))
+      const jobUrl = job?.html_url
+
+      const shaUrl = `${context.serverUrl}/${owner}/${repo}/commit/$\{{ {{ jobCheck.sha }} }}`
+
+      let summary = `This check is assosciated with ${shaUrl}\n\n`
+
+      if (jobUrl) {
+        summary += `For run logs, click here: ${jobUrl}`
+      } else {
+        summary += `Run logs could not be found for a job with name: "${jobName}"`
+      }
+
+      return { summary }

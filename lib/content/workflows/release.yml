@@ -75,7 +75,7 @@ jobs:
       sha: $\{{ steps.commit.outputs.sha }}
       check-id: $\{{ steps.check.outputs.check_id }}
     {{> job
-      jobName="Update - Release"
+      jobName="Release PR - Update"
       jobIf="needs.release.outputs.pr"
       jobCheckout=(obj ref="${{ needs.release.outputs.branch }}" fetch-depth=0)
     }}
@@ -86,7 +86,7 @@ jobs:
           GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}
         run: |
           {{ rootNpmPath }} exec --offline -- template-oss-release-manager --lockfile={{ lockfile }}
-          {{ rootNpmPath }} run rp-pull-request --ignore-scripts {{~#if allFlags}} {{ allFlags }}{{else}} --if-present{{/if}}
+          {{ rootNpmPath }} run rp-pull-request --ignore-scripts -iwr -ws --if-present
       - name: Commit
         id: commit
         env:
@@ -95,11 +95,11 @@ jobs:
           git commit --all --amend --no-edit || true
           git push --force-with-lease
           echo "::set-output  name=sha::$(git rev-parse HEAD)"
-      {{> stepChecks jobName="Update - Release" jobCheck=(obj sha="steps.commit.outputs.sha" name="Release" )}}
+      {{> stepChecks jobName="Release PR - Update" jobCheck=(obj sha="steps.commit.outputs.sha" name="Release" )}}
       {{> stepChecks jobCheck=(obj id="needs.release.outputs.check-id" )}}
 
   ci:
-    name: CI - Release
+    name: Release PR - CI
     needs: [release, update]
     if: needs.release.outputs.pr
     uses: ./.github/workflows/ci-release.yml
@@ -109,7 +109,7 @@ jobs:
 
   post-ci:
     needs: [release, update, ci]
-    {{> job jobName="Post CI - Release" jobIf="needs.release.outputs.pr && always()" jobSkipSetup=true }}
+    {{> job jobName="Release PR - Post CI" jobIf="needs.release.outputs.pr && always()" jobSkipSetup=true }}
       - name: Get Needs Result
         id: needs-result
         run: |
@@ -126,7 +126,7 @@ jobs:
 
   post-release:
     needs: release
-    {{> job jobName="Post Release - Release" jobIf="needs.release.outputs.releases" jobSkipSetup=true  }}
+    {{> job jobName="Post Release" jobIf="needs.release.outputs.releases" jobSkipSetup=true  }}
       - name: Create Release PR Comment
         uses: actions/github-script@v6
         env:
@@ -162,13 +162,13 @@ jobs:
 
   release-integration:
     needs: release
-    name: Release Integration
+    name: Post Release - Integration
     if: needs.release.outputs.release
     {{> jobReleaseIntegration }}
 
   post-release-integration:
     needs: [release, release-integration]
-    {{> job jobName="Post Release Integration - Release" jobIf="needs.release.outputs.release && always()" jobSkipSetup=true }}
+    {{> job jobName="Post Release - Post Integration" jobIf="needs.release.outputs.release && always()" jobSkipSetup=true }}
       - name: Get Needs Result
         id: needs-result
         run: |

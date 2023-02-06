@@ -1,0 +1,49 @@
+name: Upsert Comment
+description: Update or create a comment
+
+inputs:
+  token:
+    description: GitHub token to use
+    required: true
+  body:
+    description: Body of the comment, the first line will be used to match to an existing comment
+    required: true
+  login:
+    description: Login name of user to look for comments from
+    default: github-actions[bot]
+  number:
+    description: Number of the issue or pull request
+    required: true
+
+outputs:
+  comment-id:
+    description: The ID of the comment
+    value: ${{ steps.comment.outputs.result }}
+
+runs:
+  using: composite
+  steps:
+    - name: Create or Update Comment
+      uses: actions/github-script@v6
+      id: comment
+      env:
+        NUMBER: $\{{ inputs.number }}
+        BODY: $\{{ inputs.body }}
+        LOGIN: $\{{ inputs.login }}
+      with:
+        github-token: $\{{ inputs.token }}
+        script: |
+          const { BODY, LOGIN, NUMBER: issue_number } = process.env
+          const { repo: { owner, repo } } = context
+          const TITLE = BODY.split('\n')[0].trim() + '\n'
+
+          const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
+          const comment = comments.find(c => c.user.login === LOGIN && c.body.startsWith(TITLE))
+
+          if (comment?.id) {
+            await github.rest.issues.updateComment({ owner, repo, comment_id: comment.id, body: BODY })
+            return comment.id
+          }
+          
+          const res = await github.rest.issues.createComment({ owner, repo, issue_number, body })
+          return res.data.id

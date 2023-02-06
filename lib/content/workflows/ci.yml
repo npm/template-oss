@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  workflow_call:
+  pull_request:
+  push:
+    branches:
+      {{#each branches}}
+      - {{ . }}
+      {{/each}}
+  schedule:
+    # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
+    - cron: "0 9 * * 1"
+
+jobs:
+  lint:
+    name: Lint
+    if: github.repository_owner == 'npm'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup
+        id: setup
+        uses: ./.github/actions/setup-repo
+
+  test:
+    name: Test
+    if: github.repository_owner == 'npm'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup
+        id: setup
+        uses: ./.github/actions/setup-repo
+
+  {{> stepsSetup }}
+    {{> job jobName="Lint" }}
+      {{> stepLint }}
+
+  test:
+    {{> jobMatrix jobName="Test" }}
+      {{> stepTest }}

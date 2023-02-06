@@ -8,8 +8,8 @@
 {{#if updateNpm}}
 {{#if jobIsMatrix}}
 - name: Update Windows npm
-  # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
-  if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
+  # node 14 ships with npm@6, which is known to fail when updating itself in windows
+  if: matrix.platform.os == 'windows-latest' && startsWith(matrix.node-version, '14.')
   run: |
     curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
     tar xf npm-7.5.4.tgz
