@@ -768,6 +768,7 @@ permissions:
   contents: write
   pull-requests: write
   checks: write
+  issues: write
 
 jobs:
   release:
@@ -2342,6 +2343,7 @@ permissions:
   contents: write
   pull-requests: write
   checks: write
+  issues: write
 
 jobs:
   release:
@@ -3759,6 +3761,7 @@ permissions:
   contents: write
   pull-requests: write
   checks: write
+  issues: write
 
 jobs:
   release:
