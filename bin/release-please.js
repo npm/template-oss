@@ -4,7 +4,7 @@ const core = require('@actions/core')
 const main = require('../lib/release-please/index.js')
 
 const dryRun = !process.env.CI
-const [branch, eventName] = process.argv.slice(2)
+const [branch, forcePullRequest] = process.argv.slice(2)
 
 const debugPr = (val) => {
   if (dryRun) {
@@ -45,7 +45,7 @@ main({
   repo: process.env.GITHUB_REPOSITORY,
   dryRun,
   branch,
-  force: eventName === 'workflow_dispatch',
+  forcePullRequest: forcePullRequest ? +forcePullRequest : null,
 }).then(({ pr, release, releases }) => {
   if (pr) {
     debugPr(pr)

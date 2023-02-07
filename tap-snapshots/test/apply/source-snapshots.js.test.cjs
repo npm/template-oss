@@ -758,6 +758,10 @@ name: Release
 
 on:
   workflow_dispatch:
+    inputs:
+      release-pr:
+        description: a release PR number to rerun release jobs on
+        type: string
   push:
     branches:
       - main
@@ -807,7 +811,7 @@ jobs:
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
-          npx --offline template-oss-release-please \${{ github.ref_name }} \${{ github.event_name }}
+          npx --offline template-oss-release-please "\${{ github.ref_name }}" "\${{ inputs.release-pr }}"
       - name: Post Pull Request Comment
         if: steps.release.outputs.pr-number
         uses: actions/github-script@v6
@@ -830,7 +834,7 @@ jobs:
             body += \`Release workflow run: \${workflow.html_url}/n/n#### Force CI to Update This Release/n/n\`
             body += \`This PR will be updated and CI will run for every non-/\`chore:/\` commit that is pushed to /\`main/\`. \`
             body += \`To force CI to update this PR, run this command:/n/n\`
-            body += \`/\`/\`/\`/ngh workflow run release.yml -r \${REF_NAME} -R \${owner}/\${repo}/n/\`/\`/\`\`
+            body += \`/\`/\`/\`/ngh workflow run release.yml -r \${REF_NAME} -R \${owner}/\${repo} -f release-pr=\${issue_number}/n/\`/\`/\`\`
 
             if (commentId) {
               await github.rest.issues.updateComment({ owner, repo, comment_id: commentId, body })
@@ -1132,10 +1136,14 @@ jobs:
         with:
           script: |
             const { PR_NUMBER: issue_number, RESULT } = process.env
-            const { repo: { owner, repo } } = context
+            const { runId, repo: { owner, repo } } = context
 
             const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
-            const updateComment = comments.find(c => c.user.login === 'github-actions[bot]' && c.body.startsWith('## Release Workflow/n/n'))
+            const updateComment = comments.find(c =>
+              c.user.login === 'github-actions[bot]' &&
+              c.body.startsWith('## Release Workflow/n/n') &&
+              c.body.includes(runId)
+            )
 
             if (updateComment) {
               console.log('Found comment to update:', JSON.stringify(updateComment, null, 2))
@@ -2332,6 +2340,10 @@ name: Release
 
 on:
   workflow_dispatch:
+    inputs:
+      release-pr:
+        description: a release PR number to rerun release jobs on
+        type: string
   push:
     branches:
       - main
@@ -2381,7 +2393,7 @@ jobs:
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
-          npx --offline template-oss-release-please \${{ github.ref_name }} \${{ github.event_name }}
+          npx --offline template-oss-release-please "\${{ github.ref_name }}" "\${{ inputs.release-pr }}"
       - name: Post Pull Request Comment
         if: steps.release.outputs.pr-number
         uses: actions/github-script@v6
@@ -2404,7 +2416,7 @@ jobs:
             body += \`Release workflow run: \${workflow.html_url}/n/n#### Force CI to Update This Release/n/n\`
             body += \`This PR will be updated and CI will run for every non-/\`chore:/\` commit that is pushed to /\`main/\`. \`
             body += \`To force CI to update this PR, run this command:/n/n\`
-            body += \`/\`/\`/\`/ngh workflow run release.yml -r \${REF_NAME} -R \${owner}/\${repo}/n/\`/\`/\`\`
+            body += \`/\`/\`/\`/ngh workflow run release.yml -r \${REF_NAME} -R \${owner}/\${repo} -f release-pr=\${issue_number}/n/\`/\`/\`\`
 
             if (commentId) {
               await github.rest.issues.updateComment({ owner, repo, comment_id: commentId, body })
@@ -2706,10 +2718,14 @@ jobs:
         with:
           script: |
             const { PR_NUMBER: issue_number, RESULT } = process.env
-            const { repo: { owner, repo } } = context
+            const { runId, repo: { owner, repo } } = context
 
             const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
-            const updateComment = comments.find(c => c.user.login === 'github-actions[bot]' && c.body.startsWith('## Release Workflow/n/n'))
+            const updateComment = comments.find(c =>
+              c.user.login === 'github-actions[bot]' &&
+              c.body.startsWith('## Release Workflow/n/n') &&
+              c.body.includes(runId)
+            )
 
             if (updateComment) {
               console.log('Found comment to update:', JSON.stringify(updateComment, null, 2))
@@ -3749,6 +3765,10 @@ name: Release
 
 on:
   workflow_dispatch:
+    inputs:
+      release-pr:
+        description: a release PR number to rerun release jobs on
+        type: string
   push:
     branches:
       - main
@@ -3798,7 +3818,7 @@ jobs:
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
-          npx --offline template-oss-release-please \${{ github.ref_name }} \${{ github.event_name }}
+          npx --offline template-oss-release-please "\${{ github.ref_name }}" "\${{ inputs.release-pr }}"
       - name: Post Pull Request Comment
         if: steps.release.outputs.pr-number
         uses: actions/github-script@v6
@@ -3821,7 +3841,7 @@ jobs:
             body += \`Release workflow run: \${workflow.html_url}/n/n#### Force CI to Update This Release/n/n\`
             body += \`This PR will be updated and CI will run for every non-/\`chore:/\` commit that is pushed to /\`main/\`. \`
             body += \`To force CI to update this PR, run this command:/n/n\`
-            body += \`/\`/\`/\`/ngh workflow run release.yml -r \${REF_NAME} -R \${owner}/\${repo}/n/\`/\`/\`\`
+            body += \`/\`/\`/\`/ngh workflow run release.yml -r \${REF_NAME} -R \${owner}/\${repo} -f release-pr=\${issue_number}/n/\`/\`/\`\`
 
             if (commentId) {
               await github.rest.issues.updateComment({ owner, repo, comment_id: commentId, body })
@@ -4123,10 +4143,14 @@ jobs:
         with:
           script: |
             const { PR_NUMBER: issue_number, RESULT } = process.env
-            const { repo: { owner, repo } } = context
+            const { runId, repo: { owner, repo } } = context
 
             const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
-            const updateComment = comments.find(c => c.user.login === 'github-actions[bot]' && c.body.startsWith('## Release Workflow/n/n'))
+            const updateComment = comments.find(c =>
+              c.user.login === 'github-actions[bot]' &&
+              c.body.startsWith('## Release Workflow/n/n') &&
+              c.body.includes(runId)
+            )
 
             if (updateComment) {
               console.log('Found comment to update:', JSON.stringify(updateComment, null, 2))
