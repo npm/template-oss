@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.11.4](https://github.com/npm/template-oss/compare/v4.11.3...v4.11.4) (2023-02-07)
+
+### Bug Fixes
+
+* [`5e6b26d`](https://github.com/npm/template-oss/commit/5e6b26db971e1835318ad9357ada20400354e794) [#277](https://github.com/npm/template-oss/pull/277) add logging for release comments (@lukekarrys)
+* [`46d1d14`](https://github.com/npm/template-oss/commit/46d1d1449b5422cde064dea37aead7edb4e6746d) add release.yml input to rerun jobs on a merged release (@lukekarrys)
+* [`6a1dcac`](https://github.com/npm/template-oss/commit/6a1dcac283d4b75c9737dd2a813ff78d932a564c) add more logging to release please action (@lukekarrys)
+
 ## [4.11.3](https://github.com/npm/template-oss/compare/v4.11.2...v4.11.3) (2023-01-25)
 
 ### Bug Fixes
