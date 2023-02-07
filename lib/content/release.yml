@@ -143,14 +143,17 @@ jobs:
             }
 
             const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
-            const releaseComments = comments.filter(c => c.user.login === 'github-actions[bot]' && c.body.includes('Release is at'))
+              .then(cs => cs.map(c => ({ id: c.id, login: c.user.login, body: c.body })))
+            console.log(`Found comments: ${JSON.stringify(comments, null, 2)}`)
+            const releaseComments = comments.filter(c => c.login === 'github-actions[bot]' && c.body.includes('Release is at'))
 
             for (const comment of releaseComments) {
+              console.log(`Release comment: ${JSON.stringify(comment, null, 2)}`)
               await github.rest.issues.deleteComment({ owner, repo, comment_id: comment.id })
             }
 
             const runUrl = `https://github.com/${owner}/${repo}/actions/runs/${runId}`
-            await github.rest.issues.createComment({ 
+            await github.rest.issues.createComment({
               owner,
               repo,
               issue_number,
