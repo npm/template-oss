@@ -46,7 +46,21 @@ const mockChangelog = async ({ shas = true, authors = true, previousTag = true }
         return acc
       }, {}),
     }),
-
+    octokit: {
+      rest: {
+        repos: {
+          listPullRequestsAssociatedWithCommit: async (commit) => {
+            if (commit.commit_sha === 'd') {
+              return {
+                data: [{
+                  number: 50,
+                }],
+              }
+            }
+          },
+        },
+      },
+    },
   }
 
   const changelog = new ChangelogNotes({ github })
@@ -75,7 +89,8 @@ t.test('changelog', async t => {
     // eslint-disable-next-line max-len
     '* [`b`](https://github.com/npm/cli/commit/b) [#100](https://github.com/npm/cli/pull/100) b (@username)',
     '### Bug Fixes',
-    '* [`d`](https://github.com/npm/cli/commit/d) this fixes it',
+    // eslint-disable-next-line max-len
+    '* [`d`](https://github.com/npm/cli/commit/d) [#50](https://github.com/npm/cli/pull/50) this fixes it',
     '### Dependencies',
     '* [`c`](https://github.com/npm/cli/commit/c) `test@1.2.3`',
   ])
