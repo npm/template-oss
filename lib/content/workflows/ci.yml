@@ -2,7 +2,19 @@ name: CI
 
 on:
   workflow_dispatch:
+    inputs:
+      ref:
+        required: true
+        type: string
+        default: {{ defaultBranch }}
   workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+      check-sha:
+        required: true
+        type: string
   pull_request:
   push:
     branches:
