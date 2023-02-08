@@ -94,7 +94,7 @@ jobs:
         run: |
           git commit --all --amend --no-edit || true
           git push --force-with-lease
-          echo "::set-output  name=sha::$(git rev-parse HEAD)"
+          echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
       {{> stepChecks jobName="Update - Release" jobCheck=(obj sha="steps.commit.outputs.sha" name="Release" )}}
       {{> stepChecks jobCheck=(obj id="needs.release.outputs.check-id" )}}
 
@@ -121,7 +121,7 @@ jobs:
           else
             result="success"
           fi
-          echo "::set-output name=result::$result"
+          echo "result=$result" >> $GITHUB_OUTPUT
       {{> stepChecks jobCheck=(obj id="needs.update.outputs.check-id" status="steps.needs-result.outputs.result") }}
 
   post-release:
@@ -180,7 +180,7 @@ jobs:
           else
             result="white_check_mark"
           fi
-          echo "::set-output name=result::$result"
+          echo "result=$result" >> $GITHUB_OUTPUT
       - name: Update Release PR Comment
         uses: actions/github-script@v6
         env:
