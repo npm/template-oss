@@ -627,11 +627,11 @@ jobs:
         run: |
           dependabot_dir="\${{ steps.metadata.outputs.directory }}"
           if [[ "$dependabot_dir" == "/" ]]; then
-            echo "::set-output name=workspace::-iwr"
+            echo "workspace=-iwr" >> $GITHUB_OUTPUT
           else
             # strip leading slash from directory so it works as a
             # a path to the workspace flag
-            echo "::set-output name=workspace::-w \${dependabot_dir#/}"
+            echo "workspace=-w \${dependabot_dir#/}" >> $GITHUB_OUTPUT
           fi
 
       - name: Apply Changes
@@ -640,7 +640,7 @@ jobs:
         run: |
           npm run template-oss-apply \${{ steps.flags.outputs.workspace }}
           if [[ \`git status --porcelain\` ]]; then
-            echo "::set-output name=changes::true"
+            echo "changes=true" >> $GITHUB_OUTPUT
           fi
           # This only sets the conventional commit prefix. This workflow can't reliably determine
           # what the breaking change is though. If a BREAKING CHANGE message is required then
@@ -650,7 +650,7 @@ jobs:
           else
             prefix='chore'
           fi
-          echo "::set-output name=message::$prefix: postinstall for dependabot template-oss PR"
+          echo "message=$prefix: postinstall for dependabot template-oss PR" >> $GITHUB_OUTPUT
 
       # This step will fail if template-oss has made any workflow updates. It is impossible
       # for a workflow to update other workflows. In the case it does fail, we continue
@@ -934,7 +934,7 @@ jobs:
         run: |
           git commit --all --amend --no-edit || true
           git push --force-with-lease
-          echo "::set-output  name=sha::$(git rev-parse HEAD)"
+          echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
       - name: Get Workflow Job
         uses: actions/github-script@v6
         if: steps.commit.outputs.sha
@@ -1015,7 +1015,7 @@ jobs:
           else
             result="success"
           fi
-          echo "::set-output name=result::$result"
+          echo "result=$result" >> $GITHUB_OUTPUT
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
         if: needs.update.outputs.check-id && always()
@@ -1130,7 +1130,7 @@ jobs:
           else
             result="white_check_mark"
           fi
-          echo "::set-output name=result::$result"
+          echo "result=$result" >> $GITHUB_OUTPUT
       - name: Update Release PR Comment
         uses: actions/github-script@v6
         env:
@@ -2212,11 +2212,11 @@ jobs:
         run: |
           dependabot_dir="\${{ steps.metadata.outputs.directory }}"
           if [[ "$dependabot_dir" == "/" ]]; then
-            echo "::set-output name=workspace::-iwr"
+            echo "workspace=-iwr" >> $GITHUB_OUTPUT
           else
             # strip leading slash from directory so it works as a
             # a path to the workspace flag
-            echo "::set-output name=workspace::-w \${dependabot_dir#/}"
+            echo "workspace=-w \${dependabot_dir#/}" >> $GITHUB_OUTPUT
           fi
 
       - name: Apply Changes
@@ -2225,7 +2225,7 @@ jobs:
         run: |
           npm run template-oss-apply \${{ steps.flags.outputs.workspace }}
           if [[ \`git status --porcelain\` ]]; then
-            echo "::set-output name=changes::true"
+            echo "changes=true" >> $GITHUB_OUTPUT
           fi
           # This only sets the conventional commit prefix. This workflow can't reliably determine
           # what the breaking change is though. If a BREAKING CHANGE message is required then
@@ -2235,7 +2235,7 @@ jobs:
           else
             prefix='chore'
           fi
-          echo "::set-output name=message::$prefix: postinstall for dependabot template-oss PR"
+          echo "message=$prefix: postinstall for dependabot template-oss PR" >> $GITHUB_OUTPUT
 
       # This step will fail if template-oss has made any workflow updates. It is impossible
       # for a workflow to update other workflows. In the case it does fail, we continue
@@ -2519,7 +2519,7 @@ jobs:
         run: |
           git commit --all --amend --no-edit || true
           git push --force-with-lease
-          echo "::set-output  name=sha::$(git rev-parse HEAD)"
+          echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
       - name: Get Workflow Job
         uses: actions/github-script@v6
         if: steps.commit.outputs.sha
@@ -2600,7 +2600,7 @@ jobs:
           else
             result="success"
           fi
-          echo "::set-output name=result::$result"
+          echo "result=$result" >> $GITHUB_OUTPUT
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
         if: needs.update.outputs.check-id && always()
@@ -2715,7 +2715,7 @@ jobs:
           else
             result="white_check_mark"
           fi
-          echo "::set-output name=result::$result"
+          echo "result=$result" >> $GITHUB_OUTPUT
       - name: Update Release PR Comment
         uses: actions/github-script@v6
         env:
@@ -3640,11 +3640,11 @@ jobs:
         run: |
           dependabot_dir="\${{ steps.metadata.outputs.directory }}"
           if [[ "$dependabot_dir" == "/" ]]; then
-            echo "::set-output name=workspace::-iwr"
+            echo "workspace=-iwr" >> $GITHUB_OUTPUT
           else
             # strip leading slash from directory so it works as a
             # a path to the workspace flag
-            echo "::set-output name=workspace::-w \${dependabot_dir#/}"
+            echo "workspace=-w \${dependabot_dir#/}" >> $GITHUB_OUTPUT
           fi
 
       - name: Apply Changes
@@ -3653,7 +3653,7 @@ jobs:
         run: |
           npm run template-oss-apply \${{ steps.flags.outputs.workspace }}
           if [[ \`git status --porcelain\` ]]; then
-            echo "::set-output name=changes::true"
+            echo "changes=true" >> $GITHUB_OUTPUT
           fi
           # This only sets the conventional commit prefix. This workflow can't reliably determine
           # what the breaking change is though. If a BREAKING CHANGE message is required then
@@ -3663,7 +3663,7 @@ jobs:
           else
             prefix='chore'
           fi
-          echo "::set-output name=message::$prefix: postinstall for dependabot template-oss PR"
+          echo "message=$prefix: postinstall for dependabot template-oss PR" >> $GITHUB_OUTPUT
 
       # This step will fail if template-oss has made any workflow updates. It is impossible
       # for a workflow to update other workflows. In the case it does fail, we continue
@@ -3947,7 +3947,7 @@ jobs:
         run: |
           git commit --all --amend --no-edit || true
           git push --force-with-lease
-          echo "::set-output  name=sha::$(git rev-parse HEAD)"
+          echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
       - name: Get Workflow Job
         uses: actions/github-script@v6
         if: steps.commit.outputs.sha
@@ -4028,7 +4028,7 @@ jobs:
           else
             result="success"
           fi
-          echo "::set-output name=result::$result"
+          echo "result=$result" >> $GITHUB_OUTPUT
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.3.1
         if: needs.update.outputs.check-id && always()
@@ -4143,7 +4143,7 @@ jobs:
           else
             result="white_check_mark"
           fi
-          echo "::set-output name=result::$result"
+          echo "result=$result" >> $GITHUB_OUTPUT
       - name: Update Release PR Comment
         uses: actions/github-script@v6
         env:
