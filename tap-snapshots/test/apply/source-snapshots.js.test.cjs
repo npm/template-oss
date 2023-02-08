@@ -1122,7 +1122,6 @@ jobs:
       - name: Get Needs Result
         id: needs-result
         run: |
-          result=""
           if [[ "\${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
             result="x"
           elif [[ "\${{ contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
@@ -1151,7 +1150,8 @@ jobs:
             if (updateComment) {
               console.log('Found comment to update:', JSON.stringify(updateComment, null, 2))
               let body = updateComment.body.replace(/Workflow run: :[a-z_]+:/, \`Workflow run: :\${RESULT}:\`)
-              if (RESULT === 'x') {
+              const tagCodeowner = RESULT !== 'white_check_mark'
+              if (tagCodeowner) {
                 body += \`/n/n:rotating_light:\`
                 body += \` @npm/cli-team: The post-release workflow failed for this release.\`
                 body += \` Manual steps may need to be taken after examining the workflow output\`
@@ -2707,7 +2707,6 @@ jobs:
       - name: Get Needs Result
         id: needs-result
         run: |
-          result=""
           if [[ "\${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
             result="x"
           elif [[ "\${{ contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
@@ -2736,7 +2735,8 @@ jobs:
             if (updateComment) {
               console.log('Found comment to update:', JSON.stringify(updateComment, null, 2))
               let body = updateComment.body.replace(/Workflow run: :[a-z_]+:/, \`Workflow run: :\${RESULT}:\`)
-              if (RESULT === 'x') {
+              const tagCodeowner = RESULT !== 'white_check_mark'
+              if (tagCodeowner) {
                 body += \`/n/n:rotating_light:\`
                 body += \` @npm/cli-team: The post-release workflow failed for this release.\`
                 body += \` Manual steps may need to be taken after examining the workflow output\`
@@ -4135,7 +4135,6 @@ jobs:
       - name: Get Needs Result
         id: needs-result
         run: |
-          result=""
           if [[ "\${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
             result="x"
           elif [[ "\${{ contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
@@ -4164,7 +4163,8 @@ jobs:
             if (updateComment) {
               console.log('Found comment to update:', JSON.stringify(updateComment, null, 2))
               let body = updateComment.body.replace(/Workflow run: :[a-z_]+:/, \`Workflow run: :\${RESULT}:\`)
-              if (RESULT === 'x') {
+              const tagCodeowner = RESULT !== 'white_check_mark'
+              if (tagCodeowner) {
                 body += \`/n/n:rotating_light:\`
                 body += \` @npm/cli-team: The post-release workflow failed for this release.\`
                 body += \` Manual steps may need to be taken after examining the workflow output\`
