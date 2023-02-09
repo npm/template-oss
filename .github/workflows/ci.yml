@@ -4,18 +4,34 @@ name: CI
 
 on:
   workflow_dispatch:
+    inputs:
+      ref:
+        required: true
+        type: string
+      check-sha:
+        type: string
+      all:
+        default: true
+        type: boolean
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+      check-sha:
+        required: true
+        type: string
+      all:
+        default: true
+        type: boolean
   pull_request:
-    paths-ignore:
-      - workspace/test-workspace/**
   push:
     branches:
       - main
       - latest
-    paths-ignore:
-      - workspace/test-workspace/**
   schedule:
-    # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
-    - cron: "0 9 * * 1"
+    # "At 10:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_10_*_*_1
+    - cron: "0 10 * * 1"
 
 jobs:
   lint:
@@ -28,28 +44,52 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
         with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
+          ref: ${{ inputs.ref }}
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
+        with:
+          sha: ${{ inputs.check-sha }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          job-name: Lint
+
+      - name: Setup
+        id: setup
+        continue-on-error: ${{ !!steps.check.outputs.check-id }}
+        uses: ./.github/actions/setup
+
+      - name: Get Changed Workspaces
+        id: workspaces
+        continue-on-error: ${{ !!steps.check.outputs.check-id }}
+        uses: ./.github/actions/changed-workspaces
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          all: ${{ inputs.all }}
+
       - name: Lint
-        run: npm run lint --ignore-scripts
-      - name: Post Lint
-        run: npm run postlint --ignore-scripts
+        uses: ./.github/actions/lint
+        continue-on-error: ${{ !!steps.check.outputs.check-id }}
+        with:
+          flags: ${{ steps.workspaces.outputs.flags }}
+
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          conclusion: ${{ job.status }}
+          check-id: ${{ steps.check.outputs.check-id }}
 
   test:
     name: Test - ${{ matrix.platform.name }} - ${{ matrix.node-version }}
     if: github.repository_owner == 'npm'
+    runs-on: ${{ matrix.platform.os }}
+    defaults:
+      run:
+        shell: ${{ matrix.platform.shell }}
     strategy:
       fail-fast: false
       matrix:
@@ -70,42 +110,60 @@ jobs:
           - 16.x
           - 18.0.0
           - 18.x
-    runs-on: ${{ matrix.platform.os }}
-    defaults:
-      run:
-        shell: ${{ matrix.platform.shell }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Git User
+      - name: Continue Matrix Run
+        id: continue-matrix
         run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
+          if [[ "${{ matrix.node-version }}" == "14.17.0" || "${{ inputs.all }}" == "true" ]]; then
+            echo "result=true" >> $GITHUB_OUTPUT 
+          fi
+
+      - name: Checkout
+        if: steps.continue-matrix.outputs.result
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Create Check
+        if: steps.continue-matrix.outputs.result && inputs.check-sha
+        uses: ./.github/actions/create-check
+        id: check
+        with:
+          sha: ${{ inputs.check-sha }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          job-name: "Test - ${{ matrix.platform.name }} - ${{ matrix.node-version }}"
+
+      - name: Setup
+        if: steps.continue-matrix.outputs.result
+        uses: ./.github/actions/setup
+        id: setup
+        continue-on-error: ${{ !!steps.check.outputs.check-id }}
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Update Windows npm
-        # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
-        if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
-        run: |
-          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
-          tar xf npm-7.5.4.tgz
-          cd package
-          node lib/npm.js install --no-fund --no-audit -g ..\npm-7.5.4.tgz
-          cd ..
-          rmdir /s /q package
-      - name: Install npm@7
-        if: startsWith(matrix.node-version, '10.')
-        run: npm i --prefer-online --no-fund --no-audit -g npm@7
-      - name: Install npm@latest
-        if: ${{ !startsWith(matrix.node-version, '10.') }}
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Add Problem Matcher
-        run: echo "::add-matcher::.github/matchers/tap.json"
+          shell: ${{ matrix.platform.shell }}
+
+      - name: Get Changed Workspaces
+        if: steps.continue-matrix.outputs.result
+        id: workspaces
+        continue-on-error: ${{ !!steps.check.outputs.check-id }}
+        uses: ./.github/actions/changed-workspaces
+        with:
+          shell: ${{ matrix.platform.shell }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          all: ${{ inputs.all }}
+
       - name: Test
-        run: npm test --ignore-scripts
+        if: steps.continue-matrix.outputs.result
+        uses: ./.github/actions/test
+        continue-on-error: ${{ !!steps.check.outputs.check-id }}
+        with:
+          flags: ${{ steps.workspaces.outputs.flags }}
+          shell: ${{ matrix.platform.shell }}
+
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: steps.continue-matrix.outputs.result && steps.check.outputs.check-id && (success() || failure())
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          conclusion: ${{ job.status }}
+          check-id: ${{ steps.check.outputs.check-id }}

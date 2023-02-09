@@ -1,0 +1,9 @@
+branches:
+  {{#each branches}}
+  - {{ . }}
+  {{/each}}
+  {{~#if release}}
+  {{#each releaseBranches}}
+  - {{ . }}
+  {{/each}}
+  {{/if~}}

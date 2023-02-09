@@ -1,0 +1,19 @@
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Lint
+
+inputs:
+  flags:
+    description: flags to pass to the commands
+  shell:
+    description: shell to run on
+    default: bash
+
+runs:
+  using: composite
+  steps:
+    - name: Lint
+      shell: ${{ inputs.shell }}
+      run: |
+        npm run lint --ignore-scripts ${{ inputs.flags }}
+        npm run postlint --ignore-scripts ${{ inputs.flags }}

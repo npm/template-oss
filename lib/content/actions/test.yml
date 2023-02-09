@@ -1,0 +1,15 @@
+name: Test
+
+inputs:
+  flags:
+    description: flags to pass to the commands
+  shell:
+    description: shell to run on
+    default: {{ shell }}
+
+runs:
+  using: composite
+  steps:
+    - name: Test
+      shell: $\{{ inputs.shell }}
+      run: {{ rootNpmPath }} test --ignore-scripts $\{{ inputs.flags }}

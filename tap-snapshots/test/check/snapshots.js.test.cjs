@@ -30,17 +30,27 @@ Some problems were detected:
 The following repo files need to be added:
 
   .commitlintrc.js
+  .github/actions/audit/action.yml
+  .github/actions/changed-files/action.yml
+  .github/actions/changed-workspaces/action.yml
+  .github/actions/conclude-check/action.yml
+  .github/actions/create-check/action.yml
+  .github/actions/deps/action.yml
+  .github/actions/lint/action.yml
+  .github/actions/setup/action.yml
+  .github/actions/test/action.yml
+  .github/actions/upsert-comment/action.yml
   .github/CODEOWNERS
   .github/dependabot.yml
   .github/ISSUE_TEMPLATE/bug.yml
   .github/ISSUE_TEMPLATE/config.yml
   .github/matchers/tap.json
   .github/workflows/audit.yml
-  .github/workflows/ci-release.yml
   .github/workflows/ci.yml
   .github/workflows/codeql-analysis.yml
   .github/workflows/post-dependabot.yml
   .github/workflows/pull-request.yml
+  .github/workflows/release-integration.yml
   .github/workflows/release.yml
   .release-please-manifest.json
   release-please-config.json
@@ -277,17 +287,27 @@ Some problems were detected:
 The following repo files need to be added:
 
   .commitlintrc.js
+  .github/actions/audit/action.yml
+  .github/actions/changed-files/action.yml
+  .github/actions/changed-workspaces/action.yml
+  .github/actions/conclude-check/action.yml
+  .github/actions/create-check/action.yml
+  .github/actions/deps/action.yml
+  .github/actions/lint/action.yml
+  .github/actions/setup/action.yml
+  .github/actions/test/action.yml
+  .github/actions/upsert-comment/action.yml
   .github/CODEOWNERS
   .github/dependabot.yml
   .github/ISSUE_TEMPLATE/bug.yml
   .github/ISSUE_TEMPLATE/config.yml
   .github/matchers/tap.json
   .github/workflows/audit.yml
-  .github/workflows/ci-release.yml
   .github/workflows/ci.yml
   .github/workflows/codeql-analysis.yml
   .github/workflows/post-dependabot.yml
   .github/workflows/pull-request.yml
+  .github/workflows/release-integration.yml
   .github/workflows/release.yml
   .release-please-manifest.json
   release-please-config.json
@@ -363,12 +383,24 @@ To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @n
 
 The following repo files need to be added:
 
+  .github/actions/audit/action.yml
+  .github/actions/changed-files/action.yml
+  .github/actions/changed-workspaces/action.yml
+  .github/actions/conclude-check/action.yml
+  .github/actions/create-check/action.yml
+  .github/actions/deps/action.yml
+  .github/actions/lint/action.yml
+  .github/actions/setup/action.yml
+  .github/actions/test/action.yml
+  .github/actions/upsert-comment/action.yml
   .github/dependabot.yml
   .github/matchers/tap.json
-  .github/workflows/ci-name-aaaa.yml
-  .github/workflows/ci-release.yml
+  .github/workflows/audit.yml
+  .github/workflows/ci.yml
+  .github/workflows/codeql-analysis.yml
   .github/workflows/post-dependabot.yml
   .github/workflows/pull-request.yml
+  .github/workflows/release-integration.yml
   .github/workflows/release.yml
   .release-please-manifest.json
   release-please-config.json
@@ -434,12 +466,24 @@ To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @n
 
 The following repo files need to be added:
 
+  .github/actions/audit/action.yml
+  .github/actions/changed-files/action.yml
+  .github/actions/changed-workspaces/action.yml
+  .github/actions/conclude-check/action.yml
+  .github/actions/create-check/action.yml
+  .github/actions/deps/action.yml
+  .github/actions/lint/action.yml
+  .github/actions/setup/action.yml
+  .github/actions/test/action.yml
+  .github/actions/upsert-comment/action.yml
   .github/dependabot.yml
   .github/matchers/tap.json
-  .github/workflows/ci-bbb.yml
-  .github/workflows/ci-release.yml
+  .github/workflows/audit.yml
+  .github/workflows/ci.yml
+  .github/workflows/codeql-analysis.yml
   .github/workflows/post-dependabot.yml
   .github/workflows/pull-request.yml
+  .github/workflows/release-integration.yml
   .github/workflows/release.yml
   .release-please-manifest.json
   release-please-config.json

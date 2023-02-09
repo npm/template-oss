@@ -7,7 +7,8 @@
     "template-oss-apply": "bin/apply.js",
     "template-oss-check": "bin/check.js",
     "template-oss-release-please": "bin/release-please.js",
-    "template-oss-release-manager": "bin/release-manager.js"
+    "template-oss-release-manager": "bin/release-manager.js",
+    "template-oss-changed-workspaces": "bin/changed-workspaces.js"
   },
   "scripts": {
     "lint": "eslint \"**/*.js\"",

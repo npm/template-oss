@@ -1,0 +1,15 @@
+name: Audit
+
+inputs:
+  shell:
+    description: shell to run on
+    default: {{ shell }}
+
+runs:
+  using: composite
+  steps:
+    - name: Run Audit
+      shell: $\{{ inputs.shell }}
+      run: |
+        {{ rootNpmPath }} audit --omit=dev
+        {{ rootNpmPath }} audit --audit-level=none

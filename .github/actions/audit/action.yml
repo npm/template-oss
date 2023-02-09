@@ -1,0 +1,17 @@
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Audit
+
+inputs:
+  shell:
+    description: shell to run on
+    default: bash
+
+runs:
+  using: composite
+  steps:
+    - name: Run Audit
+      shell: ${{ inputs.shell }}
+      run: |
+        npm audit --omit=dev
+        npm audit --audit-level=none

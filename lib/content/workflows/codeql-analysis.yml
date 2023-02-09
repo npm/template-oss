@@ -1,28 +1,18 @@
-# This file is automatically added by @npmcli/template-oss. Do not edit.
-
 name: CodeQL
 
 on:
   push:
-    branches:
-      - main
-      - latest
+    {{> partialsBranches }}
   pull_request:
-    branches:
-      - main
-      - latest
+    {{> partialsBranches }}
   schedule:
-    # "At 11:00 UTC (03:00 PT) on Monday" https://crontab.guru/#0_11_*_*_1
-    - cron: "0 11 * * 1"
+     {{> partialsCron hour=3 }}
 
 jobs:
   analyze:
     name: Analyze
-    if: github.repository_owner == 'npm'
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
+    {{> partialsJobIf }}
+    {{> partialsJobDefaults }}
     permissions:
       actions: read
       contents: read

@@ -1,0 +1,94 @@
+name: Setup Repo
+description: Setup a repo with standard tools
+
+inputs:
+  node-version:
+    description: node version to use
+    default: {{ last ciVersions }}
+  npm-version:
+    description: npm version to use
+    default: {{#if updateNpm}}{{ npmSpec }}{{/if}}
+  cache:
+    description: whether to cache npm install or not
+    type: boolean
+    default: {{ lockfile }}
+  shell:
+    description: shell to run on
+    default: {{ shell }}
+  deps:
+    description: whether to run the deps step
+    type: boolean
+    default: true
+  deps-command:
+    description: command to run for the dependencies step
+    default: install --ignore-scripts --no-audit --no-fund
+  deps-flags:
+    description: extra flags to pass to the dependencies step
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Git User
+      shell: $\{{ inputs.shell }}
+      run: |
+        git config --global user.email "npm-cli+bot@github.com"
+        git config --global user.name "npm CLI robot"
+
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: $\{{ inputs.node-version }}
+        cache: $\{{ (inputs.cache && 'npm') || null }}
+
+    - name: Check Node Version
+      if: inputs.npm-version
+      id: node-version
+      shell: $\{{ inputs.shell }}
+      run: |
+        NODE_VERSION=$(node --version)
+        echo $NODE_VERSION
+        if npx semver@7 -r "<=10" "$NODE_VERSION" --yes; then
+          echo "ten-or-lower=true" >> $GITHUB_OUTPUT
+        fi
+        if npx semver@7 -r "<=14" "$NODE_VERSION" --yes; then
+          echo "fourteen-or-lower=true" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Update Windows npm
+      # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
+      if: inputs.npm-version && runner.os == 'Windows' && steps.node-version.outputs.fourteen-or-lower
+      shell: $\{{ inputs.shell }}
+      run: |
+        curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
+        tar xf npm-7.5.4.tgz
+        cd package
+        node lib/npm.js install --no-fund --no-audit -g ..\npm-7.5.4.tgz
+        cd ..
+        rmdir /s /q package
+
+    - name: Install npm@7
+      if: inputs.npm-version && steps.node-version.outputs.ten-or-lower
+      shell: $\{{ inputs.shell }}
+      run: npm i --prefer-online --no-fund --no-audit -g npm@7
+
+    - name: Install npm@$\{{ inputs.npm-version }}
+      if: inputs.npm-version && !steps.node-version.outputs.ten-or-lower
+      shell: $\{{ inputs.shell }}
+      run: npm i --prefer-online --no-fund --no-audit -g npm@$\{{ inputs.npm-version }}
+
+    - name: npm Version
+      shell: $\{{ inputs.shell }}
+      run: {{ rootNpmPath }} -v
+
+    - name: Setup Dependencies
+      if: inputs.deps
+      uses: ./.github/actions/deps
+      with:
+        command: $\{{ inputs.deps-command }}
+        flags: $\{{ inputs.deps-flags }}
+
+    - name: Add Problem Matcher
+      shell: $\{{ inputs.shell }}
+      run: |
+        [[ -f ./.github/matchers/tap.json ]] && echo "::add-matcher::.github/matchers/tap.json"
+

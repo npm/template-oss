@@ -1,0 +1,25 @@
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Conclude Check
+description: Conclude a check
+
+inputs:
+  token:
+    description: GitHub token to use
+    required: true
+  conclusion:
+    description: conclusion of check
+    require: true
+  check-id:
+    description: id of check to conclude
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Conclude Check
+      uses: LouisBrunner/checks-action@v1.5.0
+      with:
+        token: ${{ inputs.token }}
+        conclusion: ${{ inputs.conclusion }}
+        check_id: ${{ inputs.check-id }}

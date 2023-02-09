@@ -1,0 +1,35 @@
+name: Get Changed Workspaces
+
+inputs:
+  token:
+    description: GitHub token to use
+  shell:
+    description: shell to run on
+    default: {{ shell }}
+  all:
+    default: false
+    type: boolean
+  files:
+    description: json stringified array of file names
+    type: string
+
+outputs:
+  flags:
+    value: $\{{ steps.workspaces.outputs.flags }}
+
+runs:
+  using: composite
+  steps:
+    - name: Get Changed Files
+      uses: ./.github/actions/changed-files
+      if: $\{{ !inputs.all && !inputs.files }}
+      id: files
+      with:
+        token: $\{{ inputs.token }}
+    
+    - name: Get Workspaces
+      shell: $\{{ inputs.shell }}
+      id: workspaces
+      run: |
+        flags=$({{ rootNpmPath }} exec --offline -- template-oss-changed-workspaces '$\{{ (inputs.all && '--all') || (inputs.files || steps.files.outputs.result) }}')
+        echo "flags=${flags}" >> $GITHUB_OUTPUT

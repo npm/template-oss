@@ -1,0 +1,82 @@
+name: Upsert Comment
+description: Update or create a comment
+
+inputs:
+  token:
+    description: GitHub token to use
+    required: true
+  number:
+    description: Number of the issue or pull request
+    required: true
+  login:
+    description: Login name of user to look for comments from
+    default: github-actions[bot]
+  body:
+    description: Body of the comment, the first line will be used to match to an existing comment
+  find:
+    description: string to find in body
+  replace:
+    description: string to replace in body
+  append:
+    description: string to append to the body
+  includes:
+    description: A string that the comment needs to include
+
+outputs:
+  comment-id:
+    description: The ID of the comment
+    value: $\{{ steps.comment.outputs.result }}
+
+runs:
+  using: composite
+  steps:
+    - name: Create or Update Comment
+      uses: actions/github-script@v6
+      id: comment
+      env:
+        NUMBER: $\{{ inputs.number }}
+        BODY: $\{{ inputs.body }}
+        FIND: $\{{ inputs.find }}
+        REPLACE: $\{{ inputs.replace }}
+        APPEND: $\{{ inputs.append }}
+        LOGIN: $\{{ inputs.login }}
+        INCLUDES: $\{{ inputs.includes }}
+      with:
+        github-token: $\{{ inputs.token }}
+        script: |
+          const { BODY, FIND, REPLACE, APPEND, LOGIN, NUMBER: issue_number, INCLUDES } = process.env
+          const { repo: { owner, repo } } = context
+          const TITLE = BODY.split('\n')[0].trim() + '\n'
+          const bodyIncludes = (c) => INCLUDES ? c.body.includes(INCLUDES) : true
+
+          const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
+            .then(comments => comments.map(c => ({ id: c.id, login: c.user.login, body: c.body })))
+
+          console.log(`Found comments: ${JSON.stringify(comments, null, 2)}`)
+          console.log(`Looking for comment with: ${JSON.stringify({ LOGIN, TITLE, INCLUDES }, null, 2)}`)
+
+          const comment = comments.find(c =>
+            c.login === LOGIN &&
+            c.body.startsWith(TITLE) &&
+            bodyIncludes(c)
+          )
+
+          if (comment) {
+            console.log(`Found comment: ${JSON.stringify(comment, null, 2)}`)
+            let newBody = FIND && REPLACE ? comment.body.replace(new RegExp(FIND, 'g'), REPLACE) : BODY
+            if (APPEND) {
+              newBody += APPEND
+            }
+            await github.rest.issues.updateComment({ owner, repo, comment_id: comment.id, body: newBody })
+            return comment.id
+          }
+
+          if (FIND || REPLACE || APPEND) {
+            console.log('Could not find a comment to use find/replace or append to')
+            return
+          }
+
+          console.log('Creating new comment')
+          
+          const res = await github.rest.issues.createComment({ owner, repo, issue_number, body: BODY })
+          return res.data.id

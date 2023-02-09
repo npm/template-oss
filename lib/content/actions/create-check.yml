@@ -1,0 +1,62 @@
+name: Create Check
+description: Create a check and associate it with a sha
+
+inputs:
+  token:
+    description: GitHub token to use
+    required: true
+  sha:
+    description: sha to attach the check to
+    required: true
+  job-name:
+    description: Name of the job to find
+    required: true
+  job-status:
+    description: Status of the check being created
+    default: in_progress
+
+outputs:
+  check-id:
+    description: The ID of the check that was created
+    value: $\{{ steps.check.outputs.check_id }}
+
+runs:
+  using: composite
+  steps:
+    - name: Get Workflow Job
+      uses: actions/github-script@v6
+      id: workflow-job
+      env:
+        JOB_NAME: $\{{ inputs.job-name }}
+      with:
+        github-token: $\{{ inputs.token }}
+        script: |
+          const { JOB_NAME } = process.env
+          const { repo: { owner, repo }, runId, serverUrl } = context
+
+          const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun, {
+            owner,
+            repo,
+            run_id: runId,
+          })
+          const job = jobs.find(j => j.name.endsWith(JOB_NAME))
+
+          const shaUrl = `${serverUrl}/${owner}/${repo}/commit/$\{{ inputs.sha }}`
+          const summary = `This check is assosciated with ${shaUrl}\n\n`
+          const message = job?.html_url
+            ? `For run logs, click here: ${job.html_url}`
+            : `Run logs could not be found for a job with name: "${JOB_NAME}"`
+
+          // Return a json object with properties that LouisBrunner/checks-actions
+          // expects as the output of the check
+          return { summary: summary + message }
+
+    - name: Create Check
+      uses: LouisBrunner/checks-action@v1.5.0
+      id: check
+      with:
+        token: $\{{ inputs.token }}
+        status: $\{{ inputs.job-status }}
+        name: $\{{ inputs.job-name }}
+        sha: $\{{ inputs.sha }}
+        output: $\{{ steps.workflow-job.outputs.result }}

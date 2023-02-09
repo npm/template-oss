@@ -1,0 +1,4 @@
+runs-on: {{ runsOn }}
+defaults:
+  run:
+    shell: {{ shell }}

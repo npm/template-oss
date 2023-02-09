@@ -1,0 +1,18 @@
+name: Dependencies
+
+inputs:
+  command:
+    description: command to run for the dependencies step
+    default: install --ignore-scripts --no-audit --no-fund
+  flags:
+    description: extra flags to pass to the dependencies step
+  shell:
+    description: shell to run on
+    default: {{ shell }}
+
+runs:
+  using: composite
+  steps:
+    - name: Install Dependencies
+      shell: $\{{ inputs.shell }}
+      run: {{ rootNpmPath }} $\{{ inputs.command }} $\{{ inputs.flags }}
