@@ -67,7 +67,7 @@ jobs:
         uses: ./.github/actions/changed-workspaces
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          all: ${{ inputs.all }}
+          files: ${{ (inputs.all && '--all') || '' }}
 
       - name: Lint
         uses: ./.github/actions/lint
@@ -113,6 +113,7 @@ jobs:
     steps:
       - name: Continue Matrix Run
         id: continue-matrix
+        shell: bash
         run: |
           if [[ "${{ matrix.node-version }}" == "14.17.0" || "${{ inputs.all }}" == "true" ]]; then
             echo "result=true" >> $GITHUB_OUTPUT 
@@ -148,9 +149,8 @@ jobs:
         continue-on-error: ${{ !!steps.check.outputs.check-id }}
         uses: ./.github/actions/changed-workspaces
         with:
-          shell: ${{ matrix.platform.shell }}
           token: ${{ secrets.GITHUB_TOKEN }}
-          all: ${{ inputs.all }}
+          files: ${{ (inputs.all && '--all') || '' }}
 
       - name: Test
         if: steps.continue-matrix.outputs.result

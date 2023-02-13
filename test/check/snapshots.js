@@ -6,19 +6,20 @@ t.cleanSnapshot = setup.clean
 t.formatSnapshot = setup.format.checks
 
 t.test('check empty dir', async (t) => {
-  const s = await setup(t)
+  const s = await setup(t, { requireSelf: false })
   await t.resolveMatchSnapshot(s.check())
 })
 
 t.test('workspaces with empty dir', async (t) => {
   const s = await setup(t, {
     workspaces: { a: '@name/aaaa', b: 'bbb' },
+    requireSelf: false,
   })
   await t.resolveMatchSnapshot(s.check())
 })
 
 t.test('not ok without required', async (t) => {
-  const s = await setup(t)
+  const s = await setup(t, { requireSelf: false })
   await s.apply()
   await t.resolveMatchSnapshot(s.check())
 })

@@ -16,4 +16,7 @@ runs:
       shell: ${{ inputs.shell }}
       run: |
         npm run lint --ignore-scripts ${{ inputs.flags }}
+    - name: Post Lint
+      shell: ${{ inputs.shell }}
+      run: |
         npm run postlint --ignore-scripts ${{ inputs.flags }}

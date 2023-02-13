@@ -44,7 +44,7 @@ const main = async ({ cwd, files, all }) => {
 
 const arg = process.argv[2]
 const all = arg === '--all'
-const files = all ? [] : JSON.parse(arg ?? '[]')
+const files = all ? [] : JSON.parse(arg || '[]')
 
 module.exports = main({
   cwd: process.cwd(),

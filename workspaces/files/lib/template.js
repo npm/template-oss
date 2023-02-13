@@ -1,6 +1,7 @@
 const Handlebars = require('handlebars')
 const { basename, dirname, sep, extname, join, relative } = require('path')
 const fs = require('fs')
+
 const DELETE = '__DELETE__'
 
 const partialName = (s) => {
@@ -29,28 +30,22 @@ const walkDir = (dir, res = [], root = dir) => {
   return res
 }
 
-const makePartials = (dir, isBase) => {
-  const contents = walkDir(dir)
+const getPartials = (dir, isBase) => walkDir(dir).reduce((acc, f) => {
+  const partial = fs.readFileSync(f.path).toString()
+  const name = partialName(f.name)
 
-  const partials = contents.reduce((acc, f) => {
-    const partial = fs.readFileSync(f.path).toString()
-    const name = partialName(f.name)
+  if (isBase) {
+    // in the default dir, everything is a partial
+    // and also gets set with a default prefix for extending
+    acc[name] = partial
+    acc[partialName(`default-${name}`)] = partial
+  } else if (f.name.startsWith('partials' + sep)) {
+    // otherwise only files in partials dir get set as partials
+    acc[name] = partial
+  }
 
-    if (isBase) {
-      // in the default dir, everything is a partial
-      // and also gets set with a default prefix for extending
-      acc[name] = partial
-      acc[partialName(`default-${name}`)] = partial
-    } else if (f.name.startsWith('partials' + sep)) {
-      // otherwise only files in partials dir get set as partials
-      acc[name] = partial
-    }
-
-    return acc
-  }, {})
-
-  Handlebars.registerPartial(partials)
-}
+  return acc
+}, {})
 
 const setupHandlebars = (baseDir, ...otherDirs) => {
   Handlebars.registerHelper('join', (arr, s) => arr.join(typeof s === 'string' ? s : ', '))
@@ -64,17 +59,15 @@ const setupHandlebars = (baseDir, ...otherDirs) => {
   Handlebars.registerHelper('del', () => JSON.stringify(DELETE))
   Handlebars.registerHelper('newline', () => '\n')
 
-  makePartials(baseDir, true)
+  Handlebars.registerPartial(getPartials(baseDir, true))
   for (const dir of otherDirs) {
-    makePartials(dir)
+    Handlebars.registerPartial(getPartials(dir))
   }
 }
 
 const template = (str, { config, ...options }) => {
   setupHandlebars(...config.__PARTIAL_DIRS__)
-
   const t = Handlebars.compile(str, { strict: true })
-
   // merge in config as top level data in templates
   return t({ ...options, ...config })
 }

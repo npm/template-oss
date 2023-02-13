@@ -5,8 +5,8 @@ name: Post Dependabot
 on: pull_request
 
 jobs:
-  template-oss:
-    name: template-oss
+  npmcli-template-oss:
+    name: "@npmcli/template-oss"
     permissions:
       contents: write
     if: github.repository_owner == 'npm' && github.actor == 'dependabot[bot]'

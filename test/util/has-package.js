@@ -2,7 +2,7 @@ const fs = require('fs/promises')
 const t = require('tap')
 const path = require('path')
 const hasPackage = require('../../lib/util/has-package.js')
-const { name: NAME } = require('../../package.json')
+const { NAME } = require('../../lib/util/config.js')
 
 const checks = [
   [{ a: '1.2.3' }, 'a@1.2.3', true],

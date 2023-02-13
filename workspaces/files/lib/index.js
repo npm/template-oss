@@ -7,8 +7,6 @@ const merge = require('./merge.js')
 const Parser = require('./parser.js')
 const template = require('./template.js')
 
-const FILE_KEYS = ['rootRepo', 'rootModule', 'workspaceRepo', 'workspaceModule']
-
 const globify = pattern => pattern.split('\\').join('/')
 
 const fileEntries = (dir, files, options) => Object.entries(files)
@@ -72,7 +70,7 @@ const parseEach = async (dir, files, options, fn) => {
   return res.filter(Boolean)
 }
 
-const parseConfig = (files, dir, overrides) => {
+const parseConfigFiles = (files, dir, overrides, configKeys) => {
   const normalizeFiles = (v) => deepMapValues(v, (value, key) => {
     if (key === 'rm' && Array.isArray(value)) {
       return value.reduce((acc, k) => {
@@ -84,14 +82,14 @@ const parseConfig = (files, dir, overrides) => {
       const file = join(dir, value)
       return key === 'file' ? file : { file }
     }
-    if (value === true && FILE_KEYS.includes(key)) {
+    if (value === true && configKeys.includes(key)) {
       return {}
     }
     return value
   })
 
   const merged = merge(normalizeFiles(files), normalizeFiles(overrides))
-  const withDefaults = defaultsDeep(merged, FILE_KEYS.reduce((acc, k) => {
+  const withDefaults = defaultsDeep(merged, configKeys.reduce((acc, k) => {
     acc[k] = { add: {}, rm: {} }
     return acc
   }, {}))
@@ -99,12 +97,8 @@ const parseConfig = (files, dir, overrides) => {
   return withDefaults
 }
 
-const getAddedFiles = (files) => files ? Object.keys(files.add || {}) : []
-
 module.exports = {
   rmEach,
   parseEach,
-  FILE_KEYS,
-  parseConfig,
-  getAddedFiles,
+  parseConfigFiles,
 }

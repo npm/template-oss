@@ -5,19 +5,21 @@ const parseCIVersions = require('./parse-ci-versions.js')
 const getGitUrl = require('./get-git-url.js')
 const gitignore = require('./gitignore.js')
 const withArrays = require('./merge-with-arrays.js')
-const { FILE_KEYS, parseConfig: parseFiles, getAddedFiles } = require('@npmcli/template-oss-files')
+const { parseConfigFiles } = require('@npmcli/template-oss-files')
 
-const CONFIG_KEY = 'templateOSS'
-const getPkgConfig = (pkg) => pkg[CONFIG_KEY] || {}
-
-const { name: NAME, version: LATEST_VERSION } = require('../../../package.json')
+const FILE_KEYS = ['rootRepo', 'rootModule', 'workspaceRepo', 'workspaceModule']
 const MERGE_KEYS = [...FILE_KEYS, 'defaultContent', 'content']
-const DEFAULT_CONTENT = require.resolve('@npmcli/template-oss-content')
 
 const merge = withArrays('branches', 'distPaths', 'allowPaths', 'ignorePaths')
 
 const makePosix = (v) => v.split(win32.sep).join(posix.sep)
-const deglob = (v) => makePosix(v).replace(/[/*]+$/, '')
+const deglob = (v) => {
+  let posixGlob = makePosix(v)
+  while (posixGlob.endsWith('/') || posixGlob.endsWith('*')) {
+    posixGlob = posixGlob.slice(0, -1)
+  }
+  return posixGlob
+}
 const posixDir = (v) => `${v === '.' ? '' : deglob(v).replace(/\/$/, '')}${posix.sep}`
 const posixGlob = (str) => `${posixDir(str)}**`
 
@@ -36,10 +38,10 @@ const getCmdPath = (key, { rootConfig, defaultConfig, isRoot, pkg, rootPkg }) =>
   }
 }
 
-const mergeConfigs = (...configs) => {
+const mergeConfigs = (defaultContent, ...configs) => {
   const mergedConfig = merge(...configs.map(c => pick(c, MERGE_KEYS)))
   return defaults(mergedConfig, {
-    defaultContent: DEFAULT_CONTENT,
+    defaultContent,
     // allow all file types by default
     ...FILE_KEYS.reduce((acc, key) => {
       acc[key] = true
@@ -78,8 +80,13 @@ const getFiles = (path, rawConfig) => {
   if (!dir) {
     return []
   }
-  return [parseFiles(pick(content, FILE_KEYS), dir, pick(rawConfig, FILE_KEYS)), dir]
+  return [
+    parseConfigFiles(pick(content, FILE_KEYS), dir, pick(rawConfig, FILE_KEYS), FILE_KEYS),
+    dir,
+  ]
 }
+
+const getAddedFiles = (files) => files ? Object.keys(files.add || {}) : []
 
 const getFullConfig = async ({
   // everything is an object or an array of objects with the following
@@ -90,22 +97,19 @@ const getFullConfig = async ({
   rootPkg, // the root pkg (same as pkg when operating on the root)
   pkgs, // an array of all packages to be operated on
   wsPkgs, // an array of all workspaces being operated
+  defaultContent, // path to default content dir
 }) => {
   const isRoot = rootPkg.path === pkg.path
   const isWorkspace = !isRoot
   const isMono = !!wsPkgs.length
   const isRootMono = isRoot && isMono
 
-  const isLatest = pkg.config.version === LATEST_VERSION
-  const isDogFood = rootPkg.pkgJson.name === NAME
-  const isForce = process.argv.includes('--force')
-
   // These config items are merged betweent the root and child workspaces and only come from
   // the package.json because they can be used to read configs from other the content directories
-  const mergedConfig = mergeConfigs(rootPkg.config, pkg.config)
+  const mergedConfig = mergeConfigs(defaultContent, rootPkg.config, pkg.config)
 
-  const defaultConfig = getConfig(DEFAULT_CONTENT)
-  const [defaultFiles, defaultDir] = getFiles(DEFAULT_CONTENT, mergedConfig)
+  const defaultConfig = getConfig(defaultContent)
+  const [defaultFiles, defaultDir] = getFiles(defaultContent, mergedConfig)
   const useDefault = mergedConfig.defaultContent && defaultConfig
 
   const rootConfig = getConfig(rootPkg.config.content, rootPkg.config)
@@ -188,10 +192,6 @@ const getFullConfig = async ({
     pkgFlags: isWorkspace ? `-w ${pkg.pkgJson.name}` : '',
     workspacePaths,
     workspaceGlobs: workspacePaths.map(posixGlob),
-    // booleans to control application of updates
-    isForce,
-    isDogFood,
-    isLatest,
     // whether to install and update npm in ci
     // only do this if we aren't using a custom path to bin
     updateNpm: !npmPath.isLocal,
@@ -215,13 +215,7 @@ const getFullConfig = async ({
         ? gitignore.allowDir(wsPkgs.map((p) => makePosix(relative(rootPkg.path, p.path))))
         : [],
     ],
-    // needs update if we are dogfooding this repo, with force argv, or its
-    // behind the current version
-    needsUpdate: isForce || isDogFood || !isLatest,
     // templateoss specific values
-    __NAME__: NAME,
-    __CONFIG_KEY__: CONFIG_KEY,
-    __VERSION__: LATEST_VERSION,
     __PARTIAL_DIRS__: fileDirs,
   }
 
@@ -266,4 +260,3 @@ const getFullConfig = async ({
 }
 
 module.exports = getFullConfig
-module.exports.getPkgConfig = getPkgConfig

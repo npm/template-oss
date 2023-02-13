@@ -6,7 +6,7 @@ inputs:
     required: true
 
 outputs:
-  files:
+  names:
     value: $\{{ steps.files.outputs.result }}
 
 runs:

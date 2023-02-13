@@ -10,15 +10,13 @@ inputs:
     default: {{#if updateNpm}}{{ npmSpec }}{{/if}}
   cache:
     description: whether to cache npm install or not
-    type: boolean
     default: {{ lockfile }}
   shell:
     description: shell to run on
     default: {{ shell }}
   deps:
     description: whether to run the deps step
-    type: boolean
-    default: true
+    default: 'true'
   deps-command:
     description: command to run for the dependencies step
     default: install --ignore-scripts --no-audit --no-fund
@@ -38,12 +36,12 @@ runs:
       uses: actions/setup-node@v3
       with:
         node-version: $\{{ inputs.node-version }}
-        cache: $\{{ (inputs.cache && 'npm') || null }}
+        cache: $\{{ (inputs.cache == 'true' && 'npm') || '' }}
 
     - name: Check Node Version
       if: inputs.npm-version
       id: node-version
-      shell: $\{{ inputs.shell }}
+      shell: bash
       run: |
         NODE_VERSION=$(node --version)
         echo $NODE_VERSION
@@ -81,14 +79,14 @@ runs:
       run: {{ rootNpmPath }} -v
 
     - name: Setup Dependencies
-      if: inputs.deps
+      if: inputs.deps == 'true'
       uses: ./.github/actions/deps
       with:
         command: $\{{ inputs.deps-command }}
         flags: $\{{ inputs.deps-flags }}
 
     - name: Add Problem Matcher
-      shell: $\{{ inputs.shell }}
+      shell: bash
       run: |
         [[ -f ./.github/matchers/tap.json ]] && echo "::add-matcher::.github/matchers/tap.json"
 

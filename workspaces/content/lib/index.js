@@ -1,5 +1,3 @@
-const { name: NAME, version: LATEST_VERSION } = require('../../../package.json')
-
 const isPublic = (p) => p.config.isPublic
 
 const sharedRootAdd = () => ({
@@ -192,7 +190,6 @@ module.exports = {
   ],
   requiredPackages: {
     devDependencies: [
-      `${NAME}@${LATEST_VERSION}`,
       '@npmcli/eslint-config',
       'tap',
     ],

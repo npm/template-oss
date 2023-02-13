@@ -5,15 +5,8 @@ name: Get Changed Workspaces
 inputs:
   token:
     description: GitHub token to use
-  shell:
-    description: shell to run on
-    default: bash
-  all:
-    default: false
-    type: boolean
   files:
-    description: json stringified array of file names
-    type: string
+    description: json stringified array of file names or --all
 
 outputs:
   flags:
@@ -24,14 +17,14 @@ runs:
   steps:
     - name: Get Changed Files
       uses: ./.github/actions/changed-files
-      if: ${{ !inputs.all && !inputs.files }}
+      if: ${{ !inputs.files }}
       id: files
       with:
         token: ${{ inputs.token }}
 
     - name: Get Workspaces
-      shell: ${{ inputs.shell }}
+      shell: bash
       id: workspaces
       run: |
-        flags=$(npm exec --offline -- template-oss-changed-workspaces '${{ (inputs.all && '--all') || (inputs.files || steps.files.outputs.result) }}')
+        flags=$(npm exec --offline -- template-oss-changed-workspaces '${{ inputs.files || steps.files.outputs.names }}')
         echo "flags=${flags}" >> $GITHUB_OUTPUT

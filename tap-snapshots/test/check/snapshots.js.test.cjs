@@ -99,8 +99,7 @@ The module file package.json needs to be updated:
     ]
   }
   "templateOSS" is missing, expected {
-    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
-    "version": "{{VERSION}}"
+    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten."
   }
 
 To correct it: npx template-oss-apply --force
@@ -363,8 +362,7 @@ The module file package.json needs to be updated:
     ]
   }
   "templateOSS" is missing, expected {
-    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
-    "version": "{{VERSION}}"
+    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten."
   }
 
 To correct it: npx template-oss-apply --force
@@ -446,8 +444,7 @@ The module file package.json needs to be updated:
     ]
   }
   "templateOSS" is missing, expected {
-    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
-    "version": "{{VERSION}}"
+    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten."
   }
 
 To correct it: npx template-oss-apply --force
@@ -529,8 +526,7 @@ The module file package.json needs to be updated:
     ]
   }
   "templateOSS" is missing, expected {
-    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
-    "version": "{{VERSION}}"
+    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten."
   }
 
 To correct it: npx template-oss-apply --force

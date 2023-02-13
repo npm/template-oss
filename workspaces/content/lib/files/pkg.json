@@ -31,9 +31,6 @@
     "node": {{{ json engines }}}
     {{/if}}
   },
-  {{{ json __CONFIG_KEY__ }}}: {
-    "version": {{#if isDogFood}}{{{ del }}}{{else}}{{{ json __VERSION__ }}}{{/if}}
-  },
   "templateVersion": {{{ del }}},
   "standard": {{{ del }}},
   "tap": {

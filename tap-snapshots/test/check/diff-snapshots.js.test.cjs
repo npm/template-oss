@@ -164,14 +164,14 @@ The repo file ci.yml needs to be updated:
   .github/workflows/ci.yml
   ========================================
   @@ -146,4 +146,24 @@
+         - name: Get Changed Workspaces
            if: steps.continue-matrix.outputs.result
            id: workspaces
            continue-on-error: \${{ !!steps.check.outputs.check-id }}
-           uses: ./.github/actions/changed-workspaces
+  +        uses: ./.github/actions/changed-workspaces
   +        with:
-  +          shell: \${{ matrix.platform.shell }}
   +          token: \${{ secrets.GITHUB_TOKEN }}
-  +          all: \${{ inputs.all }}
+  +          files: \${{ (inputs.all && '--all') || '' }}
   +
   +      - name: Test
   +        if: steps.continue-matrix.outputs.result

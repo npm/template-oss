@@ -6,8 +6,8 @@ on:
 
 
 jobs:
-  template-oss:
-    name: template-oss
+  {{ __NAME_FS__ }}:
+    name: "{{ __NAME__ }}"
     permissions:
       contents: write
     {{#> partialsJobIf}}&& github.actor == 'dependabot[bot]'{{/ partialsJobIf}}

@@ -53,10 +53,13 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Run Audit
+    - name: Run Production Audit
       shell: \${{ inputs.shell }}
       run: |
         npm audit --omit=dev
+    - name: Run Full Audit
+      shell: \${{ inputs.shell }}
+      run: |
         npm audit --audit-level=none
 
 .github/actions/changed-files/action.yml
@@ -71,7 +74,7 @@ inputs:
     required: true
 
 outputs:
-  files:
+  names:
     value: \${{ steps.files.outputs.result }}
 
 runs:
@@ -110,15 +113,8 @@ name: Get Changed Workspaces
 inputs:
   token:
     description: GitHub token to use
-  shell:
-    description: shell to run on
-    default: bash
-  all:
-    default: false
-    type: boolean
   files:
-    description: json stringified array of file names
-    type: string
+    description: json stringified array of file names or --all
 
 outputs:
   flags:
@@ -129,16 +125,16 @@ runs:
   steps:
     - name: Get Changed Files
       uses: ./.github/actions/changed-files
-      if: \${{ !inputs.all && !inputs.files }}
+      if: \${{ !inputs.files }}
       id: files
       with:
         token: \${{ inputs.token }}
 
     - name: Get Workspaces
-      shell: \${{ inputs.shell }}
+      shell: bash
       id: workspaces
       run: |
-        flags=$(npm exec --offline -- template-oss-changed-workspaces '\${{ (inputs.all && '--all') || (inputs.files || steps.files.outputs.result) }}')
+        flags=$(npm exec --offline -- template-oss-changed-workspaces '\${{ inputs.files || steps.files.outputs.names }}')
         echo "flags=\${flags}" >> $GITHUB_OUTPUT
 
 .github/actions/conclude-check/action.yml
@@ -279,6 +275,9 @@ runs:
       shell: \${{ inputs.shell }}
       run: |
         npm run lint --ignore-scripts \${{ inputs.flags }}
+    - name: Post Lint
+      shell: \${{ inputs.shell }}
+      run: |
         npm run postlint --ignore-scripts \${{ inputs.flags }}
 
 .github/actions/setup/action.yml
@@ -297,15 +296,13 @@ inputs:
     default: latest
   cache:
     description: whether to cache npm install or not
-    type: boolean
     default: false
   shell:
     description: shell to run on
     default: bash
   deps:
     description: whether to run the deps step
-    type: boolean
-    default: true
+    default: 'true'
   deps-command:
     description: command to run for the dependencies step
     default: install --ignore-scripts --no-audit --no-fund
@@ -325,12 +322,12 @@ runs:
       uses: actions/setup-node@v3
       with:
         node-version: \${{ inputs.node-version }}
-        cache: \${{ (inputs.cache && 'npm') || null }}
+        cache: \${{ (inputs.cache == 'true' && 'npm') || '' }}
 
     - name: Check Node Version
       if: inputs.npm-version
       id: node-version
-      shell: \${{ inputs.shell }}
+      shell: bash
       run: |
         NODE_VERSION=$(node --version)
         echo $NODE_VERSION
@@ -368,14 +365,14 @@ runs:
       run: npm -v
 
     - name: Setup Dependencies
-      if: inputs.deps
+      if: inputs.deps == 'true'
       uses: ./.github/actions/deps
       with:
         command: \${{ inputs.deps-command }}
         flags: \${{ inputs.deps-flags }}
 
     - name: Add Problem Matcher
-      shell: \${{ inputs.shell }}
+      shell: bash
       run: |
         [[ -f ./.github/matchers/tap.json ]] && echo "::add-matcher::.github/matchers/tap.json"
 
@@ -713,7 +710,7 @@ jobs:
         uses: ./.github/actions/changed-workspaces
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
-          all: \${{ inputs.all }}
+          files: \${{ (inputs.all && '--all') || '' }}
 
       - name: Lint
         uses: ./.github/actions/lint
@@ -759,6 +756,7 @@ jobs:
     steps:
       - name: Continue Matrix Run
         id: continue-matrix
+        shell: bash
         run: |
           if [[ "\${{ matrix.node-version }}" == "14.17.0" || "\${{ inputs.all }}" == "true" ]]; then
             echo "result=true" >> $GITHUB_OUTPUT 
@@ -794,9 +792,8 @@ jobs:
         continue-on-error: \${{ !!steps.check.outputs.check-id }}
         uses: ./.github/actions/changed-workspaces
         with:
-          shell: \${{ matrix.platform.shell }}
           token: \${{ secrets.GITHUB_TOKEN }}
-          all: \${{ inputs.all }}
+          files: \${{ (inputs.all && '--all') || '' }}
 
       - name: Test
         if: steps.continue-matrix.outputs.result
@@ -866,8 +863,8 @@ name: Post Dependabot
 on: pull_request
 
 jobs:
-  template-oss:
-    name: template-oss
+  npmcli-template-oss:
+    name: "@npmcli/template-oss"
     permissions:
       contents: write
     if: github.repository_owner == 'npm' && github.actor == 'dependabot[bot]'
@@ -1428,6 +1425,9 @@ package.json
 {
   "name": "testpkg",
   "version": "1.0.0",
+  "devDependencies": {
+    "@npmcli/template-oss": "{{VERSION}}"
+  },
   "scripts": {
     "lint": "eslint /"**/*.js/"",
     "postlint": "template-oss-check",
@@ -1445,15 +1445,15 @@ package.json
   "engines": {
     "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
   },
-  "templateOSS": {
-    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
-    "version": "{{VERSION}}"
-  },
   "tap": {
     "nyc-arg": [
       "--exclude",
       "tap-snapshots/**"
     ]
+  },
+  "templateOSS": {
+    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
+    "version": "{{VERSION}}"
   }
 }
 
@@ -1527,7 +1527,10 @@ package.json
     "version": "{{VERSION}}"
   },
   "name": "testpkg",
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "devDependencies": {
+    "@npmcli/template-oss": "{{VERSION}}"
+  }
 }
 `
 
@@ -1583,10 +1586,13 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Run Audit
+    - name: Run Production Audit
       shell: \${{ inputs.shell }}
       run: |
         npm audit --omit=dev
+    - name: Run Full Audit
+      shell: \${{ inputs.shell }}
+      run: |
         npm audit --audit-level=none
 
 .github/actions/changed-files/action.yml
@@ -1601,7 +1607,7 @@ inputs:
     required: true
 
 outputs:
-  files:
+  names:
     value: \${{ steps.files.outputs.result }}
 
 runs:
@@ -1640,15 +1646,8 @@ name: Get Changed Workspaces
 inputs:
   token:
     description: GitHub token to use
-  shell:
-    description: shell to run on
-    default: bash
-  all:
-    default: false
-    type: boolean
   files:
-    description: json stringified array of file names
-    type: string
+    description: json stringified array of file names or --all
 
 outputs:
   flags:
@@ -1659,16 +1658,16 @@ runs:
   steps:
     - name: Get Changed Files
       uses: ./.github/actions/changed-files
-      if: \${{ !inputs.all && !inputs.files }}
+      if: \${{ !inputs.files }}
       id: files
       with:
         token: \${{ inputs.token }}
 
     - name: Get Workspaces
-      shell: \${{ inputs.shell }}
+      shell: bash
       id: workspaces
       run: |
-        flags=$(npm exec --offline -- template-oss-changed-workspaces '\${{ (inputs.all && '--all') || (inputs.files || steps.files.outputs.result) }}')
+        flags=$(npm exec --offline -- template-oss-changed-workspaces '\${{ inputs.files || steps.files.outputs.names }}')
         echo "flags=\${flags}" >> $GITHUB_OUTPUT
 
 .github/actions/conclude-check/action.yml
@@ -1809,6 +1808,9 @@ runs:
       shell: \${{ inputs.shell }}
       run: |
         npm run lint --ignore-scripts \${{ inputs.flags }}
+    - name: Post Lint
+      shell: \${{ inputs.shell }}
+      run: |
         npm run postlint --ignore-scripts \${{ inputs.flags }}
 
 .github/actions/setup/action.yml
@@ -1827,15 +1829,13 @@ inputs:
     default: latest
   cache:
     description: whether to cache npm install or not
-    type: boolean
     default: false
   shell:
     description: shell to run on
     default: bash
   deps:
     description: whether to run the deps step
-    type: boolean
-    default: true
+    default: 'true'
   deps-command:
     description: command to run for the dependencies step
     default: install --ignore-scripts --no-audit --no-fund
@@ -1855,12 +1855,12 @@ runs:
       uses: actions/setup-node@v3
       with:
         node-version: \${{ inputs.node-version }}
-        cache: \${{ (inputs.cache && 'npm') || null }}
+        cache: \${{ (inputs.cache == 'true' && 'npm') || '' }}
 
     - name: Check Node Version
       if: inputs.npm-version
       id: node-version
-      shell: \${{ inputs.shell }}
+      shell: bash
       run: |
         NODE_VERSION=$(node --version)
         echo $NODE_VERSION
@@ -1898,14 +1898,14 @@ runs:
       run: npm -v
 
     - name: Setup Dependencies
-      if: inputs.deps
+      if: inputs.deps == 'true'
       uses: ./.github/actions/deps
       with:
         command: \${{ inputs.deps-command }}
         flags: \${{ inputs.deps-flags }}
 
     - name: Add Problem Matcher
-      shell: \${{ inputs.shell }}
+      shell: bash
       run: |
         [[ -f ./.github/matchers/tap.json ]] && echo "::add-matcher::.github/matchers/tap.json"
 
@@ -2267,7 +2267,7 @@ jobs:
         uses: ./.github/actions/changed-workspaces
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
-          all: \${{ inputs.all }}
+          files: \${{ (inputs.all && '--all') || '' }}
 
       - name: Lint
         uses: ./.github/actions/lint
@@ -2313,6 +2313,7 @@ jobs:
     steps:
       - name: Continue Matrix Run
         id: continue-matrix
+        shell: bash
         run: |
           if [[ "\${{ matrix.node-version }}" == "14.17.0" || "\${{ inputs.all }}" == "true" ]]; then
             echo "result=true" >> $GITHUB_OUTPUT 
@@ -2348,9 +2349,8 @@ jobs:
         continue-on-error: \${{ !!steps.check.outputs.check-id }}
         uses: ./.github/actions/changed-workspaces
         with:
-          shell: \${{ matrix.platform.shell }}
           token: \${{ secrets.GITHUB_TOKEN }}
-          all: \${{ inputs.all }}
+          files: \${{ (inputs.all && '--all') || '' }}
 
       - name: Test
         if: steps.continue-matrix.outputs.result
@@ -2420,8 +2420,8 @@ name: Post Dependabot
 on: pull_request
 
 jobs:
-  template-oss:
-    name: template-oss
+  npmcli-template-oss:
+    name: "@npmcli/template-oss"
     permissions:
       contents: write
     if: github.repository_owner == 'npm' && github.actor == 'dependabot[bot]'
@@ -2988,6 +2988,9 @@ package.json
 {
   "name": "testpkg",
   "version": "1.0.0",
+  "devDependencies": {
+    "@npmcli/template-oss": "{{VERSION}}"
+  },
   "workspaces": [
     "workspaces/a",
     "workspaces/b"
@@ -3011,10 +3014,6 @@ package.json
   "engines": {
     "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
   },
-  "templateOSS": {
-    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
-    "version": "{{VERSION}}"
-  },
   "tap": {
     "test-ignore": "^(workspaces/a|workspaces/b)/",
     "nyc-arg": [
@@ -3025,6 +3024,10 @@ package.json
       "--exclude",
       "tap-snapshots/**"
     ]
+  },
+  "templateOSS": {
+    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
+    "version": "{{VERSION}}"
   }
 }
 
@@ -3137,6 +3140,9 @@ workspaces/a/package.json
 {
   "name": "a",
   "version": "1.0.0",
+  "devDependencies": {
+    "@npmcli/template-oss": "{{VERSION}}"
+  },
   "scripts": {
     "lint": "eslint /"**/*.js/"",
     "postlint": "template-oss-check",
@@ -3154,15 +3160,15 @@ workspaces/a/package.json
   "engines": {
     "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
   },
-  "templateOSS": {
-    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
-    "version": "{{VERSION}}"
-  },
   "tap": {
     "nyc-arg": [
       "--exclude",
       "tap-snapshots/**"
     ]
+  },
+  "templateOSS": {
+    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
+    "version": "{{VERSION}}"
   }
 }
 
@@ -3215,6 +3221,9 @@ workspaces/b/package.json
 {
   "name": "b",
   "version": "1.0.0",
+  "devDependencies": {
+    "@npmcli/template-oss": "{{VERSION}}"
+  },
   "scripts": {
     "lint": "eslint /"**/*.js/"",
     "postlint": "template-oss-check",
@@ -3232,15 +3241,15 @@ workspaces/b/package.json
   "engines": {
     "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
   },
-  "templateOSS": {
-    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
-    "version": "{{VERSION}}"
-  },
   "tap": {
     "nyc-arg": [
       "--exclude",
       "tap-snapshots/**"
     ]
+  },
+  "templateOSS": {
+    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
+    "version": "{{VERSION}}"
   }
 }
 `
@@ -3260,10 +3269,13 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Run Audit
+    - name: Run Production Audit
       shell: \${{ inputs.shell }}
       run: |
         npm audit --omit=dev
+    - name: Run Full Audit
+      shell: \${{ inputs.shell }}
+      run: |
         npm audit --audit-level=none
 
 .github/actions/changed-files/action.yml
@@ -3278,7 +3290,7 @@ inputs:
     required: true
 
 outputs:
-  files:
+  names:
     value: \${{ steps.files.outputs.result }}
 
 runs:
@@ -3317,15 +3329,8 @@ name: Get Changed Workspaces
 inputs:
   token:
     description: GitHub token to use
-  shell:
-    description: shell to run on
-    default: bash
-  all:
-    default: false
-    type: boolean
   files:
-    description: json stringified array of file names
-    type: string
+    description: json stringified array of file names or --all
 
 outputs:
   flags:
@@ -3336,16 +3341,16 @@ runs:
   steps:
     - name: Get Changed Files
       uses: ./.github/actions/changed-files
-      if: \${{ !inputs.all && !inputs.files }}
+      if: \${{ !inputs.files }}
       id: files
       with:
         token: \${{ inputs.token }}
 
     - name: Get Workspaces
-      shell: \${{ inputs.shell }}
+      shell: bash
       id: workspaces
       run: |
-        flags=$(npm exec --offline -- template-oss-changed-workspaces '\${{ (inputs.all && '--all') || (inputs.files || steps.files.outputs.result) }}')
+        flags=$(npm exec --offline -- template-oss-changed-workspaces '\${{ inputs.files || steps.files.outputs.names }}')
         echo "flags=\${flags}" >> $GITHUB_OUTPUT
 
 .github/actions/conclude-check/action.yml
@@ -3486,6 +3491,9 @@ runs:
       shell: \${{ inputs.shell }}
       run: |
         npm run lint --ignore-scripts \${{ inputs.flags }}
+    - name: Post Lint
+      shell: \${{ inputs.shell }}
+      run: |
         npm run postlint --ignore-scripts \${{ inputs.flags }}
 
 .github/actions/setup/action.yml
@@ -3504,15 +3512,13 @@ inputs:
     default: latest
   cache:
     description: whether to cache npm install or not
-    type: boolean
     default: false
   shell:
     description: shell to run on
     default: bash
   deps:
     description: whether to run the deps step
-    type: boolean
-    default: true
+    default: 'true'
   deps-command:
     description: command to run for the dependencies step
     default: install --ignore-scripts --no-audit --no-fund
@@ -3532,12 +3538,12 @@ runs:
       uses: actions/setup-node@v3
       with:
         node-version: \${{ inputs.node-version }}
-        cache: \${{ (inputs.cache && 'npm') || null }}
+        cache: \${{ (inputs.cache == 'true' && 'npm') || '' }}
 
     - name: Check Node Version
       if: inputs.npm-version
       id: node-version
-      shell: \${{ inputs.shell }}
+      shell: bash
       run: |
         NODE_VERSION=$(node --version)
         echo $NODE_VERSION
@@ -3575,14 +3581,14 @@ runs:
       run: npm -v
 
     - name: Setup Dependencies
-      if: inputs.deps
+      if: inputs.deps == 'true'
       uses: ./.github/actions/deps
       with:
         command: \${{ inputs.deps-command }}
         flags: \${{ inputs.deps-flags }}
 
     - name: Add Problem Matcher
-      shell: \${{ inputs.shell }}
+      shell: bash
       run: |
         [[ -f ./.github/matchers/tap.json ]] && echo "::add-matcher::.github/matchers/tap.json"
 
@@ -3863,7 +3869,7 @@ jobs:
         uses: ./.github/actions/changed-workspaces
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
-          all: \${{ inputs.all }}
+          files: \${{ (inputs.all && '--all') || '' }}
 
       - name: Lint
         uses: ./.github/actions/lint
@@ -3909,6 +3915,7 @@ jobs:
     steps:
       - name: Continue Matrix Run
         id: continue-matrix
+        shell: bash
         run: |
           if [[ "\${{ matrix.node-version }}" == "14.17.0" || "\${{ inputs.all }}" == "true" ]]; then
             echo "result=true" >> $GITHUB_OUTPUT 
@@ -3944,9 +3951,8 @@ jobs:
         continue-on-error: \${{ !!steps.check.outputs.check-id }}
         uses: ./.github/actions/changed-workspaces
         with:
-          shell: \${{ matrix.platform.shell }}
           token: \${{ secrets.GITHUB_TOKEN }}
-          all: \${{ inputs.all }}
+          files: \${{ (inputs.all && '--all') || '' }}
 
       - name: Test
         if: steps.continue-matrix.outputs.result
@@ -4016,8 +4022,8 @@ name: Post Dependabot
 on: pull_request
 
 jobs:
-  template-oss:
-    name: template-oss
+  npmcli-template-oss:
+    name: "@npmcli/template-oss"
     permissions:
       contents: write
     if: github.repository_owner == 'npm' && github.actor == 'dependabot[bot]'
@@ -4537,6 +4543,9 @@ package.json
   },
   "name": "testpkg",
   "version": "1.0.0",
+  "devDependencies": {
+    "@npmcli/template-oss": "{{VERSION}}"
+  },
   "workspaces": [
     "workspaces/a",
     "workspaces/b"
@@ -4633,6 +4642,9 @@ workspaces/a/package.json
 {
   "name": "a",
   "version": "1.0.0",
+  "devDependencies": {
+    "@npmcli/template-oss": "{{VERSION}}"
+  },
   "scripts": {
     "lint": "eslint /"**/*.js/"",
     "postlint": "template-oss-check",
@@ -4650,15 +4662,15 @@ workspaces/a/package.json
   "engines": {
     "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
   },
-  "templateOSS": {
-    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
-    "version": "{{VERSION}}"
-  },
   "tap": {
     "nyc-arg": [
       "--exclude",
       "tap-snapshots/**"
     ]
+  },
+  "templateOSS": {
+    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
+    "version": "{{VERSION}}"
   }
 }
 
@@ -4711,6 +4723,9 @@ workspaces/b/package.json
 {
   "name": "b",
   "version": "1.0.0",
+  "devDependencies": {
+    "@npmcli/template-oss": "{{VERSION}}"
+  },
   "scripts": {
     "lint": "eslint /"**/*.js/"",
     "postlint": "template-oss-check",
@@ -4728,15 +4743,15 @@ workspaces/b/package.json
   "engines": {
     "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
   },
-  "templateOSS": {
-    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
-    "version": "{{VERSION}}"
-  },
   "tap": {
     "nyc-arg": [
       "--exclude",
       "tap-snapshots/**"
     ]
+  },
+  "templateOSS": {
+    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
+    "version": "{{VERSION}}"
   }
 }
 `
@@ -4760,6 +4775,9 @@ package.json
   },
   "name": "testpkg",
   "version": "1.0.0",
+  "devDependencies": {
+    "@npmcli/template-oss": "{{VERSION}}"
+  },
   "workspaces": [
     "workspaces/a"
   ]
@@ -4773,6 +4791,9 @@ workspaces/a/package.json
     "version": "{{VERSION}}"
   },
   "name": "a",
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "devDependencies": {
+    "@npmcli/template-oss": "{{VERSION}}"
+  }
 }
 `
