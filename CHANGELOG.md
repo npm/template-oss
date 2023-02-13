@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.12.0](https://github.com/npm/template-oss/compare/v4.11.4...v4.12.0) (2023-02-13)
+
+### Features
+
+* [`6984cbd`](https://github.com/npm/template-oss/commit/6984cbdeafcc118824b4400729e4f308bf5dc18d) [#285](https://github.com/npm/template-oss/pull/285) update SECURITY.md (#285) (@lukekarrys)
+
+### Bug Fixes
+
+* [`241dbf2`](https://github.com/npm/template-oss/commit/241dbf27d7df953839de7a7ed128facf55b2464d) [#282](https://github.com/npm/template-oss/pull/282) tag codeowner for all release ci runs that are not success (#282) (@lukekarrys)
+* [`dc73ffe`](https://github.com/npm/template-oss/commit/dc73ffe1748397d600b385a3fbde23d790f6f1ff) [#281](https://github.com/npm/template-oss/pull/281) remove deprecated set-output in favor of GITHUB_OUTPUT (#281) (@lukekarrys)
+* [`f283d4a`](https://github.com/npm/template-oss/commit/f283d4a99bf9c22bd66fce327cd5665d0406bb5d) [#279](https://github.com/npm/template-oss/pull/279) add pull request numbers to all rebased commits (#279) (@lukekarrys)
+
 ## [4.11.4](https://github.com/npm/template-oss/compare/v4.11.3...v4.11.4) (2023-02-07)
 
 ### Bug Fixes
