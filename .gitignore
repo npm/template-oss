@@ -26,6 +26,3 @@
 !/SECURITY.md
 !/tap-snapshots/
 !/test/
-!/workspace/
-/workspace/*
-!/workspace/test-workspace/

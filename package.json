@@ -70,8 +70,6 @@
     "timeout": 600,
     "nyc-arg": [
       "--exclude",
-      "workspace/test-workspace/**",
-      "--exclude",
       "tap-snapshots/**"
     ],
     "test-ignore": "^(workspace/test-workspace)/"
@@ -81,8 +79,5 @@
   },
   "engines": {
     "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
-  },
-  "workspaces": [
-    "workspace/test-workspace"
-  ]
+  }
 }
