@@ -16,7 +16,7 @@ module.exports = {
       'nocomment.txt': {
         file: 'source.txt',
         parser: (p) => class extends p.Base {
-          comment = null
+          static comment = null
         },
       },
     },

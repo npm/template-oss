@@ -1,4 +1,4 @@
-const { name: NAME, version: LATEST_VERSION } = require('../../package.json')
+const { name: NAME, version: LATEST_VERSION } = require('../../../package.json')
 
 const isPublic = (p) => p.config.isPublic
 
@@ -39,14 +39,14 @@ const sharedRootAdd = () => ({
     file: 'files/release-please-manifest.json',
     filter: isPublic,
     parser: (p) => class extends p.JsonMerge {
-      comment = null
+      static comment = null
     },
   },
   'release-please-config.json': {
     file: 'files/release-please-config.json',
     filter: isPublic,
     parser: (p) => class extends p.JsonMerge {
-      comment = null
+      static comment = null
     },
   },
   // ci
@@ -54,13 +54,21 @@ const sharedRootAdd = () => ({
   // dependabot
   '.github/dependabot.yml': {
     file: 'files/dependabot.yml',
-    clean: (p) => p.config.isRoot,
-    // dependabot takes a single top level config file. this parser
-    // will run for all configured packages and each one will have
-    // its item replaced in the updates array based on the directory
-    parser: (p) => class extends p.YmlMerge {
-      key = 'updates'
-      id = 'directory'
+    parser: (p, options) => {
+      // dependabot takes a single top level config file. if we are operating on
+      // a workspace in a repo without a root lockfile, then this parser will
+      // run for all configured packages and each one will have its item
+      // replaced in the updates array based on the directory.
+      if (options.config.isMono && !options.rootConfig.lockfile) {
+        return class extends p.YmlMerge {
+          static clean = true
+          static key = 'updates'
+          static id = 'directory'
+        }
+      }
+      // otherwise, we want only a single dependabot updater which will operate
+      // on the root lockfile, even for workspaces. this is to prevent dependabot
+      // from opening multiple PRs for each instance of a shared dependency
     },
   },
 

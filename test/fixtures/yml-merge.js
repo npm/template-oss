@@ -4,8 +4,8 @@ module.exports = {
       'target.yml': {
         file: 'source.yml',
         parser: (p) => class extends p.YmlMerge {
-          key = 'key'
-          id = 'id'
+          static key = 'key'
+          static id = 'id'
         },
       },
     },

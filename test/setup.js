@@ -8,7 +8,7 @@ const npa = require('npm-package-arg')
 const output = require('../lib/util/output.js')
 const apply = require('../lib/apply/index.js')
 const check = require('../lib/check/index.js')
-const CONTENT = require('..')
+const CONTENT = require('@npmcli/template-oss-content')
 const { name: NAME, version: VERSION } = require('../package.json')
 
 const createPackageJson = (pkg) => ({
