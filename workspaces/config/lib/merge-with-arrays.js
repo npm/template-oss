@@ -1,12 +1,5 @@
 const { mergeWith } = require('lodash')
 
-const merge = (...objects) => mergeWith({}, ...objects, (value, srcValue, key) => {
-  if (Array.isArray(srcValue)) {
-    // Dont merge arrays, last array wins
-    return srcValue
-  }
-})
-
 const mergeWithArrays = (...keys) =>
   (...objects) => mergeWith({}, ...objects, (value, srcValue, key) => {
     if (Array.isArray(srcValue)) {
@@ -17,5 +10,4 @@ const mergeWithArrays = (...keys) =>
     }
   })
 
-module.exports = merge
-module.exports.withArrays = mergeWithArrays
+module.exports = mergeWithArrays

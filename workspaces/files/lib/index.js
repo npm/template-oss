@@ -1,9 +1,9 @@
 const { join } = require('path')
-const { defaultsDeep } = require('lodash')
 const { promisify } = require('util')
-const merge = require('./merge.js')
+const { defaultsDeep } = require('lodash')
 const deepMapValues = require('just-deep-map-values')
 const glob = promisify(require('glob'))
+const merge = require('./merge.js')
 const Parser = require('./parser.js')
 const template = require('./template.js')
 

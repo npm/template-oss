@@ -1,7 +1,7 @@
 {
-  "name": "@npmcli/template-oss-content",
+  "name": "@npmcli/template-oss-config",
   "version": "1.0.0",
-  "description": "The content for @npmcli/template-oss",
+  "description": "The config for @npmcli/template-oss",
   "private": true,
   "main": "lib/index.js",
   "scripts": {
@@ -16,7 +16,15 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/npm/template-oss.git",
-    "directory": "workspaces/content"
+    "directory": "workspaces/config"
+  },
+  "dependencies": {
+    "@isaacs/string-locale-compare": "^1.1.0",
+    "@npmcli/git": "^4.0.3",
+    "@npmcli/template-oss-files": "^1.0.0",
+    "hosted-git-info": "^6.1.1",
+    "lodash": "^4.17.21",
+    "semver": "^7.3.8"
   },
   "devDependencies": {
     "@npmcli/eslint-config": "^4.0.0",

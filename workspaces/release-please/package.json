@@ -1,7 +1,7 @@
 {
-  "name": "@npmcli/template-oss-content",
+  "name": "@npmcli/template-oss-release-please",
   "version": "1.0.0",
-  "description": "The content for @npmcli/template-oss",
+  "description": "",
   "private": true,
   "main": "lib/index.js",
   "scripts": {
@@ -16,12 +16,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/npm/template-oss.git",
-    "directory": "workspaces/content"
-  },
-  "devDependencies": {
-    "@npmcli/eslint-config": "^4.0.0",
-    "@npmcli/template-oss": "file:../../",
-    "tap": "^16.0.0"
+    "directory": "workspaces/release-please"
   },
   "keywords": [],
   "author": "GitHub Inc.",
@@ -34,18 +29,27 @@
     "bin/",
     "lib/"
   ],
+  "dependencies": {
+    "@isaacs/string-locale-compare": "^1.1.0",
+    "release-please": "npm:@npmcli/release-please@^14.2.6",
+    "semver": "^7.3.8"
+  },
+  "devDependencies": {
+    "@npmcli/eslint-config": "^4.0.0",
+    "@npmcli/template-oss": "file:../../",
+    "tap": "^16.0.0"
+  },
   "engines": {
     "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
   },
   "templateOSS": {
-    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
-    "//@npmcli/template-oss-config": "This file is partially managed by @npmcli/template-oss-config. Edits may be overwritten."
+    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten."
   },
   "tap": {
+    "check-coverage": false,
     "nyc-arg": [
       "--exclude",
       "tap-snapshots/**"
-    ],
-    "check-coverage": false
+    ]
   }
 }

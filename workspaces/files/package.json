@@ -1,7 +1,7 @@
 {
-  "name": "@npmcli/template-oss-content",
+  "name": "@npmcli/template-oss-files",
   "version": "1.0.0",
-  "description": "The content for @npmcli/template-oss",
+  "description": "The files for @npmcli/template-oss",
   "private": true,
   "main": "lib/index.js",
   "scripts": {
@@ -16,7 +16,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/npm/template-oss.git",
-    "directory": "workspaces/content"
+    "directory": "workspaces/files"
   },
   "devDependencies": {
     "@npmcli/eslint-config": "^4.0.0",
@@ -47,5 +47,17 @@
       "tap-snapshots/**"
     ],
     "check-coverage": false
+  },
+  "dependencies": {
+    "@npmcli/package-json": "^3.0.0",
+    "diff": "^5.1.0",
+    "glob": "^8.1.0",
+    "handlebars": "^4.7.7",
+    "ini": "^3.0.1",
+    "json-parse-even-better-errors": "^3.0.0",
+    "just-deep-map-values": "^1.2.0",
+    "just-diff": "^5.2.0",
+    "lodash": "^4.17.21",
+    "yaml": "^2.2.1"
   }
 }

@@ -3,8 +3,8 @@ const { setLogger } = require('release-please') // this avoids a release-please 
 const { Node } = require('release-please/build/src/strategies/node')
 const { Version } = require('release-please/build/src/version')
 const { TagName } = require('release-please/build/src/util/tag-name')
-const NodeWorkspace = require('../../lib/release-please/node-workspace')
-const Changelog = require('../../lib/release-please/changelog')
+const NodeWorkspace = require('../lib/node-workspace')
+const Changelog = require('../lib/changelog')
 
 setLogger({ error () {}, warn () {}, info () {}, debug () {}, trace () {} })
 

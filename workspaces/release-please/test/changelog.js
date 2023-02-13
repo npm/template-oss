@@ -1,5 +1,5 @@
 const t = require('tap')
-const ChangelogNotes = require('../../lib/release-please/changelog.js')
+const ChangelogNotes = require('../lib/changelog.js')
 
 const mockChangelog = async ({ shas = true, authors = true, previousTag = true } = {}) => {
   const commits = [{
@@ -69,7 +69,7 @@ const mockChangelog = async ({ shas = true, authors = true, previousTag = true }
     version: '1.0.0',
     previousTag: previousTag ? 'v0.1.0' : null,
     currentTag: 'v1.0.0',
-    changelogSections: require('../../release-please-config.json')['changelog-sections'],
+    changelogSections: require('../../../release-please-config.json')['changelog-sections'],
   })
 
   return notes

@@ -1,16 +1,16 @@
 const { relative, dirname, join, extname, posix, win32 } = require('path')
 const { defaults, pick, omit, uniq } = require('lodash')
 const semver = require('semver')
-const parseCIVersions = require('./util/parse-ci-versions.js')
-const getGitUrl = require('./util/get-git-url.js')
-const gitignore = require('./util/gitignore.js')
-const { withArrays } = require('./util/merge.js')
-const { FILE_KEYS, parseConfig: parseFiles, getAddedFiles } = require('./util/files.js')
+const parseCIVersions = require('./parse-ci-versions.js')
+const getGitUrl = require('./get-git-url.js')
+const gitignore = require('./gitignore.js')
+const withArrays = require('./merge-with-arrays.js')
+const { FILE_KEYS, parseConfig: parseFiles, getAddedFiles } = require('@npmcli/template-oss-files')
 
 const CONFIG_KEY = 'templateOSS'
 const getPkgConfig = (pkg) => pkg[CONFIG_KEY] || {}
 
-const { name: NAME, version: LATEST_VERSION } = require('../package.json')
+const { name: NAME, version: LATEST_VERSION } = require('../../../package.json')
 const MERGE_KEYS = [...FILE_KEYS, 'defaultContent', 'content']
 const DEFAULT_CONTENT = require.resolve('@npmcli/template-oss-content')
 

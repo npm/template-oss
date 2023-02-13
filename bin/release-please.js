@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const core = require('@actions/core')
-const main = require('../lib/release-please/index.js')
+const main = require('@npmcli/template-oss-release-please')
 
 const dryRun = !process.env.CI
 const [branch, forcePullRequest] = process.argv.slice(2)

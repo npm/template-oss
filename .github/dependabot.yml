@@ -16,7 +16,43 @@ updates:
     labels:
       - "Dependencies"
   - package-ecosystem: npm
+    directory: workspaces/config/
+    schedule:
+      interval: daily
+    allow:
+      - dependency-type: direct
+    versioning-strategy: increase-if-necessary
+    commit-message:
+      prefix: deps
+      prefix-development: chore
+    labels:
+      - "Dependencies"
+  - package-ecosystem: npm
     directory: workspaces/content/
+    schedule:
+      interval: daily
+    allow:
+      - dependency-type: direct
+    versioning-strategy: increase-if-necessary
+    commit-message:
+      prefix: deps
+      prefix-development: chore
+    labels:
+      - "Dependencies"
+  - package-ecosystem: npm
+    directory: workspaces/files/
+    schedule:
+      interval: daily
+    allow:
+      - dependency-type: direct
+    versioning-strategy: increase-if-necessary
+    commit-message:
+      prefix: deps
+      prefix-development: chore
+    labels:
+      - "Dependencies"
+  - package-ecosystem: npm
+    directory: workspaces/release-please/
     schedule:
       interval: daily
     allow:

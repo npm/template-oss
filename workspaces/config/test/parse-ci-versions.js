@@ -1,5 +1,5 @@
 const t = require('tap')
-const parse = require('../../lib/util/parse-ci-versions.js')
+const parse = require('../lib/parse-ci-versions.js')
 
 const targets = [
   [[], ''],

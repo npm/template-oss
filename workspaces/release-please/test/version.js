@@ -1,5 +1,5 @@
 const t = require('tap')
-const Version = require('../../lib/release-please/version.js')
+const Version = require('../lib/version.js')
 
 const COMMITS = {
   major: [{ type: 'feat' }, {}, {}, { breaking: true }],
