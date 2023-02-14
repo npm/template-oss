@@ -15,7 +15,7 @@ inputs:
     required: true
   job-status:
     description: Status of the check being created
-    default: in_progress
+    default: 'in_progress'
 
 outputs:
   check-id:
@@ -40,8 +40,13 @@ runs:
             owner,
             repo,
             run_id: runId,
-          })
+          }).then(jobs => jobs.map(j => ({ name: j.name, html_url: j.html_url })))
+
+          console.log(`found jobs: ${JSON.stringify(jobs, null, 2)}`)
+
           const job = jobs.find(j => j.name.endsWith(JOB_NAME))
+
+          console.log(`found job: ${JSON.stringify(job, null, 2)}`)
 
           const shaUrl = `${serverUrl}/${owner}/${repo}/commit/${{ inputs.sha }}`
           const summary = `This check is assosciated with ${shaUrl}\n\n`

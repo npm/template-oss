@@ -3,7 +3,19 @@
 name: Pull Request
 
 on:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+      force:
+        type: boolean
+      check-sha:
+        type: string
   pull_request:
+    branches:
+      - main
+      - latest
+      - release/v*
     types:
       - opened
       - reopened
@@ -12,8 +24,8 @@ on:
 
 jobs:
   commitlint:
-    name: Lint Commit
-    if: github.repository_owner == 'npm'
+    name: Lint Commits
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -23,6 +35,16 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          ref: ${{ inputs.ref }}
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
+        with:
+          sha: ${{ inputs.check-sha }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          job-name: Lint Commits
 
       - name: Setup
         uses: ./.github/actions/setup
@@ -39,3 +61,11 @@ jobs:
           PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
           echo "$PR_TITLE" | npx --offline commitlint -V
+
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          conclusion: ${{ job.status }}
+          check-id: ${{ steps.check.outputs.check-id }}

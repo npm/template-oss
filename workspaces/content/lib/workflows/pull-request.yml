@@ -1,7 +1,10 @@
 name: Pull Request
 
 on:
+  workflow_call:
+    {{> partialsWorkflowCallInputs }}
   pull_request:
+    {{> partialsBranches release=true }}
     types:
       - opened
       - reopened
@@ -10,14 +13,17 @@ on:
 
 jobs:
   commitlint:
-    name: Lint Commit
-    {{> partialsJobIf }}
+    name: Lint Commits
+    if: {{> partialsIfOrg }} && {{> partialsIfSkipPr }}
     {{> partialsJobDefaults }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          ref: $\{{ inputs.ref }}
+      
+      {{> partialsCreateCheck name="Lint Commits" }}
 
       - name: Setup
         uses: ./.github/actions/setup
@@ -34,3 +40,5 @@ jobs:
           PR_TITLE: $\{{ github.event.pull_request.title }}
         run: |
           echo "$PR_TITLE" | {{ rootNpxPath }} --offline commitlint -V
+
+      {{> partialsConcludeCheck }}

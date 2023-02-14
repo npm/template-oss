@@ -1,1 +1,0 @@
-if: github.repository_owner == '{{ org }}'{{#if @partial-block }} {{> @partial-block }}{{else}}{{ newline }}{{/if~}}

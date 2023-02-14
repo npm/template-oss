@@ -3,7 +3,5 @@ branches:
   - {{ . }}
   {{/each}}
   {{~#if release}}
-  {{#each releaseBranches}}
-  - {{ . }}
-  {{/each}}
+  - {{ releaseBranches }}
   {{/if~}}

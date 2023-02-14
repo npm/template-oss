@@ -14,7 +14,7 @@ on:
 jobs:
   check-registry:
     name: Check Registry
-    {{> partialsJobIf }}
+    if: {{> partialsIfOrg }}
     {{> partialsJobDefaults }}
     steps:
       - name: Checkout

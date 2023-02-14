@@ -16,9 +16,7 @@ const sharedRootAdd = () => ({
   '.github/workflows/audit.yml': 'workflows/audit.yml',
   '.github/workflows/ci.yml': 'workflows/ci.yml',
   '.github/workflows/codeql-analysis.yml': 'workflows/codeql-analysis.yml',
-  '.github/workflows/post-dependabot.yml': {
-    file: 'workflows/post-dependabot.yml',
-  },
+  '.github/workflows/post-dependabot.yml': 'workflows/post-dependabot.yml',
   // this lint commits which is only necessary for releases
   '.github/workflows/pull-request.yml': {
     file: 'workflows/pull-request.yml',
@@ -36,14 +34,14 @@ const sharedRootAdd = () => ({
   '.release-please-manifest.json': {
     file: 'files/release-please-manifest.json',
     filter: isPublic,
-    parser: (p) => class extends p.JsonMerge {
+    parser: ({ JsonMerge }) => class extends JsonMerge {
       static comment = null
     },
   },
   'release-please-config.json': {
     file: 'files/release-please-config.json',
     filter: isPublic,
-    parser: (p) => class extends p.JsonMerge {
+    parser: ({ JsonMerge }) => class extends JsonMerge {
       static comment = null
     },
   },
@@ -52,13 +50,14 @@ const sharedRootAdd = () => ({
   // dependabot
   '.github/dependabot.yml': {
     file: 'files/dependabot.yml',
-    parser: (p, options) => {
+    filter: (p) => p.config.isMono && !p.rootConfig.lockfile ? true : p.config.isRoot,
+    parser: ({ YmlMerge }, options) => {
       // dependabot takes a single top level config file. if we are operating on
       // a workspace in a repo without a root lockfile, then this parser will
       // run for all configured packages and each one will have its item
       // replaced in the updates array based on the directory.
       if (options.config.isMono && !options.rootConfig.lockfile) {
-        return class extends p.YmlMerge {
+        return class extends YmlMerge {
           static clean = true
           static key = 'updates'
           static id = 'directory'
@@ -140,6 +139,8 @@ const workspaceModule = {
   ],
 }
 
+const distPaths = ['bin/', 'lib/']
+
 module.exports = {
   rootRepo,
   rootModule,
@@ -147,26 +148,24 @@ module.exports = {
   workspaceModule,
   windowsCI: true,
   macCI: true,
-  branches: ['main', 'latest'],
   defaultBranch: 'main',
-  releaseBranches: ['release/v*'],
-  distPaths: [
-    'bin/',
-    'lib/',
-  ],
+  branches: ['main', 'latest'],
+  releaseBranches: 'release/v*',
+  distPaths,
   allowPaths: [
-    '/bin/',
-    '/lib/',
-    '/.eslintrc.local.*',
     '**/.gitignore',
-    '/docs/',
-    '/tap-snapshots/',
-    '/test/',
-    '/map.js',
-    '/scripts/',
-    '/README*',
-    '/LICENSE*',
-    '/CHANGELOG*',
+    ...[
+      ...distPaths,
+      '.eslintrc.local.*',
+      'docs/',
+      'tap-snapshots/',
+      'test/',
+      'scripts/',
+      'README*',
+      'LICENSE*',
+      'CHANGELOG*',
+      'map.js',
+    ].map(l => `/${l}`),
   ],
   ignorePaths: [],
   ciVersions: ['14.17.0', '14.x', '16.13.0', '16.x', '18.0.0', '18.x'],

@@ -12,9 +12,11 @@ inputs:
     required: true
   login:
     description: Login name of user to look for comments from
-    default: github-actions[bot]
+    default: 'github-actions[bot]'
+    required: true
   body:
     description: Body of the comment, the first line will be used to match to an existing comment
+    required: true
   find:
     description: string to find in body
   replace:
@@ -54,8 +56,8 @@ runs:
           const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
             .then(comments => comments.map(c => ({ id: c.id, login: c.user.login, body: c.body })))
 
-          console.log(`Found comments: ${JSON.stringify(comments, null, 2)}`)
           console.log(`Looking for comment with: ${JSON.stringify({ LOGIN, TITLE, INCLUDES }, null, 2)}`)
+          console.log(`Found comments: ${JSON.stringify(comments, null, 2)}`)
 
           const comment = comments.find(c =>
             c.login === LOGIN &&

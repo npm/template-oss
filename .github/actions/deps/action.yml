@@ -5,12 +5,13 @@ name: Dependencies
 inputs:
   command:
     description: command to run for the dependencies step
-    default: install --ignore-scripts --no-audit --no-fund
+    default: 'install --ignore-scripts --no-audit --no-fund'
   flags:
     description: extra flags to pass to the dependencies step
+    default: ''
   shell:
     description: shell to run on
-    default: bash
+    default: 'bash'
 
 runs:
   using: composite

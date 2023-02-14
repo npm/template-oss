@@ -7,8 +7,7 @@ on:
         description: a release PR number to rerun release jobs on
         type: string
   push:
-    branches:
-      {{> partialsBranches release=true }}
+    {{> partialsBranches release=true }}
 
 permissions:
   contents: write
@@ -18,7 +17,7 @@ permissions:
 jobs:
   release:
     name: Release
-    {{> partialsJobIf }}
+    if: {{> partialsIfOrg }}
     {{> partialsJobDefaults }}
     outputs:
       pr: $\{{ steps.release.outputs.pr }}
@@ -99,7 +98,7 @@ jobs:
 
       - name: Setup
         uses: ./.github/actions/setup
-      
+
       - name: Run Post Pull Request Actions
         env:
           RELEASE_PR_NUMBER: $\{{ needs.release.outputs.pr-number }}
@@ -108,7 +107,7 @@ jobs:
         run: |
           {{ rootNpmPath }} exec --offline -- template-oss-release-manager --lockfile={{ lockfile }}
           {{ rootNpmPath }} run rp-pull-request --ignore-scripts -ws -iwr --if-present
-      
+
       - name: Commit
         id: commit
         env:
@@ -117,7 +116,7 @@ jobs:
           git commit --all --amend --no-edit || true
           git push --force-with-lease
           echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-      
+
       - name: Create Check
         uses: ./.github/actions/create-check
         if: steps.commit.outputs.sha
@@ -143,13 +142,19 @@ jobs:
     with:
       ref: $\{{ needs.release.outputs.pr-branch }}
       check-sha: $\{{ needs.update.outputs.sha }}
+      all: true
 
   post-ci:
-    name: Relase PR - Post CI
+    name: Release PR - Post CI
     {{> partialsJobDefaults }}
     needs: [release, update, ci]
-    if: needs.release.outputs.pr && (success() || failure())
+    if: needs.update.outputs.check-id && (success() || failure())
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: $\{{ needs.release.outputs.pr-branch }}
+
       - name: Get Needs Result
         id: needs-result
         run: |
@@ -164,7 +169,6 @@ jobs:
 
       - name: Conclude Check
         uses: ./.github/actions/conclude-check
-        if: needs.update.outputs.check-id && (success() || failure())
         with:
           token: $\{{ secrets.GITHUB_TOKEN }}
           conclusion: $\{{ steps.needs-result.outputs.result }}
@@ -176,6 +180,9 @@ jobs:
     needs: release
     if: needs.release.outputs.releases
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Comment Text
         uses: actions/github-script@v6
         id: comment-text
@@ -188,8 +195,17 @@ jobs:
             const { runId, repo: { owner, repo } } = context
             const issue_number = releases[0].prNumber
 
-            const releasePleaseComments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
-              .then((comments) => comments.filter(c => c.login === 'github-actions[bot]' && c.body.includes('Release is at')))
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
+              .then(comments => comments.map(c => ({ id: c.id, login: c.user.login, body: c.body })))
+
+            console.log(`comments: ${JSON.stringify(comments, null, 2)}`)
+
+            const releasePleaseComments = comments.filter(c =>
+              c.login === 'github-actions[bot]' &&
+              c.body.startsWith(':robot: Release is at ')
+            )
+
+            console.log(`release please comments: ${JSON.stringify(releasePleaseComments, null, 2)}`)
 
             for (const comment of releasePleaseComments) {
               await github.rest.issues.deleteComment({ owner, repo, comment_id: comment.id })
@@ -201,7 +217,7 @@ jobs:
             }
             body += `- Workflow run: :arrows_counterclockwise: https://github.com/${owner}/${repo}/actions/runs/${runId}`
             return body
-      
+
       - name: Create Release PR Comment
         if: steps.comment-text.outputs.result
         uses: ./.github/actions/upsert-comment
@@ -226,6 +242,9 @@ jobs:
     needs: [release, release-integration]
     if: needs.release.outputs.release && (success() || failure())
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Get Needs Result
         id: needs-result
         run: |
@@ -247,7 +266,7 @@ jobs:
           RESULT: $\{{ steps.needs-result.outputs.result }}
         with:
           script: |
-            const { RESULT, PR_NUMBER, REF_NAME } = process.env             
+            const { RESULT, PR_NUMBER, REF_NAME } = process.env
             const tagCodeowner = RESULT !== 'white_check_mark'
             if (tagCodeowner) {
               let body = ''
@@ -261,7 +280,6 @@ jobs:
             }
 
       - name: Update Release PR Comment
-        if: steps.comment-text.outputs.result
         uses: ./.github/actions/upsert-comment
         with:
           token: $\{{ secrets.GITHUB_TOKEN }}

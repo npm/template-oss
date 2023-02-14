@@ -1,6 +1,9 @@
 name: CodeQL
 
 on:
+  workflow_dispatch:
+  workflow_call:
+    {{> partialsWorkflowCallInputs }}
   push:
     {{> partialsBranches }}
   pull_request:
@@ -11,15 +14,20 @@ on:
 jobs:
   analyze:
     name: Analyze
-    {{> partialsJobIf }}
+    if: {{> partialsIfOrg }} && {{> partialsIfSkipPr }}
     {{> partialsJobDefaults }}
     permissions:
       actions: read
       contents: read
       security-events: write
+      checks: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: $\{{ inputs.ref }}
+      
+      {{> partialsCreateCheck name="Analyze" }}
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
@@ -28,3 +36,5 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
+      
+      {{> partialsConcludeCheck }}

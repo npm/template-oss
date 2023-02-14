@@ -69,7 +69,32 @@ const mockChangelog = async ({ shas = true, authors = true, previousTag = true }
     version: '1.0.0',
     previousTag: previousTag ? 'v0.1.0' : null,
     currentTag: 'v1.0.0',
-    changelogSections: require('../../../release-please-config.json')['changelog-sections'],
+    changelogSections: [
+      {
+        type: 'feat',
+        section: 'Features',
+        hidden: false,
+      },
+      {
+        type: 'fix',
+        section: 'Bug Fixes',
+        hidden: false,
+      },
+      {
+        type: 'docs',
+        section: 'Documentation',
+        hidden: false,
+      },
+      {
+        type: 'deps',
+        section: 'Dependencies',
+        hidden: false,
+      },
+      {
+        type: 'chore',
+        hidden: true,
+      },
+    ],
   })
 
   return notes

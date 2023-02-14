@@ -99,25 +99,25 @@ The repo file audit.yml needs to be updated:
   [@npmcli/template-oss ERROR] There was an erroring getting the target file
   [@npmcli/template-oss ERROR] Error: {{ROOT}}/test/check/tap-testdir-diff-snapshots-update-and-remove-errors/.github/workflows/audit.yml
   
-  YAMLParseError: Implicit keys need to be on a single line at line 30, column 1:
+  YAMLParseError: Implicit keys need to be on a single line at line 57, column 1:
   
-          uses: ./.github/actions/audit
+            check-id: \${{ steps.check.outputs.check-id }}
   >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
   ^
   
-  YAMLParseError: Block scalar header includes extra characters: >>>>I at line 30, column 2:
+  YAMLParseError: Block scalar header includes extra characters: >>>>I at line 57, column 2:
   
   >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
    ^
   
-  YAMLParseError: Not a YAML token: HOPE THIS IS NOT VALID YAML<<<<<<<<<<< at line 30, column 7:
+  YAMLParseError: Not a YAML token: HOPE THIS IS NOT VALID YAML<<<<<<<<<<< at line 57, column 7:
   
   >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   
-  YAMLParseError: Implicit map keys need to be followed by map values at line 30, column 1:
+  YAMLParseError: Implicit map keys need to be followed by map values at line 57, column 1:
   
-          uses: ./.github/actions/audit
+            check-id: \${{ steps.check.outputs.check-id }}
   >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   
@@ -130,6 +130,14 @@ The repo file audit.yml needs to be updated:
   
   on:
     workflow_dispatch:
+    workflow_call:
+      inputs:
+        ref:
+          type: string
+        force:
+          type: boolean
+        check-sha:
+          type: string
     schedule:
       # "At 09:00 UTC (01:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
       - cron: "0 9 * * 1"
@@ -137,7 +145,7 @@ The repo file audit.yml needs to be updated:
   jobs:
     audit:
       name: Audit Dependencies
-      if: github.repository_owner == 'npm'
+      if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
       runs-on: ubuntu-latest
       defaults:
         run:
@@ -145,6 +153,17 @@ The repo file audit.yml needs to be updated:
       steps:
         - name: Checkout
           uses: actions/checkout@v3
+          with:
+            ref: \${{ inputs.ref }}
+  
+        - name: Create Check
+          uses: ./.github/actions/create-check
+          if: inputs.check-sha
+          id: check
+          with:
+            sha: \${{ inputs.check-sha }}
+            token: \${{ secrets.GITHUB_TOKEN }}
+            job-name: Audit Dependencies
   
         - name: Setup
           uses: ./.github/actions/setup
@@ -153,6 +172,14 @@ The repo file audit.yml needs to be updated:
   
         - name: Audit
           uses: ./.github/actions/audit
+  
+        - name: Conclude Check
+          uses: ./.github/actions/conclude-check
+          if: steps.check.outputs.check-id && (success() || failure())
+          with:
+            token: \${{ secrets.GITHUB_TOKEN }}
+            conclusion: \${{ job.status }}
+            check-id: \${{ steps.check.outputs.check-id }}
   
 
 To correct it: npx template-oss-apply --force
@@ -163,11 +190,12 @@ The repo file ci.yml needs to be updated:
 
   .github/workflows/ci.yml
   ========================================
-  @@ -146,4 +146,24 @@
+  @@ -135,4 +135,24 @@
+             shell: \${{ matrix.platform.shell }}
+   
          - name: Get Changed Workspaces
            if: steps.continue-matrix.outputs.result
-           id: workspaces
-           continue-on-error: \${{ !!steps.check.outputs.check-id }}
+  +        id: workspaces
   +        uses: ./.github/actions/changed-workspaces
   +        with:
   +          token: \${{ secrets.GITHUB_TOKEN }}
@@ -176,14 +204,13 @@ The repo file ci.yml needs to be updated:
   +      - name: Test
   +        if: steps.continue-matrix.outputs.result
   +        uses: ./.github/actions/test
-  +        continue-on-error: \${{ !!steps.check.outputs.check-id }}
   +        with:
   +          flags: \${{ steps.workspaces.outputs.flags }}
   +          shell: \${{ matrix.platform.shell }}
   +
   +      - name: Conclude Check
   +        uses: ./.github/actions/conclude-check
-  +        if: steps.continue-matrix.outputs.result && steps.check.outputs.check-id && (success() || failure())
+  +        if: steps.check.outputs.check-id && (success() || failure())
   +        with:
   +          token: \${{ secrets.GITHUB_TOKEN }}
   +          conclusion: \${{ job.status }}

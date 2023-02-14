@@ -19,7 +19,7 @@ runs:
       id: files
       with:
         token: $\{{ inputs.token }}
-    
+
     - name: Get Workspaces
       shell: bash
       id: workspaces

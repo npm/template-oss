@@ -2,19 +2,24 @@
 
 name: Audit
 
-inputs:
-  shell:
-    description: shell to run on
-    default: bash
-
 runs:
   using: composite
   steps:
-    - name: Run Production Audit
-      shell: ${{ inputs.shell }}
-      run: |
-        npm audit --omit=dev
     - name: Run Full Audit
-      shell: ${{ inputs.shell }}
+      id: all
+      shell: bash
       run: |
-        npm audit --audit-level=none
+        if ! npm audit; then
+          COUNT=$(npm audit --audit-level=none --json | jq -r '.metadata.vulnerabilities.total')
+          echo "::warning title=All Vulnerabilities::Found $COUNT vulnerabilities"
+        fi
+
+    - name: Run Production Audit
+      id: production
+      shell: bash
+      run: |
+        if ! npm audit --omit=dev; then
+          COUNT=$(npm audit --omit=dev --audit-level=none --json | jq -r '.metadata.vulnerabilities.total')
+          echo "::error title=Production Vulnerabilities::Found $COUNT production vulnerabilities"
+          exit 1
+        fi

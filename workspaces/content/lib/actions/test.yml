@@ -3,9 +3,10 @@ name: Test
 inputs:
   flags:
     description: flags to pass to the commands
+    default: ''
   shell:
     description: shell to run on
-    default: {{ shell }}
+    default: '{{ shell }}'
 
 runs:
   using: composite

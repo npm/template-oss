@@ -30,6 +30,10 @@
     "npm",
     "oss"
   ],
+  "files": [
+    "bin/",
+    "lib/"
+  ],
   "author": "GitHub Inc.",
   "license": "ISC",
   "dependencies": {
@@ -51,16 +55,18 @@
     "proc-log": "^3.0.0",
     "semver": "^7.3.5"
   },
-  "files": [
-    "bin/",
-    "lib/"
-  ],
   "devDependencies": {
     "@npmcli/eslint-config": "^4.0.0",
     "@npmcli/template-oss": "file:./",
     "tap": "^16.0.0",
     "yaml": "^2.2.1"
   },
+  "bundleDependencies": [
+    "@npmcli/template-oss-config",
+    "@npmcli/template-oss-content",
+    "@npmcli/template-oss-files",
+    "@npmcli/template-oss-release-please"
+  ],
   "tap": {
     "timeout": 600,
     "nyc-arg": [

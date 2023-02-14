@@ -4,26 +4,14 @@ name: CI
 on:
   workflow_dispatch:
     inputs:
-      ref:
-        required: true
-        type: string
-      check-sha:
-        type: string
       all:
-        default: true
         type: boolean
   workflow_call:
-    inputs:
-      ref:
-        required: true
-        type: string
-      check-sha:
-        required: true
-        type: string
+    {{> partialsWorkflowCallInputs }}
       all:
-        default: true
         type: boolean
   pull_request:
+    {{> partialsBranches }}
   push:
     {{> partialsBranches }}
   schedule:
@@ -32,7 +20,7 @@ on:
 jobs:
   lint:
     name: Lint
-    {{> partialsJobIf }}
+    if: {{> partialsIfOrg }} && {{> partialsIfSkipPr }}
     {{> partialsJobDefaults }}
     steps:
       - name: Checkout
@@ -40,23 +28,14 @@ jobs:
         with:
           ref: $\{{ inputs.ref }}
 
-      - name: Create Check
-        uses: ./.github/actions/create-check
-        if: inputs.check-sha
-        id: check
-        with:
-          sha: $\{{ inputs.check-sha }}
-          token: $\{{ secrets.GITHUB_TOKEN }}
-          job-name: Lint
+      {{> partialsCreateCheck name="Lint" }}
 
       - name: Setup
         id: setup
-        continue-on-error: $\{{ !!steps.check.outputs.check-id }}
         uses: ./.github/actions/setup
 
       - name: Get Changed Workspaces
         id: workspaces
-        continue-on-error: $\{{ !!steps.check.outputs.check-id }}
         uses: ./.github/actions/changed-workspaces
         with:
           token: $\{{ secrets.GITHUB_TOKEN }}
@@ -64,51 +43,35 @@ jobs:
 
       - name: Lint
         uses: ./.github/actions/lint
-        continue-on-error: $\{{ !!steps.check.outputs.check-id }}
         with:
           flags: $\{{ steps.workspaces.outputs.flags }}
 
-      - name: Conclude Check
-        uses: ./.github/actions/conclude-check
-        if: steps.check.outputs.check-id && (success() || failure())
-        with:
-          token: $\{{ secrets.GITHUB_TOKEN }}
-          conclusion: $\{{ job.status }}
-          check-id: $\{{ steps.check.outputs.check-id }}
+      {{> partialsConcludeCheck }}
 
   test:
     name: Test - $\{{ matrix.platform.name }} - $\{{ matrix.node-version }}
-    {{> partialsJobIf }}
+    if: {{> partialsIfOrg }} && {{> partialsIfSkipPr }}
     {{> partialsMatrixStrategy }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: $\{{ inputs.ref }}
+
+      {{> partialsCreateCheck name="Test - ${{ matrix.platform.name }} - ${{ matrix.node-version }}" }}
+
       - name: Continue Matrix Run
         id: continue-matrix
         shell: bash
         run: |
           if [[ "$\{{ matrix.node-version }}" == "{{ first ciVersions }}" || "$\{{ inputs.all }}" == "true" ]]; then
-            echo "result=true" >> $GITHUB_OUTPUT 
+            echo "result=true" >> $GITHUB_OUTPUT
           fi
-
-      - name: Checkout
-        if: steps.continue-matrix.outputs.result
-        uses: actions/checkout@v3
-        with:
-          ref: $\{{ inputs.ref }}
-
-      - name: Create Check
-        if: steps.continue-matrix.outputs.result && inputs.check-sha
-        uses: ./.github/actions/create-check
-        id: check
-        with:
-          sha: $\{{ inputs.check-sha }}
-          token: $\{{ secrets.GITHUB_TOKEN }}
-          job-name: "Test - $\{{ matrix.platform.name }} - $\{{ matrix.node-version }}"
 
       - name: Setup
         if: steps.continue-matrix.outputs.result
         uses: ./.github/actions/setup
         id: setup
-        continue-on-error: $\{{ !!steps.check.outputs.check-id }}
         with:
           node-version: $\{{ matrix.node-version }}
           shell: $\{{ matrix.platform.shell }}
@@ -116,7 +79,6 @@ jobs:
       - name: Get Changed Workspaces
         if: steps.continue-matrix.outputs.result
         id: workspaces
-        continue-on-error: $\{{ !!steps.check.outputs.check-id }}
         uses: ./.github/actions/changed-workspaces
         with:
           token: $\{{ secrets.GITHUB_TOKEN }}
@@ -125,15 +87,8 @@ jobs:
       - name: Test
         if: steps.continue-matrix.outputs.result
         uses: ./.github/actions/test
-        continue-on-error: $\{{ !!steps.check.outputs.check-id }}
         with:
           flags: $\{{ steps.workspaces.outputs.flags }}
           shell: $\{{ matrix.platform.shell }}
 
-      - name: Conclude Check
-        uses: ./.github/actions/conclude-check
-        if: steps.continue-matrix.outputs.result && steps.check.outputs.check-id && (success() || failure())
-        with:
-          token: $\{{ secrets.GITHUB_TOKEN }}
-          conclusion: $\{{ job.status }}
-          check-id: $\{{ steps.check.outputs.check-id }}
+      {{> partialsConcludeCheck }}

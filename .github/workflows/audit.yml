@@ -4,6 +4,14 @@ name: Audit
 
 on:
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+      force:
+        type: boolean
+      check-sha:
+        type: string
   schedule:
     # "At 09:00 UTC (01:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
     - cron: "0 9 * * 1"
@@ -11,7 +19,7 @@ on:
 jobs:
   audit:
     name: Audit Dependencies
-    if: github.repository_owner == 'npm'
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -19,6 +27,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
+        with:
+          sha: ${{ inputs.check-sha }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          job-name: Audit Dependencies
 
       - name: Setup
         uses: ./.github/actions/setup
@@ -27,3 +46,11 @@ jobs:
 
       - name: Audit
         uses: ./.github/actions/audit
+
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          conclusion: ${{ job.status }}
+          check-id: ${{ steps.check.outputs.check-id }}

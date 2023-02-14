@@ -5,18 +5,16 @@ name: Lint
 inputs:
   flags:
     description: flags to pass to the commands
-  shell:
-    description: shell to run on
-    default: bash
+    default: ''
 
 runs:
   using: composite
   steps:
     - name: Lint
-      shell: ${{ inputs.shell }}
+      shell: bash
       run: |
         npm run lint --ignore-scripts ${{ inputs.flags }}
     - name: Post Lint
-      shell: ${{ inputs.shell }}
+      shell: bash
       run: |
         npm run postlint --ignore-scripts ${{ inputs.flags }}

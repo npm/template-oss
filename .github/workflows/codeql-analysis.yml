@@ -3,6 +3,15 @@
 name: CodeQL
 
 on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+      force:
+        type: boolean
+      check-sha:
+        type: string
   push:
     branches:
       - main
@@ -18,7 +27,7 @@ on:
 jobs:
   analyze:
     name: Analyze
-    if: github.repository_owner == 'npm'
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -27,9 +36,21 @@ jobs:
       actions: read
       contents: read
       security-events: write
+      checks: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
+        with:
+          sha: ${{ inputs.check-sha }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          job-name: Analyze
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
@@ -38,3 +59,11 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
+
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          conclusion: ${{ job.status }}
+          check-id: ${{ steps.check.outputs.check-id }}

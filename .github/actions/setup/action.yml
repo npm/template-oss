@@ -6,22 +6,22 @@ description: Setup a repo with standard tools
 inputs:
   node-version:
     description: node version to use
-    default: 18.x
+    default: '18.x'
   npm-version:
     description: npm version to use
-    default: latest
+    default: 'latest'
   cache:
     description: whether to cache npm install or not
-    default: false
+    default: 'false'
   shell:
     description: shell to run on
-    default: bash
+    default: 'bash'
   deps:
     description: whether to run the deps step
     default: 'true'
   deps-command:
     description: command to run for the dependencies step
-    default: install --ignore-scripts --no-audit --no-fund
+    default: 'install --ignore-scripts --no-audit --no-fund'
   deps-flags:
     description: extra flags to pass to the dependencies step
 
@@ -47,10 +47,10 @@ runs:
       run: |
         NODE_VERSION=$(node --version)
         echo $NODE_VERSION
-        if npx semver@7 -r "<=10" "$NODE_VERSION" --yes; then
+        if npx semver@7 -r "<=10" "$NODE_VERSION"; then
           echo "ten-or-lower=true" >> $GITHUB_OUTPUT
         fi
-        if npx semver@7 -r "<=14" "$NODE_VERSION" --yes; then
+        if npx semver@7 -r "<=14" "$NODE_VERSION"; then
           echo "fourteen-or-lower=true" >> $GITHUB_OUTPUT
         fi
 
@@ -86,6 +86,7 @@ runs:
       with:
         command: ${{ inputs.deps-command }}
         flags: ${{ inputs.deps-flags }}
+        shell: ${{ inputs.shell }}
 
     - name: Add Problem Matcher
       shell: bash

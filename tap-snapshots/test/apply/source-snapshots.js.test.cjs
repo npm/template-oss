@@ -45,22 +45,27 @@ module.exports = {
 
 name: Audit
 
-inputs:
-  shell:
-    description: shell to run on
-    default: bash
-
 runs:
   using: composite
   steps:
-    - name: Run Production Audit
-      shell: \${{ inputs.shell }}
-      run: |
-        npm audit --omit=dev
     - name: Run Full Audit
-      shell: \${{ inputs.shell }}
+      id: all
+      shell: bash
       run: |
-        npm audit --audit-level=none
+        if ! npm audit; then
+          COUNT=$(npm audit --audit-level=none --json | jq -r '.metadata.vulnerabilities.total')
+          echo "::warning title=All Vulnerabilities::Found $COUNT vulnerabilities"
+        fi
+
+    - name: Run Production Audit
+      id: production
+      shell: bash
+      run: |
+        if ! npm audit --omit=dev; then
+          COUNT=$(npm audit --omit=dev --audit-level=none --json | jq -r '.metadata.vulnerabilities.total')
+          echo "::error title=Production Vulnerabilities::Found $COUNT production vulnerabilities"
+          exit 1
+        fi
 
 .github/actions/changed-files/action.yml
 ========================================
@@ -184,7 +189,7 @@ inputs:
     required: true
   job-status:
     description: Status of the check being created
-    default: in_progress
+    default: 'in_progress'
 
 outputs:
   check-id:
@@ -209,8 +214,13 @@ runs:
             owner,
             repo,
             run_id: runId,
-          })
+          }).then(jobs => jobs.map(j => ({ name: j.name, html_url: j.html_url })))
+
+          console.log(\`found jobs: \${JSON.stringify(jobs, null, 2)}\`)
+
           const job = jobs.find(j => j.name.endsWith(JOB_NAME))
+
+          console.log(\`found job: \${JSON.stringify(job, null, 2)}\`)
 
           const shaUrl = \`\${serverUrl}/\${owner}/\${repo}/commit/\${{ inputs.sha }}\`
           const summary = \`This check is assosciated with \${shaUrl}/n/n\`
@@ -241,12 +251,13 @@ name: Dependencies
 inputs:
   command:
     description: command to run for the dependencies step
-    default: install --ignore-scripts --no-audit --no-fund
+    default: 'install --ignore-scripts --no-audit --no-fund'
   flags:
     description: extra flags to pass to the dependencies step
+    default: ''
   shell:
     description: shell to run on
-    default: bash
+    default: 'bash'
 
 runs:
   using: composite
@@ -264,19 +275,17 @@ name: Lint
 inputs:
   flags:
     description: flags to pass to the commands
-  shell:
-    description: shell to run on
-    default: bash
+    default: ''
 
 runs:
   using: composite
   steps:
     - name: Lint
-      shell: \${{ inputs.shell }}
+      shell: bash
       run: |
         npm run lint --ignore-scripts \${{ inputs.flags }}
     - name: Post Lint
-      shell: \${{ inputs.shell }}
+      shell: bash
       run: |
         npm run postlint --ignore-scripts \${{ inputs.flags }}
 
@@ -290,22 +299,22 @@ description: Setup a repo with standard tools
 inputs:
   node-version:
     description: node version to use
-    default: 18.x
+    default: '18.x'
   npm-version:
     description: npm version to use
-    default: latest
+    default: 'latest'
   cache:
     description: whether to cache npm install or not
-    default: false
+    default: 'false'
   shell:
     description: shell to run on
-    default: bash
+    default: 'bash'
   deps:
     description: whether to run the deps step
     default: 'true'
   deps-command:
     description: command to run for the dependencies step
-    default: install --ignore-scripts --no-audit --no-fund
+    default: 'install --ignore-scripts --no-audit --no-fund'
   deps-flags:
     description: extra flags to pass to the dependencies step
 
@@ -331,10 +340,10 @@ runs:
       run: |
         NODE_VERSION=$(node --version)
         echo $NODE_VERSION
-        if npx semver@7 -r "<=10" "$NODE_VERSION" --yes; then
+        if npx semver@7 -r "<=10" "$NODE_VERSION"; then
           echo "ten-or-lower=true" >> $GITHUB_OUTPUT
         fi
-        if npx semver@7 -r "<=14" "$NODE_VERSION" --yes; then
+        if npx semver@7 -r "<=14" "$NODE_VERSION"; then
           echo "fourteen-or-lower=true" >> $GITHUB_OUTPUT
         fi
 
@@ -370,6 +379,7 @@ runs:
       with:
         command: \${{ inputs.deps-command }}
         flags: \${{ inputs.deps-flags }}
+        shell: \${{ inputs.shell }}
 
     - name: Add Problem Matcher
       shell: bash
@@ -385,9 +395,10 @@ name: Test
 inputs:
   flags:
     description: flags to pass to the commands
+    default: ''
   shell:
     description: shell to run on
-    default: bash
+    default: 'bash'
 
 runs:
   using: composite
@@ -412,9 +423,11 @@ inputs:
     required: true
   login:
     description: Login name of user to look for comments from
-    default: github-actions[bot]
+    default: 'github-actions[bot]'
+    required: true
   body:
     description: Body of the comment, the first line will be used to match to an existing comment
+    required: true
   find:
     description: string to find in body
   replace:
@@ -454,8 +467,8 @@ runs:
           const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
             .then(comments => comments.map(c => ({ id: c.id, login: c.user.login, body: c.body })))
 
-          console.log(\`Found comments: \${JSON.stringify(comments, null, 2)}\`)
           console.log(\`Looking for comment with: \${JSON.stringify({ LOGIN, TITLE, INCLUDES }, null, 2)}\`)
+          console.log(\`Found comments: \${JSON.stringify(comments, null, 2)}\`)
 
           const comment = comments.find(c =>
             c.login === LOGIN &&
@@ -615,6 +628,14 @@ name: Audit
 
 on:
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+      force:
+        type: boolean
+      check-sha:
+        type: string
   schedule:
     # "At 09:00 UTC (01:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
     - cron: "0 9 * * 1"
@@ -622,7 +643,7 @@ on:
 jobs:
   audit:
     name: Audit Dependencies
-    if: github.repository_owner == 'npm'
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -630,6 +651,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: \${{ inputs.ref }}
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
+        with:
+          sha: \${{ inputs.check-sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Audit Dependencies
 
       - name: Setup
         uses: ./.github/actions/setup
@@ -638,6 +670,14 @@ jobs:
 
       - name: Audit
         uses: ./.github/actions/audit
+
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check-id: \${{ steps.check.outputs.check-id }}
 
 .github/workflows/ci.yml
 ========================================
@@ -648,26 +688,22 @@ name: CI
 on:
   workflow_dispatch:
     inputs:
-      ref:
-        required: true
-        type: string
-      check-sha:
-        type: string
       all:
-        default: true
         type: boolean
   workflow_call:
     inputs:
       ref:
-        required: true
         type: string
+      force:
+        type: boolean
       check-sha:
-        required: true
         type: string
       all:
-        default: true
         type: boolean
   pull_request:
+    branches:
+      - main
+      - latest
   push:
     branches:
       - main
@@ -679,7 +715,7 @@ on:
 jobs:
   lint:
     name: Lint
-    if: github.repository_owner == 'npm'
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -701,12 +737,10 @@ jobs:
 
       - name: Setup
         id: setup
-        continue-on-error: \${{ !!steps.check.outputs.check-id }}
         uses: ./.github/actions/setup
 
       - name: Get Changed Workspaces
         id: workspaces
-        continue-on-error: \${{ !!steps.check.outputs.check-id }}
         uses: ./.github/actions/changed-workspaces
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
@@ -714,7 +748,6 @@ jobs:
 
       - name: Lint
         uses: ./.github/actions/lint
-        continue-on-error: \${{ !!steps.check.outputs.check-id }}
         with:
           flags: \${{ steps.workspaces.outputs.flags }}
 
@@ -728,7 +761,7 @@ jobs:
 
   test:
     name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
-    if: github.repository_owner == 'npm'
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: \${{ matrix.platform.os }}
     defaults:
       run:
@@ -754,34 +787,32 @@ jobs:
           - 18.0.0
           - 18.x
     steps:
-      - name: Continue Matrix Run
-        id: continue-matrix
-        shell: bash
-        run: |
-          if [[ "\${{ matrix.node-version }}" == "14.17.0" || "\${{ inputs.all }}" == "true" ]]; then
-            echo "result=true" >> $GITHUB_OUTPUT 
-          fi
-
       - name: Checkout
-        if: steps.continue-matrix.outputs.result
         uses: actions/checkout@v3
         with:
           ref: \${{ inputs.ref }}
 
       - name: Create Check
-        if: steps.continue-matrix.outputs.result && inputs.check-sha
         uses: ./.github/actions/create-check
+        if: inputs.check-sha
         id: check
         with:
           sha: \${{ inputs.check-sha }}
           token: \${{ secrets.GITHUB_TOKEN }}
-          job-name: "Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}"
+          job-name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
+
+      - name: Continue Matrix Run
+        id: continue-matrix
+        shell: bash
+        run: |
+          if [[ "\${{ matrix.node-version }}" == "14.17.0" || "\${{ inputs.all }}" == "true" ]]; then
+            echo "result=true" >> $GITHUB_OUTPUT
+          fi
 
       - name: Setup
         if: steps.continue-matrix.outputs.result
         uses: ./.github/actions/setup
         id: setup
-        continue-on-error: \${{ !!steps.check.outputs.check-id }}
         with:
           node-version: \${{ matrix.node-version }}
           shell: \${{ matrix.platform.shell }}
@@ -789,7 +820,6 @@ jobs:
       - name: Get Changed Workspaces
         if: steps.continue-matrix.outputs.result
         id: workspaces
-        continue-on-error: \${{ !!steps.check.outputs.check-id }}
         uses: ./.github/actions/changed-workspaces
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
@@ -798,14 +828,13 @@ jobs:
       - name: Test
         if: steps.continue-matrix.outputs.result
         uses: ./.github/actions/test
-        continue-on-error: \${{ !!steps.check.outputs.check-id }}
         with:
           flags: \${{ steps.workspaces.outputs.flags }}
           shell: \${{ matrix.platform.shell }}
 
       - name: Conclude Check
         uses: ./.github/actions/conclude-check
-        if: steps.continue-matrix.outputs.result && steps.check.outputs.check-id && (success() || failure())
+        if: steps.check.outputs.check-id && (success() || failure())
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
@@ -818,6 +847,15 @@ jobs:
 name: CodeQL
 
 on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+      force:
+        type: boolean
+      check-sha:
+        type: string
   push:
     branches:
       - main
@@ -833,7 +871,7 @@ on:
 jobs:
   analyze:
     name: Analyze
-    if: github.repository_owner == 'npm'
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -842,9 +880,21 @@ jobs:
       actions: read
       contents: read
       security-events: write
+      checks: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: \${{ inputs.ref }}
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
+        with:
+          sha: \${{ inputs.check-sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Analyze
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
@@ -854,20 +904,36 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
 
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check-id: \${{ steps.check.outputs.check-id }}
+
 .github/workflows/post-dependabot.yml
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
 
 name: Post Dependabot
 
-on: pull_request
+on:
+  pull_request:
+    branches:
+      - main
+      - latest
+      - release/v*
 
 jobs:
-  npmcli-template-oss:
+  dependency:
     name: "@npmcli/template-oss"
     permissions:
       contents: write
-    if: github.repository_owner == 'npm' && github.actor == 'dependabot[bot]'
+    outputs:
+      sha: \${{ steps.sha.outputs.sha }}
+    # TODO: remove head_ref check after testing
+    if: github.repository_owner == 'npm' && (github.actor == 'dependabot[bot]' || contains(github.head_ref, '/npm-cli/template-oss'))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -876,11 +942,21 @@ jobs:
       - name: Fetch Dependabot Metadata
         id: metadata
         uses: dependabot/fetch-metadata@v1
+        continue-on-error: true
         with:
           github-token: \${{ secrets.GITHUB_TOKEN }}
 
+      # TODO: remove step after testing
+      - name: Fake Dependabot Metadata
+        id: fake-metadata
+        if: steps.metadata.outcome == 'failure'
+        run: |
+          echo "dependency-names=@npmcli/template-oss" >> $GITHUB_OUTPUT
+          echo "directory=/" >> $GITHUB_OUTPUT
+          echo "update-type=version-update:semver-patch" >> $GITHUB_OUTPUT
+
       - name: Is Dependency
-        if: contains(steps.metadata.outputs.dependency-names, '@npmcli/template-oss')
+        if: contains(steps.metadata.outputs.dependency-names || steps.fake-metadata.outputs.dependency-names, '@npmcli/template-oss')
         id: dependency
         run: echo "continue=true" >> $GITHUB_OUTPUT
 
@@ -888,7 +964,7 @@ jobs:
         if: steps.dependency.outputs.continue
         uses: actions/checkout@v3
         with:
-          ref: \${{ github.event.pull_request.head.ref }}
+          ref: \${{ (github.event_name == 'pull_request' && github.event.pull_request.head.ref) || '' }}
 
       - name: Setup
         if: steps.dependency.outputs.continue
@@ -899,36 +975,32 @@ jobs:
         uses: ./.github/actions/changed-workspaces
         id: workspaces
         with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          files: '["\${{ steps.metadata.outputs.directory }}"]'
+          files: '["\${{ steps.metadata.outputs.directory || steps.fake-metadata.outputs.directory }}"]'
 
+      # This only sets the conventional commit prefix. This workflow can't reliably determine
+      # what the breaking change is though. If a BREAKING CHANGE message is required then
+      # this PR check will fail and the commit will be amended with stafftools
       - name: Apply Changes
         if: steps.workspaces.outputs.flags
         id: apply
         run: |
           npm run template-oss-apply \${{ steps.workspaces.outputs.flags }}
           if [[ \`git status --porcelain\` ]]; then
-            echo "changes=true" >> $GITHUB_OUTPUT
+            if [[ "\${{ steps.metadata.outputs.update-type || steps.fake-metadata.outputs.update-type }}" == "version-update:semver-major" ]]; then
+              prefix='feat!'
+            else
+              prefix='chore'
+            fi
+            echo "message=$prefix: postinstall for dependabot template-oss PR" >> $GITHUB_OUTPUT
           fi
-          # This only sets the conventional commit prefix. This workflow can't reliably determine
-          # what the breaking change is though. If a BREAKING CHANGE message is required then
-          # this PR check will fail and the commit will be amended with stafftools
-          if [[ "\${{ steps.metadata.outputs.update-type }}" == "version-update:semver-major" ]]; then
-            prefix='feat!'
-          else
-            prefix='chore'
-          fi
-          echo "message=$prefix: postinstall for dependabot template-oss PR" >> $GITHUB_OUTPUT
 
       # This step will fail if template-oss has made any workflow updates. It is impossible
       # for a workflow to update other workflows. In the case it does fail, we continue
       # and then try to apply only a portion of the changes in the next step
       - name: Push All Changes
-        if: steps.apply.outputs.changes
+        if: steps.apply.outputs.message
         id: push
         continue-on-error: true
-        env:
-          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
           git commit -am "\${{ steps.apply.outputs.message }}"
           git push
@@ -937,9 +1009,9 @@ jobs:
       # and attempt to commit and push again. This is helpful because we will have a commit
       # with the correct prefix that we can then --amend with @npmcli/stafftools later.
       - name: Push All Changes Except Workflows
-        if: steps.apply.outputs.changes && steps.push.outcome == 'failure'
-        env:
-          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        if: steps.apply.outputs.message && steps.push.outcome == 'failure'
+        id: push-on-error
+        continue-on-error: true
         run: |
           git reset HEAD~
           git checkout HEAD -- .github/workflows/
@@ -947,25 +1019,53 @@ jobs:
           git commit -am "\${{ steps.apply.outputs.message }}"
           git push
 
-      # Check if all the necessary template-oss changes were applied. Since we continued
-      # on errors in one of the previous steps, this check will fail if our follow up
-      # only applied a portion of the changes and we need to followup manually.
-      #
-      # Note that this used to run \`lint\` and \`postlint\` but that will fail this action
-      # if we've also shipped any linting changes separate from template-oss. We do
-      # linting in another action, so we want to fail this one only if there are
-      # template-oss changes that could not be applied.
-      - name: Check Changes
-        if: steps.apply.outputs.changes
-        run: |
-          npm exec --offline \${{ steps.workspaces.outputs.flags }} -- template-oss-check
-
+      # If template-oss is applying breaking changes, then we fail this PR with a message saying what to do. There's no need
+      # to run CI in this case because the PR will need to be fixed manually so CI will run on those commits.
       - name: Fail on Breaking Change
-        if: steps.apply.outputs.changes && startsWith(steps.apply.outputs.message, 'feat!')
+        if: startsWith(steps.apply.outputs.message, 'feat!')
         run: |
-          echo "This PR has a breaking change. Run 'npx -p @npmcli/stafftools gh template-oss-fix'"
-          echo "for more information on how to fix this with a BREAKING CHANGE footer."
+          TITLE="Breaking Changes"
+          MESSAGE="This PR has a breaking change. Run 'npx -p @npmcli/stafftools gh template-oss-fix'"
+          MESSAGE="$MESSAGE for more information on how to fix this with a BREAKING CHANGE footer."
+          echo "::error title=$TITLE::$MESSAGE"
           exit 1
+
+      - name: Get SHA
+        id: sha
+        run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
+  # If everything succeeded so far then we run our normal CI workflow since GitHub actions wont rerun after a bot
+  # pushes a new commit to a PR. We rerun all of CI because template-oss could affect any code in the repo including
+  # lint settings and test settings.
+  ci:
+    name: CI
+    needs: [ dependency ]
+    if: needs.dependency.outputs.sha
+    uses: ./.github/workflows/ci.yml
+    with:
+      ref: \${{ github.head_ref }}
+      check-sha: \${{ needs.dependency.outputs.sha }}
+      force: true
+
+  codeql-analysis:
+    name: CodeQL
+    needs: [ dependency ]
+    if: needs.dependency.outputs.sha
+    uses: ./.github/workflows/codeql-analysis.yml
+    with:
+      ref: \${{ github.head_ref }}
+      check-sha: \${{ needs.dependency.outputs.sha }}
+      force: true
+
+  pull-request:
+    name: Pull Request
+    needs: [ dependency ]
+    if: needs.dependency.outputs.sha
+    uses: ./.github/workflows/pull-request.yml
+    with:
+      ref: \${{ github.head_ref }}
+      check-sha: \${{ needs.dependency.outputs.sha }}
+      force: true
 
 .github/workflows/pull-request.yml
 ========================================
@@ -974,7 +1074,19 @@ jobs:
 name: Pull Request
 
 on:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+      force:
+        type: boolean
+      check-sha:
+        type: string
   pull_request:
+    branches:
+      - main
+      - latest
+      - release/v*
     types:
       - opened
       - reopened
@@ -983,8 +1095,8 @@ on:
 
 jobs:
   commitlint:
-    name: Lint Commit
-    if: github.repository_owner == 'npm'
+    name: Lint Commits
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -994,6 +1106,16 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          ref: \${{ inputs.ref }}
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
+        with:
+          sha: \${{ inputs.check-sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Lint Commits
 
       - name: Setup
         uses: ./.github/actions/setup
@@ -1010,6 +1132,14 @@ jobs:
           PR_TITLE: \${{ github.event.pull_request.title }}
         run: |
           echo "$PR_TITLE" | npx --offline commitlint -V
+
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check-id: \${{ steps.check.outputs.check-id }}
 
 .github/workflows/release-integration.yml
 ========================================
@@ -1085,10 +1215,9 @@ on:
         type: string
   push:
     branches:
-      branches:
-        - main
-        - latest
-        - release/v*
+      - main
+      - latest
+      - release/v*
 
 permissions:
   contents: write
@@ -1229,16 +1358,22 @@ jobs:
     with:
       ref: \${{ needs.release.outputs.pr-branch }}
       check-sha: \${{ needs.update.outputs.sha }}
+      all: true
 
   post-ci:
-    name: Relase PR - Post CI
+    name: Release PR - Post CI
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
     needs: [ release, update, ci ]
-    if: needs.release.outputs.pr && (success() || failure())
+    if: needs.update.outputs.check-id && (success() || failure())
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: \${{ needs.release.outputs.pr-branch }}
+
       - name: Get Needs Result
         id: needs-result
         run: |
@@ -1253,7 +1388,6 @@ jobs:
 
       - name: Conclude Check
         uses: ./.github/actions/conclude-check
-        if: needs.update.outputs.check-id && (success() || failure())
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ steps.needs-result.outputs.result }}
@@ -1268,6 +1402,9 @@ jobs:
     needs: release
     if: needs.release.outputs.releases
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Comment Text
         uses: actions/github-script@v6
         id: comment-text
@@ -1280,8 +1417,17 @@ jobs:
             const { runId, repo: { owner, repo } } = context
             const issue_number = releases[0].prNumber
 
-            const releasePleaseComments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
-              .then((comments) => comments.filter(c => c.login === 'github-actions[bot]' && c.body.includes('Release is at')))
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
+              .then(comments => comments.map(c => ({ id: c.id, login: c.user.login, body: c.body })))
+
+            console.log(\`comments: \${JSON.stringify(comments, null, 2)}\`)
+
+            const releasePleaseComments = comments.filter(c =>
+              c.login === 'github-actions[bot]' &&
+              c.body.startsWith(':robot: Release is at ')
+            )
+
+            console.log(\`release please comments: \${JSON.stringify(releasePleaseComments, null, 2)}\`)
 
             for (const comment of releasePleaseComments) {
               await github.rest.issues.deleteComment({ owner, repo, comment_id: comment.id })
@@ -1321,6 +1467,9 @@ jobs:
     needs: [ release, release-integration ]
     if: needs.release.outputs.release && (success() || failure())
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Get Needs Result
         id: needs-result
         run: |
@@ -1342,7 +1491,7 @@ jobs:
           RESULT: \${{ steps.needs-result.outputs.result }}
         with:
           script: |
-            const { RESULT, PR_NUMBER, REF_NAME } = process.env             
+            const { RESULT, PR_NUMBER, REF_NAME } = process.env
             const tagCodeowner = RESULT !== 'white_check_mark'
             if (tagCodeowner) {
               let body = ''
@@ -1356,7 +1505,6 @@ jobs:
             }
 
       - name: Update Release PR Comment
-        if: steps.comment-text.outputs.result
         uses: ./.github/actions/upsert-comment
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
@@ -1578,22 +1726,27 @@ module.exports = {
 
 name: Audit
 
-inputs:
-  shell:
-    description: shell to run on
-    default: bash
-
 runs:
   using: composite
   steps:
-    - name: Run Production Audit
-      shell: \${{ inputs.shell }}
-      run: |
-        npm audit --omit=dev
     - name: Run Full Audit
-      shell: \${{ inputs.shell }}
+      id: all
+      shell: bash
       run: |
-        npm audit --audit-level=none
+        if ! npm audit; then
+          COUNT=$(npm audit --audit-level=none --json | jq -r '.metadata.vulnerabilities.total')
+          echo "::warning title=All Vulnerabilities::Found $COUNT vulnerabilities"
+        fi
+
+    - name: Run Production Audit
+      id: production
+      shell: bash
+      run: |
+        if ! npm audit --omit=dev; then
+          COUNT=$(npm audit --omit=dev --audit-level=none --json | jq -r '.metadata.vulnerabilities.total')
+          echo "::error title=Production Vulnerabilities::Found $COUNT production vulnerabilities"
+          exit 1
+        fi
 
 .github/actions/changed-files/action.yml
 ========================================
@@ -1717,7 +1870,7 @@ inputs:
     required: true
   job-status:
     description: Status of the check being created
-    default: in_progress
+    default: 'in_progress'
 
 outputs:
   check-id:
@@ -1742,8 +1895,13 @@ runs:
             owner,
             repo,
             run_id: runId,
-          })
+          }).then(jobs => jobs.map(j => ({ name: j.name, html_url: j.html_url })))
+
+          console.log(\`found jobs: \${JSON.stringify(jobs, null, 2)}\`)
+
           const job = jobs.find(j => j.name.endsWith(JOB_NAME))
+
+          console.log(\`found job: \${JSON.stringify(job, null, 2)}\`)
 
           const shaUrl = \`\${serverUrl}/\${owner}/\${repo}/commit/\${{ inputs.sha }}\`
           const summary = \`This check is assosciated with \${shaUrl}/n/n\`
@@ -1774,12 +1932,13 @@ name: Dependencies
 inputs:
   command:
     description: command to run for the dependencies step
-    default: install --ignore-scripts --no-audit --no-fund
+    default: 'install --ignore-scripts --no-audit --no-fund'
   flags:
     description: extra flags to pass to the dependencies step
+    default: ''
   shell:
     description: shell to run on
-    default: bash
+    default: 'bash'
 
 runs:
   using: composite
@@ -1797,19 +1956,17 @@ name: Lint
 inputs:
   flags:
     description: flags to pass to the commands
-  shell:
-    description: shell to run on
-    default: bash
+    default: ''
 
 runs:
   using: composite
   steps:
     - name: Lint
-      shell: \${{ inputs.shell }}
+      shell: bash
       run: |
         npm run lint --ignore-scripts \${{ inputs.flags }}
     - name: Post Lint
-      shell: \${{ inputs.shell }}
+      shell: bash
       run: |
         npm run postlint --ignore-scripts \${{ inputs.flags }}
 
@@ -1823,22 +1980,22 @@ description: Setup a repo with standard tools
 inputs:
   node-version:
     description: node version to use
-    default: 18.x
+    default: '18.x'
   npm-version:
     description: npm version to use
-    default: latest
+    default: 'latest'
   cache:
     description: whether to cache npm install or not
-    default: false
+    default: 'false'
   shell:
     description: shell to run on
-    default: bash
+    default: 'bash'
   deps:
     description: whether to run the deps step
     default: 'true'
   deps-command:
     description: command to run for the dependencies step
-    default: install --ignore-scripts --no-audit --no-fund
+    default: 'install --ignore-scripts --no-audit --no-fund'
   deps-flags:
     description: extra flags to pass to the dependencies step
 
@@ -1864,10 +2021,10 @@ runs:
       run: |
         NODE_VERSION=$(node --version)
         echo $NODE_VERSION
-        if npx semver@7 -r "<=10" "$NODE_VERSION" --yes; then
+        if npx semver@7 -r "<=10" "$NODE_VERSION"; then
           echo "ten-or-lower=true" >> $GITHUB_OUTPUT
         fi
-        if npx semver@7 -r "<=14" "$NODE_VERSION" --yes; then
+        if npx semver@7 -r "<=14" "$NODE_VERSION"; then
           echo "fourteen-or-lower=true" >> $GITHUB_OUTPUT
         fi
 
@@ -1903,6 +2060,7 @@ runs:
       with:
         command: \${{ inputs.deps-command }}
         flags: \${{ inputs.deps-flags }}
+        shell: \${{ inputs.shell }}
 
     - name: Add Problem Matcher
       shell: bash
@@ -1918,9 +2076,10 @@ name: Test
 inputs:
   flags:
     description: flags to pass to the commands
+    default: ''
   shell:
     description: shell to run on
-    default: bash
+    default: 'bash'
 
 runs:
   using: composite
@@ -1945,9 +2104,11 @@ inputs:
     required: true
   login:
     description: Login name of user to look for comments from
-    default: github-actions[bot]
+    default: 'github-actions[bot]'
+    required: true
   body:
     description: Body of the comment, the first line will be used to match to an existing comment
+    required: true
   find:
     description: string to find in body
   replace:
@@ -1987,8 +2148,8 @@ runs:
           const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
             .then(comments => comments.map(c => ({ id: c.id, login: c.user.login, body: c.body })))
 
-          console.log(\`Found comments: \${JSON.stringify(comments, null, 2)}\`)
           console.log(\`Looking for comment with: \${JSON.stringify({ LOGIN, TITLE, INCLUDES }, null, 2)}\`)
+          console.log(\`Found comments: \${JSON.stringify(comments, null, 2)}\`)
 
           const comment = comments.find(c =>
             c.login === LOGIN &&
@@ -2172,6 +2333,14 @@ name: Audit
 
 on:
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+      force:
+        type: boolean
+      check-sha:
+        type: string
   schedule:
     # "At 09:00 UTC (01:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
     - cron: "0 9 * * 1"
@@ -2179,7 +2348,7 @@ on:
 jobs:
   audit:
     name: Audit Dependencies
-    if: github.repository_owner == 'npm'
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -2187,6 +2356,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: \${{ inputs.ref }}
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
+        with:
+          sha: \${{ inputs.check-sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Audit Dependencies
 
       - name: Setup
         uses: ./.github/actions/setup
@@ -2195,6 +2375,14 @@ jobs:
 
       - name: Audit
         uses: ./.github/actions/audit
+
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check-id: \${{ steps.check.outputs.check-id }}
 
 .github/workflows/ci.yml
 ========================================
@@ -2205,26 +2393,22 @@ name: CI
 on:
   workflow_dispatch:
     inputs:
-      ref:
-        required: true
-        type: string
-      check-sha:
-        type: string
       all:
-        default: true
         type: boolean
   workflow_call:
     inputs:
       ref:
-        required: true
         type: string
+      force:
+        type: boolean
       check-sha:
-        required: true
         type: string
       all:
-        default: true
         type: boolean
   pull_request:
+    branches:
+      - main
+      - latest
   push:
     branches:
       - main
@@ -2236,7 +2420,7 @@ on:
 jobs:
   lint:
     name: Lint
-    if: github.repository_owner == 'npm'
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -2258,12 +2442,10 @@ jobs:
 
       - name: Setup
         id: setup
-        continue-on-error: \${{ !!steps.check.outputs.check-id }}
         uses: ./.github/actions/setup
 
       - name: Get Changed Workspaces
         id: workspaces
-        continue-on-error: \${{ !!steps.check.outputs.check-id }}
         uses: ./.github/actions/changed-workspaces
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
@@ -2271,7 +2453,6 @@ jobs:
 
       - name: Lint
         uses: ./.github/actions/lint
-        continue-on-error: \${{ !!steps.check.outputs.check-id }}
         with:
           flags: \${{ steps.workspaces.outputs.flags }}
 
@@ -2285,7 +2466,7 @@ jobs:
 
   test:
     name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
-    if: github.repository_owner == 'npm'
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: \${{ matrix.platform.os }}
     defaults:
       run:
@@ -2311,34 +2492,32 @@ jobs:
           - 18.0.0
           - 18.x
     steps:
-      - name: Continue Matrix Run
-        id: continue-matrix
-        shell: bash
-        run: |
-          if [[ "\${{ matrix.node-version }}" == "14.17.0" || "\${{ inputs.all }}" == "true" ]]; then
-            echo "result=true" >> $GITHUB_OUTPUT 
-          fi
-
       - name: Checkout
-        if: steps.continue-matrix.outputs.result
         uses: actions/checkout@v3
         with:
           ref: \${{ inputs.ref }}
 
       - name: Create Check
-        if: steps.continue-matrix.outputs.result && inputs.check-sha
         uses: ./.github/actions/create-check
+        if: inputs.check-sha
         id: check
         with:
           sha: \${{ inputs.check-sha }}
           token: \${{ secrets.GITHUB_TOKEN }}
-          job-name: "Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}"
+          job-name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
+
+      - name: Continue Matrix Run
+        id: continue-matrix
+        shell: bash
+        run: |
+          if [[ "\${{ matrix.node-version }}" == "14.17.0" || "\${{ inputs.all }}" == "true" ]]; then
+            echo "result=true" >> $GITHUB_OUTPUT
+          fi
 
       - name: Setup
         if: steps.continue-matrix.outputs.result
         uses: ./.github/actions/setup
         id: setup
-        continue-on-error: \${{ !!steps.check.outputs.check-id }}
         with:
           node-version: \${{ matrix.node-version }}
           shell: \${{ matrix.platform.shell }}
@@ -2346,7 +2525,6 @@ jobs:
       - name: Get Changed Workspaces
         if: steps.continue-matrix.outputs.result
         id: workspaces
-        continue-on-error: \${{ !!steps.check.outputs.check-id }}
         uses: ./.github/actions/changed-workspaces
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
@@ -2355,14 +2533,13 @@ jobs:
       - name: Test
         if: steps.continue-matrix.outputs.result
         uses: ./.github/actions/test
-        continue-on-error: \${{ !!steps.check.outputs.check-id }}
         with:
           flags: \${{ steps.workspaces.outputs.flags }}
           shell: \${{ matrix.platform.shell }}
 
       - name: Conclude Check
         uses: ./.github/actions/conclude-check
-        if: steps.continue-matrix.outputs.result && steps.check.outputs.check-id && (success() || failure())
+        if: steps.check.outputs.check-id && (success() || failure())
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
@@ -2375,6 +2552,15 @@ jobs:
 name: CodeQL
 
 on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+      force:
+        type: boolean
+      check-sha:
+        type: string
   push:
     branches:
       - main
@@ -2390,7 +2576,7 @@ on:
 jobs:
   analyze:
     name: Analyze
-    if: github.repository_owner == 'npm'
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -2399,9 +2585,21 @@ jobs:
       actions: read
       contents: read
       security-events: write
+      checks: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: \${{ inputs.ref }}
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
+        with:
+          sha: \${{ inputs.check-sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Analyze
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
@@ -2411,20 +2609,36 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
 
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check-id: \${{ steps.check.outputs.check-id }}
+
 .github/workflows/post-dependabot.yml
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
 
 name: Post Dependabot
 
-on: pull_request
+on:
+  pull_request:
+    branches:
+      - main
+      - latest
+      - release/v*
 
 jobs:
-  npmcli-template-oss:
+  dependency:
     name: "@npmcli/template-oss"
     permissions:
       contents: write
-    if: github.repository_owner == 'npm' && github.actor == 'dependabot[bot]'
+    outputs:
+      sha: \${{ steps.sha.outputs.sha }}
+    # TODO: remove head_ref check after testing
+    if: github.repository_owner == 'npm' && (github.actor == 'dependabot[bot]' || contains(github.head_ref, '/npm-cli/template-oss'))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -2433,11 +2647,21 @@ jobs:
       - name: Fetch Dependabot Metadata
         id: metadata
         uses: dependabot/fetch-metadata@v1
+        continue-on-error: true
         with:
           github-token: \${{ secrets.GITHUB_TOKEN }}
 
+      # TODO: remove step after testing
+      - name: Fake Dependabot Metadata
+        id: fake-metadata
+        if: steps.metadata.outcome == 'failure'
+        run: |
+          echo "dependency-names=@npmcli/template-oss" >> $GITHUB_OUTPUT
+          echo "directory=/" >> $GITHUB_OUTPUT
+          echo "update-type=version-update:semver-patch" >> $GITHUB_OUTPUT
+
       - name: Is Dependency
-        if: contains(steps.metadata.outputs.dependency-names, '@npmcli/template-oss')
+        if: contains(steps.metadata.outputs.dependency-names || steps.fake-metadata.outputs.dependency-names, '@npmcli/template-oss')
         id: dependency
         run: echo "continue=true" >> $GITHUB_OUTPUT
 
@@ -2445,7 +2669,7 @@ jobs:
         if: steps.dependency.outputs.continue
         uses: actions/checkout@v3
         with:
-          ref: \${{ github.event.pull_request.head.ref }}
+          ref: \${{ (github.event_name == 'pull_request' && github.event.pull_request.head.ref) || '' }}
 
       - name: Setup
         if: steps.dependency.outputs.continue
@@ -2456,36 +2680,32 @@ jobs:
         uses: ./.github/actions/changed-workspaces
         id: workspaces
         with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          files: '["\${{ steps.metadata.outputs.directory }}"]'
+          files: '["\${{ steps.metadata.outputs.directory || steps.fake-metadata.outputs.directory }}"]'
 
+      # This only sets the conventional commit prefix. This workflow can't reliably determine
+      # what the breaking change is though. If a BREAKING CHANGE message is required then
+      # this PR check will fail and the commit will be amended with stafftools
       - name: Apply Changes
         if: steps.workspaces.outputs.flags
         id: apply
         run: |
           npm run template-oss-apply \${{ steps.workspaces.outputs.flags }}
           if [[ \`git status --porcelain\` ]]; then
-            echo "changes=true" >> $GITHUB_OUTPUT
+            if [[ "\${{ steps.metadata.outputs.update-type || steps.fake-metadata.outputs.update-type }}" == "version-update:semver-major" ]]; then
+              prefix='feat!'
+            else
+              prefix='chore'
+            fi
+            echo "message=$prefix: postinstall for dependabot template-oss PR" >> $GITHUB_OUTPUT
           fi
-          # This only sets the conventional commit prefix. This workflow can't reliably determine
-          # what the breaking change is though. If a BREAKING CHANGE message is required then
-          # this PR check will fail and the commit will be amended with stafftools
-          if [[ "\${{ steps.metadata.outputs.update-type }}" == "version-update:semver-major" ]]; then
-            prefix='feat!'
-          else
-            prefix='chore'
-          fi
-          echo "message=$prefix: postinstall for dependabot template-oss PR" >> $GITHUB_OUTPUT
 
       # This step will fail if template-oss has made any workflow updates. It is impossible
       # for a workflow to update other workflows. In the case it does fail, we continue
       # and then try to apply only a portion of the changes in the next step
       - name: Push All Changes
-        if: steps.apply.outputs.changes
+        if: steps.apply.outputs.message
         id: push
         continue-on-error: true
-        env:
-          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
           git commit -am "\${{ steps.apply.outputs.message }}"
           git push
@@ -2494,9 +2714,9 @@ jobs:
       # and attempt to commit and push again. This is helpful because we will have a commit
       # with the correct prefix that we can then --amend with @npmcli/stafftools later.
       - name: Push All Changes Except Workflows
-        if: steps.apply.outputs.changes && steps.push.outcome == 'failure'
-        env:
-          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        if: steps.apply.outputs.message && steps.push.outcome == 'failure'
+        id: push-on-error
+        continue-on-error: true
         run: |
           git reset HEAD~
           git checkout HEAD -- .github/workflows/
@@ -2504,25 +2724,53 @@ jobs:
           git commit -am "\${{ steps.apply.outputs.message }}"
           git push
 
-      # Check if all the necessary template-oss changes were applied. Since we continued
-      # on errors in one of the previous steps, this check will fail if our follow up
-      # only applied a portion of the changes and we need to followup manually.
-      #
-      # Note that this used to run \`lint\` and \`postlint\` but that will fail this action
-      # if we've also shipped any linting changes separate from template-oss. We do
-      # linting in another action, so we want to fail this one only if there are
-      # template-oss changes that could not be applied.
-      - name: Check Changes
-        if: steps.apply.outputs.changes
-        run: |
-          npm exec --offline \${{ steps.workspaces.outputs.flags }} -- template-oss-check
-
+      # If template-oss is applying breaking changes, then we fail this PR with a message saying what to do. There's no need
+      # to run CI in this case because the PR will need to be fixed manually so CI will run on those commits.
       - name: Fail on Breaking Change
-        if: steps.apply.outputs.changes && startsWith(steps.apply.outputs.message, 'feat!')
+        if: startsWith(steps.apply.outputs.message, 'feat!')
         run: |
-          echo "This PR has a breaking change. Run 'npx -p @npmcli/stafftools gh template-oss-fix'"
-          echo "for more information on how to fix this with a BREAKING CHANGE footer."
+          TITLE="Breaking Changes"
+          MESSAGE="This PR has a breaking change. Run 'npx -p @npmcli/stafftools gh template-oss-fix'"
+          MESSAGE="$MESSAGE for more information on how to fix this with a BREAKING CHANGE footer."
+          echo "::error title=$TITLE::$MESSAGE"
           exit 1
+
+      - name: Get SHA
+        id: sha
+        run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
+  # If everything succeeded so far then we run our normal CI workflow since GitHub actions wont rerun after a bot
+  # pushes a new commit to a PR. We rerun all of CI because template-oss could affect any code in the repo including
+  # lint settings and test settings.
+  ci:
+    name: CI
+    needs: [ dependency ]
+    if: needs.dependency.outputs.sha
+    uses: ./.github/workflows/ci.yml
+    with:
+      ref: \${{ github.head_ref }}
+      check-sha: \${{ needs.dependency.outputs.sha }}
+      force: true
+
+  codeql-analysis:
+    name: CodeQL
+    needs: [ dependency ]
+    if: needs.dependency.outputs.sha
+    uses: ./.github/workflows/codeql-analysis.yml
+    with:
+      ref: \${{ github.head_ref }}
+      check-sha: \${{ needs.dependency.outputs.sha }}
+      force: true
+
+  pull-request:
+    name: Pull Request
+    needs: [ dependency ]
+    if: needs.dependency.outputs.sha
+    uses: ./.github/workflows/pull-request.yml
+    with:
+      ref: \${{ github.head_ref }}
+      check-sha: \${{ needs.dependency.outputs.sha }}
+      force: true
 
 .github/workflows/pull-request.yml
 ========================================
@@ -2531,7 +2779,19 @@ jobs:
 name: Pull Request
 
 on:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+      force:
+        type: boolean
+      check-sha:
+        type: string
   pull_request:
+    branches:
+      - main
+      - latest
+      - release/v*
     types:
       - opened
       - reopened
@@ -2540,8 +2800,8 @@ on:
 
 jobs:
   commitlint:
-    name: Lint Commit
-    if: github.repository_owner == 'npm'
+    name: Lint Commits
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -2551,6 +2811,16 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          ref: \${{ inputs.ref }}
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
+        with:
+          sha: \${{ inputs.check-sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Lint Commits
 
       - name: Setup
         uses: ./.github/actions/setup
@@ -2567,6 +2837,14 @@ jobs:
           PR_TITLE: \${{ github.event.pull_request.title }}
         run: |
           echo "$PR_TITLE" | npx --offline commitlint -V
+
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check-id: \${{ steps.check.outputs.check-id }}
 
 .github/workflows/release-integration.yml
 ========================================
@@ -2642,10 +2920,9 @@ on:
         type: string
   push:
     branches:
-      branches:
-        - main
-        - latest
-        - release/v*
+      - main
+      - latest
+      - release/v*
 
 permissions:
   contents: write
@@ -2786,16 +3063,22 @@ jobs:
     with:
       ref: \${{ needs.release.outputs.pr-branch }}
       check-sha: \${{ needs.update.outputs.sha }}
+      all: true
 
   post-ci:
-    name: Relase PR - Post CI
+    name: Release PR - Post CI
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
     needs: [ release, update, ci ]
-    if: needs.release.outputs.pr && (success() || failure())
+    if: needs.update.outputs.check-id && (success() || failure())
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: \${{ needs.release.outputs.pr-branch }}
+
       - name: Get Needs Result
         id: needs-result
         run: |
@@ -2810,7 +3093,6 @@ jobs:
 
       - name: Conclude Check
         uses: ./.github/actions/conclude-check
-        if: needs.update.outputs.check-id && (success() || failure())
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ steps.needs-result.outputs.result }}
@@ -2825,6 +3107,9 @@ jobs:
     needs: release
     if: needs.release.outputs.releases
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Comment Text
         uses: actions/github-script@v6
         id: comment-text
@@ -2837,8 +3122,17 @@ jobs:
             const { runId, repo: { owner, repo } } = context
             const issue_number = releases[0].prNumber
 
-            const releasePleaseComments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
-              .then((comments) => comments.filter(c => c.login === 'github-actions[bot]' && c.body.includes('Release is at')))
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
+              .then(comments => comments.map(c => ({ id: c.id, login: c.user.login, body: c.body })))
+
+            console.log(\`comments: \${JSON.stringify(comments, null, 2)}\`)
+
+            const releasePleaseComments = comments.filter(c =>
+              c.login === 'github-actions[bot]' &&
+              c.body.startsWith(':robot: Release is at ')
+            )
+
+            console.log(\`release please comments: \${JSON.stringify(releasePleaseComments, null, 2)}\`)
 
             for (const comment of releasePleaseComments) {
               await github.rest.issues.deleteComment({ owner, repo, comment_id: comment.id })
@@ -2878,6 +3172,9 @@ jobs:
     needs: [ release, release-integration ]
     if: needs.release.outputs.release && (success() || failure())
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Get Needs Result
         id: needs-result
         run: |
@@ -2899,7 +3196,7 @@ jobs:
           RESULT: \${{ steps.needs-result.outputs.result }}
         with:
           script: |
-            const { RESULT, PR_NUMBER, REF_NAME } = process.env             
+            const { RESULT, PR_NUMBER, REF_NAME } = process.env
             const tagCodeowner = RESULT !== 'white_check_mark'
             if (tagCodeowner) {
               let body = ''
@@ -2913,7 +3210,6 @@ jobs:
             }
 
       - name: Update Release PR Comment
-        if: steps.comment-text.outputs.result
         uses: ./.github/actions/upsert-comment
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
@@ -3261,22 +3557,27 @@ exports[`test/apply/source-snapshots.js TAP workspaces only > expect resolving P
 
 name: Audit
 
-inputs:
-  shell:
-    description: shell to run on
-    default: bash
-
 runs:
   using: composite
   steps:
-    - name: Run Production Audit
-      shell: \${{ inputs.shell }}
-      run: |
-        npm audit --omit=dev
     - name: Run Full Audit
-      shell: \${{ inputs.shell }}
+      id: all
+      shell: bash
       run: |
-        npm audit --audit-level=none
+        if ! npm audit; then
+          COUNT=$(npm audit --audit-level=none --json | jq -r '.metadata.vulnerabilities.total')
+          echo "::warning title=All Vulnerabilities::Found $COUNT vulnerabilities"
+        fi
+
+    - name: Run Production Audit
+      id: production
+      shell: bash
+      run: |
+        if ! npm audit --omit=dev; then
+          COUNT=$(npm audit --omit=dev --audit-level=none --json | jq -r '.metadata.vulnerabilities.total')
+          echo "::error title=Production Vulnerabilities::Found $COUNT production vulnerabilities"
+          exit 1
+        fi
 
 .github/actions/changed-files/action.yml
 ========================================
@@ -3400,7 +3701,7 @@ inputs:
     required: true
   job-status:
     description: Status of the check being created
-    default: in_progress
+    default: 'in_progress'
 
 outputs:
   check-id:
@@ -3425,8 +3726,13 @@ runs:
             owner,
             repo,
             run_id: runId,
-          })
+          }).then(jobs => jobs.map(j => ({ name: j.name, html_url: j.html_url })))
+
+          console.log(\`found jobs: \${JSON.stringify(jobs, null, 2)}\`)
+
           const job = jobs.find(j => j.name.endsWith(JOB_NAME))
+
+          console.log(\`found job: \${JSON.stringify(job, null, 2)}\`)
 
           const shaUrl = \`\${serverUrl}/\${owner}/\${repo}/commit/\${{ inputs.sha }}\`
           const summary = \`This check is assosciated with \${shaUrl}/n/n\`
@@ -3457,12 +3763,13 @@ name: Dependencies
 inputs:
   command:
     description: command to run for the dependencies step
-    default: install --ignore-scripts --no-audit --no-fund
+    default: 'install --ignore-scripts --no-audit --no-fund'
   flags:
     description: extra flags to pass to the dependencies step
+    default: ''
   shell:
     description: shell to run on
-    default: bash
+    default: 'bash'
 
 runs:
   using: composite
@@ -3480,19 +3787,17 @@ name: Lint
 inputs:
   flags:
     description: flags to pass to the commands
-  shell:
-    description: shell to run on
-    default: bash
+    default: ''
 
 runs:
   using: composite
   steps:
     - name: Lint
-      shell: \${{ inputs.shell }}
+      shell: bash
       run: |
         npm run lint --ignore-scripts \${{ inputs.flags }}
     - name: Post Lint
-      shell: \${{ inputs.shell }}
+      shell: bash
       run: |
         npm run postlint --ignore-scripts \${{ inputs.flags }}
 
@@ -3506,22 +3811,22 @@ description: Setup a repo with standard tools
 inputs:
   node-version:
     description: node version to use
-    default: 18.x
+    default: '18.x'
   npm-version:
     description: npm version to use
-    default: latest
+    default: 'latest'
   cache:
     description: whether to cache npm install or not
-    default: false
+    default: 'false'
   shell:
     description: shell to run on
-    default: bash
+    default: 'bash'
   deps:
     description: whether to run the deps step
     default: 'true'
   deps-command:
     description: command to run for the dependencies step
-    default: install --ignore-scripts --no-audit --no-fund
+    default: 'install --ignore-scripts --no-audit --no-fund'
   deps-flags:
     description: extra flags to pass to the dependencies step
 
@@ -3547,10 +3852,10 @@ runs:
       run: |
         NODE_VERSION=$(node --version)
         echo $NODE_VERSION
-        if npx semver@7 -r "<=10" "$NODE_VERSION" --yes; then
+        if npx semver@7 -r "<=10" "$NODE_VERSION"; then
           echo "ten-or-lower=true" >> $GITHUB_OUTPUT
         fi
-        if npx semver@7 -r "<=14" "$NODE_VERSION" --yes; then
+        if npx semver@7 -r "<=14" "$NODE_VERSION"; then
           echo "fourteen-or-lower=true" >> $GITHUB_OUTPUT
         fi
 
@@ -3586,6 +3891,7 @@ runs:
       with:
         command: \${{ inputs.deps-command }}
         flags: \${{ inputs.deps-flags }}
+        shell: \${{ inputs.shell }}
 
     - name: Add Problem Matcher
       shell: bash
@@ -3601,9 +3907,10 @@ name: Test
 inputs:
   flags:
     description: flags to pass to the commands
+    default: ''
   shell:
     description: shell to run on
-    default: bash
+    default: 'bash'
 
 runs:
   using: composite
@@ -3628,9 +3935,11 @@ inputs:
     required: true
   login:
     description: Login name of user to look for comments from
-    default: github-actions[bot]
+    default: 'github-actions[bot]'
+    required: true
   body:
     description: Body of the comment, the first line will be used to match to an existing comment
+    required: true
   find:
     description: string to find in body
   replace:
@@ -3670,8 +3979,8 @@ runs:
           const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
             .then(comments => comments.map(c => ({ id: c.id, login: c.user.login, body: c.body })))
 
-          console.log(\`Found comments: \${JSON.stringify(comments, null, 2)}\`)
           console.log(\`Looking for comment with: \${JSON.stringify({ LOGIN, TITLE, INCLUDES }, null, 2)}\`)
+          console.log(\`Found comments: \${JSON.stringify(comments, null, 2)}\`)
 
           const comment = comments.find(c =>
             c.login === LOGIN &&
@@ -3774,6 +4083,14 @@ name: Audit
 
 on:
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+      force:
+        type: boolean
+      check-sha:
+        type: string
   schedule:
     # "At 09:00 UTC (01:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
     - cron: "0 9 * * 1"
@@ -3781,7 +4098,7 @@ on:
 jobs:
   audit:
     name: Audit Dependencies
-    if: github.repository_owner == 'npm'
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -3789,6 +4106,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: \${{ inputs.ref }}
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
+        with:
+          sha: \${{ inputs.check-sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Audit Dependencies
 
       - name: Setup
         uses: ./.github/actions/setup
@@ -3797,6 +4125,14 @@ jobs:
 
       - name: Audit
         uses: ./.github/actions/audit
+
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check-id: \${{ steps.check.outputs.check-id }}
 
 .github/workflows/ci.yml
 ========================================
@@ -3807,26 +4143,22 @@ name: CI
 on:
   workflow_dispatch:
     inputs:
-      ref:
-        required: true
-        type: string
-      check-sha:
-        type: string
       all:
-        default: true
         type: boolean
   workflow_call:
     inputs:
       ref:
-        required: true
         type: string
+      force:
+        type: boolean
       check-sha:
-        required: true
         type: string
       all:
-        default: true
         type: boolean
   pull_request:
+    branches:
+      - main
+      - latest
   push:
     branches:
       - main
@@ -3838,7 +4170,7 @@ on:
 jobs:
   lint:
     name: Lint
-    if: github.repository_owner == 'npm'
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -3860,12 +4192,10 @@ jobs:
 
       - name: Setup
         id: setup
-        continue-on-error: \${{ !!steps.check.outputs.check-id }}
         uses: ./.github/actions/setup
 
       - name: Get Changed Workspaces
         id: workspaces
-        continue-on-error: \${{ !!steps.check.outputs.check-id }}
         uses: ./.github/actions/changed-workspaces
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
@@ -3873,7 +4203,6 @@ jobs:
 
       - name: Lint
         uses: ./.github/actions/lint
-        continue-on-error: \${{ !!steps.check.outputs.check-id }}
         with:
           flags: \${{ steps.workspaces.outputs.flags }}
 
@@ -3887,7 +4216,7 @@ jobs:
 
   test:
     name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
-    if: github.repository_owner == 'npm'
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: \${{ matrix.platform.os }}
     defaults:
       run:
@@ -3913,34 +4242,32 @@ jobs:
           - 18.0.0
           - 18.x
     steps:
-      - name: Continue Matrix Run
-        id: continue-matrix
-        shell: bash
-        run: |
-          if [[ "\${{ matrix.node-version }}" == "14.17.0" || "\${{ inputs.all }}" == "true" ]]; then
-            echo "result=true" >> $GITHUB_OUTPUT 
-          fi
-
       - name: Checkout
-        if: steps.continue-matrix.outputs.result
         uses: actions/checkout@v3
         with:
           ref: \${{ inputs.ref }}
 
       - name: Create Check
-        if: steps.continue-matrix.outputs.result && inputs.check-sha
         uses: ./.github/actions/create-check
+        if: inputs.check-sha
         id: check
         with:
           sha: \${{ inputs.check-sha }}
           token: \${{ secrets.GITHUB_TOKEN }}
-          job-name: "Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}"
+          job-name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
+
+      - name: Continue Matrix Run
+        id: continue-matrix
+        shell: bash
+        run: |
+          if [[ "\${{ matrix.node-version }}" == "14.17.0" || "\${{ inputs.all }}" == "true" ]]; then
+            echo "result=true" >> $GITHUB_OUTPUT
+          fi
 
       - name: Setup
         if: steps.continue-matrix.outputs.result
         uses: ./.github/actions/setup
         id: setup
-        continue-on-error: \${{ !!steps.check.outputs.check-id }}
         with:
           node-version: \${{ matrix.node-version }}
           shell: \${{ matrix.platform.shell }}
@@ -3948,7 +4275,6 @@ jobs:
       - name: Get Changed Workspaces
         if: steps.continue-matrix.outputs.result
         id: workspaces
-        continue-on-error: \${{ !!steps.check.outputs.check-id }}
         uses: ./.github/actions/changed-workspaces
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
@@ -3957,14 +4283,13 @@ jobs:
       - name: Test
         if: steps.continue-matrix.outputs.result
         uses: ./.github/actions/test
-        continue-on-error: \${{ !!steps.check.outputs.check-id }}
         with:
           flags: \${{ steps.workspaces.outputs.flags }}
           shell: \${{ matrix.platform.shell }}
 
       - name: Conclude Check
         uses: ./.github/actions/conclude-check
-        if: steps.continue-matrix.outputs.result && steps.check.outputs.check-id && (success() || failure())
+        if: steps.check.outputs.check-id && (success() || failure())
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
@@ -3977,6 +4302,15 @@ jobs:
 name: CodeQL
 
 on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+      force:
+        type: boolean
+      check-sha:
+        type: string
   push:
     branches:
       - main
@@ -3992,7 +4326,7 @@ on:
 jobs:
   analyze:
     name: Analyze
-    if: github.repository_owner == 'npm'
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -4001,9 +4335,21 @@ jobs:
       actions: read
       contents: read
       security-events: write
+      checks: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: \${{ inputs.ref }}
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
+        with:
+          sha: \${{ inputs.check-sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Analyze
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
@@ -4013,20 +4359,36 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
 
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check-id: \${{ steps.check.outputs.check-id }}
+
 .github/workflows/post-dependabot.yml
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
 
 name: Post Dependabot
 
-on: pull_request
+on:
+  pull_request:
+    branches:
+      - main
+      - latest
+      - release/v*
 
 jobs:
-  npmcli-template-oss:
+  dependency:
     name: "@npmcli/template-oss"
     permissions:
       contents: write
-    if: github.repository_owner == 'npm' && github.actor == 'dependabot[bot]'
+    outputs:
+      sha: \${{ steps.sha.outputs.sha }}
+    # TODO: remove head_ref check after testing
+    if: github.repository_owner == 'npm' && (github.actor == 'dependabot[bot]' || contains(github.head_ref, '/npm-cli/template-oss'))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -4035,11 +4397,21 @@ jobs:
       - name: Fetch Dependabot Metadata
         id: metadata
         uses: dependabot/fetch-metadata@v1
+        continue-on-error: true
         with:
           github-token: \${{ secrets.GITHUB_TOKEN }}
 
+      # TODO: remove step after testing
+      - name: Fake Dependabot Metadata
+        id: fake-metadata
+        if: steps.metadata.outcome == 'failure'
+        run: |
+          echo "dependency-names=@npmcli/template-oss" >> $GITHUB_OUTPUT
+          echo "directory=/" >> $GITHUB_OUTPUT
+          echo "update-type=version-update:semver-patch" >> $GITHUB_OUTPUT
+
       - name: Is Dependency
-        if: contains(steps.metadata.outputs.dependency-names, '@npmcli/template-oss')
+        if: contains(steps.metadata.outputs.dependency-names || steps.fake-metadata.outputs.dependency-names, '@npmcli/template-oss')
         id: dependency
         run: echo "continue=true" >> $GITHUB_OUTPUT
 
@@ -4047,7 +4419,7 @@ jobs:
         if: steps.dependency.outputs.continue
         uses: actions/checkout@v3
         with:
-          ref: \${{ github.event.pull_request.head.ref }}
+          ref: \${{ (github.event_name == 'pull_request' && github.event.pull_request.head.ref) || '' }}
 
       - name: Setup
         if: steps.dependency.outputs.continue
@@ -4058,36 +4430,32 @@ jobs:
         uses: ./.github/actions/changed-workspaces
         id: workspaces
         with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          files: '["\${{ steps.metadata.outputs.directory }}"]'
+          files: '["\${{ steps.metadata.outputs.directory || steps.fake-metadata.outputs.directory }}"]'
 
+      # This only sets the conventional commit prefix. This workflow can't reliably determine
+      # what the breaking change is though. If a BREAKING CHANGE message is required then
+      # this PR check will fail and the commit will be amended with stafftools
       - name: Apply Changes
         if: steps.workspaces.outputs.flags
         id: apply
         run: |
           npm run template-oss-apply \${{ steps.workspaces.outputs.flags }}
           if [[ \`git status --porcelain\` ]]; then
-            echo "changes=true" >> $GITHUB_OUTPUT
+            if [[ "\${{ steps.metadata.outputs.update-type || steps.fake-metadata.outputs.update-type }}" == "version-update:semver-major" ]]; then
+              prefix='feat!'
+            else
+              prefix='chore'
+            fi
+            echo "message=$prefix: postinstall for dependabot template-oss PR" >> $GITHUB_OUTPUT
           fi
-          # This only sets the conventional commit prefix. This workflow can't reliably determine
-          # what the breaking change is though. If a BREAKING CHANGE message is required then
-          # this PR check will fail and the commit will be amended with stafftools
-          if [[ "\${{ steps.metadata.outputs.update-type }}" == "version-update:semver-major" ]]; then
-            prefix='feat!'
-          else
-            prefix='chore'
-          fi
-          echo "message=$prefix: postinstall for dependabot template-oss PR" >> $GITHUB_OUTPUT
 
       # This step will fail if template-oss has made any workflow updates. It is impossible
       # for a workflow to update other workflows. In the case it does fail, we continue
       # and then try to apply only a portion of the changes in the next step
       - name: Push All Changes
-        if: steps.apply.outputs.changes
+        if: steps.apply.outputs.message
         id: push
         continue-on-error: true
-        env:
-          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
           git commit -am "\${{ steps.apply.outputs.message }}"
           git push
@@ -4096,9 +4464,9 @@ jobs:
       # and attempt to commit and push again. This is helpful because we will have a commit
       # with the correct prefix that we can then --amend with @npmcli/stafftools later.
       - name: Push All Changes Except Workflows
-        if: steps.apply.outputs.changes && steps.push.outcome == 'failure'
-        env:
-          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        if: steps.apply.outputs.message && steps.push.outcome == 'failure'
+        id: push-on-error
+        continue-on-error: true
         run: |
           git reset HEAD~
           git checkout HEAD -- .github/workflows/
@@ -4106,25 +4474,53 @@ jobs:
           git commit -am "\${{ steps.apply.outputs.message }}"
           git push
 
-      # Check if all the necessary template-oss changes were applied. Since we continued
-      # on errors in one of the previous steps, this check will fail if our follow up
-      # only applied a portion of the changes and we need to followup manually.
-      #
-      # Note that this used to run \`lint\` and \`postlint\` but that will fail this action
-      # if we've also shipped any linting changes separate from template-oss. We do
-      # linting in another action, so we want to fail this one only if there are
-      # template-oss changes that could not be applied.
-      - name: Check Changes
-        if: steps.apply.outputs.changes
-        run: |
-          npm exec --offline \${{ steps.workspaces.outputs.flags }} -- template-oss-check
-
+      # If template-oss is applying breaking changes, then we fail this PR with a message saying what to do. There's no need
+      # to run CI in this case because the PR will need to be fixed manually so CI will run on those commits.
       - name: Fail on Breaking Change
-        if: steps.apply.outputs.changes && startsWith(steps.apply.outputs.message, 'feat!')
+        if: startsWith(steps.apply.outputs.message, 'feat!')
         run: |
-          echo "This PR has a breaking change. Run 'npx -p @npmcli/stafftools gh template-oss-fix'"
-          echo "for more information on how to fix this with a BREAKING CHANGE footer."
+          TITLE="Breaking Changes"
+          MESSAGE="This PR has a breaking change. Run 'npx -p @npmcli/stafftools gh template-oss-fix'"
+          MESSAGE="$MESSAGE for more information on how to fix this with a BREAKING CHANGE footer."
+          echo "::error title=$TITLE::$MESSAGE"
           exit 1
+
+      - name: Get SHA
+        id: sha
+        run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
+  # If everything succeeded so far then we run our normal CI workflow since GitHub actions wont rerun after a bot
+  # pushes a new commit to a PR. We rerun all of CI because template-oss could affect any code in the repo including
+  # lint settings and test settings.
+  ci:
+    name: CI
+    needs: [ dependency ]
+    if: needs.dependency.outputs.sha
+    uses: ./.github/workflows/ci.yml
+    with:
+      ref: \${{ github.head_ref }}
+      check-sha: \${{ needs.dependency.outputs.sha }}
+      force: true
+
+  codeql-analysis:
+    name: CodeQL
+    needs: [ dependency ]
+    if: needs.dependency.outputs.sha
+    uses: ./.github/workflows/codeql-analysis.yml
+    with:
+      ref: \${{ github.head_ref }}
+      check-sha: \${{ needs.dependency.outputs.sha }}
+      force: true
+
+  pull-request:
+    name: Pull Request
+    needs: [ dependency ]
+    if: needs.dependency.outputs.sha
+    uses: ./.github/workflows/pull-request.yml
+    with:
+      ref: \${{ github.head_ref }}
+      check-sha: \${{ needs.dependency.outputs.sha }}
+      force: true
 
 .github/workflows/pull-request.yml
 ========================================
@@ -4133,7 +4529,19 @@ jobs:
 name: Pull Request
 
 on:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+      force:
+        type: boolean
+      check-sha:
+        type: string
   pull_request:
+    branches:
+      - main
+      - latest
+      - release/v*
     types:
       - opened
       - reopened
@@ -4142,8 +4550,8 @@ on:
 
 jobs:
   commitlint:
-    name: Lint Commit
-    if: github.repository_owner == 'npm'
+    name: Lint Commits
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -4153,6 +4561,16 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          ref: \${{ inputs.ref }}
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
+        with:
+          sha: \${{ inputs.check-sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Lint Commits
 
       - name: Setup
         uses: ./.github/actions/setup
@@ -4169,6 +4587,14 @@ jobs:
           PR_TITLE: \${{ github.event.pull_request.title }}
         run: |
           echo "$PR_TITLE" | npx --offline commitlint -V
+
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check-id: \${{ steps.check.outputs.check-id }}
 
 .github/workflows/release-integration.yml
 ========================================
@@ -4244,10 +4670,9 @@ on:
         type: string
   push:
     branches:
-      branches:
-        - main
-        - latest
-        - release/v*
+      - main
+      - latest
+      - release/v*
 
 permissions:
   contents: write
@@ -4388,16 +4813,22 @@ jobs:
     with:
       ref: \${{ needs.release.outputs.pr-branch }}
       check-sha: \${{ needs.update.outputs.sha }}
+      all: true
 
   post-ci:
-    name: Relase PR - Post CI
+    name: Release PR - Post CI
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
     needs: [ release, update, ci ]
-    if: needs.release.outputs.pr && (success() || failure())
+    if: needs.update.outputs.check-id && (success() || failure())
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: \${{ needs.release.outputs.pr-branch }}
+
       - name: Get Needs Result
         id: needs-result
         run: |
@@ -4412,7 +4843,6 @@ jobs:
 
       - name: Conclude Check
         uses: ./.github/actions/conclude-check
-        if: needs.update.outputs.check-id && (success() || failure())
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ steps.needs-result.outputs.result }}
@@ -4427,6 +4857,9 @@ jobs:
     needs: release
     if: needs.release.outputs.releases
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Comment Text
         uses: actions/github-script@v6
         id: comment-text
@@ -4439,8 +4872,17 @@ jobs:
             const { runId, repo: { owner, repo } } = context
             const issue_number = releases[0].prNumber
 
-            const releasePleaseComments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
-              .then((comments) => comments.filter(c => c.login === 'github-actions[bot]' && c.body.includes('Release is at')))
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
+              .then(comments => comments.map(c => ({ id: c.id, login: c.user.login, body: c.body })))
+
+            console.log(\`comments: \${JSON.stringify(comments, null, 2)}\`)
+
+            const releasePleaseComments = comments.filter(c =>
+              c.login === 'github-actions[bot]' &&
+              c.body.startsWith(':robot: Release is at ')
+            )
+
+            console.log(\`release please comments: \${JSON.stringify(releasePleaseComments, null, 2)}\`)
 
             for (const comment of releasePleaseComments) {
               await github.rest.issues.deleteComment({ owner, repo, comment_id: comment.id })
@@ -4480,6 +4922,9 @@ jobs:
     needs: [ release, release-integration ]
     if: needs.release.outputs.release && (success() || failure())
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Get Needs Result
         id: needs-result
         run: |
@@ -4501,7 +4946,7 @@ jobs:
           RESULT: \${{ steps.needs-result.outputs.result }}
         with:
           script: |
-            const { RESULT, PR_NUMBER, REF_NAME } = process.env             
+            const { RESULT, PR_NUMBER, REF_NAME } = process.env
             const tagCodeowner = RESULT !== 'white_check_mark'
             if (tagCodeowner) {
               let body = ''
@@ -4515,7 +4960,6 @@ jobs:
             }
 
       - name: Update Release PR Comment
-        if: steps.comment-text.outputs.result
         uses: ./.github/actions/upsert-comment
         with:
           token: \${{ secrets.GITHUB_TOKEN }}

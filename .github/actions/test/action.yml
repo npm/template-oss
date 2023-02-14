@@ -5,9 +5,10 @@ name: Test
 inputs:
   flags:
     description: flags to pass to the commands
+    default: ''
   shell:
     description: shell to run on
-    default: bash
+    default: 'bash'
 
 runs:
   using: composite

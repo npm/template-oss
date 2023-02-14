@@ -2,17 +2,23 @@ name: Audit
 
 on:
   workflow_dispatch:
+  workflow_call:
+    {{> partialsWorkflowCallInputs }}
   schedule:
     {{> partialsCron hour=1 }}
 
 jobs:
   audit:
     name: Audit Dependencies
-    {{> partialsJobIf }}
+    if: {{> partialsIfOrg }} && {{> partialsIfSkipPr }}
     {{> partialsJobDefaults }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: $\{{ inputs.ref }}
+
+      {{> partialsCreateCheck name="Audit Dependencies" }}
 
       - name: Setup
         uses: ./.github/actions/setup
@@ -21,3 +27,5 @@ jobs:
 
       - name: Audit
         uses: ./.github/actions/audit
+
+      {{> partialsConcludeCheck }}
