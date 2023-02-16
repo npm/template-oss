@@ -47,7 +47,7 @@
     "@npmcli/package-json": "^3.0.0",
     "@npmcli/template-oss-config": "^1.0.0",
     "@npmcli/template-oss-content": "^1.0.0",
-    "@npmcli/template-oss-files": "^1.0.0",
+    "@npmcli/template-oss-parser": "^1.0.0",
     "@npmcli/template-oss-release-please": "^1.0.0",
     "@octokit/rest": "^19.0.4",
     "lodash": "^4.17.21",
@@ -64,7 +64,7 @@
   "bundleDependencies": [
     "@npmcli/template-oss-config",
     "@npmcli/template-oss-content",
-    "@npmcli/template-oss-files",
+    "@npmcli/template-oss-parser",
     "@npmcli/template-oss-release-please"
   ],
   "tap": {

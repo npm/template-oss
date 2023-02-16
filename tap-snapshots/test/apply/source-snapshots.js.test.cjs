@@ -49,21 +49,19 @@ runs:
   using: composite
   steps:
     - name: Run Full Audit
-      id: all
       shell: bash
       run: |
         if ! npm audit; then
           COUNT=$(npm audit --audit-level=none --json | jq -r '.metadata.vulnerabilities.total')
-          echo "::warning title=All Vulnerabilities::Found $COUNT vulnerabilities"
+          echo "::warning title=All Vulnerabilities::Found $COUNT"
         fi
 
     - name: Run Production Audit
-      id: production
       shell: bash
       run: |
         if ! npm audit --omit=dev; then
           COUNT=$(npm audit --omit=dev --audit-level=none --json | jq -r '.metadata.vulnerabilities.total')
-          echo "::error title=Production Vulnerabilities::Found $COUNT production vulnerabilities"
+          echo "::error title=Production Vulnerabilities::Found $COUNT"
           exit 1
         fi
 
@@ -933,7 +931,7 @@ jobs:
     outputs:
       sha: \${{ steps.sha.outputs.sha }}
     # TODO: remove head_ref check after testing
-    if: github.repository_owner == 'npm' && (github.actor == 'dependabot[bot]' || contains(github.head_ref, '/npm-cli/template-oss'))
+    if: github.repository_owner == 'npm' && github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -946,17 +944,8 @@ jobs:
         with:
           github-token: \${{ secrets.GITHUB_TOKEN }}
 
-      # TODO: remove step after testing
-      - name: Fake Dependabot Metadata
-        id: fake-metadata
-        if: steps.metadata.outcome == 'failure'
-        run: |
-          echo "dependency-names=@npmcli/template-oss" >> $GITHUB_OUTPUT
-          echo "directory=/" >> $GITHUB_OUTPUT
-          echo "update-type=version-update:semver-patch" >> $GITHUB_OUTPUT
-
       - name: Is Dependency
-        if: contains(steps.metadata.outputs.dependency-names || steps.fake-metadata.outputs.dependency-names, '@npmcli/template-oss')
+        if: contains(steps.metadata.outputs.dependency-names, '@npmcli/template-oss')
         id: dependency
         run: echo "continue=true" >> $GITHUB_OUTPUT
 
@@ -975,7 +964,7 @@ jobs:
         uses: ./.github/actions/changed-workspaces
         id: workspaces
         with:
-          files: '["\${{ steps.metadata.outputs.directory || steps.fake-metadata.outputs.directory }}"]'
+          files: '["\${{ steps.metadata.outputs.directory }}"]'
 
       # This only sets the conventional commit prefix. This workflow can't reliably determine
       # what the breaking change is though. If a BREAKING CHANGE message is required then
@@ -986,7 +975,7 @@ jobs:
         run: |
           npm run template-oss-apply \${{ steps.workspaces.outputs.flags }}
           if [[ \`git status --porcelain\` ]]; then
-            if [[ "\${{ steps.metadata.outputs.update-type || steps.fake-metadata.outputs.update-type }}" == "version-update:semver-major" ]]; then
+            if [[ "\${{ steps.metadata.outputs.update-type }}" == "version-update:semver-major" ]]; then
               prefix='feat!'
             else
               prefix='chore'
@@ -1730,21 +1719,19 @@ runs:
   using: composite
   steps:
     - name: Run Full Audit
-      id: all
       shell: bash
       run: |
         if ! npm audit; then
           COUNT=$(npm audit --audit-level=none --json | jq -r '.metadata.vulnerabilities.total')
-          echo "::warning title=All Vulnerabilities::Found $COUNT vulnerabilities"
+          echo "::warning title=All Vulnerabilities::Found $COUNT"
         fi
 
     - name: Run Production Audit
-      id: production
       shell: bash
       run: |
         if ! npm audit --omit=dev; then
           COUNT=$(npm audit --omit=dev --audit-level=none --json | jq -r '.metadata.vulnerabilities.total')
-          echo "::error title=Production Vulnerabilities::Found $COUNT production vulnerabilities"
+          echo "::error title=Production Vulnerabilities::Found $COUNT"
           exit 1
         fi
 
@@ -2638,7 +2625,7 @@ jobs:
     outputs:
       sha: \${{ steps.sha.outputs.sha }}
     # TODO: remove head_ref check after testing
-    if: github.repository_owner == 'npm' && (github.actor == 'dependabot[bot]' || contains(github.head_ref, '/npm-cli/template-oss'))
+    if: github.repository_owner == 'npm' && github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -2651,17 +2638,8 @@ jobs:
         with:
           github-token: \${{ secrets.GITHUB_TOKEN }}
 
-      # TODO: remove step after testing
-      - name: Fake Dependabot Metadata
-        id: fake-metadata
-        if: steps.metadata.outcome == 'failure'
-        run: |
-          echo "dependency-names=@npmcli/template-oss" >> $GITHUB_OUTPUT
-          echo "directory=/" >> $GITHUB_OUTPUT
-          echo "update-type=version-update:semver-patch" >> $GITHUB_OUTPUT
-
       - name: Is Dependency
-        if: contains(steps.metadata.outputs.dependency-names || steps.fake-metadata.outputs.dependency-names, '@npmcli/template-oss')
+        if: contains(steps.metadata.outputs.dependency-names, '@npmcli/template-oss')
         id: dependency
         run: echo "continue=true" >> $GITHUB_OUTPUT
 
@@ -2680,7 +2658,7 @@ jobs:
         uses: ./.github/actions/changed-workspaces
         id: workspaces
         with:
-          files: '["\${{ steps.metadata.outputs.directory || steps.fake-metadata.outputs.directory }}"]'
+          files: '["\${{ steps.metadata.outputs.directory }}"]'
 
       # This only sets the conventional commit prefix. This workflow can't reliably determine
       # what the breaking change is though. If a BREAKING CHANGE message is required then
@@ -2691,7 +2669,7 @@ jobs:
         run: |
           npm run template-oss-apply \${{ steps.workspaces.outputs.flags }}
           if [[ \`git status --porcelain\` ]]; then
-            if [[ "\${{ steps.metadata.outputs.update-type || steps.fake-metadata.outputs.update-type }}" == "version-update:semver-major" ]]; then
+            if [[ "\${{ steps.metadata.outputs.update-type }}" == "version-update:semver-major" ]]; then
               prefix='feat!'
             else
               prefix='chore'
@@ -3561,21 +3539,19 @@ runs:
   using: composite
   steps:
     - name: Run Full Audit
-      id: all
       shell: bash
       run: |
         if ! npm audit; then
           COUNT=$(npm audit --audit-level=none --json | jq -r '.metadata.vulnerabilities.total')
-          echo "::warning title=All Vulnerabilities::Found $COUNT vulnerabilities"
+          echo "::warning title=All Vulnerabilities::Found $COUNT"
         fi
 
     - name: Run Production Audit
-      id: production
       shell: bash
       run: |
         if ! npm audit --omit=dev; then
           COUNT=$(npm audit --omit=dev --audit-level=none --json | jq -r '.metadata.vulnerabilities.total')
-          echo "::error title=Production Vulnerabilities::Found $COUNT production vulnerabilities"
+          echo "::error title=Production Vulnerabilities::Found $COUNT"
           exit 1
         fi
 
@@ -4388,7 +4364,7 @@ jobs:
     outputs:
       sha: \${{ steps.sha.outputs.sha }}
     # TODO: remove head_ref check after testing
-    if: github.repository_owner == 'npm' && (github.actor == 'dependabot[bot]' || contains(github.head_ref, '/npm-cli/template-oss'))
+    if: github.repository_owner == 'npm' && github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -4401,17 +4377,8 @@ jobs:
         with:
           github-token: \${{ secrets.GITHUB_TOKEN }}
 
-      # TODO: remove step after testing
-      - name: Fake Dependabot Metadata
-        id: fake-metadata
-        if: steps.metadata.outcome == 'failure'
-        run: |
-          echo "dependency-names=@npmcli/template-oss" >> $GITHUB_OUTPUT
-          echo "directory=/" >> $GITHUB_OUTPUT
-          echo "update-type=version-update:semver-patch" >> $GITHUB_OUTPUT
-
       - name: Is Dependency
-        if: contains(steps.metadata.outputs.dependency-names || steps.fake-metadata.outputs.dependency-names, '@npmcli/template-oss')
+        if: contains(steps.metadata.outputs.dependency-names, '@npmcli/template-oss')
         id: dependency
         run: echo "continue=true" >> $GITHUB_OUTPUT
 
@@ -4430,7 +4397,7 @@ jobs:
         uses: ./.github/actions/changed-workspaces
         id: workspaces
         with:
-          files: '["\${{ steps.metadata.outputs.directory || steps.fake-metadata.outputs.directory }}"]'
+          files: '["\${{ steps.metadata.outputs.directory }}"]'
 
       # This only sets the conventional commit prefix. This workflow can't reliably determine
       # what the breaking change is though. If a BREAKING CHANGE message is required then
@@ -4441,7 +4408,7 @@ jobs:
         run: |
           npm run template-oss-apply \${{ steps.workspaces.outputs.flags }}
           if [[ \`git status --porcelain\` ]]; then
-            if [[ "\${{ steps.metadata.outputs.update-type || steps.fake-metadata.outputs.update-type }}" == "version-update:semver-major" ]]; then
+            if [[ "\${{ steps.metadata.outputs.update-type }}" == "version-update:semver-major" ]]; then
               prefix='feat!'
             else
               prefix='chore'

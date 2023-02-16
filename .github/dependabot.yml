@@ -40,7 +40,7 @@ updates:
     labels:
       - "Dependencies"
   - package-ecosystem: npm
-    directory: workspaces/files/
+    directory: workspaces/parser/
     schedule:
       interval: daily
     allow:

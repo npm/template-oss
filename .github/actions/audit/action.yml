@@ -6,20 +6,18 @@ runs:
   using: composite
   steps:
     - name: Run Full Audit
-      id: all
       shell: bash
       run: |
         if ! npm audit; then
           COUNT=$(npm audit --audit-level=none --json | jq -r '.metadata.vulnerabilities.total')
-          echo "::warning title=All Vulnerabilities::Found $COUNT vulnerabilities"
+          echo "::warning title=All Vulnerabilities::Found $COUNT"
         fi
 
     - name: Run Production Audit
-      id: production
       shell: bash
       run: |
         if ! npm audit --omit=dev; then
           COUNT=$(npm audit --omit=dev --audit-level=none --json | jq -r '.metadata.vulnerabilities.total')
-          echo "::error title=Production Vulnerabilities::Found $COUNT production vulnerabilities"
+          echo "::error title=Production Vulnerabilities::Found $COUNT"
           exit 1
         fi

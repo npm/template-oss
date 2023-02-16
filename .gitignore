@@ -30,5 +30,5 @@
 /workspaces/*
 !/workspaces/config/
 !/workspaces/content/
-!/workspaces/files/
+!/workspaces/parser/
 !/workspaces/release-please/

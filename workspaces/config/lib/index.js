@@ -5,7 +5,7 @@ const parseCIVersions = require('./parse-ci-versions.js')
 const getGitUrl = require('./get-git-url.js')
 const gitignore = require('./gitignore.js')
 const withArrays = require('./merge-with-arrays.js')
-const { parseConfigFiles } = require('@npmcli/template-oss-files')
+const { parseConfigFiles } = require('@npmcli/template-oss-parser')
 
 const FILE_KEYS = ['rootRepo', 'rootModule', 'workspaceRepo', 'workspaceModule']
 const MERGE_KEYS = [...FILE_KEYS, 'defaultContent', 'content']
