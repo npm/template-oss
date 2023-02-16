@@ -61,12 +61,6 @@
     "tap": "^16.0.0",
     "yaml": "^2.2.1"
   },
-  "bundleDependencies": [
-    "@npmcli/template-oss-config",
-    "@npmcli/template-oss-content",
-    "@npmcli/template-oss-parser",
-    "@npmcli/template-oss-release-please"
-  ],
   "tap": {
     "timeout": 600,
     "nyc-arg": [

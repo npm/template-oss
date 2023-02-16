@@ -1,8 +1,6 @@
 {
   "name": "@npmcli/template-oss-release-please",
   "version": "1.0.0",
-  "description": "",
-  "private": true,
   "main": "lib/index.js",
   "scripts": {
     "test": "tap",

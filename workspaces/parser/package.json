@@ -1,8 +1,6 @@
 {
   "name": "@npmcli/template-oss-parser",
   "version": "1.0.0",
-  "description": "The files for @npmcli/template-oss",
-  "private": true,
   "main": "lib/index.js",
   "scripts": {
     "test": "tap",
