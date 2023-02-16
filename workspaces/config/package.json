@@ -23,6 +23,7 @@
     "@npmcli/git": "^4.0.3",
     "@npmcli/template-oss-parser": "^1.0.0",
     "hosted-git-info": "^6.1.1",
+    "just-deep-map-values": "^1.2.0",
     "lodash": "^4.17.21",
     "semver": "^7.3.8"
   },

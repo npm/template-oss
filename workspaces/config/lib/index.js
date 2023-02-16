@@ -1,16 +1,30 @@
 const { relative, dirname, join, extname, posix, win32 } = require('path')
-const { defaults, pick, omit, uniq } = require('lodash')
+const { defaults, pick, omit, uniq, defaultsDeep, mergeWith } = require('lodash')
+const deepMapValues = require('just-deep-map-values')
 const semver = require('semver')
 const parseCIVersions = require('./parse-ci-versions.js')
 const getGitUrl = require('./get-git-url.js')
 const gitignore = require('./gitignore.js')
-const withArrays = require('./merge-with-arrays.js')
-const { parseConfigFiles } = require('@npmcli/template-oss-parser')
 
 const FILE_KEYS = ['rootRepo', 'rootModule', 'workspaceRepo', 'workspaceModule']
 const MERGE_KEYS = [...FILE_KEYS, 'defaultContent', 'content']
+const MERGE_CONFIG_ARRAY_KEYS = ['branches', 'distPaths', 'allowPaths', 'ignorePaths']
 
-const merge = withArrays('branches', 'distPaths', 'allowPaths', 'ignorePaths')
+const merge = (...o) => mergeWith({}, ...o, (_, srcValue) => {
+  if (Array.isArray(srcValue)) {
+    // Dont merge arrays, last array wins
+    return srcValue
+  }
+})
+
+const mergeConfig = (...o) => mergeWith({}, ...o, (value, srcValue, key) => {
+  if (Array.isArray(srcValue)) {
+    if (MERGE_CONFIG_ARRAY_KEYS.includes(key)) {
+      return (Array.isArray(value) ? value : []).concat(srcValue)
+    }
+    return srcValue
+  }
+})
 
 const makePosix = (v) => v.split(win32.sep).join(posix.sep)
 const deglob = (v) => {
@@ -38,8 +52,35 @@ const getCmdPath = (key, { rootConfig, defaultConfig, isRoot, pkg, rootPkg }) =>
   }
 }
 
+const parseConfigFiles = (files, dir, overrides, configKeys) => {
+  const normalizeFiles = (v) => deepMapValues(v, (value, key) => {
+    if (key === 'rm' && Array.isArray(value)) {
+      return value.reduce((acc, k) => {
+        acc[k] = true
+        return acc
+      }, {})
+    }
+    if (typeof value === 'string') {
+      const file = join(dir, value)
+      return key === 'file' ? file : { file }
+    }
+    if (value === true && configKeys.includes(key)) {
+      return {}
+    }
+    return value
+  })
+
+  const merged = merge(normalizeFiles(files), normalizeFiles(overrides))
+  const withDefaults = defaultsDeep(merged, configKeys.reduce((acc, k) => {
+    acc[k] = { add: {}, rm: {} }
+    return acc
+  }, {}))
+
+  return withDefaults
+}
+
 const mergeConfigs = (defaultContent, ...configs) => {
-  const mergedConfig = merge(...configs.map(c => pick(c, MERGE_KEYS)))
+  const mergedConfig = mergeConfig(...configs.map(c => pick(c, MERGE_KEYS)))
   return defaults(mergedConfig, {
     defaultContent,
     // allow all file types by default
@@ -72,7 +113,7 @@ const readContentPath = (path) => {
 
 const getConfig = (path, rawConfig) => {
   const config = omit(readContentPath(path).content, FILE_KEYS)
-  return merge(config, rawConfig ? omit(rawConfig, FILE_KEYS) : {})
+  return mergeConfig(config, rawConfig ? omit(rawConfig, FILE_KEYS) : {})
 }
 
 const getFiles = (path, rawConfig) => {
@@ -117,14 +158,14 @@ const getFullConfig = async ({
 
   // The content config only gets set from the package we are in, it doesn't inherit
   // anything from the root
-  const rootPkgConfig = merge(useDefault, rootConfig)
-  const pkgConfig = merge(useDefault, getConfig(pkg.config.content, pkg.config))
+  const rootPkgConfig = mergeConfig(useDefault, rootConfig)
+  const pkgConfig = mergeConfig(useDefault, getConfig(pkg.config.content, pkg.config))
   const [pkgFiles, pkgDir] = getFiles(mergedConfig.content, mergedConfig)
 
   // Files get merged in from the default content (that template-oss provides) as well
   // as any content paths provided from the root or the workspace
   const fileDirs = uniq([useDefault && defaultDir, rootDir, pkgDir].filter(Boolean))
-  const files = merge(useDefault && defaultFiles, rootFiles, pkgFiles)
+  const files = mergeConfig(useDefault && defaultFiles, rootFiles, pkgFiles)
   const repoFiles = isRoot ? files.rootRepo : files.workspaceRepo
   const moduleFiles = isRoot ? files.rootModule : files.workspaceModule
 

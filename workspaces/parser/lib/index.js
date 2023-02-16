@@ -1,9 +1,6 @@
 const { join } = require('path')
 const { promisify } = require('util')
-const { defaultsDeep } = require('lodash')
-const deepMapValues = require('just-deep-map-values')
 const glob = promisify(require('glob'))
-const merge = require('./merge.js')
 const Parser = require('./parser.js')
 const template = require('./template.js')
 
@@ -70,35 +67,7 @@ const parseEach = async (dir, files, options, fn) => {
   return res.filter(Boolean)
 }
 
-const parseConfigFiles = (files, dir, overrides, configKeys) => {
-  const normalizeFiles = (v) => deepMapValues(v, (value, key) => {
-    if (key === 'rm' && Array.isArray(value)) {
-      return value.reduce((acc, k) => {
-        acc[k] = true
-        return acc
-      }, {})
-    }
-    if (typeof value === 'string') {
-      const file = join(dir, value)
-      return key === 'file' ? file : { file }
-    }
-    if (value === true && configKeys.includes(key)) {
-      return {}
-    }
-    return value
-  })
-
-  const merged = merge(normalizeFiles(files), normalizeFiles(overrides))
-  const withDefaults = defaultsDeep(merged, configKeys.reduce((acc, k) => {
-    acc[k] = { add: {}, rm: {} }
-    return acc
-  }, {}))
-
-  return withDefaults
-}
-
 module.exports = {
   rmEach,
   parseEach,
-  parseConfigFiles,
 }

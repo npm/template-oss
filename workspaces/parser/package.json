@@ -54,7 +54,6 @@
     "handlebars": "^4.7.7",
     "ini": "^3.0.1",
     "json-parse-even-better-errors": "^3.0.0",
-    "just-deep-map-values": "^1.2.0",
     "just-diff": "^5.2.0",
     "lodash": "^4.17.21",
     "yaml": "^2.2.1"

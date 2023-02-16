@@ -4,11 +4,17 @@ const yaml = require('yaml')
 const NpmPackageJson = require('@npmcli/package-json')
 const jsonParse = require('json-parse-even-better-errors')
 const Diff = require('diff')
-const { unset } = require('lodash')
+const { unset, mergeWith } = require('lodash')
 const ini = require('ini')
 const template = require('./template.js')
 const jsonDiff = require('./json-diff')
-const merge = require('./merge.js')
+
+const merge = (...o) => mergeWith({}, ...o, (_, srcValue) => {
+  if (Array.isArray(srcValue)) {
+    // Dont merge arrays, last array wins
+    return srcValue
+  }
+})
 
 const setFirst = (first, rest) => ({ ...first, ...rest })
 
