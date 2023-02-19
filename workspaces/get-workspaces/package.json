@@ -1,0 +1,52 @@
+{
+  "name": "@npmcli/actions-get-workspaces",
+  "version": "1.0.0",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "tap",
+    "lint": "eslint \"**/*.js\"",
+    "postlint": "template-oss-check",
+    "template-oss-apply": "template-oss-apply --force",
+    "lintfix": "npm run lint -- --fix",
+    "snap": "tap",
+    "posttest": "npm run lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/npm/template-oss.git",
+    "directory": "workspaces/get-workspaces"
+  },
+  "keywords": [],
+  "author": "GitHub Inc.",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/npm/template-oss/issues"
+  },
+  "homepage": "https://github.com/npm/template-oss#readme",
+  "files": [
+    "bin/",
+    "lib/"
+  ],
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "@npmcli/map-workspaces": "^3.0.2"
+  },
+  "devDependencies": {
+    "@npmcli/eslint-config": "^4.0.0",
+    "@npmcli/template-oss": "file:../../",
+    "tap": "^16.0.0"
+  },
+  "engines": {
+    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
+  },
+  "templateOSS": {
+    "@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten."
+  },
+  "tap": {
+    "check-coverage": false,
+    "nyc-arg": [
+      "--exclude",
+      "tap-snapshots/**"
+    ]
+  }
+}

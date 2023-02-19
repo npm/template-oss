@@ -1,4 +1,10 @@
 {
+  "plugins": [
+    "node-workspace"
+  ],
+  "exclude-packages-from-root": true,
+  "group-pull-request-title-pattern": "chore: release ${version}",
+  "pull-request-title-pattern": "chore: release${component} ${version}",
   "changelog-sections": [
     {
       "type": "feat",
@@ -26,18 +32,13 @@
     }
   ],
   "packages": {
-    ".": {
+    "": {
       "package-name": ""
     },
     "workspaces/config": {},
-    "workspaces/content": {},
-    "workspaces/parser": {},
-    "workspaces/release-please": {}
-  },
-  "exclude-packages-from-root": true,
-  "group-pull-request-title-pattern": "chore: release ${version}",
-  "pull-request-title-pattern": "chore: release${component} ${version}",
-  "plugins": [
-    "node-workspace"
-  ]
+    "workspaces/get-workspaces": {},
+    "workspaces/release-manager": {},
+    "workspaces/release-please": {},
+    "workspaces/rules": {}
+  }
 }

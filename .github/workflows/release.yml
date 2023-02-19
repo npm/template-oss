@@ -44,10 +44,12 @@ jobs:
 
       - name: Release Please
         id: release
+        uses: ./.github/actions/release-please
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          npx --offline template-oss-release-please "${{ github.ref_name }}" "${{ inputs.release-pr }}"
+        with:
+          branch: ${{ github.ref_name }}
+          release-pr: ${{ inputs.release-pr }}
 
       # If we have opened a release PR, then immediately create an "in_progress"
       # check for it so the GitHub UI doesn't report that its mergeable.
@@ -110,14 +112,21 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup
 
+      - name: Release Managers
+        uses: ./.github/actions/release-manager
+        env:
+          RELEASE_PR_NUMBER: ${{ needs.release.outputs.pr-number }}
+          RELEASE_COMMENT_ID: ${{ needs.release.outputs.comment-id }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          lockfile: false
+
       - name: Run Post Pull Request Actions
         env:
           RELEASE_PR_NUMBER: ${{ needs.release.outputs.pr-number }}
           RELEASE_COMMENT_ID: ${{ needs.release.outputs.comment-id }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          npm exec --offline -- template-oss-release-manager --lockfile=false
-          npm run rp-pull-request --ignore-scripts -ws -iwr --if-present
+        run: npm run rp-pull-request --ignore-scripts -ws -iwr --if-present
 
       - name: Commit
         id: commit

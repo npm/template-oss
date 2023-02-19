@@ -25,6 +25,6 @@ runs:
     - name: Get Workspaces
       shell: bash
       id: workspaces
-      run: |
-        flags=$(npm exec --offline -- template-oss-changed-workspaces '${{ inputs.files || steps.files.outputs.names }}')
-        echo "flags=${flags}" >> $GITHUB_OUTPUT
+      uses: ./.github/actions/get-workspaces
+      with:
+        files: ${{ inputs.files || steps.files.outputs.names }}

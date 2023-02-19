@@ -6,6 +6,25 @@ This module bundles the npm CLI team's basics for package development into a sin
 
 ### Configuration
 
+
+```js
+{
+  templateOSS: {
+    extends: '@npmcli/template-oss-config',
+    files: {},
+    root: {
+
+    },
+    workspace: {
+
+    },
+    files: {
+
+    }
+  }
+}
+```
+
 Configure the use of `@npmcli/template-oss` in your `package.json` using the `templateOSS` property.
 
 ```js

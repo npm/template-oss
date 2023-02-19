@@ -17,11 +17,9 @@
     "directory": "workspaces/config"
   },
   "dependencies": {
-    "@isaacs/string-locale-compare": "^1.1.0",
-    "@npmcli/git": "^4.0.3",
-    "@npmcli/template-oss-parser": "^1.0.0",
-    "hosted-git-info": "^6.1.1",
-    "just-deep-map-values": "^1.2.0",
+    "@npmcli/actions-changed-workspaces": "^1.0.0",
+    "@npmcli/actions-release-manager": "^1.0.0",
+    "@npmcli/actions-release-please": "^1.0.0",
     "lodash": "^4.17.21",
     "semver": "^7.3.8"
   },
@@ -45,7 +43,7 @@
     "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
   },
   "templateOSS": {
-    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten."
+    "@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten."
   },
   "tap": {
     "nyc-arg": [

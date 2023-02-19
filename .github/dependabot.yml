@@ -28,7 +28,7 @@ updates:
     labels:
       - "Dependencies"
   - package-ecosystem: npm
-    directory: workspaces/content/
+    directory: workspaces/get-workspaces/
     schedule:
       interval: daily
     allow:
@@ -40,7 +40,7 @@ updates:
     labels:
       - "Dependencies"
   - package-ecosystem: npm
-    directory: workspaces/parser/
+    directory: workspaces/release-manager/
     schedule:
       interval: daily
     allow:
@@ -53,6 +53,18 @@ updates:
       - "Dependencies"
   - package-ecosystem: npm
     directory: workspaces/release-please/
+    schedule:
+      interval: daily
+    allow:
+      - dependency-type: direct
+    versioning-strategy: increase-if-necessary
+    commit-message:
+      prefix: deps
+      prefix-development: chore
+    labels:
+      - "Dependencies"
+  - package-ecosystem: npm
+    directory: workspaces/rules/
     schedule:
       interval: daily
     allow:

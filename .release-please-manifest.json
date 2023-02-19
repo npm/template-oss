@@ -1,7 +1,8 @@
 {
-  ".": "4.11.4",
+  "": "4.11.4",
   "workspaces/config": "1.0.0",
-  "workspaces/content": "1.0.0",
-  "workspaces/parser": "1.0.0",
-  "workspaces/release-please": "1.0.0"
+  "workspaces/get-workspaces": "1.0.0",
+  "workspaces/release-manager": "1.0.0",
+  "workspaces/release-please": "1.0.0",
+  "workspaces/rules": "1.0.0"
 }

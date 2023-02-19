@@ -1,0 +1,49 @@
+{
+  "author": "GitHub Inc.",
+  "files": {{{ json distPaths }}},
+  "scripts": {
+    "lint": "eslint \"**/*.js\"",
+    "postlint": "template-oss-check",
+    "template-oss-apply": "template-oss-apply --force",
+    "lintfix": "{{ pkgNpmPath }} run lint -- --fix",
+    "snap": "tap",
+    "test": "tap",
+    "posttest": "{{ pkgNpmPath }} run lint",
+    {{#if isRootMono}}
+    "test-all": "{{ pkgNpmPath }} run test -ws -iwr --if-present",
+    "lint-all": "{{ pkgNpmPath }} run lint -ws -iwr --if-present",
+    {{/if}}
+    "template-copy": {{{ del }}},
+    "lint:fix": {{{ del }}},
+    "preversion": {{{ del }}},
+    "postversion": {{{ del }}},
+    "prepublishOnly": {{{ del }}},
+    "postpublish": {{{ del }}},
+    "eslint": {{{ del }}},
+    "npmclilint": {{{ del }}},
+    "prerelease": {{{ del }}},
+    "postrelease": {{{ del }}},
+    "postsnap": {{{ del }}}
+  },
+  "repository": {{#if pkg.repository}}{{{ json pkg.repository }}}{{else}}{{{ del }}}{{/if}},
+  "engines": {
+    {{#if engines}}
+    "node": {{{ json engines }}}
+    {{/if}}
+  },
+  "templateVersion": {{{ del }}},
+  "standard": {{{ del }}},
+  "tap": {
+    {{#if pkg.workspacePaths}}
+    "test-ignore": "^({{ join pkg.workspacePaths "|" }})/",
+    {{/if}}
+    "nyc-arg": [
+      {{#each pkg.workspaceGlobs}}
+      "--exclude",
+      "{{ . }}",
+      {{/each}}
+      "--exclude",
+      "tap-snapshots/**"
+    ]
+  }
+}

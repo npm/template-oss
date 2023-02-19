@@ -1,0 +1,29 @@
+name: Get Changed Workspaces
+
+inputs:
+  token:
+    description: GitHub token to use
+  files:
+    description: json stringified array of file names or --all
+
+outputs:
+  flags:
+    value: $\{{ steps.workspaces.outputs.flags }}
+
+runs:
+  using: composite
+  steps:
+    - name: Get Changed Files
+      uses: ./.github/actions/changed-files
+      if: $\{{ !inputs.files }}
+      id: files
+      with:
+        token: $\{{ inputs.token }}
+
+    - name: Get Workspaces
+      shell: bash
+      id: workspaces
+      uses: ./.github/actions/get-workspaces
+      with:
+        files: $\{{ inputs.files || steps.files.outputs.names }}
+

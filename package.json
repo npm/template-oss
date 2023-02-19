@@ -5,10 +5,7 @@
   "main": "lib/content/index.js",
   "bin": {
     "template-oss-apply": "bin/apply.js",
-    "template-oss-check": "bin/check.js",
-    "template-oss-release-please": "bin/release-please.js",
-    "template-oss-release-manager": "bin/release-manager.js",
-    "template-oss-changed-workspaces": "bin/changed-workspaces.js"
+    "template-oss-check": "bin/check.js"
   },
   "scripts": {
     "lint": "eslint \"**/*.js\"",
@@ -37,27 +34,18 @@
   "author": "GitHub Inc.",
   "license": "ISC",
   "dependencies": {
-    "@actions/core": "^1.9.1",
-    "@commitlint/cli": "^17.1.1",
-    "@commitlint/config-conventional": "^17.1.0",
-    "@isaacs/string-locale-compare": "^1.1.0",
-    "@npmcli/arborist": "^6.0.0",
-    "@npmcli/git": "^4.0.0",
-    "@npmcli/map-workspaces": "^3.0.0",
+    "@npmcli/git": "^4.0.3",
+    "@npmcli/map-workspaces": "^3.0.2",
     "@npmcli/package-json": "^3.0.0",
-    "@npmcli/template-oss-config": "^1.0.0",
-    "@npmcli/template-oss-content": "^1.0.0",
-    "@npmcli/template-oss-parser": "^1.0.0",
-    "@npmcli/template-oss-release-please": "^1.0.0",
-    "@octokit/rest": "^19.0.4",
+    "hosted-git-info": "^6.1.1",
     "lodash": "^4.17.21",
-    "npm-package-arg": "^10.0.0",
-    "proc-log": "^3.0.0",
-    "semver": "^7.3.5"
+    "proc-log": "^3.0.0"
   },
   "devDependencies": {
+    "@isaacs/string-locale-compare": "^1.1.0",
     "@npmcli/eslint-config": "^4.0.0",
     "@npmcli/template-oss": "file:./",
+    "npm-package-arg": "^10.1.0",
     "tap": "^16.0.0",
     "yaml": "^2.2.1"
   },
@@ -72,7 +60,7 @@
     "test-ignore": "^(workspaces)/"
   },
   "templateOSS": {
-    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten."
+    "@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten."
   },
   "engines": {
     "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
