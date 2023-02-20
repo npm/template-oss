@@ -13,28 +13,28 @@
     "test-all": "{$ pkgNpmPath $} run test -ws -iwr --if-present",
     "lint-all": "{$ pkgNpmPath $} run lint -ws -iwr --if-present",
     {# endif #}
-    "template-copy": {$ del $},
-    "lint:fix": {$ del $},
-    "preversion": {$ del $},
-    "postversion": {$ del $},
-    "prepublishOnly": {$ del $},
-    "postpublish": {$ del $},
-    "eslint": {$ del $},
-    "npmclilint": {$ del $},
-    "prerelease": {$ del $},
-    "postrelease": {$ del $},
-    "postsnap": {$ del $}
+    "template-copy": {$ DELETE $},
+    "lint:fix": {$ DELETE $},
+    "preversion": {$ DELETE $},
+    "postversion": {$ DELETE $},
+    "prepublishOnly": {$ DELETE $},
+    "postpublish": {$ DELETE $},
+    "eslint": {$ DELETE $},
+    "npmclilint": {$ DELETE $},
+    "prerelease": {$ DELETE $},
+    "postrelease": {$ DELETE $},
+    "postsnap": {$ DELETE $}
   },
-  "repository": {$ pkg.repository | dump if pkg.repository else del $},
+  "repository": {$ pkg.repository | dump if pkg.repository else DELETE $},
   "engines": {
     {# if engines #}
     "node": {$ engines | dump $}
     {# endif #}
   },
-  "templateVersion": {$ del $},
-  "standard": {$ del $},
+  "templateVersion": {$ DELETE $},
+  "standard": {$ DELETE $},
   "tap": {
-    "test-ignore": {# if pkg.workspacePaths.length #}"^({$ pkg.workspacePaths | join $})/"{# else #}{$ del $}{# endif #},
+    "test-ignore": {# if pkg.workspacePaths.length #}"^({$ pkg.workspacePaths | join $})/"{# else #}{$ DELETE $}{# endif #},
     "nyc-arg": [
       {# for g in pkg.workspaceGlobs #}
       "--exclude",

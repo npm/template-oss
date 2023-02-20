@@ -2,7 +2,7 @@ const { data, postData } = require('./data.js')
 
 const isPublic = (o) => o.pkg.isPublic
 
-const isDependabotMerge = (o) => o.repo.isMono && !o.rootData.lockfile
+const isDependabotMerge = (o) => o.repo.isMono && !o.rootPkg.data.lockfile
 
 const releasePleaseConfig = (file) => ({
   file,
@@ -139,12 +139,14 @@ const filesOptions = {
 }
 
 module.exports = {
-  data,
-  postData,
-  workspace: {
-    data: {
-      // workspaces never get a lockfile regardless of root setting
-      lockfile: false,
+  data: {
+    values: data,
+    postData,
+    workspace: {
+      values: {
+        // workspaces never get a lockfile regardless of root setting
+        lockfile: false,
+      },
     },
   },
   rules: {

@@ -4,7 +4,7 @@ const yaml = require('yaml')
 const NpmPackageJson = require('@npmcli/package-json')
 const jsonParse = require('json-parse-even-better-errors')
 const Diff = require('diff')
-const { unset, mergeWith } = require('lodash')
+const { unset, mergeWith, orderBy } = require('lodash')
 const ini = require('ini')
 const esbuild = require('esbuild')
 const minimatch = require('minimatch')
@@ -50,7 +50,7 @@ const fsOk = (code) => (error) => {
 const state = new Map()
 
 class Base {
-  static types = []
+  static match = null
   static header = 'This file is automatically added by {$ options.name $}. Do not edit.'
   static comment = (v) => v
   static template = template
@@ -64,6 +64,12 @@ class Base {
     this.source = source
     this.options = options
     this.state.count++
+    this.options.log.info(
+      this.options.pkg.relativeToRoot(this.source),
+      '-->',
+      this.options.pkg.relativeToRoot(this.target),
+      this.state.count
+    )
   }
 
   get state () {
@@ -88,7 +94,6 @@ class Base {
 
   async read (s) {
     if (s === this.source) {
-      this.options.log.info('read', s)
       // allow shadowing files in configured content directories
       // without needing to add the file to the config explicitly
       const dirs = this.options.baseDirs
@@ -136,7 +141,6 @@ class Base {
     // XXX: find more efficient way to do this. we can build all possible dirs before get here
     await fs.mkdir(dirname(this.target), { recursive: true, force: true })
     await fs.writeFile(this.target, this.toString(s))
-    this.options.log.info('write', this.target)
   }
 
   diff (t, s) {
@@ -206,17 +210,17 @@ class Base {
 }
 
 class Gitignore extends Base {
-  static types = ['codeowners', 'gitignore']
+  static match = ['codeowners', 'gitignore']
   static comment = (c) => `# ${c}`
 }
 
 class Js extends Base {
-  static types = ['*.js']
+  static match = ['*.js']
   static comment = (c) => `/* ${c} */`
 }
 
 class Ini extends Base {
-  static types = ['*.ini']
+  static match = ['*.ini']
   static comment = (c) => `; ${c}`
   static diff = jsonDiff
 
@@ -242,17 +246,17 @@ class Ini extends Base {
 }
 
 class IniMerge extends Ini {
-  static types = ['npmrc']
+  static match = ['npmrc']
   static merge = merge
 }
 
 class Markdown extends Base {
-  static types = ['*.md']
+  static match = ['*.md']
   static comment = (c) => `<!-- ${c} -->`
 }
 
 class Yml extends Base {
-  static types = ['*.yml']
+  static match = ['*.yml']
   static comment = (c) => ` ${c}`
 
   toString (s) {
@@ -279,6 +283,7 @@ class Yml extends Base {
 }
 
 class YmlMerge extends Yml {
+  static match = null
   prepare (source, t) {
     if (t === null) {
       // If target does not exist or is in an
@@ -314,7 +319,7 @@ class YmlMerge extends Yml {
 }
 
 class Json extends Base {
-  static types = ['*.json']
+  static match = ['*.json']
   // its a json comment! not really but we do add a special key
   // to json objects
   static comment = (c, o) => ({ [o.options.name]: c })
@@ -342,12 +347,13 @@ class Json extends Base {
 }
 
 class JsonMerge extends Json {
+  static match = null
   static header = 'This file is partially managed by {$ options.name $}. Edits may be overwritten.'
   static merge = merge
 }
 
 class PackageJson extends JsonMerge {
-  static types = ['pkg.json']
+  static match = ['pkg.json']
 
   async prepare (s, t) {
     // merge new source with current pkg content
@@ -356,10 +362,14 @@ class PackageJson extends JsonMerge {
     // move comment to config field
     const configKey = this.options.options.configKey
     const header = this.header()
-    const headerKey = Object.keys(header)[0]
+
+    // set the new value and move it to the top of the object
     update[configKey] = setFirst(header, update[configKey])
-    delete update[headerKey]
-    delete update[configKey][`//${headerKey}`]
+
+    // remove the old property and the legacy version in the config that started with //
+    const headerKey = Object.keys(header)[0]
+    unset(update, headerKey)
+    unset(update, [configKey, `//${headerKey}`])
 
     return update
   }
@@ -420,21 +430,19 @@ const Parsers = {
   Esbuild,
 }
 
-const parserLookup = Object.values(Parsers)
+// lookup parsers with a preference for matches without a *
+// since those are more specific
+const parserLookup = orderBy(
+  Object.values(Parsers),
+  (p) => p.match?.find(t => !t.includes('*')),
+  'asc'
+)
 
 const getParser = (file) => {
-  const parsers = parserLookup
-    .map(p => {
-      const type = p.types.find(t => minimatch(file, `**/${t}`, { nocase: true }))
-      if (type) {
-        return { parser: p, type }
-      }
-    })
-    .filter(Boolean)
+  const parser = parserLookup
+    .find(p => p.match?.find(t => minimatch(file, `**/${t}`, { nocase: true })))
 
-  const noMagicParser = parsers.find(p => !p.type.includes('*'))
-
-  return noMagicParser?.parser || parsers[0]?.parser || Parsers.Base
+  return parser || Parsers.Base
 }
 
 module.exports = getParser

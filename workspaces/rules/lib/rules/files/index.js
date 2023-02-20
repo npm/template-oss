@@ -94,9 +94,7 @@ const resolveFile = (file, baseDir = '') => {
   }
 }
 
-const filesConfig = (ruleConfig) => {
-  const { baseDir, options: ruleOptions, ...rest } = ruleConfig
-
+const filesConfig = (ruleOptions, baseDir) => {
   const normalizeFiles = (o) => pick(deepMapValues(o, (value, key) => {
     if (key === REMOVE && Array.isArray(value)) {
       return value.reduce((acc, k) => {
@@ -122,15 +120,11 @@ const filesConfig = (ruleConfig) => {
     return acc
   }, {})
 
-  return {
-    ...rest,
-    options: defaultsDeep(normalizeFiles(ruleOptions), defaultFiles),
-    baseDirs: [baseDir],
-  }
+  return defaultsDeep(normalizeFiles(ruleOptions), defaultFiles)
 }
 
 const filesData = (rule, options) => {
-  const { pkg, data, wsPkgs } = options
+  const { pkg, wsPkgs } = options
 
   const rootDirs = gitignore.allowRootDir([
     // Allways allow module files in root or workspaces
@@ -147,9 +141,9 @@ const filesData = (rule, options) => {
     ignorePaths: [
       ...gitignore.sort([
         ...rootDirs,
-        ...data.lockfile ? ['!/package-lock.json'] : [],
-        ...(data.allowPaths || []).map((p) => `!${p}`),
-        ...(data.ignorePaths || []),
+        ...pkg.data.lockfile ? ['!/package-lock.json'] : [],
+        ...(pkg.data.allowPaths || []).map((p) => `!${p}`),
+        ...(pkg.data.ignorePaths || []),
       ]),
       // these cant be sorted since they rely on order
       // to allow a previously ignored directoy
@@ -161,6 +155,7 @@ const filesData = (rule, options) => {
 module.exports = {
   name: 'files',
   apply: [{
+    name: 'root',
     when: ({ options }) => options.needsUpdate,
     run: (o) => applyFiles({
       dir: o.rootPkg.path,
@@ -168,6 +163,7 @@ module.exports = {
       files: o.rule.options.rootFiles,
     }, o),
   }, {
+    name: 'module',
     when: ({ options }) => options.needsUpdate,
     run: (o) => applyFiles({
       dir: o.pkg.path,
@@ -175,18 +171,21 @@ module.exports = {
       files: o.rule.options.files,
     }, o),
   }],
-  check: [
-    (o) => checkFiles({
+  check: [{
+    name: 'root',
+    run: (o) => checkFiles({
       dir: o.rootPkg.path,
       baseDirs: o.rule.baseDirs,
       files: o.rule.options.rootFiles,
     }, o),
-    (o) => checkFiles({
+  }, {
+    name: 'module',
+    run: (o) => checkFiles({
       dir: o.pkg.path,
       baseDirs: o.rule.baseDirs,
       files: o.rule.options.files,
     }, o),
-  ],
+  }],
   data: filesData,
   config: filesConfig,
 }
