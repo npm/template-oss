@@ -1,21 +1,23 @@
+{# import "partials/workflow.yml" as workflow with context #}
+
 name: CodeQL
 
 on:
   workflow_dispatch:
   workflow_call:
-    {{> partialsWorkflowCallInputs }}
+    {$ workflow.callInputs() | indent(4) $}
   push:
-    {{> partialsBranches }}
+    {$ workflow.branchesList() | indent(4) $}
   pull_request:
-    {{> partialsBranches }}
+    {$ workflow.branchesList() | indent(4) $}
   schedule:
-     {{> partialsCron hour=3 }}
+    {$ workflow.cron(3) | indent(4) $}
 
 jobs:
   analyze:
     name: Analyze
-    if: {{> partialsIfOrg }} && {{> partialsIfSkipPr }}
-    {{> partialsJobDefaults }}
+    if: {# include "partials/if-org.yml" #} && {$ workflow.skipPr() $}
+    {$ workflow.defaults() | indent(4) $}
     permissions:
       actions: read
       contents: read
@@ -25,9 +27,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: $\{{ inputs.ref }}
+          ref: ${{ inputs.ref }}
       
-      {{> partialsCreateCheck name="Analyze" }}
+      {$ workflow.createCheck('Analyze') | indent(6) $}
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
@@ -37,4 +39,4 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
       
-      {{> partialsConcludeCheck }}
+      {$ workflow.concludeCheck() | indent(6) $}

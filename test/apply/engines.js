@@ -55,7 +55,7 @@ t.test('latest ci versions in workspace', async (t) => {
         'source.json': '{ "node": {{{ json engines }}} }',
         'index.js': `module.exports={
           rootRepo:{add:{'target.json':'source.json'}},
-          workspaceRepo:{add:{'target-{{ pkgNameFs }}.json':'source.json'}}
+          workspaceRepo:{add:{'target-{$ pkgNameFs $}.json':'source.json'}}
         }`,
       },
     },

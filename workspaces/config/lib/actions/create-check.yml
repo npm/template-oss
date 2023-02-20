@@ -18,7 +18,7 @@ inputs:
 outputs:
   check-id:
     description: The ID of the check that was created
-    value: $\{{ steps.check.outputs.check_id }}
+    value: ${{ steps.check.outputs.check_id }}
 
 runs:
   using: composite
@@ -27,9 +27,9 @@ runs:
       uses: actions/github-script@v6
       id: workflow-job
       env:
-        JOB_NAME: $\{{ inputs.job-name }}
+        JOB_NAME: ${{ inputs.job-name }}
       with:
-        github-token: $\{{ inputs.token }}
+        github-token: ${{ inputs.token }}
         script: |
           const { JOB_NAME } = process.env
           const { repo: { owner, repo }, runId, serverUrl } = context
@@ -46,7 +46,7 @@ runs:
 
           console.log(`found job: ${JSON.stringify(job, null, 2)}`)
 
-          const shaUrl = `${serverUrl}/${owner}/${repo}/commit/$\{{ inputs.sha }}`
+          const shaUrl = `${serverUrl}/${owner}/${repo}/commit/${{ inputs.sha }}`
           const summary = `This check is assosciated with ${shaUrl}\n\n`
           const message = job?.html_url
             ? `For run logs, click here: ${job.html_url}`
@@ -60,8 +60,8 @@ runs:
       uses: LouisBrunner/checks-action@v1.5.0
       id: check
       with:
-        token: $\{{ inputs.token }}
-        status: $\{{ inputs.job-status }}
-        name: $\{{ inputs.job-name }}
-        sha: $\{{ inputs.sha }}
-        output: $\{{ steps.workflow-job.outputs.result }}
+        token: ${{ inputs.token }}
+        status: ${{ inputs.job-status }}
+        name: ${{ inputs.job-name }}
+        sha: ${{ inputs.sha }}
+        output: ${{ steps.workflow-job.outputs.result }}

@@ -8,13 +8,13 @@ const localConfigs = readdir(__dirname)
 
 module.exports = {
   root: true,
-  {{#if pkg.workspaceGlobs}}
+  {#- if pkg.workspaceGlobs.length #}
   ignorePatterns: [
-    {{#each pkg.workspaceGlobs}}
-    '{{ . }}',
-    {{/each}}
+    {# for g in pkg.workspaceGlobs -#}
+    '{$ g $}',
+    {#- endfor #}
   ],
-  {{/if}}
+  {#- endif #}
   extends: [
     '@npmcli',
     ...localConfigs,

@@ -1,5 +1,4 @@
 {
-  "@npmcli/template-oss": "This file is automatically added by @npmcli/template-oss. Do not edit.",
   "problemMatcher": [
     {
       "owner": "tap",

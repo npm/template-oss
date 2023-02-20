@@ -32,7 +32,7 @@ on:
 jobs:
   lint:
     name: Lint
-    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npmcli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -78,7 +78,7 @@ jobs:
 
   test:
     name: Test - ${{ matrix.platform.name }} - ${{ matrix.node-version }}
-    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npmcli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ${{ matrix.platform.os }}
     defaults:
       run:

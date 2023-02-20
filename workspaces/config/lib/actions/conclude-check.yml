@@ -18,6 +18,6 @@ runs:
     - name: Conclude Check
       uses: LouisBrunner/checks-action@v1.5.0
       with:
-        token: $\{{ inputs.token }}
-        conclusion: $\{{ inputs.conclusion }}
-        check_id: $\{{ inputs.check-id }}
+        token: ${{ inputs.token }}
+        conclusion: ${{ inputs.conclusion }}
+        check_id: ${{ inputs.check-id }}

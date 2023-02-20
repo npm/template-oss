@@ -4,16 +4,16 @@ description: Setup a repo with standard tools
 inputs:
   node-version:
     description: node version to use
-    default: '{{ last ciVersions }}'
+    default: '{$ ciVersions | last $}'
   npm-version:
     description: npm version to use
-    default: '{{#if updateNpm}}{{ npmSpec }}{{/if}}'
+    default: '{$ npmSpec if updateNpm $}'
   cache:
     description: whether to cache npm install or not
-    default: '{{ lockfile }}'
+    default: '{$ lockfile $}'
   shell:
     description: shell to run on
-    default: '{{ shell }}'
+    default: '{$ shell $}'
   deps:
     description: whether to run the deps step
     default: 'true'
@@ -27,7 +27,7 @@ runs:
   using: composite
   steps:
     - name: Setup Git User
-      shell: $\{{ inputs.shell }}
+      shell: ${{ inputs.shell }}
       run: |
         git config --global user.email "npm-cli+bot@github.com"
         git config --global user.name "npm CLI robot"
@@ -35,8 +35,8 @@ runs:
     - name: Setup Node
       uses: actions/setup-node@v3
       with:
-        node-version: $\{{ inputs.node-version }}
-        cache: $\{{ (inputs.cache == 'true' && 'npm') || '' }}
+        node-version: ${{ inputs.node-version }}
+        cache: ${{ (inputs.cache == 'true' && 'npm') || '' }}
 
     - name: Check Node Version
       if: inputs.npm-version
@@ -55,7 +55,7 @@ runs:
     - name: Update Windows npm
       # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
       if: inputs.npm-version && runner.os == 'Windows' && steps.node-version.outputs.fourteen-or-lower
-      shell: $\{{ inputs.shell }}
+      shell: ${{ inputs.shell }}
       run: |
         curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
         tar xf npm-7.5.4.tgz
@@ -66,25 +66,28 @@ runs:
 
     - name: Install npm@7
       if: inputs.npm-version && steps.node-version.outputs.ten-or-lower
-      shell: $\{{ inputs.shell }}
-      run: npm i --prefer-online --no-fund --no-audit -g npm@7
+      shell: ${{ inputs.shell }}
+      run: |
+        npm i --prefer-online --no-fund --no-audit -g npm@7
 
-    - name: Install npm@$\{{ inputs.npm-version }}
+    - name: Install npm@${{ inputs.npm-version }}
       if: inputs.npm-version && !steps.node-version.outputs.ten-or-lower
-      shell: $\{{ inputs.shell }}
-      run: npm i --prefer-online --no-fund --no-audit -g npm@$\{{ inputs.npm-version }}
+      shell: ${{ inputs.shell }}
+      run: |
+        npm i --prefer-online --no-fund --no-audit -g npm@${{ inputs.npm-version }}
 
     - name: npm Version
-      shell: $\{{ inputs.shell }}
-      run: {{ rootNpmPath }} -v
+      shell: ${{ inputs.shell }}
+      run: |
+        {$ rootNpmPath $} -v
 
     - name: Setup Dependencies
       if: inputs.deps == 'true'
       uses: ./.github/actions/deps
       with:
-        command: $\{{ inputs.deps-command }}
-        flags: $\{{ inputs.deps-flags }}
-        shell: $\{{ inputs.shell }}
+        command: ${{ inputs.deps-command }}
+        flags: ${{ inputs.deps-flags }}
+        shell: ${{ inputs.shell }}
 
     - name: Add Problem Matcher
       shell: bash

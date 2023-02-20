@@ -15,4 +15,5 @@ runs:
   steps:
     - name: Test
       shell: ${{ inputs.shell }}
-      run: npm test --ignore-scripts ${{ inputs.flags }}
+      run: |
+        npm test --ignore-scripts ${{ inputs.flags }}

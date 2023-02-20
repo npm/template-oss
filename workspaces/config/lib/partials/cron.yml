@@ -1,3 +1,0 @@
-{{! All our times are early AM pacific time, so add 8 to get utc }}
-# "At {{ padHour (add hour 8) }}:00 UTC ({{ padHour hour }}:00 PT) on Monday" https://crontab.guru/#0_{{ add hour 8 }}_*_*_1
-- cron: "0 {{ add hour 8 }} * * 1"

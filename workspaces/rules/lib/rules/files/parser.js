@@ -1,5 +1,5 @@
 const fs = require('fs/promises')
-const { basename, extname, dirname, relative, join } = require('path')
+const { dirname, relative, join } = require('path')
 const yaml = require('yaml')
 const NpmPackageJson = require('@npmcli/package-json')
 const jsonParse = require('json-parse-even-better-errors')
@@ -7,6 +7,7 @@ const Diff = require('diff')
 const { unset, mergeWith } = require('lodash')
 const ini = require('ini')
 const esbuild = require('esbuild')
+const minimatch = require('minimatch')
 const template = require('./template.js')
 
 // json diff takes a delete key to find values that should be deleted instead of diffed
@@ -50,7 +51,7 @@ const state = new Map()
 
 class Base {
   static types = []
-  static header = 'This file is automatically added by {{ options.name }}. Do not edit.'
+  static header = 'This file is automatically added by {$ options.name $}. Do not edit.'
   static comment = (v) => v
   static template = template
   static diff = strDiff
@@ -210,12 +211,12 @@ class Gitignore extends Base {
 }
 
 class Js extends Base {
-  static types = ['js']
+  static types = ['*.js']
   static comment = (c) => `/* ${c} */`
 }
 
 class Ini extends Base {
-  static types = ['ini']
+  static types = ['*.ini']
   static comment = (c) => `; ${c}`
   static diff = jsonDiff
 
@@ -246,12 +247,12 @@ class IniMerge extends Ini {
 }
 
 class Markdown extends Base {
-  static types = ['md']
+  static types = ['*.md']
   static comment = (c) => `<!-- ${c} -->`
 }
 
 class Yml extends Base {
-  static types = ['yml']
+  static types = ['*.yml']
   static comment = (c) => ` ${c}`
 
   toString (s) {
@@ -313,7 +314,7 @@ class YmlMerge extends Yml {
 }
 
 class Json extends Base {
-  static types = ['json']
+  static types = ['*.json']
   // its a json comment! not really but we do add a special key
   // to json objects
   static comment = (c, o) => ({ [o.options.name]: c })
@@ -341,7 +342,7 @@ class Json extends Base {
 }
 
 class JsonMerge extends Json {
-  static header = 'This file is partially managed by {{ options.name }}. Edits may be overwritten.'
+  static header = 'This file is partially managed by {$ options.name $}. Edits may be overwritten.'
   static merge = merge
 }
 
@@ -376,7 +377,6 @@ class PackageJson extends JsonMerge {
 }
 
 class Esbuild extends Js {
-  static types = []
   // these diffs are too big to show, so this will only display
   // that the file needs to be updated or not
   static diff = null
@@ -414,21 +414,27 @@ const Parsers = {
   Markdown,
   Yml,
   YmlMerge,
+  PackageJson,
   Json,
   JsonMerge,
-  PackageJson,
   Esbuild,
 }
 
 const parserLookup = Object.values(Parsers)
 
 const getParser = (file) => {
-  const base = basename(file).toLowerCase()
-  const ext = extname(file).slice(1).toLowerCase()
+  const parsers = parserLookup
+    .map(p => {
+      const type = p.types.find(t => minimatch(file, `**/${t}`, { nocase: true }))
+      if (type) {
+        return { parser: p, type }
+      }
+    })
+    .filter(Boolean)
 
-  return parserLookup.find((p) => p.types.includes(base))
-    || parserLookup.find((p) => p.types.includes(ext))
-    || Parsers.Base
+  const noMagicParser = parsers.find(p => !p.type.includes('*'))
+
+  return noMagicParser?.parser || parsers[0]?.parser || Parsers.Base
 }
 
 module.exports = getParser

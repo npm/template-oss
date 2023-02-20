@@ -18,4 +18,5 @@ runs:
   steps:
     - name: Install Dependencies
       shell: ${{ inputs.shell }}
-      run: npm ${{ inputs.command }} ${{ inputs.flags }}
+      run: |
+        npm ${{ inputs.command }} ${{ inputs.flags }}

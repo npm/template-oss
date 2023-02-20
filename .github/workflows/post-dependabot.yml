@@ -16,7 +16,6 @@ jobs:
       contents: write
     outputs:
       sha: ${{ steps.sha.outputs.sha }}
-    # TODO: remove head_ref check after testing
     if: github.repository_owner == 'npm' && github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
     defaults:

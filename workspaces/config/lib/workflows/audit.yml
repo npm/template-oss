@@ -1,24 +1,26 @@
+{# import "partials/workflow.yml" as workflow with context #}
+
 name: Audit
 
 on:
   workflow_dispatch:
   workflow_call:
-    {{> partialsWorkflowCallInputs }}
+    {$ workflow.callInputs() | indent(4) $}
   schedule:
-    {{> partialsCron hour=1 }}
+    {$ workflow.cron(1) | indent(4) $}
 
 jobs:
   audit:
     name: Audit Dependencies
-    if: {{> partialsIfOrg }} && {{> partialsIfSkipPr }}
-    {{> partialsJobDefaults }}
+    if: {# include "partials/if-org.yml" #} && {$ workflow.skipPr() $}
+    {$ workflow.defaults() | indent(4) $}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: $\{{ inputs.ref }}
+          ref: ${{ inputs.ref }}
 
-      {{> partialsCreateCheck name="Audit Dependencies" }}
+      {$ workflow.createCheck('Audit Dependencies') | indent(6) $}
 
       - name: Setup
         uses: ./.github/actions/setup
@@ -28,4 +30,4 @@ jobs:
       - name: Audit
         uses: ./.github/actions/audit
 
-      {{> partialsConcludeCheck }}
+      {$ workflow.concludeCheck() | indent(6) $}

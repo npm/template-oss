@@ -69,16 +69,19 @@ runs:
     - name: Install npm@7
       if: inputs.npm-version && steps.node-version.outputs.ten-or-lower
       shell: ${{ inputs.shell }}
-      run: npm i --prefer-online --no-fund --no-audit -g npm@7
+      run: |
+        npm i --prefer-online --no-fund --no-audit -g npm@7
 
     - name: Install npm@${{ inputs.npm-version }}
       if: inputs.npm-version && !steps.node-version.outputs.ten-or-lower
       shell: ${{ inputs.shell }}
-      run: npm i --prefer-online --no-fund --no-audit -g npm@${{ inputs.npm-version }}
+      run: |
+        npm i --prefer-online --no-fund --no-audit -g npm@${{ inputs.npm-version }}
 
     - name: npm Version
       shell: ${{ inputs.shell }}
-      run: npm -v
+      run: |
+        npm -v
 
     - name: Setup Dependencies
       if: inputs.deps == 'true'

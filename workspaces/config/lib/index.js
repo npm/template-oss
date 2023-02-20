@@ -4,10 +4,24 @@ const isPublic = (o) => o.pkg.isPublic
 
 const isDependabotMerge = (o) => o.repo.isMono && !o.rootData.lockfile
 
-const noCommentJson = ({ JsonMerge }) => class extends JsonMerge {
-  static clean = true
-  static comment = null
-}
+const releasePleaseConfig = (file) => ({
+  file,
+  filter: isPublic,
+  parser: ({ JsonMerge }) => class extends JsonMerge {
+    static clean = true
+    static comment = null
+  },
+})
+
+const jsAction = (dir, file) => ({
+  [`.github/actions/${dir}/index.js`]: {
+    file,
+    parser: ({ Esbuild }) => Esbuild,
+  },
+  [`.github/actions/${dir}/action.yml`]: {
+    file: `${file}/lib/action.yml`,
+  },
+})
 
 const filesOptions = {
   files: {
@@ -34,24 +48,15 @@ const filesOptions = {
       '.github/actions/test/action.yml': 'actions/test.yml',
       '.github/actions/upsert-comment/action.yml': 'actions/upsert-comment.yml',
       // js actions
-      '.github/actions/release-please/index.js': {
-        file: '@npmcli/actions-release-please',
-        parser: ({ Esbuild }) => Esbuild,
-      },
-      '.github/actions/release-manager/index.js': {
-        file: '@npmcli/actions-release-manager',
-        parser: ({ Esbuild }) => Esbuild,
-      },
-      '.github/actions/get-workspaces/index.js': {
-        file: '@npmcli/actions-get-workspaces',
-        parser: ({ Esbuild }) => Esbuild,
-      },
+      ...jsAction('release-please', '@npmcli/actions-release-please'),
+      ...jsAction('release-manager', '@npmcli/actions-release-manager'),
+      ...jsAction('get-workspaces', '@npmcli/actions-get-workspaces'),
       // workflows
       '.github/workflows/audit.yml': 'workflows/audit.yml',
       '.github/workflows/ci.yml': 'workflows/ci.yml',
       '.github/workflows/codeql-analysis.yml': 'workflows/codeql-analysis.yml',
       '.github/workflows/post-dependabot.yml': 'workflows/post-dependabot.yml',
-      // this lint commits which is only necessary for releases
+      // // this lint commits which is only necessary for releases
       '.github/workflows/pull-request.yml': {
         file: 'workflows/pull-request.yml',
         filter: isPublic,
@@ -64,19 +69,16 @@ const filesOptions = {
         file: 'workflows/release-integration.yml',
         filter: isPublic,
       },
-      // release please config
-      '.release-please-manifest.json': {
-        file: 'files/release-please-manifest.json',
-        filter: isPublic,
-        parser: noCommentJson,
-      },
-      'release-please-config.json': {
-        file: 'files/release-please-config.json',
-        filter: isPublic,
-        parser: noCommentJson,
-      },
+      // // release please config
+      '.release-please-manifest.json': releasePleaseConfig('files/release-please-manifest.json'),
+      'release-please-config.json': releasePleaseConfig('files/release-please-config.json'),
       // ci
-      '.github/matchers/tap.json': 'files/tap.json',
+      '.github/matchers/tap.json': {
+        file: 'files/tap.json',
+        parser: ({ Json }) => class extends Json {
+          static comment = null
+        },
+      },
       // dependabot
       // dependabot takes a single top level config file. if we are operating on
       // a workspace in a repo without a root lockfile, then this parser will
@@ -123,8 +125,8 @@ const filesOptions = {
     rootFiles: {
       rm: {
         // These are the old release please and ci files that should be removed now
-        '.github/workflows/release-please-{{ pkg.nameFs }}.yml': true,
-        '.github/workflows/ci-{{ pkg.nameFs }}.yml': true,
+        '.github/workflows/release-please{$ pkg.nameFs $}.yml': true,
+        '.github/workflows/ci{$ pkg.nameFs $}.yml': true,
       },
     },
     files: {

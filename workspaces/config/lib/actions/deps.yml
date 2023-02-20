@@ -9,11 +9,12 @@ inputs:
     default: ''
   shell:
     description: shell to run on
-    default: '{{ shell }}'
+    default: '{$ shell $}'
 
 runs:
   using: composite
   steps:
     - name: Install Dependencies
-      shell: $\{{ inputs.shell }}
-      run: {{ rootNpmPath }} $\{{ inputs.command }} $\{{ inputs.flags }}
+      shell: ${{ inputs.shell }}
+      run: |
+        {$ rootNpmPath $} ${{ inputs.command }} ${{ inputs.flags }}

@@ -7,7 +7,7 @@ inputs:
 
 outputs:
   names:
-    value: $\{{ steps.files.outputs.result }}
+    value: ${{ steps.files.outputs.result }}
 
 runs:
   using: composite
@@ -16,7 +16,7 @@ runs:
       uses: actions/github-script@v6
       id: files
       with:
-        github-token: $\{{ inputs.token }}
+        github-token: ${{ inputs.token }}
         script: |
           const { repo: { owner, repo }, eventName, payload, sha } = context
           let files

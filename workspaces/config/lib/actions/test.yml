@@ -6,11 +6,12 @@ inputs:
     default: ''
   shell:
     description: shell to run on
-    default: '{{ shell }}'
+    default: '{$ shell $}'
 
 runs:
   using: composite
   steps:
     - name: Test
-      shell: $\{{ inputs.shell }}
-      run: {{ rootNpmPath }} test --ignore-scripts $\{{ inputs.flags }}
+      shell: ${{ inputs.shell }}
+      run: |
+        {$ rootNpmPath $} test --ignore-scripts ${{ inputs.flags }}

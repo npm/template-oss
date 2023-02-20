@@ -39,7 +39,7 @@ const getParsers = (fileOptions, options) => {
       }
     }
 
-    return new (Parser(file))(target, file, parserOptions)
+    return new (Parser(file, options))(target, file, parserOptions)
   })
 
   return parsers.filter(Boolean)

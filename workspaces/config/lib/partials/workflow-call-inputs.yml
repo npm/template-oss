@@ -1,7 +1,0 @@
-inputs:
-  ref:
-    type: string
-  force:
-    type: boolean
-  check-sha:
-    type: string

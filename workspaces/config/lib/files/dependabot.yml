@@ -2,12 +2,12 @@ version: 2
 
 updates:
   - package-ecosystem: npm
-    directory: {{ pkg.dir }}
+    directory: {$ pkg.dir $}
     schedule:
       interval: daily
     allow:
       - dependency-type: direct
-    versioning-strategy: {{ dependabot }}
+    versioning-strategy: {$ dependabot $}
     commit-message:
       prefix: deps
       prefix-development: chore

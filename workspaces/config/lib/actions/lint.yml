@@ -11,8 +11,8 @@ runs:
     - name: Lint
       shell: bash
       run: |
-        {{ rootNpmPath }} run lint --ignore-scripts $\{{ inputs.flags }}
+        {$ rootNpmPath $} run lint --ignore-scripts ${{ inputs.flags }}
     - name: Post Lint
       shell: bash
       run: |
-        {{ rootNpmPath }} run postlint --ignore-scripts $\{{ inputs.flags }}
+        {$ rootNpmPath $} run postlint --ignore-scripts ${{ inputs.flags }}

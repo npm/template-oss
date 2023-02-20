@@ -1,8 +1,0 @@
-- name: Create Check
-  uses: ./.github/actions/create-check
-  if: inputs.check-sha
-  id: check
-  with:
-    sha: $\{{ inputs.check-sha }}
-    token: $\{{ secrets.GITHUB_TOKEN }}
-    job-name: {{ name }}

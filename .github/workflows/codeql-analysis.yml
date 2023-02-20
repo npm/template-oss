@@ -27,7 +27,7 @@ on:
 jobs:
   analyze:
     name: Analyze
-    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npmcli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
     defaults:
       run:

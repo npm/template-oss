@@ -27,7 +27,7 @@ inputs:
 outputs:
   comment-id:
     description: The ID of the comment
-    value: $\{{ steps.comment.outputs.result }}
+    value: ${{ steps.comment.outputs.result }}
 
 runs:
   using: composite
@@ -36,15 +36,15 @@ runs:
       uses: actions/github-script@v6
       id: comment
       env:
-        NUMBER: $\{{ inputs.number }}
-        BODY: $\{{ inputs.body }}
-        FIND: $\{{ inputs.find }}
-        REPLACE: $\{{ inputs.replace }}
-        APPEND: $\{{ inputs.append }}
-        LOGIN: $\{{ inputs.login }}
-        INCLUDES: $\{{ inputs.includes }}
+        NUMBER: ${{ inputs.number }}
+        BODY: ${{ inputs.body }}
+        FIND: ${{ inputs.find }}
+        REPLACE: ${{ inputs.replace }}
+        APPEND: ${{ inputs.append }}
+        LOGIN: ${{ inputs.login }}
+        INCLUDES: ${{ inputs.includes }}
       with:
-        github-token: $\{{ inputs.token }}
+        github-token: ${{ inputs.token }}
         script: |
           const { BODY, FIND, REPLACE, APPEND, LOGIN, NUMBER: issue_number, INCLUDES } = process.env
           const { repo: { owner, repo } } = context
