@@ -5,11 +5,13 @@ const fs = require('fs/promises')
 const Git = require('@npmcli/git')
 const localeCompare = require('@isaacs/string-locale-compare')('en')
 const npa = require('npm-package-arg')
-const output = require('../lib/util/output.js')
-const apply = require('../lib/apply/index.js')
-const check = require('../lib/check/index.js')
-const { DEFAULT_CONTENT, NAME, VERSION } = require('../lib/util/config.js')
+const { output } = require('../lib/cli.js')
+const run = require('../lib/index.js')
+const { defaultConfig: DEFAULT_CONTENT, name: NAME, version: VERSION } = require('../lib/constants')
 const { requiredPackages } = require(DEFAULT_CONTENT)
+
+const apply = (root) => run(root, { command: 'apply' })
+const check = (root) => run(root, { command: 'check' })
 
 const createPackageJson = (pkg) => ({
   'package.json': JSON.stringify(pkg, null, 2),
@@ -52,7 +54,13 @@ const setupRoot = async (root) => {
   // fs methods for reading from the root
   const rootFs = Object.fromEntries(Object.entries({
     readdir: fs.readdir,
-    readFile: (p) => fs.readFile(p, { encoding: 'utf-8' }),
+    readFile: (p) => {
+      if (/\/actions\/[a-z-]+\/index.js$/.test(p)) {
+        return '[ESBUILD FILE]'
+      } else {
+        return fs.readFile(p, { encoding: 'utf-8' })
+      }
+    },
     writeFile: (p, d) => fs.writeFile(p, d, { encoding: 'utf-8' }),
     appendFile: fs.appendFile,
     stat: fs.stat,

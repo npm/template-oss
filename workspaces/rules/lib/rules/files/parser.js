@@ -1,201 +1,221 @@
 const fs = require('fs/promises')
 const { dirname, relative, join } = require('path')
-const yaml = require('yaml')
-const NpmPackageJson = require('@npmcli/package-json')
-const jsonParse = require('json-parse-even-better-errors')
-const Diff = require('diff')
-const { unset, mergeWith, orderBy } = require('lodash')
-const ini = require('ini')
-const esbuild = require('esbuild')
-const minimatch = require('minimatch')
-const template = require('./template.js')
+const { merge, mergeWithArrays, strDiff, template, mergeWithCustomizer } = require('./util')
+const { has, identity } = require('lodash')
 
-// json diff takes a delete key to find values that should be deleted instead of diffed
-const jsonDiff = require('./json-diff')(template.DELETE)
-
-// create a patch and strip out the filename. if it ends up an empty string
-// then return true since the files are equal
-const strDiff = (t, s) => Diff.createPatch('', t, s).split('\n').slice(4).join('\n')
-
-const merge = (...o) => mergeWith({}, ...o, (_, srcValue) => {
-  if (Array.isArray(srcValue)) {
-    // Dont merge arrays, last array wins
-    return srcValue
-  }
-})
-
-const setFirst = (first, rest) => ({ ...first, ...rest })
-
-const traverse = (value, visit, keys = []) => {
-  if (keys.length) {
-    const res = visit(keys, value)
-    if (res != null) {
-      return
-    }
-  }
-  if (typeof value === 'object' && value !== null) {
-    for (const [k, v] of Object.entries(value)) {
-      traverse(v, visit, keys.concat(k))
-    }
-  }
-}
-
-const fsOk = (code) => (error) => {
+const noEntOk = (code) => (error) => {
   if (error.code === 'ENOENT') {
     return null
   }
   return Object.assign(error, { code })
 }
 
-const state = new Map()
+const CACHE = new Map()
 
-class Base {
-  static match = null
-  static header = 'This file is automatically added by {$ options.name $}. Do not edit.'
-  static comment = (v) => v
-  static template = template
-  static diff = strDiff
-  static clean = false
-  static merge = false // supply a merge function which runs on prepare for certain types
-  static DELETE = template.DELETE
+class Parser {
+  static DELETE = '__DELETE__'
 
-  constructor (target, source, options) {
+  #parserRule
+
+  constructor (target, source, { cache = true, ...options } = {}) {
+    if (!cache) {
+      CACHE.clear()
+    }
+
     this.target = target
+    this.#state.count++
+    this.#parserRule = options.rule.parser ?? {}
     this.source = source
-    this.options = options
-    this.state.count++
-    this.options.log.info(
-      this.options.pkg.relativeToRoot(this.source),
-      '-->',
-      this.options.pkg.relativeToRoot(this.target),
-      this.state.count
-    )
-  }
-
-  get state () {
-    if (!state.has(this.target)) {
-      state.set(this.target, { count: 0 })
-    }
-    return state.get(this.target)
-  }
-
-  header () {
-    if (typeof this.constructor.comment === 'function') {
-      return this.constructor.comment(this.template(this.constructor.header || ''), this.options)
+    this.data = options.data
+    this.options = {
+      ...options,
+      target,
+      source,
+      state: this.#state,
     }
   }
 
-  clean () {
-    if (this.state.count === 1 && this.constructor.clean) {
-      return fs.rm(this.target).catch(fsOk())
+  #setDefaultProp (key, def) {
+    if (has(this.#parserRule, key)) {
+      this[key] = this.#parserRule[key]
+    } else if (this[key] === undefined) {
+      this[key] = def
     }
-    return null
   }
 
-  async read (s) {
-    if (s === this.source) {
-      // allow shadowing files in configured content directories
-      // without needing to add the file to the config explicitly
-      const dirs = this.options.baseDirs
-      const relDir = dirs.find(d => s.startsWith(d))
-      if (relDir) {
-        const relFile = relative(relDir, s)
-        const lookupDirs = dirs.slice(0).reverse()
-        for (const dir of lookupDirs) {
-          const file = await fs.readFile(join(dir, relFile), { encoding: 'utf-8' }).catch(fsOk())
-          if (file !== null) {
-            return file
-          }
-        }
+  #setDefaultProps () {
+    this.parserOptions = merge(this.parserOptions, this.#parserRule.options)
+    this.#setDefaultProp('diff', true)
+    this.#setDefaultProp('template', true)
+    this.#setDefaultProp('clean', false)
+    this.#setDefaultProp('stringify', identity)
+    this.#setDefaultProp('format', identity)
+    this.#setDefaultProp('parse', identity)
+    this.#setDefaultProp('setHeader', identity)
+    this.#setDefaultProp('merge', false)
+    this.#setDefaultProp('comment')
+  }
+
+  get #state () {
+    if (!CACHE.has(this.target)) {
+      CACHE.set(this.target, { count: 0 })
+    }
+    return CACHE.get(this.target)
+  }
+
+  get header () {
+    if (!this.comment) {
+      return undefined
+    }
+    const h = this.#template(this.merge
+      ? 'This file is partially updated by {$ options.name $}. Edits may be overwritten.'
+      : 'This file is automatically updated by {$ options.name $}. Do not edit.')
+    return typeof this.comment === 'function'
+      ? this.comment(h)
+      : `${this.comment} ${h}`
+  }
+
+  #template (s) {
+    if (this.template) {
+      if (typeof this.template === 'function') {
+        return this.template(s)
       }
-    }
-
-    return fs.readFile(s, { encoding: 'utf-8' })
-  }
-
-  template (s) {
-    if (typeof this.constructor.template === 'function') {
-      return this.constructor.template(s, this.options)
+      return template(s, {
+        baseDirs: this.options.baseDirs,
+        templateOptions: this.parserOptions?.template,
+        data: this.data,
+        DELETE: Parser.DELETE,
+      })
     }
     return s
   }
 
-  parse (s) {
-    return s
-  }
-
-  prepare (s) {
-    const header = this.header()
-    return header ? `${header}\n\n${s}` : s
-  }
-
-  prepareTarget (s) {
-    return s
-  }
-
-  toString (s) {
-    return s.toString()
-  }
-
-  async write (s) {
-    // XXX: find more efficient way to do this. we can build all possible dirs before get here
-    await fs.mkdir(dirname(this.target), { recursive: true, force: true })
-    await fs.writeFile(this.target, this.toString(s))
-  }
-
-  diff (t, s) {
-    if (typeof this.constructor.diff === 'function') {
-      const diff = this.constructor.diff(t, s)
-      if (typeof diff === 'string') {
-        return diff.trim() || true
-      }
-      return diff
+  #diff (t, s) {
+    if (this.diff) {
+      const diffRes = typeof this.diff === 'function'
+        ? this.diff(t, s)
+        : strDiff(t, s, { context: this.parserOptions?.diffContext })
+      return typeof diffRes === 'string' ? (diffRes.trim() || true) : diffRes
     }
     return t === s
   }
 
-  // the apply methods are the only ones that should be called publically
-  // but everything is public interface so it can be overridden by child classes
-  applyWrite () {
-    return Promise.resolve(this.clean())
-      .then(() => this.read(this.source))
-      // replace template vars first, this will throw for nonexistant vars
-      // because it must be parseable after this step
-      .then((s) => this.template(s))
-      // parse into whatever data structure is necessary for maniuplating
-      // diffing, merging, etc. by default its a string
-      .then((s) => {
-        this.sourcePreParse = s
-        return this.parse(s)
-      })
-      // prepare the source for writing and diffing, pass in current
-      // target for merging. errors parsing or preparing targets are ok here
-      .then((s) => this.applyTarget().catch(() => null).then((t) => this.prepare(s, t)))
-      .then((s) => this.write(s))
+  #setStringHeader (s) {
+    const h = this.header
+    return typeof h === 'string' ? `${h}\n\n${s}` : s
   }
 
-  applyTarget () {
-    return Promise.resolve(this.read(this.target))
-      .then((s) => this.parse(s))
-      // for only preparing the target for diffing
-      .then((s) => this.prepareTarget(s))
+  #prepareWrite (s, t) {
+    s = this.#merge(s, t)
+    s = this.stringify(s)
+    s = typeof s === 'string' ? this.#setStringHeader(s) : this.setHeader(s)
+    return this.format(s)
+  }
+
+  #prepareDiff (s, t) {
+    s = this.#prepareWrite(s, t)
+    return this.parse(s)
+  }
+
+  #merge (s, t) {
+    let source = s
+    if (this.merge && t) {
+      if (typeof this.merge === 'function') {
+        source = this.merge(t, source)
+      } else if (this.parserOptions?.mergeArrays) {
+        source = mergeWithArrays(t, source)
+      } else if (this.parserOptions?.mergeCustomizer) {
+        source = mergeWithCustomizer(t, source, this.parserOptions?.mergeCustomizer)
+      } else {
+        source = merge(t, source)
+      }
+    }
+    return source
+  }
+
+  async #clean () {
+    if (typeof this.clean === 'function') {
+      return this.clean(this.target)
+    } else if (this.clean && this.#state.count === 1) {
+      return fs.rm(this.target).catch(noEntOk())
+    }
+    return null
+  }
+
+  async #read (s) {
+    if (s === this.source) {
+      // allow shadowing files in configured content directories
+      // without needing to add the file to the config explicitly
+      const dirs = this.options.baseDirs ?? []
+      const relDir = dirs.find(d => s.startsWith(d))
+      if (relDir) {
+        const relFile = relative(relDir, s)
+        for (const dir of dirs) {
+          try {
+            return await fs.readFile(join(dir, relFile), { encoding: 'utf-8' })
+          } catch (err) {
+            if (err.code === 'ENOENT') {
+              continue
+            }
+            throw err
+          }
+        }
+      }
+    }
+    return fs.readFile(s, { encoding: 'utf-8' })
+  }
+
+  async write (s) {
+    s = s.trim().replace(/\r\n/g, '\n') + '\n'
+    await fs.mkdir(dirname(this.target), { recursive: true, force: true })
+    await fs.writeFile(this.target, s, { encoding: 'utf-8' })
+  }
+
+  async #getTarget () {
+    const read = await this.#read(this.target)
+    return this.parse(read)
+  }
+
+  async #getSource () {
+    const read = await this.#read(this.source)
+    // replace template vars first, this will throw for nonexistant vars
+    // because it must be parseable after this step
+    const templated = await this.#template(read)
+    // parse into whatever data structure is necessary for maniuplating
+    // diffing, merging, etc. by default its a string
+    return this.parse(templated)
+  }
+
+  async applyWrite () {
+    this.#setDefaultProps()
+
+    await this.#clean()
+    // prepare the source for writing and diffing, pass in current
+    // target for merging. errors parsing or preparing targets are ok here
+    const prepared = await this.#prepareWrite(
+      await this.#getSource(),
+      await this.#getTarget().catch(() => null)
+    )
+    return this.write(prepared)
   }
 
   async applyDiff () {
+    this.#setDefaultProps()
+
     // handle if old does not exist
     const targetError = 'ETARGETERROR'
-    const target = await this.applyTarget().catch(fsOk(targetError))
+    const target = await this.#getTarget().catch(noEntOk(targetError))
 
     // no need to diff if current file does not exist
     if (target === null) {
       return null
     }
 
-    const source = await Promise.resolve(this.read(this.source))
-      .then((s) => this.template(s))
-      .then((s) => this.parse(s))
-      // gets the target to diff against in case it needs to merge, etc
-      .then((s) => this.prepare(s, target))
+    // gets the target to diff against in case it needs to merge, etc
+    const prepared = await this.#prepareDiff(
+      await this.#getSource(),
+      target
+    )
 
     // if there was a target error then return false to show that the file
     // is there but needs to be updated. skip showing a diff since it might be huge
@@ -205,245 +225,8 @@ class Base {
 
     // individual diff methods are responsible for returning a string
     // representing the diff. an empty trimmed string means no diff
-    return this.diff(target.replace(/\r\n/g, '\n'), source.replace(/\r\n/g, '\n'))
+    return this.#diff(target, prepared)
   }
 }
 
-class Gitignore extends Base {
-  static match = ['codeowners', 'gitignore']
-  static comment = (c) => `# ${c}`
-}
-
-class Js extends Base {
-  static match = ['*.js']
-  static comment = (c) => `/* ${c} */`
-}
-
-class Ini extends Base {
-  static match = ['*.ini']
-  static comment = (c) => `; ${c}`
-  static diff = jsonDiff
-
-  toString (s) {
-    return typeof s === 'string' ? s : ini.stringify(s)
-  }
-
-  parse (s) {
-    return typeof s === 'string' ? ini.parse(s) : s
-  }
-
-  prepare (s, t) {
-    let source = s
-    if (typeof this.constructor.merge === 'function' && t) {
-      source = this.constructor.merge(t, s)
-    }
-    return super.prepare(this.toString(source))
-  }
-
-  diff (t, s) {
-    return super.diff(this.parse(t), this.parse(s))
-  }
-}
-
-class IniMerge extends Ini {
-  static match = ['npmrc']
-  static merge = merge
-}
-
-class Markdown extends Base {
-  static match = ['*.md']
-  static comment = (c) => `<!-- ${c} -->`
-}
-
-class Yml extends Base {
-  static match = ['*.yml']
-  static comment = (c) => ` ${c}`
-
-  toString (s) {
-    try {
-      return s.toString({ lineWidth: 0, indent: 2 })
-    } catch (err) {
-      err.message = [this.target, this.sourcePreParse, ...s.errors, err.message].join('\n')
-      throw err
-    }
-  }
-
-  parse (s) {
-    return yaml.parseDocument(s)
-  }
-
-  prepare (s) {
-    s.commentBefore = this.header()
-    return this.toString(s)
-  }
-
-  prepareTarget (s) {
-    return this.toString(s)
-  }
-}
-
-class YmlMerge extends Yml {
-  static match = null
-  prepare (source, t) {
-    if (t === null) {
-      // If target does not exist or is in an
-      // error state, we cant do anything but write
-      // the whole document
-      return super.prepare(source)
-    }
-
-    const key = [].concat(this.constructor.key)
-
-    const getId = (node) => {
-      const index = node.items.findIndex(p => p.key?.value === this.constructor.id)
-      return index !== -1 ? node.items[index].value?.value : node.toJSON()
-    }
-
-    const target = this.parse(t)
-    const targetNodes = target.getIn(key).items.reduce((acc, node, index) => {
-      acc[getId(node)] = { node, index }
-      return acc
-    }, {})
-
-    for (const node of source.getIn(key).items) {
-      const index = targetNodes[getId(node)]?.index
-      if (typeof index === 'number' && index !== -1) {
-        target.setIn([...key, index], node)
-      } else {
-        target.addIn(key, node)
-      }
-    }
-
-    return super.prepare(target)
-  }
-}
-
-class Json extends Base {
-  static match = ['*.json']
-  // its a json comment! not really but we do add a special key
-  // to json objects
-  static comment = (c, o) => ({ [o.options.name]: c })
-  static diff = jsonDiff
-
-  toString (s) {
-    return JSON.stringify(
-      s,
-      (_, v) => v === this.constructor.DELETE ? undefined : v,
-      2
-    ).trim() + '\n'
-  }
-
-  parse (s) {
-    return jsonParse(s)
-  }
-
-  prepare (s, t) {
-    let source = s
-    if (typeof this.constructor.merge === 'function' && t) {
-      source = this.constructor.merge(t, s)
-    }
-    return setFirst(this.header(), source)
-  }
-}
-
-class JsonMerge extends Json {
-  static match = null
-  static header = 'This file is partially managed by {$ options.name $}. Edits may be overwritten.'
-  static merge = merge
-}
-
-class PackageJson extends JsonMerge {
-  static match = ['pkg.json']
-
-  async prepare (s, t) {
-    // merge new source with current pkg content
-    const update = super.prepare(s, t)
-
-    // move comment to config field
-    const configKey = this.options.options.configKey
-    const header = this.header()
-
-    // set the new value and move it to the top of the object
-    update[configKey] = setFirst(header, update[configKey])
-
-    // remove the old property and the legacy version in the config that started with //
-    const headerKey = Object.keys(header)[0]
-    unset(update, headerKey)
-    unset(update, [configKey, `//${headerKey}`])
-
-    return update
-  }
-
-  async write (s) {
-    const pkg = await NpmPackageJson.load(dirname(this.target))
-    pkg.update(s)
-    traverse(pkg.content, (keys, value) => {
-      if (value === this.constructor.DELETE) {
-        return unset(pkg.content, keys)
-      }
-    })
-    await pkg.save()
-  }
-}
-
-class Esbuild extends Js {
-  // these diffs are too big to show, so this will only display
-  // that the file needs to be updated or not
-  static diff = null
-  static build = {
-    logLevel: 'silent',
-    platform: 'node',
-    write: false,
-    target: 'node16', // this targets github actions which uses node@16
-  }
-
-  parse (s) {
-    const res = esbuild.buildSync({
-      stdin: {
-        contents: s,
-        resolveDir: dirname(this.source),
-      },
-      bundle: true,
-      ...this.constructor.build,
-    })
-
-    if (res.errors.length) {
-      throw new Error(JSON.stringify(res.errors, null, 2))
-    }
-
-    return res.outputFiles[0].text
-  }
-}
-
-const Parsers = {
-  Base,
-  Gitignore,
-  Js,
-  Ini,
-  IniMerge,
-  Markdown,
-  Yml,
-  YmlMerge,
-  PackageJson,
-  Json,
-  JsonMerge,
-  Esbuild,
-}
-
-// lookup parsers with a preference for matches without a *
-// since those are more specific
-const parserLookup = orderBy(
-  Object.values(Parsers),
-  (p) => p.match?.find(t => !t.includes('*')),
-  'asc'
-)
-
-const getParser = (file) => {
-  const parser = parserLookup
-    .find(p => p.match?.find(t => minimatch(file, `**/${t}`, { nocase: true })))
-
-  return parser || Parsers.Base
-}
-
-module.exports = getParser
-module.exports.Parsers = Parsers
+module.exports = Parser

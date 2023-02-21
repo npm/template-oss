@@ -1,0 +1,1 @@
+module.exports={rootRepo:{add:{'target.json':'source.json'}}}

@@ -1,11 +1,11 @@
-# This file is automatically added by @npmcli/template-oss. Do not edit.
+# This file is automatically updated by @npmcli/template-oss. Do not edit.
 
 name: Lint
 
 inputs:
   flags:
     description: flags to pass to the commands
-    default: ''
+    default: ""
 
 runs:
   using: composite

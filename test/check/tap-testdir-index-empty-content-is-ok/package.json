@@ -1,0 +1,11 @@
+{
+  "templateOSS": {
+    "content": "content_dir",
+    "defaultContent": false
+  },
+  "name": "testpkg",
+  "version": "1.0.0",
+  "devDependencies": {
+    "@npmcli/template-oss": "4.11.4"
+  }
+}

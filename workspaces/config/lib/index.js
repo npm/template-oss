@@ -1,29 +1,27 @@
+const { parsers } = require('@npmcli/template-oss-rules/lib/rules/files')
 const { data, postData } = require('./data.js')
 
 const isPublic = (o) => o.pkg.isPublic
 
 const isDependabotMerge = (o) => o.repo.isMono && !o.rootPkg.data.lockfile
 
-const releasePleaseConfig = (file) => ({
-  file,
-  filter: isPublic,
-  parser: ({ JsonMerge }) => class extends JsonMerge {
-    static clean = true
-    static comment = null
-  },
-})
-
 const jsAction = (dir, file) => ({
-  [`.github/actions/${dir}/index.js`]: {
-    file,
-    parser: ({ Esbuild }) => Esbuild,
-  },
-  [`.github/actions/${dir}/action.yml`]: {
-    file: `${file}/lib/action.yml`,
-  },
+  [`.github/actions/${dir}/index.js`]: `${file}/lib/index.js`,
+  [`.github/actions/${dir}/action.yml`]: `${file}/lib/action.yml`,
 })
 
 const filesOptions = {
+  parser: {
+    matches: {
+      // '.github/workflows/*.yml': parsers.WorkflowYml,
+      '*release-please-*.json': class ReleasePleaseConfig extends parsers.JsonMerge {
+        clean = true
+        comment = null
+      },
+      '.github/actions/*/index.js': parsers.Esbuild,
+    },
+    options: {},
+  },
   files: {
     add: {
       '.eslintrc.js': 'files/eslintrc.js',
@@ -70,16 +68,16 @@ const filesOptions = {
         filter: isPublic,
       },
       // // release please config
-      '.release-please-manifest.json': releasePleaseConfig('files/release-please-manifest.json'),
-      'release-please-config.json': releasePleaseConfig('files/release-please-config.json'),
-      // ci
-      '.github/matchers/tap.json': {
-        file: 'files/tap.json',
-        parser: ({ Json }) => class extends Json {
-          static comment = null
-        },
+      '.release-please-manifest.json': {
+        file: 'files/release-please-manifest.json',
+        filter: isPublic,
       },
-      // dependabot
+      'release-please-config.json': {
+        file: 'files/release-please-config.json',
+        filter: isPublic,
+      },
+      // ci
+      '.github/matchers/tap.json': 'files/tap.json',
       // dependabot takes a single top level config file. if we are operating on
       // a workspace in a repo without a root lockfile, then this parser will
       // run for all configured packages and each one will have its item
@@ -90,10 +88,9 @@ const filesOptions = {
       '.github/dependabot.yml': {
         file: 'files/dependabot.yml',
         filter: (o) => isDependabotMerge(o) ? true : o.pkg.isRoot,
-        parser: ({ YmlMerge }, o) => isDependabotMerge(o) && class extends YmlMerge {
-          static clean = true
-          static key = 'updates'
-          static id = 'directory'
+        parser: (o) => isDependabotMerge(o) && class DependabotYml extends parsers.YmlAppend {
+          clean = true
+          parserOptions = { key: 'updates', id: 'directory' }
         },
       },
     },
@@ -123,11 +120,11 @@ const filesOptions = {
   },
   workspace: {
     rootFiles: {
-      rm: {
+      rm: [
         // These are the old release please and ci files that should be removed now
-        '.github/workflows/release-please{$ pkg.nameFs $}.yml': true,
-        '.github/workflows/ci{$ pkg.nameFs $}.yml': true,
-      },
+        '.github/workflows/release-please{$ pkg.nameFs $}.yml',
+        '.github/workflows/ci{$ pkg.nameFs $}.yml',
+      ],
     },
     files: {
       rm: [
@@ -142,6 +139,9 @@ module.exports = {
   data: {
     values: data,
     postData,
+    options: {
+      mergeArrays: ['allowPaths', 'distPaths'],
+    },
     workspace: {
       values: {
         // workspaces never get a lockfile regardless of root setting

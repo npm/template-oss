@@ -1,10 +1,41 @@
 const { join } = require('path')
 const { promisify } = require('util')
 const glob = promisify(require('glob'))
-const Parser = require('./parser.js')
-const template = require('./template.js')
+const minimatch = require('minimatch')
+const { orderBy } = require('lodash')
+const Base = require('./parser.js')
+const { template, merge } = require('./util.js')
+const Parsers = require('./parsers.js')
 
 const globify = pattern => pattern.split('\\').join('/')
+
+const orderMatches = (keys) => orderBy(
+  keys,
+  (k) => k.includes('*'),
+  'asc'
+)
+
+const defaultMatches = {
+  CODEOWNERS: Parsers.Gitignore,
+  '.gitignore': Parsers.Gitignore,
+  '*.js': Parsers.Js,
+  '*.ini': Parsers.Ini,
+  '.npmrc': Parsers.IniMerge,
+  '*.md': Parsers.Markdown,
+  '*.yml': Parsers.Yml,
+  '*.json': Parsers.Json,
+  'package.json': Parsers.PackageJson,
+}
+
+const defaultMatchLookup = orderMatches(Object.keys(defaultMatches))
+
+const matchParser = (file, matches = {}) => {
+  const matchLookup = orderMatches(Object.keys(matches)).concat(defaultMatchLookup)
+  const matchKey = matchLookup.find((k) => minimatch(file, `**/${k}`, { dot: true }))
+  if (matchKey) {
+    return matches[matchKey] ?? defaultMatches[matchKey]
+  }
+}
 
 const fileEntries = ({ files, dir }, options) => Object.entries(files)
   // remove any false values
@@ -24,22 +55,24 @@ const getParsers = (fileOptions, options) => {
       return null
     }
 
-    const parserOptions = {
-      ...options,
-      baseDirs: fileOptions.baseDirs,
-    }
+    let FileParser
 
-    if (parser) {
+    if (typeof parser === 'function') {
       // allow files to extend base parsers or create new ones
-      const FoundParser = parser(Parser.Parsers, options)
       // parsers can be returned conditionally so if nothing was returned
       // fall back to the default parser for this file
-      if (FoundParser) {
-        return new FoundParser(target, file, parserOptions)
-      }
+      FileParser = Object.prototype.isPrototypeOf.call(Base, parser)
+        ? parser
+        : parser(options)
+    } else if (parser) {
+      options.rule.parser.options = merge(options.rule.parser.options, parser)
     }
 
-    return new (Parser(file, options))(target, file, parserOptions)
+    if (!FileParser) {
+      FileParser = matchParser(target, options.rule.parser?.matches)
+    }
+
+    return new (FileParser ?? Base)(target, file, options)
   })
 
   return parsers.filter(Boolean)
@@ -69,11 +102,10 @@ const rmEach = async (fileOptions, options, fn) => {
 const parseEach = async (fileOptions, options, fn) => {
   const res = []
   for (const parser of getParsers(fileOptions, options)) {
-    // try {
+    options.log.verbose('PARSER:', parser.constructor.name, parser.options.state.count)
+    options.log.verbose('SOURCE:', options.pkg.relativeToRoot(parser.source))
+    options.log.verbose('TARGET:', options.pkg.relativeToRoot(parser.target))
     res.push(await fn(parser))
-    // } catch (err) {
-    //   options.log.error(parser.target, parser.source, err)
-    // }
   }
   return res.filter(Boolean)
 }

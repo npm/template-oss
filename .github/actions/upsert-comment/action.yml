@@ -1,4 +1,4 @@
-# This file is automatically added by @npmcli/template-oss. Do not edit.
+# This file is automatically updated by @npmcli/template-oss. Do not edit.
 
 name: Upsert Comment
 description: Update or create a comment
@@ -12,7 +12,7 @@ inputs:
     required: true
   login:
     description: Login name of user to look for comments from
-    default: 'github-actions[bot]'
+    default: "github-actions[bot]"
     required: true
   body:
     description: Body of the comment, the first line will be used to match to an existing comment

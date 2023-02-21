@@ -1,4 +1,4 @@
-# This file is automatically added by @npmcli/template-oss. Do not edit.
+# This file is automatically updated by @npmcli/template-oss. Do not edit.
 
 # ignore everything in the root
 /*
@@ -26,6 +26,13 @@
 !/SECURITY.md
 !/tap-snapshots/
 !/test/
+!/workspaces/
+/workspaces/*
+!/workspaces/config/
+!/workspaces/get-workspaces/
+!/workspaces/release-manager/
+!/workspaces/release-please/
+!/workspaces/rules/
 !/workspaces/
 /workspaces/*
 !/workspaces/config/

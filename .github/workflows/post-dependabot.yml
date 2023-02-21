@@ -1,4 +1,4 @@
-# This file is automatically added by @npmcli/template-oss. Do not edit.
+# This file is automatically updated by @npmcli/template-oss. Do not edit.
 
 name: Post Dependabot
 
@@ -113,7 +113,7 @@ jobs:
   # lint settings and test settings.
   ci:
     name: CI
-    needs: [ dependency ]
+    needs: [dependency]
     if: needs.dependency.outputs.sha
     uses: ./.github/workflows/ci.yml
     with:
@@ -123,7 +123,7 @@ jobs:
 
   codeql-analysis:
     name: CodeQL
-    needs: [ dependency ]
+    needs: [dependency]
     if: needs.dependency.outputs.sha
     uses: ./.github/workflows/codeql-analysis.yml
     with:
@@ -133,7 +133,7 @@ jobs:
 
   pull-request:
     name: Pull Request
-    needs: [ dependency ]
+    needs: [dependency]
     if: needs.dependency.outputs.sha
     uses: ./.github/workflows/pull-request.yml
     with:

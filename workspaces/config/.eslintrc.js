@@ -1,4 +1,4 @@
-/* This file is automatically added by @npmcli/template-oss. Do not edit. */
+/* This file is automatically updated by @npmcli/template-oss. Do not edit. */
 
 'use strict'
 
@@ -10,8 +10,5 @@ const localConfigs = readdir(__dirname)
 
 module.exports = {
   root: true,
-  extends: [
-    '@npmcli',
-    ...localConfigs,
-  ],
+  extends: ['@npmcli', ...localConfigs],
 }

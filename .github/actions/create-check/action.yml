@@ -1,4 +1,4 @@
-# This file is automatically added by @npmcli/template-oss. Do not edit.
+# This file is automatically updated by @npmcli/template-oss. Do not edit.
 
 name: Create Check
 description: Create a check and associate it with a sha
@@ -15,7 +15,7 @@ inputs:
     required: true
   job-status:
     description: Status of the check being created
-    default: 'in_progress'
+    default: "in_progress"
 
 outputs:
   check-id:

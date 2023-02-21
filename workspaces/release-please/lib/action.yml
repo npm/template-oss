@@ -1,13 +1,19 @@
-name: 'Get Workspaces'
-description: 'Get workspaces'
+name: 'Release Please'
 
 inputs:
-  files:
-    description: 'files'
+  token:
+    required: true
+  branch:
+    required: true
+  release-pr:
 
 outputs:
-  flags:
-    description: 'workspace flags'
+  pr:
+  pr-branch:
+  pr-number:
+  pr-sha:
+  release:
+  releases:
 
 runs:
   using: 'node16'

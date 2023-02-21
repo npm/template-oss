@@ -1,77 +1,28 @@
 const core = require('@actions/core')
 const main = require('./release-please.js')
 
-const dryRun = !process.env.CI
-const branch = dryRun ? process.argv[2] : core.getInput('branch')
-const forcePullRequest = dryRun ? process.argv[3] : core.getInput('release-pr')
-
-const outputPr = (val) => {
-  if (!val) {
-    return
-  }
-  if (dryRun) {
-    console.log('PR:', val.title.toString())
-    console.log('='.repeat(40))
-    console.log(val.body.toString())
-    console.log('='.repeat(40))
-    for (const update of val.updates.filter(u => u.updater.changelogEntry)) {
-      console.log('CHANGELOG:', update.path)
-      console.log('-'.repeat(40))
-      console.log(update.updater.changelogEntry)
-      console.log('-'.repeat(40))
-    }
-    for (const update of val.updates.filter(u => u.updater.rawContent)) {
-      console.log('package:', update.path)
-      console.log('-'.repeat(40))
-      console.log(JSON.parse(update.updater.rawContent).name)
-      console.log(JSON.parse(update.updater.rawContent).version)
-      console.log('-'.repeat(40))
-    }
-  } else {
-    core.setOutput('pr', JSON.stringify(val))
-    core.setOutput('pr-branch', val.headBranchName)
-    core.setOutput('pr-number', val.number)
-    core.setOutput('pr-sha', val.sha)
-  }
-}
-
-const outputRelease = (val) => {
-  if (!val) {
-    return
-  }
-  if (dryRun) {
-    console.log('ROOT RELEASE:', JSON.stringify(val, null, 2))
-  } else {
-    core.setOutput('release', JSON.stringify(val))
-  }
-}
-
-const outputReleases = (val) => {
-  if (!val) {
-    return
-  }
-  if (dryRun) {
-    console.log('ALL RELEASES:', JSON.stringify(val, null, 2))
-  } else {
-    core.setOutput('releases', JSON.stringify(val))
-  }
-}
+const forcePullRequest = core.getInput('release-pr')
 
 main({
-  token: process.env.GITHUB_TOKEN,
+  token: core.getInput('token'),
   repo: process.env.GITHUB_REPOSITORY,
-  dryRun,
-  branch,
+  branch: core.getInput('branch'),
+  dryRun: core.getInput('dry-run'),
   forcePullRequest: forcePullRequest ? +forcePullRequest : null,
 }).then(({ pr, release, releases }) => {
-  outputPr(pr)
-  outputRelease(release)
-  outputReleases(releases)
+  if (pr) {
+    core.setOutput('pr', JSON.stringify(pr))
+    core.setOutput('pr-branch', pr.headBranchName)
+    core.setOutput('pr-number', pr.number)
+    core.setOutput('pr-sha', pr.sha)
+  }
+  if (release) {
+    core.setOutput('release', JSON.stringify(release))
+  }
+  if (releases) {
+    core.setOutput('releases', JSON.stringify(releases))
+  }
   return null
 }).catch(err => {
-  if (dryRun) {
-    console.error(err)
-  } else {
-    core.setFailed(`failed: ${err}`)
-  }
+  core.setFailed(err)
 })

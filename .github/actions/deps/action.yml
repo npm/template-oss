@@ -1,17 +1,17 @@
-# This file is automatically added by @npmcli/template-oss. Do not edit.
+# This file is automatically updated by @npmcli/template-oss. Do not edit.
 
 name: Dependencies
 
 inputs:
   command:
     description: command to run for the dependencies step
-    default: 'install --ignore-scripts --no-audit --no-fund'
+    default: "install --ignore-scripts --no-audit --no-fund"
   flags:
     description: extra flags to pass to the dependencies step
-    default: ''
+    default: ""
   shell:
     description: shell to run on
-    default: 'bash'
+    default: "bash"
 
 runs:
   using: composite

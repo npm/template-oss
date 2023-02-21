@@ -1,5 +1,4 @@
 name: 'Get Workspaces'
-description: 'Get workspaces'
 
 inputs:
   files:

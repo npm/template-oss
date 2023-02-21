@@ -7,13 +7,11 @@ const git = require('@npmcli/git')
 // is copied into an existing repo, there could be files already checked in
 // to git that are now ignored by new gitignore rules. We want to warn
 // about these files.
-const run = async ({ root, path, options, log }) => {
-  log.verbose({ root, path })
-
+const run = async ({ rootPkg, pkg, log }) => {
   // use the root to detect a git repo but the project directory (path) for the
   // ignore check
-  const ignoreFile = resolve(path, '.gitignore')
-  if (!await git.is({ cwd: root }) || !existsSync(ignoreFile)) {
+  const ignoreFile = resolve(pkg.path, '.gitignore')
+  if (!await git.is({ cwd: rootPkg.path }) || !existsSync(ignoreFile)) {
     log.verbose('no git or no gitignore')
     return null
   }
@@ -25,8 +23,8 @@ const run = async ({ root, path, options, log }) => {
     '--cached',
     '--ignored',
     // https://git-scm.com/docs/git-ls-files#_exclude_patterns
-    `--${options.isRoot ? 'exclude-from' : 'exclude-per-directory'}=${basename(ignoreFile)}`,
-  ], { cwd: path })
+    `--${pkg.isRoot ? 'exclude-from' : 'exclude-per-directory'}=${basename(ignoreFile)}`,
+  ], { cwd: pkg.path })
 
   log.verbose('ls-files', res)
 
@@ -34,7 +32,7 @@ const run = async ({ root, path, options, log }) => {
     .trim()
     .split('\n')
     .filter(Boolean)
-    .map(f => resolve(path, f))
+    .map(f => resolve(pkg.path, f))
     .filter((f) => existsSync(f))
 
   if (!files.length) {
@@ -46,11 +44,11 @@ const run = async ({ root, path, options, log }) => {
     .split(/\r?\n/)
     .filter((l) => l && !l.trim().startsWith('#'))
 
-  const relIgnore = options.relative(ignoreFile)
+  const relIgnore = pkg.relativeToRoot(ignoreFile)
 
   return {
     title: `The following files are tracked by git but matching a pattern in ${relIgnore}:`,
-    body: files.map(options.relative),
+    body: files.map(pkg.relativeToRoot),
     solution: ['move files to not match one of the following patterns:', ...ignores],
   }
 }

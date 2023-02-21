@@ -1,4 +1,4 @@
-# This file is automatically added by @npmcli/template-oss. Do not edit.
+# This file is partially updated by @npmcli/template-oss. Edits may be overwritten.
 
 version: 2
 
@@ -41,30 +41,6 @@ updates:
       - "Dependencies"
   - package-ecosystem: npm
     directory: workspaces/release-manager/
-    schedule:
-      interval: daily
-    allow:
-      - dependency-type: direct
-    versioning-strategy: increase-if-necessary
-    commit-message:
-      prefix: deps
-      prefix-development: chore
-    labels:
-      - "Dependencies"
-  - package-ecosystem: npm
-    directory: workspaces/release-please/
-    schedule:
-      interval: daily
-    allow:
-      - dependency-type: direct
-    versioning-strategy: increase-if-necessary
-    commit-message:
-      prefix: deps
-      prefix-development: chore
-    labels:
-      - "Dependencies"
-  - package-ecosystem: npm
-    directory: workspaces/rules/
     schedule:
       interval: daily
     allow:

@@ -41,7 +41,7 @@ const defaults = {
   ],
 }
 
-const localCmdPath = (key, data, { pkg, relativeToRoot }) => {
+const localCmdPath = (key, data, { pkg }) => {
   const cmdPath = data[key]
 
   if (cmdPath === defaults[key]) {
@@ -49,7 +49,7 @@ const localCmdPath = (key, data, { pkg, relativeToRoot }) => {
   }
 
   // Make a path relative from a workspace to the root if we are in a workspace
-  const pkgPath = pkg.isRoot ? cmdPath : relativeToRoot(cmdPath)
+  const pkgPath = pkg.isRoot ? cmdPath : pkg.relativeToRoot(cmdPath)
 
   return {
     root: `node ${cmdPath}`,

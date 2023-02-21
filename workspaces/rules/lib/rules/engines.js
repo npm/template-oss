@@ -1,15 +1,16 @@
 const semver = require('semver')
 const Arborist = require('@npmcli/arborist')
 
-const run = async ({ path, pkg, options, rule }) => {
+const run = async ({ pkg, rule, log }) => {
   const { skipPackages = [] } = rule
 
-  const pkgPath = options.relative('package.json')
-  const arb = new Arborist({ path })
+  const arb = new Arborist({ path: pkg.path })
   const tree = await arb.loadActual({ forceActual: true })
 
-  const engines = pkg.engines.node
-  const deps = await tree.querySelectorAll(`#${pkg.name} > .prod:attr(engines, [node])`)
+  const engines = pkg.json.engines.node
+  const query = `#${pkg.name} > .prod:attr(engines, [node])`
+  log.info(query)
+  const deps = await tree.querySelectorAll()
 
   const invalid = []
   for (const dep of deps) {
@@ -28,6 +29,7 @@ const run = async ({ path, pkg, options, rule }) => {
   }
 
   if (invalid.length) {
+    const pkgPath = pkg.relativeToRoot('package.json')
     const title = `The following production dependencies are not compatible with ` +
       `\`engines.node: ${engines}\` found in \`${pkgPath}\`:`
     return {
@@ -46,6 +48,6 @@ module.exports = {
   name: 'engines',
   check: {
     run,
-    when: ({ pkg }) => pkg.engines?.node,
+    when: ({ pkg }) => pkg.json.engines?.node,
   },
 }

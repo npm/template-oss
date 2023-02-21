@@ -1,4 +1,4 @@
-# This file is automatically added by @npmcli/template-oss. Do not edit.
+# This file is automatically updated by @npmcli/template-oss. Do not edit.
 
 name: Release
 
@@ -45,9 +45,8 @@ jobs:
       - name: Release Please
         id: release
         uses: ./.github/actions/release-please
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref_name }}
           release-pr: ${{ inputs.release-pr }}
 
@@ -157,7 +156,7 @@ jobs:
 
   ci:
     name: Release PR - CI
-    needs: [ release, update ]
+    needs: [release, update]
     if: needs.release.outputs.pr
     uses: ./.github/workflows/ci.yml
     with:
@@ -171,7 +170,7 @@ jobs:
     defaults:
       run:
         shell: bash
-    needs: [ release, update, ci ]
+    needs: [release, update, ci]
     if: needs.update.outputs.check-id && (success() || failure())
     steps:
       - name: Checkout
@@ -269,7 +268,7 @@ jobs:
     defaults:
       run:
         shell: bash
-    needs: [ release, release-integration ]
+    needs: [release, release-integration]
     if: needs.release.outputs.release && (success() || failure())
     steps:
       - name: Checkout

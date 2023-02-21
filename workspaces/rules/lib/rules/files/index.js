@@ -1,11 +1,13 @@
 const { join, isAbsolute } = require('path')
-const { defaultsDeep, pick } = require('lodash')
+const { defaultsDeep, pick, omit, partition } = require('lodash')
 const deepMapValues = require('just-deep-map-values')
-const { partition } = require('lodash')
 const localeCompare = require('@isaacs/string-locale-compare')('en')
 const fs = require('fs/promises')
 const { rmEach, parseEach } = require('./files')
 const gitignore = require('../../gitignore')
+const parsers = require('./parsers')
+const Base = require('./parser')
+const util = require('./util')
 
 const FILE_KEYS = ['files', 'rootFiles']
 const ADD = 'add'
@@ -30,7 +32,7 @@ const checkFiles = async (fileOptions, options) => {
   const rm = await rmEach({
     ...fileOptions,
     files: rmFiles,
-  }, options, (f) => options.relativeToRoot(f))
+  }, options, (f) => options.pkg.relativeToRoot(f))
 
   options.log.verbose('rm', rm)
 
@@ -44,7 +46,7 @@ const checkFiles = async (fileOptions, options) => {
 
   const addOrUpdate = await parseEach({ ...fileOptions, files: addFiles }, options, async (p) => {
     const diff = await p.applyDiff()
-    const target = options.relativeToRoot(p.target)
+    const target = options.pkg.relativeToRoot(p.target)
 
     if (diff === null) {
       // needs to be added
@@ -120,7 +122,10 @@ const filesConfig = (ruleOptions, baseDir) => {
     return acc
   }, {})
 
-  return defaultsDeep(normalizeFiles(ruleOptions), defaultFiles)
+  return {
+    ...omit(ruleOptions, FILE_KEYS),
+    ...defaultsDeep(normalizeFiles(ruleOptions), defaultFiles),
+  }
 }
 
 const filesData = (rule, options) => {
@@ -128,9 +133,9 @@ const filesData = (rule, options) => {
 
   const rootDirs = gitignore.allowRootDir([
     // Allways allow module files in root or workspaces
-    ...Object.keys(rule.options.files.add),
+    ...Object.keys(rule.files.add),
     // in the root allow all repo files
-    ...pkg.isRoot ? Object.keys(rule.options.rootFiles.add) : [],
+    ...pkg.isRoot ? Object.keys(rule.rootFiles.add) : [],
   ])
 
   const wsDirs = pkg.isRoot
@@ -159,33 +164,39 @@ module.exports = {
     when: ({ options }) => options.needsUpdate,
     run: (o) => applyFiles({
       dir: o.rootPkg.path,
-      baseDirs: o.rule.baseDirs,
-      files: o.rule.options.rootFiles,
+      files: o.rule.rootFiles,
     }, o),
   }, {
     name: 'module',
     when: ({ options }) => options.needsUpdate,
     run: (o) => applyFiles({
       dir: o.pkg.path,
-      baseDirs: o.rule.baseDirs,
-      files: o.rule.options.files,
+      files: o.rule.files,
     }, o),
   }],
   check: [{
     name: 'root',
     run: (o) => checkFiles({
       dir: o.rootPkg.path,
-      baseDirs: o.rule.baseDirs,
-      files: o.rule.options.rootFiles,
+      files: o.rule.rootFiles,
     }, o),
   }, {
     name: 'module',
     run: (o) => checkFiles({
       dir: o.pkg.path,
-      baseDirs: o.rule.baseDirs,
-      files: o.rule.options.files,
+      files: o.rule.files,
     }, o),
   }],
-  data: filesData,
+  data: {
+    values: filesData,
+    options: {
+      mergeArrays: ['ignorePaths'],
+    },
+  },
   config: filesConfig,
+  parsers: {
+    ...parsers,
+    Base,
+  },
+  util,
 }

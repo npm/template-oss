@@ -1,4 +1,4 @@
-# This file is automatically added by @npmcli/template-oss. Do not edit.
+# This file is automatically updated by @npmcli/template-oss. Do not edit.
 
 name: Setup Repo
 description: Setup a repo with standard tools
@@ -6,22 +6,22 @@ description: Setup a repo with standard tools
 inputs:
   node-version:
     description: node version to use
-    default: '18.x'
+    default: "18.x"
   npm-version:
     description: npm version to use
-    default: 'latest'
+    default: "latest"
   cache:
     description: whether to cache npm install or not
-    default: 'false'
+    default: "false"
   shell:
     description: shell to run on
-    default: 'bash'
+    default: "bash"
   deps:
     description: whether to run the deps step
-    default: 'true'
+    default: "true"
   deps-command:
     description: command to run for the dependencies step
-    default: 'install --ignore-scripts --no-audit --no-fund'
+    default: "install --ignore-scripts --no-audit --no-fund"
   deps-flags:
     description: extra flags to pass to the dependencies step
 

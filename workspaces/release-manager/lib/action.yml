@@ -1,13 +1,11 @@
-name: 'Get Workspaces'
-description: 'Get workspaces'
+name: 'Release Manager'
 
 inputs:
-  files:
-    description: 'files'
-
-outputs:
-  flags:
-    description: 'workspace flags'
+  token:
+    required: true
+  pr-number:
+    required: true
+  comment-id:
 
 runs:
   using: 'node16'

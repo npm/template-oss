@@ -1,16 +1,15 @@
-# This file is automatically added by @npmcli/template-oss. Do not edit.
+# This file is automatically updated by @npmcli/template-oss. Do not edit.
 
-name: 'Get Workspaces'
-description: 'Get workspaces'
+name: "Get Workspaces"
 
 inputs:
   files:
-    description: 'files'
+    description: "files"
 
 outputs:
   flags:
-    description: 'workspace flags'
+    description: "workspace flags"
 
 runs:
-  using: 'node16'
-  main: 'index.js'
+  using: "node16"
+  main: "index.js"

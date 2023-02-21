@@ -39,9 +39,8 @@ jobs:
       - name: Release Please
         id: release
         uses: ./.github/actions/release-please
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref_name }}
           release-pr: ${{ inputs.release-pr }}
 
