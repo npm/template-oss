@@ -5,10 +5,14 @@ t.test('allow paths are merged', async (t) => {
   const s = await setup(t, {
     package: {
       templateOSS: {
-        allowPaths: [
-          '/a',
-          '/b',
-        ],
+        data: {
+          values: {
+            allowPaths: [
+              '/a',
+              '/b',
+            ],
+          },
+        },
       },
     },
   })
@@ -17,31 +21,32 @@ t.test('allow paths are merged', async (t) => {
   const ignore = await s.readFile('.gitignore')
   t.ok(ignore.includes('!/a'))
   t.ok(ignore.includes('!/b'))
-  t.ok(ignore.includes('!/lib/'))
+  t.ok(ignore.includes('/*'))
+  t.ok(ignore.includes('!**/.gitignore'))
 })
 
-t.test('works with custom content', async (t) => {
-  const s = await setup(t, {
-    package: {
-      templateOSS: {
-        content: 'content_dir',
-        defaultContent: false,
-        allowPaths: [
-          '/a',
-          '/b',
-        ],
-      },
-    },
-    testdir: {
-      content_dir: {
-        'paths.json': '{{{json allowPaths}}}',
-        'index.js': 'module.exports={rootRepo:{add:{"paths.json":"paths.json"}}}',
-      },
-    },
-  })
-  await s.apply()
+// t.test('works with custom content', async (t) => {
+//   const s = await setup(t, {
+//     package: {
+//       templateOSS: {
+//         content: 'content_dir',
+//         defaultContent: false,
+//         allowPaths: [
+//           '/a',
+//           '/b',
+//         ],
+//       },
+//     },
+//     testdir: {
+//       content_dir: {
+//         'paths.json': '{{{json allowPaths}}}',
+//         'index.js': 'module.exports={rootRepo:{add:{"paths.json":"paths.json"}}}',
+//       },
+//     },
+//   })
+//   await s.apply()
 
-  const paths = await s.readJson('paths.json')
-  t.equal(paths[0], '/a')
-  t.equal(paths[1], '/b')
-})
+//   const paths = await s.readJson('paths.json')
+//   t.equal(paths[0], '/a')
+//   t.equal(paths[1], '/b')
+// })

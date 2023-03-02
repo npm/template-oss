@@ -1,0 +1,7 @@
+# ignore everything in the root
+/*
+
+# keep these
+{#- for p in ignorePaths #}
+{$ p $}
+{#- endfor #}

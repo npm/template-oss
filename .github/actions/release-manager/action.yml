@@ -1,0 +1,14 @@
+# This file is automatically updated by @npmcli/template-oss. Do not edit.
+
+name: "Release Manager"
+
+inputs:
+  token:
+    required: true
+  pr-number:
+    required: true
+  comment-id:
+
+runs:
+  using: "node16"
+  main: "index.js"

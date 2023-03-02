@@ -5,11 +5,13 @@ const fs = require('fs/promises')
 const Git = require('@npmcli/git')
 const localeCompare = require('@isaacs/string-locale-compare')('en')
 const npa = require('npm-package-arg')
-const output = require('../lib/util/output.js')
-const apply = require('../lib/apply/index.js')
-const check = require('../lib/check/index.js')
-const CONTENT = require('..')
-const { name: NAME, version: VERSION } = require('../package.json')
+const { output } = require('../lib/cli.js')
+const run = require('../lib/index.js')
+const { defaultConfig: DEFAULT_CONTENT, name: NAME, version: VERSION } = require('../lib/constants')
+const { requiredPackages } = require(DEFAULT_CONTENT)
+
+const apply = (root) => run(root, { command: 'apply' })
+const check = (root) => run(root, { command: 'check' })
 
 const createPackageJson = (pkg) => ({
   'package.json': JSON.stringify(pkg, null, 2),
@@ -27,21 +29,24 @@ const pkgWithName = (name, defName) => {
 }
 
 // minimum package.json for no errors
-const okPackage = () => Object.entries(CONTENT.requiredPackages)
-  .reduce((acc, [location, deps]) => {
-    acc[location] = Object.fromEntries(deps.map((name) => {
-      const arg = npa(name)
-      return [arg.name, arg.fetchSpec === 'latest' ? '*' : arg.fetchSpec]
-    }))
-    return acc
-  }, {
-    tap: {
-      'nyc-arg': [
-        '--exclude',
-        'tap-snapshots/**',
-      ],
-    },
-  })
+const okPackage = () => {
+  const pkg = Object.entries(requiredPackages)
+    .reduce((acc, [location, deps]) => {
+      acc[location] = Object.fromEntries(deps.map((name) => {
+        const arg = npa(name)
+        return [arg.name, arg.fetchSpec === 'latest' ? '*' : arg.fetchSpec]
+      }))
+      return acc
+    }, {
+      tap: {
+        'nyc-arg': [
+          '--exclude',
+          'tap-snapshots/**',
+        ],
+      },
+    })
+  return pkg
+}
 
 const setupRoot = async (root) => {
   const rootPath = (...p) => join(root, ...p)
@@ -49,7 +54,13 @@ const setupRoot = async (root) => {
   // fs methods for reading from the root
   const rootFs = Object.fromEntries(Object.entries({
     readdir: fs.readdir,
-    readFile: (p) => fs.readFile(p, { encoding: 'utf-8' }),
+    readFile: (p) => {
+      if (/\/actions\/[a-z-]+\/index.js$/.test(p)) {
+        return '[ESBUILD FILE]'
+      } else {
+        return fs.readFile(p, { encoding: 'utf-8' })
+      }
+    },
     writeFile: (p, d) => fs.writeFile(p, d, { encoding: 'utf-8' }),
     appendFile: fs.appendFile,
     stat: fs.stat,
@@ -102,12 +113,17 @@ const setup = async (t, {
   workspaces = {},
   testdir = {},
   ok,
+  requireSelf = true,
 } = {}) => {
-  const wsLookup = {}
-  const pkg = merge(
-    pkgWithName(package, 'testpkg'),
-    ok ? okPackage() : {}
+  const mergePkg = (name, defName) => merge(
+    {},
+    pkgWithName(name, defName),
+    ok ? okPackage() : {},
+    requireSelf || ok ? { devDependencies: { [NAME]: VERSION } } : {}
   )
+
+  const wsLookup = {}
+  const pkg = mergePkg(package, 'testpkg')
 
   // convenience for passing in workspaces as an object
   // and getting those converted to a proper workspaces array
@@ -119,10 +135,7 @@ const setup = async (t, {
     merge(testdir, { [wsDir]: {} })
 
     for (const [wsBase, wsPkgName] of wsEntries) {
-      const wsPkg = merge(
-        pkgWithName(wsPkgName, wsBase),
-        ok ? okPackage() : {}
-      )
+      const wsPkg = mergePkg(wsPkgName, wsBase)
       const wsPath = posix.join(wsDir, wsBase)
       // obj to lookup workspaces by path in tests
       wsLookup[wsBase] = wsPath
@@ -164,12 +177,19 @@ const setupGit = async (...args) => {
   }
 }
 
-const cleanSnapshot = (str) => str
+module.exports = setup
+module.exports.git = setupGit
+module.exports.pkgVersion = VERSION
+module.exports.fixture = (f) => fs.readFile(resolve(__dirname, 'fixtures', f), 'utf-8')
+
+module.exports.clean = (str) => str
   .replace(resolve(), '{{ROOT}}')
   .replace(/\\+/g, '/')
   .replace(/\r\n/g, '\n')
   .replace(new RegExp(`("version": "|${esc(NAME)}@)${esc(VERSION)}`, 'g'), '$1{{VERSION}}')
-const formatSnapshots = {
+  .replace(new RegExp(`("${NAME}": ")${VERSION.replace(/[.]/g, '\\.')}(")`, 'g'), '$1{{VERSION}}$2')
+
+module.exports.format = {
   checks: (arr) => output(arr).trim(),
   readdir: (arr) => arr.sort(localeCompare).join('\n').trim(),
   readdirSource: (obj) => Object.entries(obj)
@@ -177,20 +197,6 @@ const formatSnapshots = {
     .map(([file, content]) => [file, '='.repeat(40), content].join('\n').trim())
     .join('\n\n')
     .trim(),
-}
-
-module.exports = setup
-module.exports.git = setupGit
-module.exports.content = CONTENT
-module.exports.pkgVersion = VERSION
-module.exports.clean = cleanSnapshot
-module.exports.format = formatSnapshots
-module.exports.okPackage = okPackage
-module.exports.fixture = (f) => fs.readFile(resolve(__dirname, 'fixtures', f), 'utf-8')
-module.exports.log = (t, f = () => true) => {
-  const cb = (...args) => f(...args) && console.error(...args)
-  process.on('log', cb)
-  t.teardown(() => process.off('log', cb))
 }
 
 // make tap not report this as skipping tests

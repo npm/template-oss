@@ -1,4 +1,0 @@
-- name: Lint
-  run: {{ rootNpmPath }} run lint --ignore-scripts {{~#if jobRunFlags}} {{ jobRunFlags }}{{/if}}
-- name: Post Lint
-  run: {{ rootNpmPath }} run postlint --ignore-scripts {{~#if jobRunFlags}} {{ jobRunFlags }}{{/if}}

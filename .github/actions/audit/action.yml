@@ -1,0 +1,23 @@
+# This file is automatically updated by @npmcli/template-oss. Do not edit.
+
+name: Audit
+
+runs:
+  using: composite
+  steps:
+    - name: Run Full Audit
+      shell: bash
+      run: |
+        if ! npm audit; then
+          COUNT=$(npm audit --audit-level=none --json | jq -r '.metadata.vulnerabilities.total')
+          echo "::warning title=All Vulnerabilities::Found $COUNT"
+        fi
+
+    - name: Run Production Audit
+      shell: bash
+      run: |
+        if ! npm audit --omit=dev; then
+          COUNT=$(npm audit --omit=dev --audit-level=none --json | jq -r '.metadata.vulnerabilities.total')
+          echo "::error title=Production Vulnerabilities::Found $COUNT"
+          exit 1
+        fi

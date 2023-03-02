@@ -1,0 +1,19 @@
+# This file is automatically updated by @npmcli/template-oss. Do not edit.
+
+name: Test
+
+inputs:
+  flags:
+    description: flags to pass to the commands
+    default: ""
+  shell:
+    description: shell to run on
+    default: "bash"
+
+runs:
+  using: composite
+  steps:
+    - name: Test
+      shell: ${{ inputs.shell }}
+      run: |
+        npm test --ignore-scripts ${{ inputs.flags }}

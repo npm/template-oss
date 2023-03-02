@@ -1,0 +1,33 @@
+{# import "partials/workflow.yml" as workflow with context #}
+
+name: Audit
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    {$ workflow.callInputs() | indent(4) $}
+  schedule:
+    {$ workflow.cron(1) | indent(4) $}
+
+jobs:
+  audit:
+    name: Audit Dependencies
+    if: {# include "partials/if-org.yml" #} && {$ workflow.skipPr() $}
+    {$ workflow.defaults() | indent(4) $}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
+
+      {$ workflow.createCheck('Audit Dependencies') | indent(6) $}
+
+      - name: Setup
+        uses: ./.github/actions/setup
+        with:
+          deps-flags: "--package-lock"
+
+      - name: Audit
+        uses: ./.github/actions/audit
+
+      {$ workflow.concludeCheck() | indent(6) $}

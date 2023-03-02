@@ -1,26 +1,16 @@
 #!/usr/bin/env node
 
-const check = require('../lib/check/index.js')
-const output = require('../lib/util/output.js')
+const run = require('../lib/index.js')
+const cli = require('../lib/cli.js')
 
-const main = async () => {
-  const {
-    npm_config_local_prefix: root,
-  } = process.env
-
-  if (!root) {
-    throw new Error('This package requires npm >7.21.1')
-  }
-
-  const problems = await check(root)
+cli(async (opts) => {
+  const problems = await run(opts.root, {
+    ...opts,
+    command: 'check',
+  })
 
   if (problems.length) {
     process.exitCode = 1
-    console.error(output(problems))
+    return { check: problems }
   }
-}
-
-module.exports = main().catch((err) => {
-  console.error(err.stack)
-  process.exitCode = 1
 })

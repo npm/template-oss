@@ -99,25 +99,25 @@ The repo file audit.yml needs to be updated:
   [@npmcli/template-oss ERROR] There was an erroring getting the target file
   [@npmcli/template-oss ERROR] Error: {{ROOT}}/test/check/tap-testdir-diff-snapshots-update-and-remove-errors/.github/workflows/audit.yml
   
-  YAMLParseError: Implicit keys need to be on a single line at line 40, column 1:
+  YAMLParseError: Implicit keys need to be on a single line at line 57, column 1:
   
-          run: npm audit --audit-level=none
+            check-id: \${{ steps.check.outputs.check-id }}
   >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
   ^
   
-  YAMLParseError: Block scalar header includes extra characters: >>>>I at line 40, column 2:
+  YAMLParseError: Block scalar header includes extra characters: >>>>I at line 57, column 2:
   
   >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
    ^
   
-  YAMLParseError: Not a YAML token: HOPE THIS IS NOT VALID YAML<<<<<<<<<<< at line 40, column 7:
+  YAMLParseError: Not a YAML token: HOPE THIS IS NOT VALID YAML<<<<<<<<<<< at line 57, column 7:
   
   >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   
-  YAMLParseError: Implicit map keys need to be followed by map values at line 40, column 1:
+  YAMLParseError: Implicit map keys need to be followed by map values at line 57, column 1:
   
-          run: npm audit --audit-level=none
+            check-id: \${{ steps.check.outputs.check-id }}
   >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   
@@ -130,14 +130,22 @@ The repo file audit.yml needs to be updated:
   
   on:
     workflow_dispatch:
+    workflow_call:
+      inputs:
+        ref:
+          type: string
+        force:
+          type: boolean
+        check-sha:
+          type: string
     schedule:
-      # "At 08:00 UTC (01:00 PT) on Monday" https://crontab.guru/#0_8_*_*_1
-      - cron: "0 8 * * 1"
+      # "At 09:00 UTC (01:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
+      - cron: "0 9 * * 1"
   
   jobs:
     audit:
       name: Audit Dependencies
-      if: github.repository_owner == 'npm'
+      if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
       runs-on: ubuntu-latest
       defaults:
         run:
@@ -145,24 +153,33 @@ The repo file audit.yml needs to be updated:
       steps:
         - name: Checkout
           uses: actions/checkout@v3
-        - name: Setup Git User
-          run: |
-            git config --global user.email "npm-cli+bot@github.com"
-            git config --global user.name "npm CLI robot"
-        - name: Setup Node
-          uses: actions/setup-node@v3
           with:
-            node-version: 18.x
-        - name: Install npm@latest
-          run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-        - name: npm Version
-          run: npm -v
-        - name: Install Dependencies
-          run: npm i --ignore-scripts --no-audit --no-fund --package-lock
-        - name: Run Production Audit
-          run: npm audit --omit=dev
-        - name: Run Full Audit
-          run: npm audit --audit-level=none
+            ref: \${{ inputs.ref }}
+  
+        - name: Create Check
+          uses: ./.github/actions/create-check
+          if: inputs.check-sha
+          id: check
+          with:
+            sha: \${{ inputs.check-sha }}
+            token: \${{ secrets.GITHUB_TOKEN }}
+            job-name: Audit Dependencies
+  
+        - name: Setup
+          uses: ./.github/actions/setup
+          with:
+            deps-flags: "--package-lock"
+  
+        - name: Audit
+          uses: ./.github/actions/audit
+  
+        - name: Conclude Check
+          uses: ./.github/actions/conclude-check
+          if: steps.check.outputs.check-id && (success() || failure())
+          with:
+            token: \${{ secrets.GITHUB_TOKEN }}
+            conclusion: \${{ job.status }}
+            check-id: \${{ steps.check.outputs.check-id }}
   
 
 To correct it: npx template-oss-apply --force
@@ -173,33 +190,31 @@ The repo file ci.yml needs to be updated:
 
   .github/workflows/ci.yml
   ========================================
-  @@ -83,5 +83,25 @@
-             node-version: \${{ matrix.node-version }}
-         - name: Update Windows npm
-           # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
-           if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
-  -        run: ""
-  +        run: |
-  +          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
-  +          tar xf npm-7.5.4.tgz
-  +          cd package
-  +          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
-  +          cd ..
-  +          rmdir /s /q package
-  +      - name: Install npm@7
-  +        if: startsWith(matrix.node-version, '10.')
-  +        run: npm i --prefer-online --no-fund --no-audit -g npm@7
-  +      - name: Install npm@latest
-  +        if: \${{ !startsWith(matrix.node-version, '10.') }}
-  +        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-  +      - name: npm Version
-  +        run: npm -v
-  +      - name: Install Dependencies
-  +        run: npm i --ignore-scripts --no-audit --no-fund
-  +      - name: Add Problem Matcher
-  +        run: echo "::add-matcher::.github/matchers/tap.json"
+  @@ -135,4 +135,24 @@
+             shell: \${{ matrix.platform.shell }}
+   
+         - name: Get Changed Workspaces
+           if: steps.continue-matrix.outputs.result
+  +        id: workspaces
+  +        uses: ./.github/actions/changed-workspaces
+  +        with:
+  +          token: \${{ secrets.GITHUB_TOKEN }}
+  +          files: \${{ (inputs.all && '--all') || '' }}
+  +
   +      - name: Test
-  +        run: npm test --ignore-scripts
+  +        if: steps.continue-matrix.outputs.result
+  +        uses: ./.github/actions/test
+  +        with:
+  +          flags: \${{ steps.workspaces.outputs.flags }}
+  +          shell: \${{ matrix.platform.shell }}
+  +
+  +      - name: Conclude Check
+  +        uses: ./.github/actions/conclude-check
+  +        if: steps.check.outputs.check-id && (success() || failure())
+  +        with:
+  +          token: \${{ secrets.GITHUB_TOKEN }}
+  +          conclusion: \${{ job.status }}
+  +          check-id: \${{ steps.check.outputs.check-id }}
 
 To correct it: npx template-oss-apply --force
 

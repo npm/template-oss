@@ -1,7 +1,0 @@
-# ignore everything in the root
-/*
-
-# keep these
-{{#each ignorePaths}}
-{{ . }}
-{{/each}}

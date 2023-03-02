@@ -1,0 +1,95 @@
+{# import "partials/workflow.yml" as workflow with context #}
+
+name: CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      all:
+        type: boolean
+  workflow_call:
+   {$ workflow.callInputs() | indent(4) $}
+      all:
+        type: boolean
+  pull_request:
+    {$ workflow.branchesList() | indent(4) $}
+  push:
+    {$ workflow.branchesList() | indent(4) $}
+  schedule:
+    {$ workflow.cron(2) | indent(4) $}
+
+jobs:
+  lint:
+    name: Lint
+    if: {# include "partials/if-org.yml" #} && {$ workflow.skipPr() $}
+    {$ workflow.defaults() | indent(4) $}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
+
+      {$ workflow.createCheck('Lint') | indent(6) $}
+
+      - name: Setup
+        id: setup
+        uses: ./.github/actions/setup
+
+      - name: Get Changed Workspaces
+        id: workspaces
+        uses: ./.github/actions/changed-workspaces
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: ${{ (inputs.all && '--all') || '' }}
+
+      - name: Lint
+        uses: ./.github/actions/lint
+        with:
+          flags: ${{ steps.workspaces.outputs.flags }}
+
+      {$ workflow.concludeCheck() | indent(6) $}
+
+  test:
+    name: Test - ${{ matrix.platform.name }} - ${{ matrix.node-version }}
+    if: {# include "partials/if-org.yml" #} && {$ workflow.skipPr() $}
+    {$ workflow.matrix() | indent(4) $}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
+
+      {$ workflow.createCheck('Test - ${{ matrix.platform.name }} - ${{ matrix.node-version }}') | indent(6) $}
+
+      - name: Continue Matrix Run
+        id: continue-matrix
+        shell: bash
+        run: |
+          if [[ "${{ matrix.node-version }}" == "{$ ciVersions | first $}" || "${{ inputs.all }}" == "true" ]]; then
+            echo "result=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup
+        if: steps.continue-matrix.outputs.result
+        uses: ./.github/actions/setup
+        id: setup
+        with:
+          node-version: ${{ matrix.node-version }}
+          shell: ${{ matrix.platform.shell }}
+
+      - name: Get Changed Workspaces
+        if: steps.continue-matrix.outputs.result
+        id: workspaces
+        uses: ./.github/actions/changed-workspaces
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: ${{ (inputs.all && '--all') || '' }}
+
+      - name: Test
+        if: steps.continue-matrix.outputs.result
+        uses: ./.github/actions/test
+        with:
+          flags: ${{ steps.workspaces.outputs.flags }}
+          shell: ${{ matrix.platform.shell }}
+
+      {$ workflow.concludeCheck() | indent(6) $}

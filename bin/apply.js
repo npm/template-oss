@@ -1,22 +1,12 @@
 #!/usr/bin/env node
 
-const apply = require('../lib/apply/index.js')
+const run = require('../lib/index.js')
+const cli = require('../lib/cli.js')
 
-const main = async () => {
-  const {
-    npm_config_global: globalMode,
-    npm_config_local_prefix: root,
-  } = process.env
-
-  // do nothing in global mode or when the local prefix isn't set
-  if (globalMode === 'true' || !root) {
+cli((opts) => {
+  // do nothing in global mode during postinstall
+  if (opts.global) {
     return
   }
-
-  await apply(root)
-}
-
-module.exports = main().catch((err) => {
-  console.error(err.stack)
-  process.exitCode = 1
+  return run(opts.root, { command: 'apply', ...opts })
 })

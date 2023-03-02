@@ -1,0 +1,22 @@
+# This file is automatically updated by @npmcli/template-oss. Do not edit.
+
+name: "Release Please"
+
+inputs:
+  token:
+    required: true
+  branch:
+    required: true
+  release-pr:
+
+outputs:
+  pr:
+  pr-branch:
+  pr-number:
+  pr-sha:
+  release:
+  releases:
+
+runs:
+  using: "node16"
+  main: "index.js"

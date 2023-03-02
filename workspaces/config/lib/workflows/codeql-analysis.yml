@@ -1,0 +1,42 @@
+{# import "partials/workflow.yml" as workflow with context #}
+
+name: CodeQL
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    {$ workflow.callInputs() | indent(4) $}
+  push:
+    {$ workflow.branchesList() | indent(4) $}
+  pull_request:
+    {$ workflow.branchesList() | indent(4) $}
+  schedule:
+    {$ workflow.cron(3) | indent(4) $}
+
+jobs:
+  analyze:
+    name: Analyze
+    if: {# include "partials/if-org.yml" #} && {$ workflow.skipPr() $}
+    {$ workflow.defaults() | indent(4) $}
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+      checks: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
+      
+      {$ workflow.createCheck('Analyze') | indent(6) $}
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: javascript
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+      
+      {$ workflow.concludeCheck() | indent(6) $}

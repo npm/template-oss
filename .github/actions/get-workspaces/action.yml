@@ -1,0 +1,15 @@
+# This file is automatically updated by @npmcli/template-oss. Do not edit.
+
+name: "Get Workspaces"
+
+inputs:
+  files:
+    description: "files"
+
+outputs:
+  flags:
+    description: "workspace flags"
+
+runs:
+  using: "node16"
+  main: "index.js"

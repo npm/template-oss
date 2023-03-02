@@ -1,0 +1,82 @@
+{# macro defaults(_runsOn, _shell) -#}
+runs-on: {$ _runsOn if _runsOn else runsOn $}
+defaults:
+  run:
+    shell: {$ _shell if _shell else shell $}
+{#- endmacro #}
+
+{# macro matrix(_runsOn, _shell) -#}
+{$ defaults('${{ matrix.platform.os }}', '${{ matrix.platform.shell }}') $}
+strategy:
+  fail-fast: false
+  matrix:
+    platform:
+      - name: Linux
+        os: ubuntu-latest
+        shell: bash
+      {#- if macCI #}
+      - name: macOS
+        os: macos-latest
+        shell: bash
+      {#- endif #}
+      {#- if windowsCI #}
+      - name: Windows
+        os: windows-latest
+        shell: cmd
+      {#- endif #}
+    node-version:
+      {#- for v in ciVersions #}
+      - {$ v $}
+      {#- endfor #}
+{#- endmacro #}
+
+{# macro callInputs() -#}
+inputs:
+  ref:
+    type: string
+  force:
+    type: boolean
+  check-sha:
+    type: string
+{#- endmacro #}
+
+{# macro skipPr() -#}
+!(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '{$ options.nameBranch $}')) || startsWith(github.head_ref, 'release/v*')))
+{#- endmacro #}
+
+{# macro cron(hour) -#}
+<#- All our times are early AM pacific time, so add 8 to get utc -#>
+# "At {$ (hour + 8) | pad $}:00 UTC ({$ hour | pad $}:00 PT) on Monday" https://crontab.guru/#0_{$ hour + 8 $}_*_*_1
+- cron: "0 {$ hour + 8 $} * * 1"
+{#- endmacro #}
+
+{# macro createCheck(name) -#}
+- name: Create Check
+  uses: ./.github/actions/create-check
+  if: inputs.check-sha
+  id: check
+  with:
+    sha: ${{ inputs.check-sha }}
+    token: ${{ secrets.GITHUB_TOKEN }}
+    job-name: {$ name $}
+{#- endmacro #}
+
+{# macro concludeCheck() -#}
+- name: Conclude Check
+  uses: ./.github/actions/conclude-check
+  if: steps.check.outputs.check-id && (success() || failure())
+  with:
+    token: ${{ secrets.GITHUB_TOKEN }}
+    conclusion: ${{ job.status }}
+    check-id: ${{ steps.check.outputs.check-id }}
+{#- endmacro #}
+
+{# macro branchesList(release) -#}
+branches:
+  {#- for branch in branches #}
+  - {$ branch $}
+  {#- endfor #}
+  {#- if release #}
+  - {$ releaseBranches $}
+  {#- endif #}
+{#- endmacro #}

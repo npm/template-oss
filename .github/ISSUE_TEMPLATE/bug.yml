@@ -1,9 +1,9 @@
-# This file is automatically added by @npmcli/template-oss. Do not edit.
+# This file is automatically updated by @npmcli/template-oss. Do not edit.
 
 name: Bug
 description: File a bug/issue
 title: "[BUG] <title>"
-labels: [ Bug, Needs Triage ]
+labels: [Bug, Needs Triage]
 
 body:
   - type: checkboxes

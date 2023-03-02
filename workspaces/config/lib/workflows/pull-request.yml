@@ -1,0 +1,46 @@
+{# import "partials/workflow.yml" as workflow with context #}
+
+name: Pull Request
+
+on:
+  workflow_call:
+    {$ workflow.callInputs() | indent(4) $}
+  pull_request:
+    {$ workflow.branchesList(true) | indent(4) $}
+    types:
+      - opened
+      - reopened
+      - edited
+      - synchronize
+
+jobs:
+  commitlint:
+    name: Lint Commits
+    if: {# include "partials/if-org.yml" #} && {$ workflow.skipPr() $}
+    {$ workflow.defaults() | indent(4) $}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.ref }}
+      
+      {$ workflow.createCheck('Lint Commits') | indent(6) $}
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Run Commitlint on Commits
+        id: commit
+        continue-on-error: true
+        run: |
+          {$ rootNpxPath $} --offline commitlint -V --from 'origin/${{ github.base_ref }}' --to '${{ github.event.pull_request.head.sha }}'
+
+      - name: Run Commitlint on PR Title
+        if: steps.commit.outcome == 'failure'
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          echo "$PR_TITLE" | {$ rootNpxPath $} --offline commitlint -V
+
+      {$ workflow.concludeCheck() | indent(6) $}

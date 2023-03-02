@@ -39,6 +39,461 @@ module.exports = {
   ],
 }
 
+.github/actions/audit/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Audit
+
+runs:
+  using: composite
+  steps:
+    - name: Run Full Audit
+      shell: bash
+      run: |
+        if ! npm audit; then
+          COUNT=$(npm audit --audit-level=none --json | jq -r '.metadata.vulnerabilities.total')
+          echo "::warning title=All Vulnerabilities::Found $COUNT"
+        fi
+
+    - name: Run Production Audit
+      shell: bash
+      run: |
+        if ! npm audit --omit=dev; then
+          COUNT=$(npm audit --omit=dev --audit-level=none --json | jq -r '.metadata.vulnerabilities.total')
+          echo "::error title=Production Vulnerabilities::Found $COUNT"
+          exit 1
+        fi
+
+.github/actions/changed-files/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Get Changed Files
+
+inputs:
+  token:
+    description: GitHub token to use
+    required: true
+
+outputs:
+  names:
+    value: \${{ steps.files.outputs.result }}
+
+runs:
+  using: composite
+  steps:
+    - name: Get Changed Files
+      uses: actions/github-script@v6
+      id: files
+      with:
+        github-token: \${{ inputs.token }}
+        script: |
+          const { repo: { owner, repo }, eventName, payload, sha } = context
+          let files
+          if (eventName === 'pull_request' || eventName === 'pull_request_target') {
+            files = await github.paginate(github.rest.pulls.listFiles, {
+              owner,
+              repo,
+              pull_number: payload.pull_request.number,
+            })
+          } else {
+            const { data: commit } = await github.rest.repos.getCommit({
+              owner,
+              repo,
+              ref: sha,
+            })
+            files = commit.files
+          }
+          return files.map(f => f.filename)
+
+.github/actions/changed-workspaces/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Get Changed Workspaces
+
+inputs:
+  token:
+    description: GitHub token to use
+  files:
+    description: json stringified array of file names or --all
+
+outputs:
+  flags:
+    value: \${{ steps.workspaces.outputs.flags }}
+
+runs:
+  using: composite
+  steps:
+    - name: Get Changed Files
+      uses: ./.github/actions/changed-files
+      if: \${{ !inputs.files }}
+      id: files
+      with:
+        token: \${{ inputs.token }}
+
+    - name: Get Workspaces
+      shell: bash
+      id: workspaces
+      run: |
+        flags=$(npm exec --offline -- template-oss-changed-workspaces '\${{ inputs.files || steps.files.outputs.names }}')
+        echo "flags=\${flags}" >> $GITHUB_OUTPUT
+
+.github/actions/conclude-check/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Conclude Check
+description: Conclude a check
+
+inputs:
+  token:
+    description: GitHub token to use
+    required: true
+  conclusion:
+    description: conclusion of check
+    require: true
+  check-id:
+    description: id of check to conclude
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Conclude Check
+      uses: LouisBrunner/checks-action@v1.5.0
+      with:
+        token: \${{ inputs.token }}
+        conclusion: \${{ inputs.conclusion }}
+        check_id: \${{ inputs.check-id }}
+
+.github/actions/create-check/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Create Check
+description: Create a check and associate it with a sha
+
+inputs:
+  token:
+    description: GitHub token to use
+    required: true
+  sha:
+    description: sha to attach the check to
+    required: true
+  job-name:
+    description: Name of the job to find
+    required: true
+  job-status:
+    description: Status of the check being created
+    default: 'in_progress'
+
+outputs:
+  check-id:
+    description: The ID of the check that was created
+    value: \${{ steps.check.outputs.check_id }}
+
+runs:
+  using: composite
+  steps:
+    - name: Get Workflow Job
+      uses: actions/github-script@v6
+      id: workflow-job
+      env:
+        JOB_NAME: \${{ inputs.job-name }}
+      with:
+        github-token: \${{ inputs.token }}
+        script: |
+          const { JOB_NAME } = process.env
+          const { repo: { owner, repo }, runId, serverUrl } = context
+
+          const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun, {
+            owner,
+            repo,
+            run_id: runId,
+          }).then(jobs => jobs.map(j => ({ name: j.name, html_url: j.html_url })))
+
+          console.log(\`found jobs: \${JSON.stringify(jobs, null, 2)}\`)
+
+          const job = jobs.find(j => j.name.endsWith(JOB_NAME))
+
+          console.log(\`found job: \${JSON.stringify(job, null, 2)}\`)
+
+          const shaUrl = \`\${serverUrl}/\${owner}/\${repo}/commit/\${{ inputs.sha }}\`
+          const summary = \`This check is assosciated with \${shaUrl}/n/n\`
+          const message = job?.html_url
+            ? \`For run logs, click here: \${job.html_url}\`
+            : \`Run logs could not be found for a job with name: "\${JOB_NAME}"\`
+
+          // Return a json object with properties that LouisBrunner/checks-actions
+          // expects as the output of the check
+          return { summary: summary + message }
+
+    - name: Create Check
+      uses: LouisBrunner/checks-action@v1.5.0
+      id: check
+      with:
+        token: \${{ inputs.token }}
+        status: \${{ inputs.job-status }}
+        name: \${{ inputs.job-name }}
+        sha: \${{ inputs.sha }}
+        output: \${{ steps.workflow-job.outputs.result }}
+
+.github/actions/deps/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Dependencies
+
+inputs:
+  command:
+    description: command to run for the dependencies step
+    default: 'install --ignore-scripts --no-audit --no-fund'
+  flags:
+    description: extra flags to pass to the dependencies step
+    default: ''
+  shell:
+    description: shell to run on
+    default: 'bash'
+
+runs:
+  using: composite
+  steps:
+    - name: Install Dependencies
+      shell: \${{ inputs.shell }}
+      run: npm \${{ inputs.command }} \${{ inputs.flags }}
+
+.github/actions/lint/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Lint
+
+inputs:
+  flags:
+    description: flags to pass to the commands
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Lint
+      shell: bash
+      run: |
+        npm run lint --ignore-scripts \${{ inputs.flags }}
+    - name: Post Lint
+      shell: bash
+      run: |
+        npm run postlint --ignore-scripts \${{ inputs.flags }}
+
+.github/actions/setup/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Setup Repo
+description: Setup a repo with standard tools
+
+inputs:
+  node-version:
+    description: node version to use
+    default: '18.x'
+  npm-version:
+    description: npm version to use
+    default: 'latest'
+  cache:
+    description: whether to cache npm install or not
+    default: 'false'
+  shell:
+    description: shell to run on
+    default: 'bash'
+  deps:
+    description: whether to run the deps step
+    default: 'true'
+  deps-command:
+    description: command to run for the dependencies step
+    default: 'install --ignore-scripts --no-audit --no-fund'
+  deps-flags:
+    description: extra flags to pass to the dependencies step
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Git User
+      shell: \${{ inputs.shell }}
+      run: |
+        git config --global user.email "npm-cli+bot@github.com"
+        git config --global user.name "npm CLI robot"
+
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: \${{ inputs.node-version }}
+        cache: \${{ (inputs.cache == 'true' && 'npm') || '' }}
+
+    - name: Check Node Version
+      if: inputs.npm-version
+      id: node-version
+      shell: bash
+      run: |
+        NODE_VERSION=$(node --version)
+        echo $NODE_VERSION
+        if npx semver@7 -r "<=10" "$NODE_VERSION"; then
+          echo "ten-or-lower=true" >> $GITHUB_OUTPUT
+        fi
+        if npx semver@7 -r "<=14" "$NODE_VERSION"; then
+          echo "fourteen-or-lower=true" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Update Windows npm
+      # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
+      if: inputs.npm-version && runner.os == 'Windows' && steps.node-version.outputs.fourteen-or-lower
+      shell: \${{ inputs.shell }}
+      run: |
+        curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
+        tar xf npm-7.5.4.tgz
+        cd package
+        node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
+        cd ..
+        rmdir /s /q package
+
+    - name: Install npm@7
+      if: inputs.npm-version && steps.node-version.outputs.ten-or-lower
+      shell: \${{ inputs.shell }}
+      run: npm i --prefer-online --no-fund --no-audit -g npm@7
+
+    - name: Install npm@\${{ inputs.npm-version }}
+      if: inputs.npm-version && !steps.node-version.outputs.ten-or-lower
+      shell: \${{ inputs.shell }}
+      run: npm i --prefer-online --no-fund --no-audit -g npm@\${{ inputs.npm-version }}
+
+    - name: npm Version
+      shell: \${{ inputs.shell }}
+      run: npm -v
+
+    - name: Setup Dependencies
+      if: inputs.deps == 'true'
+      uses: ./.github/actions/deps
+      with:
+        command: \${{ inputs.deps-command }}
+        flags: \${{ inputs.deps-flags }}
+        shell: \${{ inputs.shell }}
+
+    - name: Add Problem Matcher
+      shell: bash
+      run: |
+        [[ -f ./.github/matchers/tap.json ]] && echo "::add-matcher::.github/matchers/tap.json"
+
+.github/actions/test/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Test
+
+inputs:
+  flags:
+    description: flags to pass to the commands
+    default: ''
+  shell:
+    description: shell to run on
+    default: 'bash'
+
+runs:
+  using: composite
+  steps:
+    - name: Test
+      shell: \${{ inputs.shell }}
+      run: npm test --ignore-scripts \${{ inputs.flags }}
+
+.github/actions/upsert-comment/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Upsert Comment
+description: Update or create a comment
+
+inputs:
+  token:
+    description: GitHub token to use
+    required: true
+  number:
+    description: Number of the issue or pull request
+    required: true
+  login:
+    description: Login name of user to look for comments from
+    default: 'github-actions[bot]'
+    required: true
+  body:
+    description: Body of the comment, the first line will be used to match to an existing comment
+    required: true
+  find:
+    description: string to find in body
+  replace:
+    description: string to replace in body
+  append:
+    description: string to append to the body
+  includes:
+    description: A string that the comment needs to include
+
+outputs:
+  comment-id:
+    description: The ID of the comment
+    value: \${{ steps.comment.outputs.result }}
+
+runs:
+  using: composite
+  steps:
+    - name: Create or Update Comment
+      uses: actions/github-script@v6
+      id: comment
+      env:
+        NUMBER: \${{ inputs.number }}
+        BODY: \${{ inputs.body }}
+        FIND: \${{ inputs.find }}
+        REPLACE: \${{ inputs.replace }}
+        APPEND: \${{ inputs.append }}
+        LOGIN: \${{ inputs.login }}
+        INCLUDES: \${{ inputs.includes }}
+      with:
+        github-token: \${{ inputs.token }}
+        script: |
+          const { BODY, FIND, REPLACE, APPEND, LOGIN, NUMBER: issue_number, INCLUDES } = process.env
+          const { repo: { owner, repo } } = context
+          const TITLE = BODY.split('/n')[0].trim() + '/n'
+          const bodyIncludes = (c) => INCLUDES ? c.body.includes(INCLUDES) : true
+
+          const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
+            .then(comments => comments.map(c => ({ id: c.id, login: c.user.login, body: c.body })))
+
+          console.log(\`Looking for comment with: \${JSON.stringify({ LOGIN, TITLE, INCLUDES }, null, 2)}\`)
+          console.log(\`Found comments: \${JSON.stringify(comments, null, 2)}\`)
+
+          const comment = comments.find(c =>
+            c.login === LOGIN &&
+            c.body.startsWith(TITLE) &&
+            bodyIncludes(c)
+          )
+
+          if (comment) {
+            console.log(\`Found comment: \${JSON.stringify(comment, null, 2)}\`)
+            let newBody = FIND && REPLACE ? comment.body.replace(new RegExp(FIND, 'g'), REPLACE) : BODY
+            if (APPEND) {
+              newBody += APPEND
+            }
+            await github.rest.issues.updateComment({ owner, repo, comment_id: comment.id, body: newBody })
+            return comment.id
+          }
+
+          if (FIND || REPLACE || APPEND) {
+            console.log('Could not find a comment to use find/replace or append to')
+            return
+          }
+
+          console.log('Creating new comment')
+
+          const res = await github.rest.issues.createComment({ owner, repo, issue_number, body: BODY })
+          return res.data.id
+
 .github/CODEOWNERS
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
@@ -171,14 +626,22 @@ name: Audit
 
 on:
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+      force:
+        type: boolean
+      check-sha:
+        type: string
   schedule:
-    # "At 08:00 UTC (01:00 PT) on Monday" https://crontab.guru/#0_8_*_*_1
-    - cron: "0 8 * * 1"
+    # "At 09:00 UTC (01:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
+    - cron: "0 9 * * 1"
 
 jobs:
   audit:
     name: Audit Dependencies
-    if: github.repository_owner == 'npm'
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -186,243 +649,33 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund --package-lock
-      - name: Run Production Audit
-        run: npm audit --omit=dev
-      - name: Run Full Audit
-        run: npm audit --audit-level=none
-
-.github/workflows/ci-release.yml
-========================================
-# This file is automatically added by @npmcli/template-oss. Do not edit.
-
-name: CI - Release
-
-on:
-  workflow_dispatch:
-    inputs:
-      ref:
-        required: true
-        type: string
-        default: main
-  workflow_call:
-    inputs:
-      ref:
-        required: true
-        type: string
-      check-sha:
-        required: true
-        type: string
-
-jobs:
-  lint-all:
-    name: Lint All
-    if: github.repository_owner == 'npm'
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Get Workflow Job
-        uses: actions/github-script@v6
-        if: inputs.check-sha
-        id: check-output
-        env:
-          JOB_NAME: "Lint All"
-          MATRIX_NAME: ""
-        with:
-          script: |
-            const { owner, repo } = context.repo
-
-            const { data } = await github.rest.actions.listJobsForWorkflowRun({
-              owner,
-              repo,
-              run_id: context.runId,
-              per_page: 100
-            })
-
-            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
-            const job = data.jobs.find(j => j.name.endsWith(jobName))
-            const jobUrl = job?.html_url
-
-            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ inputs.check-sha }}\`
-
-            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
-
-            if (jobUrl) {
-              summary += \`For run logs, click here: \${jobUrl}\`
-            } else {
-              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
-            }
-
-            return { summary }
-      - name: Create Check
-        uses: LouisBrunner/checks-action@v1.3.1
-        id: check
-        if: inputs.check-sha
-        with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          status: in_progress
-          name: Lint All
-          sha: \${{ inputs.check-sha }}
-          output: \${{ steps.check-output.outputs.result }}
-      - name: Checkout
-        uses: actions/checkout@v3
         with:
           ref: \${{ inputs.ref }}
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
         with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Lint
-        run: npm run lint --ignore-scripts
-      - name: Post Lint
-        run: npm run postlint --ignore-scripts
+          sha: \${{ inputs.check-sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Audit Dependencies
+
+      - name: Setup
+        uses: ./.github/actions/setup
+        with:
+          deps-flags: "--package-lock"
+
+      - name: Audit
+        uses: ./.github/actions/audit
+
       - name: Conclude Check
-        uses: LouisBrunner/checks-action@v1.3.1
-        if: steps.check.outputs.check_id && always()
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
-          check_id: \${{ steps.check.outputs.check_id }}
-
-  test-all:
-    name: Test All - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
-    if: github.repository_owner == 'npm'
-    strategy:
-      fail-fast: false
-      matrix:
-        platform:
-          - name: Linux
-            os: ubuntu-latest
-            shell: bash
-          - name: macOS
-            os: macos-latest
-            shell: bash
-          - name: Windows
-            os: windows-latest
-            shell: cmd
-        node-version:
-          - 14.17.0
-          - 14.x
-          - 16.13.0
-          - 16.x
-          - 18.0.0
-          - 18.x
-    runs-on: \${{ matrix.platform.os }}
-    defaults:
-      run:
-        shell: \${{ matrix.platform.shell }}
-    steps:
-      - name: Get Workflow Job
-        uses: actions/github-script@v6
-        if: inputs.check-sha
-        id: check-output
-        env:
-          JOB_NAME: "Test All"
-          MATRIX_NAME: " - \${{ matrix.platform.name }} - \${{ matrix.node-version }}"
-        with:
-          script: |
-            const { owner, repo } = context.repo
-
-            const { data } = await github.rest.actions.listJobsForWorkflowRun({
-              owner,
-              repo,
-              run_id: context.runId,
-              per_page: 100
-            })
-
-            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
-            const job = data.jobs.find(j => j.name.endsWith(jobName))
-            const jobUrl = job?.html_url
-
-            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ inputs.check-sha }}\`
-
-            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
-
-            if (jobUrl) {
-              summary += \`For run logs, click here: \${jobUrl}\`
-            } else {
-              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
-            }
-
-            return { summary }
-      - name: Create Check
-        uses: LouisBrunner/checks-action@v1.3.1
-        id: check
-        if: inputs.check-sha
-        with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          status: in_progress
-          name: Test All - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
-          sha: \${{ inputs.check-sha }}
-          output: \${{ steps.check-output.outputs.result }}
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: \${{ inputs.ref }}
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: \${{ matrix.node-version }}
-      - name: Update Windows npm
-        # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
-        if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
-        run: |
-          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
-          tar xf npm-7.5.4.tgz
-          cd package
-          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
-          cd ..
-          rmdir /s /q package
-      - name: Install npm@7
-        if: startsWith(matrix.node-version, '10.')
-        run: npm i --prefer-online --no-fund --no-audit -g npm@7
-      - name: Install npm@latest
-        if: \${{ !startsWith(matrix.node-version, '10.') }}
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Add Problem Matcher
-        run: echo "::add-matcher::.github/matchers/tap.json"
-      - name: Test
-        run: npm test --ignore-scripts
-      - name: Conclude Check
-        uses: LouisBrunner/checks-action@v1.3.1
-        if: steps.check.outputs.check_id && always()
-        with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          conclusion: \${{ job.status }}
-          check_id: \${{ steps.check.outputs.check_id }}
+          check-id: \${{ steps.check.outputs.check-id }}
 
 .github/workflows/ci.yml
 ========================================
@@ -432,19 +685,35 @@ name: CI
 
 on:
   workflow_dispatch:
+    inputs:
+      all:
+        type: boolean
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+      force:
+        type: boolean
+      check-sha:
+        type: string
+      all:
+        type: boolean
   pull_request:
+    branches:
+      - main
+      - latest
   push:
     branches:
       - main
       - latest
   schedule:
-    # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
-    - cron: "0 9 * * 1"
+    # "At 10:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_10_*_*_1
+    - cron: "0 10 * * 1"
 
 jobs:
   lint:
     name: Lint
-    if: github.repository_owner == 'npm'
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -452,28 +721,49 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
         with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
+          ref: \${{ inputs.ref }}
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
+        with:
+          sha: \${{ inputs.check-sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Lint
+
+      - name: Setup
+        id: setup
+        uses: ./.github/actions/setup
+
+      - name: Get Changed Workspaces
+        id: workspaces
+        uses: ./.github/actions/changed-workspaces
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          files: \${{ (inputs.all && '--all') || '' }}
+
       - name: Lint
-        run: npm run lint --ignore-scripts
-      - name: Post Lint
-        run: npm run postlint --ignore-scripts
+        uses: ./.github/actions/lint
+        with:
+          flags: \${{ steps.workspaces.outputs.flags }}
+
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check-id: \${{ steps.check.outputs.check-id }}
 
   test:
     name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
-    if: github.repository_owner == 'npm'
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
+    runs-on: \${{ matrix.platform.os }}
+    defaults:
+      run:
+        shell: \${{ matrix.platform.shell }}
     strategy:
       fail-fast: false
       matrix:
@@ -494,45 +784,59 @@ jobs:
           - 16.x
           - 18.0.0
           - 18.x
-    runs-on: \${{ matrix.platform.os }}
-    defaults:
-      run:
-        shell: \${{ matrix.platform.shell }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Git User
+        with:
+          ref: \${{ inputs.ref }}
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
+        with:
+          sha: \${{ inputs.check-sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
+
+      - name: Continue Matrix Run
+        id: continue-matrix
+        shell: bash
         run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
+          if [[ "\${{ matrix.node-version }}" == "14.17.0" || "\${{ inputs.all }}" == "true" ]]; then
+            echo "result=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup
+        if: steps.continue-matrix.outputs.result
+        uses: ./.github/actions/setup
+        id: setup
         with:
           node-version: \${{ matrix.node-version }}
-      - name: Update Windows npm
-        # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
-        if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
-        run: |
-          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
-          tar xf npm-7.5.4.tgz
-          cd package
-          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
-          cd ..
-          rmdir /s /q package
-      - name: Install npm@7
-        if: startsWith(matrix.node-version, '10.')
-        run: npm i --prefer-online --no-fund --no-audit -g npm@7
-      - name: Install npm@latest
-        if: \${{ !startsWith(matrix.node-version, '10.') }}
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Add Problem Matcher
-        run: echo "::add-matcher::.github/matchers/tap.json"
+          shell: \${{ matrix.platform.shell }}
+
+      - name: Get Changed Workspaces
+        if: steps.continue-matrix.outputs.result
+        id: workspaces
+        uses: ./.github/actions/changed-workspaces
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          files: \${{ (inputs.all && '--all') || '' }}
+
       - name: Test
-        run: npm test --ignore-scripts
+        if: steps.continue-matrix.outputs.result
+        uses: ./.github/actions/test
+        with:
+          flags: \${{ steps.workspaces.outputs.flags }}
+          shell: \${{ matrix.platform.shell }}
+
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check-id: \${{ steps.check.outputs.check-id }}
 
 .github/workflows/codeql-analysis.yml
 ========================================
@@ -541,6 +845,15 @@ jobs:
 name: CodeQL
 
 on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+      force:
+        type: boolean
+      check-sha:
+        type: string
   push:
     branches:
       - main
@@ -550,30 +863,52 @@ on:
       - main
       - latest
   schedule:
-    # "At 10:00 UTC (03:00 PT) on Monday" https://crontab.guru/#0_10_*_*_1
-    - cron: "0 10 * * 1"
+    # "At 11:00 UTC (03:00 PT) on Monday" https://crontab.guru/#0_11_*_*_1
+    - cron: "0 11 * * 1"
 
 jobs:
   analyze:
     name: Analyze
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     permissions:
       actions: read
       contents: read
       security-events: write
+      checks: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
+        with:
+          ref: \${{ inputs.ref }}
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
+        with:
+          sha: \${{ inputs.check-sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Analyze
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
           languages: javascript
+
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
+
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check-id: \${{ steps.check.outputs.check-id }}
 
 .github/workflows/post-dependabot.yml
 ========================================
@@ -581,86 +916,80 @@ jobs:
 
 name: Post Dependabot
 
-on: pull_request
-
-permissions:
-  contents: write
+on:
+  pull_request:
+    branches:
+      - main
+      - latest
+      - release/v*
 
 jobs:
-  template-oss:
-    name: template-oss
+  dependency:
+    name: "@npmcli/template-oss"
+    permissions:
+      contents: write
+    outputs:
+      sha: \${{ steps.sha.outputs.sha }}
+    # TODO: remove head_ref check after testing
     if: github.repository_owner == 'npm' && github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: \${{ github.event.pull_request.head.ref }}
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
       - name: Fetch Dependabot Metadata
         id: metadata
         uses: dependabot/fetch-metadata@v1
+        continue-on-error: true
         with:
           github-token: \${{ secrets.GITHUB_TOKEN }}
 
-      # Dependabot can update multiple directories so we output which directory
-      # it is acting on so we can run the command for the correct root or workspace
-      - name: Get Dependabot Directory
+      - name: Is Dependency
         if: contains(steps.metadata.outputs.dependency-names, '@npmcli/template-oss')
-        id: flags
-        run: |
-          dependabot_dir="\${{ steps.metadata.outputs.directory }}"
-          if [[ "$dependabot_dir" == "/" ]]; then
-            echo "workspace=-iwr" >> $GITHUB_OUTPUT
-          else
-            # strip leading slash from directory so it works as a
-            # a path to the workspace flag
-            echo "workspace=-w \${dependabot_dir#/}" >> $GITHUB_OUTPUT
-          fi
+        id: dependency
+        run: echo "continue=true" >> $GITHUB_OUTPUT
 
+      - name: Checkout
+        if: steps.dependency.outputs.continue
+        uses: actions/checkout@v3
+        with:
+          ref: \${{ (github.event_name == 'pull_request' && github.event.pull_request.head.ref) || '' }}
+
+      - name: Setup
+        if: steps.dependency.outputs.continue
+        uses: ./.github/actions/setup
+
+      - name: Get Workspaces
+        if: steps.dependency.outputs.continue
+        uses: ./.github/actions/changed-workspaces
+        id: workspaces
+        with:
+          files: '["\${{ steps.metadata.outputs.directory }}"]'
+
+      # This only sets the conventional commit prefix. This workflow can't reliably determine
+      # what the breaking change is though. If a BREAKING CHANGE message is required then
+      # this PR check will fail and the commit will be amended with stafftools
       - name: Apply Changes
-        if: steps.flags.outputs.workspace
+        if: steps.workspaces.outputs.flags
         id: apply
         run: |
-          npm run template-oss-apply \${{ steps.flags.outputs.workspace }}
+          npm run template-oss-apply \${{ steps.workspaces.outputs.flags }}
           if [[ \`git status --porcelain\` ]]; then
-            echo "changes=true" >> $GITHUB_OUTPUT
+            if [[ "\${{ steps.metadata.outputs.update-type }}" == "version-update:semver-major" ]]; then
+              prefix='feat!'
+            else
+              prefix='chore'
+            fi
+            echo "message=$prefix: postinstall for dependabot template-oss PR" >> $GITHUB_OUTPUT
           fi
-          # This only sets the conventional commit prefix. This workflow can't reliably determine
-          # what the breaking change is though. If a BREAKING CHANGE message is required then
-          # this PR check will fail and the commit will be amended with stafftools
-          if [[ "\${{ steps.metadata.outputs.update-type }}" == "version-update:semver-major" ]]; then
-            prefix='feat!'
-          else
-            prefix='chore'
-          fi
-          echo "message=$prefix: postinstall for dependabot template-oss PR" >> $GITHUB_OUTPUT
 
       # This step will fail if template-oss has made any workflow updates. It is impossible
       # for a workflow to update other workflows. In the case it does fail, we continue
       # and then try to apply only a portion of the changes in the next step
       - name: Push All Changes
-        if: steps.apply.outputs.changes
+        if: steps.apply.outputs.message
         id: push
         continue-on-error: true
-        env:
-          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
           git commit -am "\${{ steps.apply.outputs.message }}"
           git push
@@ -669,9 +998,9 @@ jobs:
       # and attempt to commit and push again. This is helpful because we will have a commit
       # with the correct prefix that we can then --amend with @npmcli/stafftools later.
       - name: Push All Changes Except Workflows
-        if: steps.apply.outputs.changes && steps.push.outcome == 'failure'
-        env:
-          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        if: steps.apply.outputs.message && steps.push.outcome == 'failure'
+        id: push-on-error
+        continue-on-error: true
         run: |
           git reset HEAD~
           git checkout HEAD -- .github/workflows/
@@ -679,25 +1008,53 @@ jobs:
           git commit -am "\${{ steps.apply.outputs.message }}"
           git push
 
-      # Check if all the necessary template-oss changes were applied. Since we continued
-      # on errors in one of the previous steps, this check will fail if our follow up
-      # only applied a portion of the changes and we need to followup manually.
-      #
-      # Note that this used to run \`lint\` and \`postlint\` but that will fail this action
-      # if we've also shipped any linting changes separate from template-oss. We do
-      # linting in another action, so we want to fail this one only if there are
-      # template-oss changes that could not be applied.
-      - name: Check Changes
-        if: steps.apply.outputs.changes
-        run: |
-          npm exec --offline \${{ steps.flags.outputs.workspace }} -- template-oss-check
-
+      # If template-oss is applying breaking changes, then we fail this PR with a message saying what to do. There's no need
+      # to run CI in this case because the PR will need to be fixed manually so CI will run on those commits.
       - name: Fail on Breaking Change
-        if: steps.apply.outputs.changes && startsWith(steps.apply.outputs.message, 'feat!')
+        if: startsWith(steps.apply.outputs.message, 'feat!')
         run: |
-          echo "This PR has a breaking change. Run 'npx -p @npmcli/stafftools gh template-oss-fix'"
-          echo "for more information on how to fix this with a BREAKING CHANGE footer."
+          TITLE="Breaking Changes"
+          MESSAGE="This PR has a breaking change. Run 'npx -p @npmcli/stafftools gh template-oss-fix'"
+          MESSAGE="$MESSAGE for more information on how to fix this with a BREAKING CHANGE footer."
+          echo "::error title=$TITLE::$MESSAGE"
           exit 1
+
+      - name: Get SHA
+        id: sha
+        run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
+  # If everything succeeded so far then we run our normal CI workflow since GitHub actions wont rerun after a bot
+  # pushes a new commit to a PR. We rerun all of CI because template-oss could affect any code in the repo including
+  # lint settings and test settings.
+  ci:
+    name: CI
+    needs: [ dependency ]
+    if: needs.dependency.outputs.sha
+    uses: ./.github/workflows/ci.yml
+    with:
+      ref: \${{ github.head_ref }}
+      check-sha: \${{ needs.dependency.outputs.sha }}
+      force: true
+
+  codeql-analysis:
+    name: CodeQL
+    needs: [ dependency ]
+    if: needs.dependency.outputs.sha
+    uses: ./.github/workflows/codeql-analysis.yml
+    with:
+      ref: \${{ github.head_ref }}
+      check-sha: \${{ needs.dependency.outputs.sha }}
+      force: true
+
+  pull-request:
+    name: Pull Request
+    needs: [ dependency ]
+    if: needs.dependency.outputs.sha
+    uses: ./.github/workflows/pull-request.yml
+    with:
+      ref: \${{ github.head_ref }}
+      check-sha: \${{ needs.dependency.outputs.sha }}
+      force: true
 
 .github/workflows/pull-request.yml
 ========================================
@@ -706,7 +1063,19 @@ jobs:
 name: Pull Request
 
 on:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+      force:
+        type: boolean
+      check-sha:
+        type: string
   pull_request:
+    branches:
+      - main
+      - latest
+      - release/v*
     types:
       - opened
       - reopened
@@ -716,7 +1085,7 @@ on:
 jobs:
   commitlint:
     name: Lint Commits
-    if: github.repository_owner == 'npm'
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -726,64 +1095,60 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
+          ref: \${{ inputs.ref }}
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
         with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
+          sha: \${{ inputs.check-sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Lint Commits
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
       - name: Run Commitlint on Commits
         id: commit
         continue-on-error: true
         run: |
-          npx --offline commitlint -V --from 'origin/\${{ github.base_ref }}' --to \${{ github.event.pull_request.head.sha }}
+          npx --offline commitlint -V --from 'origin/\${{ github.base_ref }}' --to '\${{ github.event.pull_request.head.sha }}'
+
       - name: Run Commitlint on PR Title
         if: steps.commit.outcome == 'failure'
+        env:
+          PR_TITLE: \${{ github.event.pull_request.title }}
         run: |
-          echo '\${{ github.event.pull_request.title }}' | npx --offline commitlint -V
+          echo "$PR_TITLE" | npx --offline commitlint -V
 
-.github/workflows/release.yml
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check-id: \${{ steps.check.outputs.check-id }}
+
+.github/workflows/release-integration.yml
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
 
-name: Release
+name: Release Integration
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
-      release-pr:
-        description: a release PR number to rerun release jobs on
+      release:
+        required: true
         type: string
-  push:
-    branches:
-      - main
-      - latest
-      - release/v*
-
-permissions:
-  contents: write
-  pull-requests: write
-  checks: write
+      releases:
+        required: true
+        type: string
 
 jobs:
-  release:
-    outputs:
-      pr: \${{ steps.release.outputs.pr }}
-      release: \${{ steps.release.outputs.release }}
-      releases: \${{ steps.release.outputs.releases }}
-      branch: \${{ steps.release.outputs.pr-branch }}
-      pr-number: \${{ steps.release.outputs.pr-number }}
-      comment-id: \${{ steps.pr-comment.outputs.result }}
-      check-id: \${{ steps.check.outputs.check_id }}
-    name: Release
+  check-registry:
+    name: Check Registry
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
     defaults:
@@ -792,297 +1157,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
+
+      - name: Setup
+        uses: ./.github/actions/setup
         with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Release Please
-        id: release
-        env:
-          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
-        run: |
-          npx --offline template-oss-release-please "\${{ github.ref_name }}" "\${{ inputs.release-pr }}"
-      - name: Post Pull Request Comment
-        if: steps.release.outputs.pr-number
-        uses: actions/github-script@v6
-        id: pr-comment
-        env:
-          PR_NUMBER: \${{ steps.release.outputs.pr-number }}
-          REF_NAME: \${{ github.ref_name }}
-        with:
-          script: |
-            const { REF_NAME, PR_NUMBER: issue_number } = process.env
-            const { runId, repo: { owner, repo } } = context
+          deps: false
 
-            const { data: workflow } = await github.rest.actions.getWorkflowRun({ owner, repo, run_id: runId })
-
-            let body = '## Release Manager/n/n'
-
-            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
-            let commentId = comments.find(c => c.user.login === 'github-actions[bot]' && c.body.startsWith(body))?.id
-
-            body += \`Release workflow run: \${workflow.html_url}/n/n#### Force CI to Update This Release/n/n\`
-            body += \`This PR will be updated and CI will run for every non-/\`chore:/\` commit that is pushed to /\`main/\`. \`
-            body += \`To force CI to update this PR, run this command:/n/n\`
-            body += \`/\`/\`/\`/ngh workflow run release.yml -r \${REF_NAME} -R \${owner}/\${repo} -f release-pr=\${issue_number}/n/\`/\`/\`\`
-
-            if (commentId) {
-              await github.rest.issues.updateComment({ owner, repo, comment_id: commentId, body })
-            } else {
-              const { data: comment } = await github.rest.issues.createComment({ owner, repo, issue_number, body })
-              commentId = comment?.id
-            }
-
-            return commentId
-      - name: Get Workflow Job
-        uses: actions/github-script@v6
-        if: steps.release.outputs.pr-sha
-        id: check-output
-        env:
-          JOB_NAME: "Release"
-          MATRIX_NAME: ""
-        with:
-          script: |
-            const { owner, repo } = context.repo
-
-            const { data } = await github.rest.actions.listJobsForWorkflowRun({
-              owner,
-              repo,
-              run_id: context.runId,
-              per_page: 100
-            })
-
-            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
-            const job = data.jobs.find(j => j.name.endsWith(jobName))
-            const jobUrl = job?.html_url
-
-            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ steps.release.outputs.pr-sha }}\`
-
-            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
-
-            if (jobUrl) {
-              summary += \`For run logs, click here: \${jobUrl}\`
-            } else {
-              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
-            }
-
-            return { summary }
-      - name: Create Check
-        uses: LouisBrunner/checks-action@v1.3.1
-        id: check
-        if: steps.release.outputs.pr-sha
-        with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          status: in_progress
-          name: Release
-          sha: \${{ steps.release.outputs.pr-sha }}
-          output: \${{ steps.check-output.outputs.result }}
-
-  update:
-    needs: release
-    outputs:
-      sha: \${{ steps.commit.outputs.sha }}
-      check-id: \${{ steps.check.outputs.check_id }}
-    name: Update - Release
-    if: github.repository_owner == 'npm' && needs.release.outputs.pr
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          ref: \${{ needs.release.outputs.branch }}
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Run Post Pull Request Actions
-        env:
-          RELEASE_PR_NUMBER: \${{ needs.release.outputs.pr-number }}
-          RELEASE_COMMENT_ID: \${{ needs.release.outputs.comment-id }}
-          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
-        run: |
-          npm exec --offline -- template-oss-release-manager --lockfile=false
-          npm run rp-pull-request --ignore-scripts --if-present
-      - name: Commit
-        id: commit
-        env:
-          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git commit --all --amend --no-edit || true
-          git push --force-with-lease
-          echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-      - name: Get Workflow Job
-        uses: actions/github-script@v6
-        if: steps.commit.outputs.sha
-        id: check-output
-        env:
-          JOB_NAME: "Update - Release"
-          MATRIX_NAME: ""
-        with:
-          script: |
-            const { owner, repo } = context.repo
-
-            const { data } = await github.rest.actions.listJobsForWorkflowRun({
-              owner,
-              repo,
-              run_id: context.runId,
-              per_page: 100
-            })
-
-            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
-            const job = data.jobs.find(j => j.name.endsWith(jobName))
-            const jobUrl = job?.html_url
-
-            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ steps.commit.outputs.sha }}\`
-
-            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
-
-            if (jobUrl) {
-              summary += \`For run logs, click here: \${jobUrl}\`
-            } else {
-              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
-            }
-
-            return { summary }
-      - name: Create Check
-        uses: LouisBrunner/checks-action@v1.3.1
-        id: check
-        if: steps.commit.outputs.sha
-        with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          status: in_progress
-          name: Release
-          sha: \${{ steps.commit.outputs.sha }}
-          output: \${{ steps.check-output.outputs.result }}
-      - name: Conclude Check
-        uses: LouisBrunner/checks-action@v1.3.1
-        if: needs.release.outputs.check-id && always()
-        with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          conclusion: \${{ job.status }}
-          check_id: \${{ needs.release.outputs.check-id }}
-
-  ci:
-    name: CI - Release
-    needs: [ release, update ]
-    if: needs.release.outputs.pr
-    uses: ./.github/workflows/ci-release.yml
-    with:
-      ref: \${{ needs.release.outputs.branch }}
-      check-sha: \${{ needs.update.outputs.sha }}
-
-  post-ci:
-    needs: [ release, update, ci ]
-    name: Post CI - Release
-    if: github.repository_owner == 'npm' && needs.release.outputs.pr && always()
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Get Needs Result
-        id: needs-result
-        run: |
-          result=""
-          if [[ "\${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
-            result="failure"
-          elif [[ "\${{ contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
-            result="cancelled"
-          else
-            result="success"
-          fi
-          echo "result=$result" >> $GITHUB_OUTPUT
-      - name: Conclude Check
-        uses: LouisBrunner/checks-action@v1.3.1
-        if: needs.update.outputs.check-id && always()
-        with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          conclusion: \${{ steps.needs-result.outputs.result }}
-          check_id: \${{ needs.update.outputs.check-id }}
-
-  post-release:
-    needs: release
-    name: Post Release - Release
-    if: github.repository_owner == 'npm' && needs.release.outputs.releases
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Create Release PR Comment
-        uses: actions/github-script@v6
-        env:
-          RELEASES: \${{ needs.release.outputs.releases }}
-        with:
-          script: |
-            const releases = JSON.parse(process.env.RELEASES)
-            const { runId, repo: { owner, repo } } = context
-            const issue_number = releases[0].prNumber
-
-            let body = '## Release Workflow/n/n'
-            for (const { pkgName, version, url } of releases) {
-              body += \`- /\`\${pkgName}@\${version}/\` \${url}/n\`
-            }
-
-            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
-              .then(cs => cs.map(c => ({ id: c.id, login: c.user.login, body: c.body })))
-            console.log(\`Found comments: \${JSON.stringify(comments, null, 2)}\`)
-            const releaseComments = comments.filter(c => c.login === 'github-actions[bot]' && c.body.includes('Release is at'))
-
-            for (const comment of releaseComments) {
-              console.log(\`Release comment: \${JSON.stringify(comment, null, 2)}\`)
-              await github.rest.issues.deleteComment({ owner, repo, comment_id: comment.id })
-            }
-
-            const runUrl = \`https://github.com/\${owner}/\${repo}/actions/runs/\${runId}\`
-            await github.rest.issues.createComment({
-              owner,
-              repo,
-              issue_number,
-              body: \`\${body}- Workflow run: :arrows_counterclockwise: \${runUrl}\`,
-            })
-
-  release-integration:
-    needs: release
-    name: Release Integration
-    if: needs.release.outputs.release
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
       - name: View in Registry
         run: |
           EXIT_CODE=0
@@ -1110,15 +1190,275 @@ jobs:
 
           exit $EXIT_CODE
 
-  post-release-integration:
-    needs: [ release, release-integration ]
-    name: Post Release Integration - Release
-    if: github.repository_owner == 'npm' && needs.release.outputs.release && always()
+.github/workflows/release.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release-pr:
+        description: a release PR number to rerun release jobs on
+        type: string
+  push:
+    branches:
+      - main
+      - latest
+      - release/v*
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: write
+
+jobs:
+  release:
+    name: Release
+    if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
+    outputs:
+      pr: \${{ steps.release.outputs.pr }}
+      release: \${{ steps.release.outputs.release }}
+      releases: \${{ steps.release.outputs.releases }}
+      pr-branch: \${{ steps.release.outputs.pr-branch }}
+      pr-number: \${{ steps.release.outputs.pr-number }}
+      comment-id: \${{ steps.pr-comment.outputs.comment-id }}
+      check-id: \${{ steps.check.outputs.check-id }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Release Please
+        id: release
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npx --offline template-oss-release-please "\${{ github.ref_name }}" "\${{ inputs.release-pr }}"
+
+      # If we have opened a release PR, then immediately create an "in_progress"
+      # check for it so the GitHub UI doesn't report that its mergeable.
+      # This check will be swapped out for real CI checks once those are started.
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: steps.release.outputs.pr-sha
+        id: check
+        with:
+          sha: \${{ steps.release.outputs.pr-sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Release
+
+      - name: Comment Text
+        uses: actions/github-script@v6
+        if: steps.release.outputs.pr-number
+        id: comment-text
+        env:
+          PR_NUMBER: \${{ steps.release.outputs.pr-number }}
+          REF_NAME: \${{ github.ref_name }}
+        with:
+          result-encoding: string
+          script: |
+            const { runId, repo: { owner, repo } } = context
+            const { data: workflow } = await github.rest.actions.getWorkflowRun({ owner, repo, run_id: runId })
+            let body = '## Release Manager/n/n'
+            body += \`Release workflow run: \${workflow.html_url}/n/n#### Force CI to Update This Release/n/n\`
+            body += \`This PR will be updated and CI will run for every non-/\`chore:/\` commit that is pushed to /\`main/\`. \`
+            body += \`To force CI to update this PR, run this command:/n/n\`
+            body += \`/\`/\`/\`/ngh workflow run release.yml -r \${process.env.REF_NAME} -R \${owner}/\${repo} -f release-pr=\${process.env.PR_NUMBER}/n/\`/\`/\`\`
+            return body
+
+      - name: Post Pull Request Comment
+        if: steps.comment-text.outputs.result
+        uses: ./.github/actions/upsert-comment
+        id: pr-comment
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          body: \${{ steps.comment-text.outputs.result }}
+          number: \${{ steps.release.outputs.pr-number }}
+
+  update:
+    name: Release PR - Update
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    if: needs.release.outputs.pr
+    needs: release
+    outputs:
+      sha: \${{ steps.commit.outputs.sha }}
+      check-id: \${{ steps.check.outputs.check-id }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: \${{ needs.release.outputs.pr-branch }}
+          fetch-depth: 0
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Run Post Pull Request Actions
+        env:
+          RELEASE_PR_NUMBER: \${{ needs.release.outputs.pr-number }}
+          RELEASE_COMMENT_ID: \${{ needs.release.outputs.comment-id }}
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm exec --offline -- template-oss-release-manager --lockfile=false
+          npm run rp-pull-request --ignore-scripts -ws -iwr --if-present
+
+      - name: Commit
+        id: commit
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git commit --all --amend --no-edit || true
+          git push --force-with-lease
+          echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: steps.commit.outputs.sha
+        id: check
+        with:
+          sha: \${{ steps.vommit.outputs.sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Release
+
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: needs.release.outputs.check-id && (success() || failure())
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check-id: \${{ needs.release.outputs.check-id }}
+
+  ci:
+    name: Release PR - CI
+    needs: [ release, update ]
+    if: needs.release.outputs.pr
+    uses: ./.github/workflows/ci.yml
+    with:
+      ref: \${{ needs.release.outputs.pr-branch }}
+      check-sha: \${{ needs.update.outputs.sha }}
+      all: true
+
+  post-ci:
+    name: Release PR - Post CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    needs: [ release, update, ci ]
+    if: needs.update.outputs.check-id && (success() || failure())
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: \${{ needs.release.outputs.pr-branch }}
+
+      - name: Get Needs Result
+        id: needs-result
+        run: |
+          if [[ "\${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
+            result="failure"
+          elif [[ "\${{ contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
+            result="cancelled"
+          else
+            result="success"
+          fi
+          echo "result=$result" >> $GITHUB_OUTPUT
+
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ steps.needs-result.outputs.result }}
+          check-id: \${{ needs.update.outputs.check-id }}
+
+  post-release:
+    name: Post Release
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    needs: release
+    if: needs.release.outputs.releases
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Comment Text
+        uses: actions/github-script@v6
+        id: comment-text
+        env:
+          RELEASES: \${{ needs.release.outputs.releases }}
+        with:
+          result-encoding: string
+          script: |
+            const releases = JSON.parse(process.env.RELEASES)
+            const { runId, repo: { owner, repo } } = context
+            const issue_number = releases[0].prNumber
+
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
+              .then(comments => comments.map(c => ({ id: c.id, login: c.user.login, body: c.body })))
+
+            console.log(\`comments: \${JSON.stringify(comments, null, 2)}\`)
+
+            const releasePleaseComments = comments.filter(c =>
+              c.login === 'github-actions[bot]' &&
+              c.body.startsWith(':robot: Release is at ')
+            )
+
+            console.log(\`release please comments: \${JSON.stringify(releasePleaseComments, null, 2)}\`)
+
+            for (const comment of releasePleaseComments) {
+              await github.rest.issues.deleteComment({ owner, repo, comment_id: comment.id })
+            }
+
+            let body = '## Release Workflow/n/n'
+            for (const { pkgName, version, url } of releases) {
+              body += \`- /\`\${pkgName}@\${version}/\` \${url}/n\`
+            }
+            body += \`- Workflow run: :arrows_counterclockwise: https://github.com/\${owner}/\${repo}/actions/runs/\${runId}\`
+            return body
+
+      - name: Create Release PR Comment
+        if: steps.comment-text.outputs.result
+        uses: ./.github/actions/upsert-comment
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          body: \${{ steps.comment-text.outputs.result }}
+          number: \${{ fromJson(needs.release.outputs.release).prNumber }}
+          includes: \${{ github.run_id }}
+
+  release-integration:
+    name: Post Release - Integration
+    needs: release
+    if: needs.release.outputs.release
+    uses: ./.github/workflows/release-integration.yml
+    with:
+      release: needs.release.outputs.release
+      releases: needs.release.outputs.releases
+
+  post-release-integration:
+    name: Post Release - Post Integration
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    needs: [ release, release-integration ]
+    if: needs.release.outputs.release && (success() || failure())
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Get Needs Result
         id: needs-result
         run: |
@@ -1130,42 +1470,39 @@ jobs:
             result="white_check_mark"
           fi
           echo "result=$result" >> $GITHUB_OUTPUT
-      - name: Update Release PR Comment
+
+      - name: Comment Text
         uses: actions/github-script@v6
+        id: comment-text
         env:
           PR_NUMBER: \${{ fromJSON(needs.release.outputs.release).prNumber }}
+          REF_NAME: \${{ github.ref_name }}
           RESULT: \${{ steps.needs-result.outputs.result }}
         with:
           script: |
-            const { PR_NUMBER: issue_number, RESULT } = process.env
-            const { runId, repo: { owner, repo } } = context
-
-            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
-            const updateComment = comments.find(c =>
-              c.user.login === 'github-actions[bot]' &&
-              c.body.startsWith('## Release Workflow/n/n') &&
-              c.body.includes(runId)
-            )
-
-            if (updateComment) {
-              console.log('Found comment to update:', JSON.stringify(updateComment, null, 2))
-              let body = updateComment.body.replace(/Workflow run: :[a-z_]+:/, \`Workflow run: :\${RESULT}:\`)
-              const tagCodeowner = RESULT !== 'white_check_mark'
-              if (tagCodeowner) {
-                body += \`/n/n:rotating_light:\`
-                body += \` @npm/cli-team: The post-release workflow failed for this release.\`
-                body += \` Manual steps may need to be taken after examining the workflow output\`
-                body += \` from the above workflow run. :rotating_light:\`
-              }
-              await github.rest.issues.updateComment({
-                owner,
-                repo,
-                body,
-                comment_id: updateComment.id,
-              })
-            } else {
-              console.log('No matching comments found:', JSON.stringify(comments, null, 2))
+            const { RESULT, PR_NUMBER, REF_NAME } = process.env
+            const tagCodeowner = RESULT !== 'white_check_mark'
+            if (tagCodeowner) {
+              let body = ''
+              body += \`/n/n:rotating_light:\`
+              body += \` @npm/cli-team: The post-release workflow failed for this release.\`
+              body += \` Manual steps may need to be taken after examining the workflow output\`
+              body += \` from the above workflow run. :rotating_light:\`
+              body += \`/n/nTo rerun the workflow run the following command:/n/n\`
+              body += \`/\`/\`/\`/ngh workflow run release.yml -r \${REF_NAME} -R \${owner}/\${repo} -f release-pr=\${PR_NUMBER}/n/\`/\`/\`\`
+              return body
             }
+
+      - name: Update Release PR Comment
+        uses: ./.github/actions/upsert-comment
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          body: "## Release Workflow"
+          find: "Workflow run: :[a-z_]+:"
+          replace: "Workflow run :\${{ steps.needs-result.outputs.result }}:"
+          append: \${{ steps.comment-text.outputs.result }}
+          number: \${{ fromJson(needs.release.outputs.release).prNumber }}
+          includes: \${{ github.run_id }}
 
 .gitignore
 ========================================
@@ -1225,6 +1562,9 @@ package.json
 {
   "name": "testpkg",
   "version": "1.0.0",
+  "devDependencies": {
+    "@npmcli/template-oss": "{{VERSION}}"
+  },
   "scripts": {
     "lint": "eslint /"**/*.js/"",
     "postlint": "template-oss-check",
@@ -1242,15 +1582,15 @@ package.json
   "engines": {
     "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
   },
-  "templateOSS": {
-    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
-    "version": "{{VERSION}}"
-  },
   "tap": {
     "nyc-arg": [
       "--exclude",
       "tap-snapshots/**"
     ]
+  },
+  "templateOSS": {
+    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
+    "version": "{{VERSION}}"
   }
 }
 
@@ -1324,7 +1664,10 @@ package.json
     "version": "{{VERSION}}"
   },
   "name": "testpkg",
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "devDependencies": {
+    "@npmcli/template-oss": "{{VERSION}}"
+  }
 }
 `
 
@@ -1365,6 +1708,461 @@ module.exports = {
     ...localConfigs,
   ],
 }
+
+.github/actions/audit/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Audit
+
+runs:
+  using: composite
+  steps:
+    - name: Run Full Audit
+      shell: bash
+      run: |
+        if ! npm audit; then
+          COUNT=$(npm audit --audit-level=none --json | jq -r '.metadata.vulnerabilities.total')
+          echo "::warning title=All Vulnerabilities::Found $COUNT"
+        fi
+
+    - name: Run Production Audit
+      shell: bash
+      run: |
+        if ! npm audit --omit=dev; then
+          COUNT=$(npm audit --omit=dev --audit-level=none --json | jq -r '.metadata.vulnerabilities.total')
+          echo "::error title=Production Vulnerabilities::Found $COUNT"
+          exit 1
+        fi
+
+.github/actions/changed-files/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Get Changed Files
+
+inputs:
+  token:
+    description: GitHub token to use
+    required: true
+
+outputs:
+  names:
+    value: \${{ steps.files.outputs.result }}
+
+runs:
+  using: composite
+  steps:
+    - name: Get Changed Files
+      uses: actions/github-script@v6
+      id: files
+      with:
+        github-token: \${{ inputs.token }}
+        script: |
+          const { repo: { owner, repo }, eventName, payload, sha } = context
+          let files
+          if (eventName === 'pull_request' || eventName === 'pull_request_target') {
+            files = await github.paginate(github.rest.pulls.listFiles, {
+              owner,
+              repo,
+              pull_number: payload.pull_request.number,
+            })
+          } else {
+            const { data: commit } = await github.rest.repos.getCommit({
+              owner,
+              repo,
+              ref: sha,
+            })
+            files = commit.files
+          }
+          return files.map(f => f.filename)
+
+.github/actions/changed-workspaces/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Get Changed Workspaces
+
+inputs:
+  token:
+    description: GitHub token to use
+  files:
+    description: json stringified array of file names or --all
+
+outputs:
+  flags:
+    value: \${{ steps.workspaces.outputs.flags }}
+
+runs:
+  using: composite
+  steps:
+    - name: Get Changed Files
+      uses: ./.github/actions/changed-files
+      if: \${{ !inputs.files }}
+      id: files
+      with:
+        token: \${{ inputs.token }}
+
+    - name: Get Workspaces
+      shell: bash
+      id: workspaces
+      run: |
+        flags=$(npm exec --offline -- template-oss-changed-workspaces '\${{ inputs.files || steps.files.outputs.names }}')
+        echo "flags=\${flags}" >> $GITHUB_OUTPUT
+
+.github/actions/conclude-check/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Conclude Check
+description: Conclude a check
+
+inputs:
+  token:
+    description: GitHub token to use
+    required: true
+  conclusion:
+    description: conclusion of check
+    require: true
+  check-id:
+    description: id of check to conclude
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Conclude Check
+      uses: LouisBrunner/checks-action@v1.5.0
+      with:
+        token: \${{ inputs.token }}
+        conclusion: \${{ inputs.conclusion }}
+        check_id: \${{ inputs.check-id }}
+
+.github/actions/create-check/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Create Check
+description: Create a check and associate it with a sha
+
+inputs:
+  token:
+    description: GitHub token to use
+    required: true
+  sha:
+    description: sha to attach the check to
+    required: true
+  job-name:
+    description: Name of the job to find
+    required: true
+  job-status:
+    description: Status of the check being created
+    default: 'in_progress'
+
+outputs:
+  check-id:
+    description: The ID of the check that was created
+    value: \${{ steps.check.outputs.check_id }}
+
+runs:
+  using: composite
+  steps:
+    - name: Get Workflow Job
+      uses: actions/github-script@v6
+      id: workflow-job
+      env:
+        JOB_NAME: \${{ inputs.job-name }}
+      with:
+        github-token: \${{ inputs.token }}
+        script: |
+          const { JOB_NAME } = process.env
+          const { repo: { owner, repo }, runId, serverUrl } = context
+
+          const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun, {
+            owner,
+            repo,
+            run_id: runId,
+          }).then(jobs => jobs.map(j => ({ name: j.name, html_url: j.html_url })))
+
+          console.log(\`found jobs: \${JSON.stringify(jobs, null, 2)}\`)
+
+          const job = jobs.find(j => j.name.endsWith(JOB_NAME))
+
+          console.log(\`found job: \${JSON.stringify(job, null, 2)}\`)
+
+          const shaUrl = \`\${serverUrl}/\${owner}/\${repo}/commit/\${{ inputs.sha }}\`
+          const summary = \`This check is assosciated with \${shaUrl}/n/n\`
+          const message = job?.html_url
+            ? \`For run logs, click here: \${job.html_url}\`
+            : \`Run logs could not be found for a job with name: "\${JOB_NAME}"\`
+
+          // Return a json object with properties that LouisBrunner/checks-actions
+          // expects as the output of the check
+          return { summary: summary + message }
+
+    - name: Create Check
+      uses: LouisBrunner/checks-action@v1.5.0
+      id: check
+      with:
+        token: \${{ inputs.token }}
+        status: \${{ inputs.job-status }}
+        name: \${{ inputs.job-name }}
+        sha: \${{ inputs.sha }}
+        output: \${{ steps.workflow-job.outputs.result }}
+
+.github/actions/deps/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Dependencies
+
+inputs:
+  command:
+    description: command to run for the dependencies step
+    default: 'install --ignore-scripts --no-audit --no-fund'
+  flags:
+    description: extra flags to pass to the dependencies step
+    default: ''
+  shell:
+    description: shell to run on
+    default: 'bash'
+
+runs:
+  using: composite
+  steps:
+    - name: Install Dependencies
+      shell: \${{ inputs.shell }}
+      run: npm \${{ inputs.command }} \${{ inputs.flags }}
+
+.github/actions/lint/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Lint
+
+inputs:
+  flags:
+    description: flags to pass to the commands
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Lint
+      shell: bash
+      run: |
+        npm run lint --ignore-scripts \${{ inputs.flags }}
+    - name: Post Lint
+      shell: bash
+      run: |
+        npm run postlint --ignore-scripts \${{ inputs.flags }}
+
+.github/actions/setup/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Setup Repo
+description: Setup a repo with standard tools
+
+inputs:
+  node-version:
+    description: node version to use
+    default: '18.x'
+  npm-version:
+    description: npm version to use
+    default: 'latest'
+  cache:
+    description: whether to cache npm install or not
+    default: 'false'
+  shell:
+    description: shell to run on
+    default: 'bash'
+  deps:
+    description: whether to run the deps step
+    default: 'true'
+  deps-command:
+    description: command to run for the dependencies step
+    default: 'install --ignore-scripts --no-audit --no-fund'
+  deps-flags:
+    description: extra flags to pass to the dependencies step
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Git User
+      shell: \${{ inputs.shell }}
+      run: |
+        git config --global user.email "npm-cli+bot@github.com"
+        git config --global user.name "npm CLI robot"
+
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: \${{ inputs.node-version }}
+        cache: \${{ (inputs.cache == 'true' && 'npm') || '' }}
+
+    - name: Check Node Version
+      if: inputs.npm-version
+      id: node-version
+      shell: bash
+      run: |
+        NODE_VERSION=$(node --version)
+        echo $NODE_VERSION
+        if npx semver@7 -r "<=10" "$NODE_VERSION"; then
+          echo "ten-or-lower=true" >> $GITHUB_OUTPUT
+        fi
+        if npx semver@7 -r "<=14" "$NODE_VERSION"; then
+          echo "fourteen-or-lower=true" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Update Windows npm
+      # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
+      if: inputs.npm-version && runner.os == 'Windows' && steps.node-version.outputs.fourteen-or-lower
+      shell: \${{ inputs.shell }}
+      run: |
+        curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
+        tar xf npm-7.5.4.tgz
+        cd package
+        node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
+        cd ..
+        rmdir /s /q package
+
+    - name: Install npm@7
+      if: inputs.npm-version && steps.node-version.outputs.ten-or-lower
+      shell: \${{ inputs.shell }}
+      run: npm i --prefer-online --no-fund --no-audit -g npm@7
+
+    - name: Install npm@\${{ inputs.npm-version }}
+      if: inputs.npm-version && !steps.node-version.outputs.ten-or-lower
+      shell: \${{ inputs.shell }}
+      run: npm i --prefer-online --no-fund --no-audit -g npm@\${{ inputs.npm-version }}
+
+    - name: npm Version
+      shell: \${{ inputs.shell }}
+      run: npm -v
+
+    - name: Setup Dependencies
+      if: inputs.deps == 'true'
+      uses: ./.github/actions/deps
+      with:
+        command: \${{ inputs.deps-command }}
+        flags: \${{ inputs.deps-flags }}
+        shell: \${{ inputs.shell }}
+
+    - name: Add Problem Matcher
+      shell: bash
+      run: |
+        [[ -f ./.github/matchers/tap.json ]] && echo "::add-matcher::.github/matchers/tap.json"
+
+.github/actions/test/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Test
+
+inputs:
+  flags:
+    description: flags to pass to the commands
+    default: ''
+  shell:
+    description: shell to run on
+    default: 'bash'
+
+runs:
+  using: composite
+  steps:
+    - name: Test
+      shell: \${{ inputs.shell }}
+      run: npm test --ignore-scripts \${{ inputs.flags }}
+
+.github/actions/upsert-comment/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Upsert Comment
+description: Update or create a comment
+
+inputs:
+  token:
+    description: GitHub token to use
+    required: true
+  number:
+    description: Number of the issue or pull request
+    required: true
+  login:
+    description: Login name of user to look for comments from
+    default: 'github-actions[bot]'
+    required: true
+  body:
+    description: Body of the comment, the first line will be used to match to an existing comment
+    required: true
+  find:
+    description: string to find in body
+  replace:
+    description: string to replace in body
+  append:
+    description: string to append to the body
+  includes:
+    description: A string that the comment needs to include
+
+outputs:
+  comment-id:
+    description: The ID of the comment
+    value: \${{ steps.comment.outputs.result }}
+
+runs:
+  using: composite
+  steps:
+    - name: Create or Update Comment
+      uses: actions/github-script@v6
+      id: comment
+      env:
+        NUMBER: \${{ inputs.number }}
+        BODY: \${{ inputs.body }}
+        FIND: \${{ inputs.find }}
+        REPLACE: \${{ inputs.replace }}
+        APPEND: \${{ inputs.append }}
+        LOGIN: \${{ inputs.login }}
+        INCLUDES: \${{ inputs.includes }}
+      with:
+        github-token: \${{ inputs.token }}
+        script: |
+          const { BODY, FIND, REPLACE, APPEND, LOGIN, NUMBER: issue_number, INCLUDES } = process.env
+          const { repo: { owner, repo } } = context
+          const TITLE = BODY.split('/n')[0].trim() + '/n'
+          const bodyIncludes = (c) => INCLUDES ? c.body.includes(INCLUDES) : true
+
+          const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
+            .then(comments => comments.map(c => ({ id: c.id, login: c.user.login, body: c.body })))
+
+          console.log(\`Looking for comment with: \${JSON.stringify({ LOGIN, TITLE, INCLUDES }, null, 2)}\`)
+          console.log(\`Found comments: \${JSON.stringify(comments, null, 2)}\`)
+
+          const comment = comments.find(c =>
+            c.login === LOGIN &&
+            c.body.startsWith(TITLE) &&
+            bodyIncludes(c)
+          )
+
+          if (comment) {
+            console.log(\`Found comment: \${JSON.stringify(comment, null, 2)}\`)
+            let newBody = FIND && REPLACE ? comment.body.replace(new RegExp(FIND, 'g'), REPLACE) : BODY
+            if (APPEND) {
+              newBody += APPEND
+            }
+            await github.rest.issues.updateComment({ owner, repo, comment_id: comment.id, body: newBody })
+            return comment.id
+          }
+
+          if (FIND || REPLACE || APPEND) {
+            console.log('Could not find a comment to use find/replace or append to')
+            return
+          }
+
+          console.log('Creating new comment')
+
+          const res = await github.rest.issues.createComment({ owner, repo, issue_number, body: BODY })
+          return res.data.id
 
 .github/CODEOWNERS
 ========================================
@@ -1522,486 +2320,56 @@ name: Audit
 
 on:
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+      force:
+        type: boolean
+      check-sha:
+        type: string
   schedule:
-    # "At 08:00 UTC (01:00 PT) on Monday" https://crontab.guru/#0_8_*_*_1
-    - cron: "0 8 * * 1"
+    # "At 09:00 UTC (01:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
+    - cron: "0 9 * * 1"
 
 jobs:
   audit:
     name: Audit Dependencies
-    if: github.repository_owner == 'npm'
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund --package-lock
-      - name: Run Production Audit
-        run: npm audit --omit=dev
-      - name: Run Full Audit
-        run: npm audit --audit-level=none
-
-.github/workflows/ci-a.yml
-========================================
-# This file is automatically added by @npmcli/template-oss. Do not edit.
-
-name: CI - a
-
-on:
-  workflow_dispatch:
-  pull_request:
-    paths:
-      - workspaces/a/**
-  push:
-    branches:
-      - main
-      - latest
-    paths:
-      - workspaces/a/**
-  schedule:
-    # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
-    - cron: "0 9 * * 1"
-
-jobs:
-  lint:
-    name: Lint
-    if: github.repository_owner == 'npm'
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Lint
-        run: npm run lint --ignore-scripts -w a
-      - name: Post Lint
-        run: npm run postlint --ignore-scripts -w a
-
-  test:
-    name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
-    if: github.repository_owner == 'npm'
-    strategy:
-      fail-fast: false
-      matrix:
-        platform:
-          - name: Linux
-            os: ubuntu-latest
-            shell: bash
-          - name: macOS
-            os: macos-latest
-            shell: bash
-          - name: Windows
-            os: windows-latest
-            shell: cmd
-        node-version:
-          - 14.17.0
-          - 14.x
-          - 16.13.0
-          - 16.x
-          - 18.0.0
-          - 18.x
-    runs-on: \${{ matrix.platform.os }}
-    defaults:
-      run:
-        shell: \${{ matrix.platform.shell }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: \${{ matrix.node-version }}
-      - name: Update Windows npm
-        # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
-        if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
-        run: |
-          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
-          tar xf npm-7.5.4.tgz
-          cd package
-          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
-          cd ..
-          rmdir /s /q package
-      - name: Install npm@7
-        if: startsWith(matrix.node-version, '10.')
-        run: npm i --prefer-online --no-fund --no-audit -g npm@7
-      - name: Install npm@latest
-        if: \${{ !startsWith(matrix.node-version, '10.') }}
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Add Problem Matcher
-        run: echo "::add-matcher::.github/matchers/tap.json"
-      - name: Test
-        run: npm test --ignore-scripts -w a
-
-.github/workflows/ci-b.yml
-========================================
-# This file is automatically added by @npmcli/template-oss. Do not edit.
-
-name: CI - b
-
-on:
-  workflow_dispatch:
-  pull_request:
-    paths:
-      - workspaces/b/**
-  push:
-    branches:
-      - main
-      - latest
-    paths:
-      - workspaces/b/**
-  schedule:
-    # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
-    - cron: "0 9 * * 1"
-
-jobs:
-  lint:
-    name: Lint
-    if: github.repository_owner == 'npm'
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Lint
-        run: npm run lint --ignore-scripts -w b
-      - name: Post Lint
-        run: npm run postlint --ignore-scripts -w b
-
-  test:
-    name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
-    if: github.repository_owner == 'npm'
-    strategy:
-      fail-fast: false
-      matrix:
-        platform:
-          - name: Linux
-            os: ubuntu-latest
-            shell: bash
-          - name: macOS
-            os: macos-latest
-            shell: bash
-          - name: Windows
-            os: windows-latest
-            shell: cmd
-        node-version:
-          - 14.17.0
-          - 14.x
-          - 16.13.0
-          - 16.x
-          - 18.0.0
-          - 18.x
-    runs-on: \${{ matrix.platform.os }}
-    defaults:
-      run:
-        shell: \${{ matrix.platform.shell }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: \${{ matrix.node-version }}
-      - name: Update Windows npm
-        # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
-        if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
-        run: |
-          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
-          tar xf npm-7.5.4.tgz
-          cd package
-          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
-          cd ..
-          rmdir /s /q package
-      - name: Install npm@7
-        if: startsWith(matrix.node-version, '10.')
-        run: npm i --prefer-online --no-fund --no-audit -g npm@7
-      - name: Install npm@latest
-        if: \${{ !startsWith(matrix.node-version, '10.') }}
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Add Problem Matcher
-        run: echo "::add-matcher::.github/matchers/tap.json"
-      - name: Test
-        run: npm test --ignore-scripts -w b
-
-.github/workflows/ci-release.yml
-========================================
-# This file is automatically added by @npmcli/template-oss. Do not edit.
-
-name: CI - Release
-
-on:
-  workflow_dispatch:
-    inputs:
-      ref:
-        required: true
-        type: string
-        default: main
-  workflow_call:
-    inputs:
-      ref:
-        required: true
-        type: string
-      check-sha:
-        required: true
-        type: string
-
-jobs:
-  lint-all:
-    name: Lint All
-    if: github.repository_owner == 'npm'
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Get Workflow Job
-        uses: actions/github-script@v6
-        if: inputs.check-sha
-        id: check-output
-        env:
-          JOB_NAME: "Lint All"
-          MATRIX_NAME: ""
-        with:
-          script: |
-            const { owner, repo } = context.repo
-
-            const { data } = await github.rest.actions.listJobsForWorkflowRun({
-              owner,
-              repo,
-              run_id: context.runId,
-              per_page: 100
-            })
-
-            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
-            const job = data.jobs.find(j => j.name.endsWith(jobName))
-            const jobUrl = job?.html_url
-
-            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ inputs.check-sha }}\`
-
-            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
-
-            if (jobUrl) {
-              summary += \`For run logs, click here: \${jobUrl}\`
-            } else {
-              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
-            }
-
-            return { summary }
-      - name: Create Check
-        uses: LouisBrunner/checks-action@v1.3.1
-        id: check
-        if: inputs.check-sha
-        with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          status: in_progress
-          name: Lint All
-          sha: \${{ inputs.check-sha }}
-          output: \${{ steps.check-output.outputs.result }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
           ref: \${{ inputs.ref }}
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Lint
-        run: npm run lint --ignore-scripts -ws -iwr --if-present
-      - name: Post Lint
-        run: npm run postlint --ignore-scripts -ws -iwr --if-present
-      - name: Conclude Check
-        uses: LouisBrunner/checks-action@v1.3.1
-        if: steps.check.outputs.check_id && always()
-        with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          conclusion: \${{ job.status }}
-          check_id: \${{ steps.check.outputs.check_id }}
 
-  test-all:
-    name: Test All - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
-    if: github.repository_owner == 'npm'
-    strategy:
-      fail-fast: false
-      matrix:
-        platform:
-          - name: Linux
-            os: ubuntu-latest
-            shell: bash
-          - name: macOS
-            os: macos-latest
-            shell: bash
-          - name: Windows
-            os: windows-latest
-            shell: cmd
-        node-version:
-          - 14.17.0
-          - 14.x
-          - 16.13.0
-          - 16.x
-          - 18.0.0
-          - 18.x
-    runs-on: \${{ matrix.platform.os }}
-    defaults:
-      run:
-        shell: \${{ matrix.platform.shell }}
-    steps:
-      - name: Get Workflow Job
-        uses: actions/github-script@v6
-        if: inputs.check-sha
-        id: check-output
-        env:
-          JOB_NAME: "Test All"
-          MATRIX_NAME: " - \${{ matrix.platform.name }} - \${{ matrix.node-version }}"
-        with:
-          script: |
-            const { owner, repo } = context.repo
-
-            const { data } = await github.rest.actions.listJobsForWorkflowRun({
-              owner,
-              repo,
-              run_id: context.runId,
-              per_page: 100
-            })
-
-            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
-            const job = data.jobs.find(j => j.name.endsWith(jobName))
-            const jobUrl = job?.html_url
-
-            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ inputs.check-sha }}\`
-
-            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
-
-            if (jobUrl) {
-              summary += \`For run logs, click here: \${jobUrl}\`
-            } else {
-              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
-            }
-
-            return { summary }
       - name: Create Check
-        uses: LouisBrunner/checks-action@v1.3.1
-        id: check
+        uses: ./.github/actions/create-check
         if: inputs.check-sha
+        id: check
         with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          status: in_progress
-          name: Test All - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
           sha: \${{ inputs.check-sha }}
-          output: \${{ steps.check-output.outputs.result }}
-      - name: Checkout
-        uses: actions/checkout@v3
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Audit Dependencies
+
+      - name: Setup
+        uses: ./.github/actions/setup
         with:
-          ref: \${{ inputs.ref }}
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: \${{ matrix.node-version }}
-      - name: Update Windows npm
-        # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
-        if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
-        run: |
-          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
-          tar xf npm-7.5.4.tgz
-          cd package
-          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
-          cd ..
-          rmdir /s /q package
-      - name: Install npm@7
-        if: startsWith(matrix.node-version, '10.')
-        run: npm i --prefer-online --no-fund --no-audit -g npm@7
-      - name: Install npm@latest
-        if: \${{ !startsWith(matrix.node-version, '10.') }}
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Add Problem Matcher
-        run: echo "::add-matcher::.github/matchers/tap.json"
-      - name: Test
-        run: npm test --ignore-scripts -ws -iwr --if-present
+          deps-flags: "--package-lock"
+
+      - name: Audit
+        uses: ./.github/actions/audit
+
       - name: Conclude Check
-        uses: LouisBrunner/checks-action@v1.3.1
-        if: steps.check.outputs.check_id && always()
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
-          check_id: \${{ steps.check.outputs.check_id }}
+          check-id: \${{ steps.check.outputs.check-id }}
 
 .github/workflows/ci.yml
 ========================================
@@ -2011,25 +2379,35 @@ name: CI
 
 on:
   workflow_dispatch:
+    inputs:
+      all:
+        type: boolean
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+      force:
+        type: boolean
+      check-sha:
+        type: string
+      all:
+        type: boolean
   pull_request:
-    paths-ignore:
-      - workspaces/a/**
-      - workspaces/b/**
+    branches:
+      - main
+      - latest
   push:
     branches:
       - main
       - latest
-    paths-ignore:
-      - workspaces/a/**
-      - workspaces/b/**
   schedule:
-    # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
-    - cron: "0 9 * * 1"
+    # "At 10:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_10_*_*_1
+    - cron: "0 10 * * 1"
 
 jobs:
   lint:
     name: Lint
-    if: github.repository_owner == 'npm'
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -2037,28 +2415,49 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
         with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
+          ref: \${{ inputs.ref }}
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
+        with:
+          sha: \${{ inputs.check-sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Lint
+
+      - name: Setup
+        id: setup
+        uses: ./.github/actions/setup
+
+      - name: Get Changed Workspaces
+        id: workspaces
+        uses: ./.github/actions/changed-workspaces
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          files: \${{ (inputs.all && '--all') || '' }}
+
       - name: Lint
-        run: npm run lint --ignore-scripts
-      - name: Post Lint
-        run: npm run postlint --ignore-scripts
+        uses: ./.github/actions/lint
+        with:
+          flags: \${{ steps.workspaces.outputs.flags }}
+
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check-id: \${{ steps.check.outputs.check-id }}
 
   test:
     name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
-    if: github.repository_owner == 'npm'
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
+    runs-on: \${{ matrix.platform.os }}
+    defaults:
+      run:
+        shell: \${{ matrix.platform.shell }}
     strategy:
       fail-fast: false
       matrix:
@@ -2079,45 +2478,59 @@ jobs:
           - 16.x
           - 18.0.0
           - 18.x
-    runs-on: \${{ matrix.platform.os }}
-    defaults:
-      run:
-        shell: \${{ matrix.platform.shell }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Git User
+        with:
+          ref: \${{ inputs.ref }}
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
+        with:
+          sha: \${{ inputs.check-sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
+
+      - name: Continue Matrix Run
+        id: continue-matrix
+        shell: bash
         run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
+          if [[ "\${{ matrix.node-version }}" == "14.17.0" || "\${{ inputs.all }}" == "true" ]]; then
+            echo "result=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup
+        if: steps.continue-matrix.outputs.result
+        uses: ./.github/actions/setup
+        id: setup
         with:
           node-version: \${{ matrix.node-version }}
-      - name: Update Windows npm
-        # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
-        if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
-        run: |
-          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
-          tar xf npm-7.5.4.tgz
-          cd package
-          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
-          cd ..
-          rmdir /s /q package
-      - name: Install npm@7
-        if: startsWith(matrix.node-version, '10.')
-        run: npm i --prefer-online --no-fund --no-audit -g npm@7
-      - name: Install npm@latest
-        if: \${{ !startsWith(matrix.node-version, '10.') }}
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Add Problem Matcher
-        run: echo "::add-matcher::.github/matchers/tap.json"
+          shell: \${{ matrix.platform.shell }}
+
+      - name: Get Changed Workspaces
+        if: steps.continue-matrix.outputs.result
+        id: workspaces
+        uses: ./.github/actions/changed-workspaces
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          files: \${{ (inputs.all && '--all') || '' }}
+
       - name: Test
-        run: npm test --ignore-scripts
+        if: steps.continue-matrix.outputs.result
+        uses: ./.github/actions/test
+        with:
+          flags: \${{ steps.workspaces.outputs.flags }}
+          shell: \${{ matrix.platform.shell }}
+
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check-id: \${{ steps.check.outputs.check-id }}
 
 .github/workflows/codeql-analysis.yml
 ========================================
@@ -2126,6 +2539,15 @@ jobs:
 name: CodeQL
 
 on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+      force:
+        type: boolean
+      check-sha:
+        type: string
   push:
     branches:
       - main
@@ -2135,30 +2557,52 @@ on:
       - main
       - latest
   schedule:
-    # "At 10:00 UTC (03:00 PT) on Monday" https://crontab.guru/#0_10_*_*_1
-    - cron: "0 10 * * 1"
+    # "At 11:00 UTC (03:00 PT) on Monday" https://crontab.guru/#0_11_*_*_1
+    - cron: "0 11 * * 1"
 
 jobs:
   analyze:
     name: Analyze
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     permissions:
       actions: read
       contents: read
       security-events: write
+      checks: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
+        with:
+          ref: \${{ inputs.ref }}
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
+        with:
+          sha: \${{ inputs.check-sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Analyze
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
           languages: javascript
+
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
+
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check-id: \${{ steps.check.outputs.check-id }}
 
 .github/workflows/post-dependabot.yml
 ========================================
@@ -2166,86 +2610,80 @@ jobs:
 
 name: Post Dependabot
 
-on: pull_request
-
-permissions:
-  contents: write
+on:
+  pull_request:
+    branches:
+      - main
+      - latest
+      - release/v*
 
 jobs:
-  template-oss:
-    name: template-oss
+  dependency:
+    name: "@npmcli/template-oss"
+    permissions:
+      contents: write
+    outputs:
+      sha: \${{ steps.sha.outputs.sha }}
+    # TODO: remove head_ref check after testing
     if: github.repository_owner == 'npm' && github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: \${{ github.event.pull_request.head.ref }}
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
       - name: Fetch Dependabot Metadata
         id: metadata
         uses: dependabot/fetch-metadata@v1
+        continue-on-error: true
         with:
           github-token: \${{ secrets.GITHUB_TOKEN }}
 
-      # Dependabot can update multiple directories so we output which directory
-      # it is acting on so we can run the command for the correct root or workspace
-      - name: Get Dependabot Directory
+      - name: Is Dependency
         if: contains(steps.metadata.outputs.dependency-names, '@npmcli/template-oss')
-        id: flags
-        run: |
-          dependabot_dir="\${{ steps.metadata.outputs.directory }}"
-          if [[ "$dependabot_dir" == "/" ]]; then
-            echo "workspace=-iwr" >> $GITHUB_OUTPUT
-          else
-            # strip leading slash from directory so it works as a
-            # a path to the workspace flag
-            echo "workspace=-w \${dependabot_dir#/}" >> $GITHUB_OUTPUT
-          fi
+        id: dependency
+        run: echo "continue=true" >> $GITHUB_OUTPUT
 
+      - name: Checkout
+        if: steps.dependency.outputs.continue
+        uses: actions/checkout@v3
+        with:
+          ref: \${{ (github.event_name == 'pull_request' && github.event.pull_request.head.ref) || '' }}
+
+      - name: Setup
+        if: steps.dependency.outputs.continue
+        uses: ./.github/actions/setup
+
+      - name: Get Workspaces
+        if: steps.dependency.outputs.continue
+        uses: ./.github/actions/changed-workspaces
+        id: workspaces
+        with:
+          files: '["\${{ steps.metadata.outputs.directory }}"]'
+
+      # This only sets the conventional commit prefix. This workflow can't reliably determine
+      # what the breaking change is though. If a BREAKING CHANGE message is required then
+      # this PR check will fail and the commit will be amended with stafftools
       - name: Apply Changes
-        if: steps.flags.outputs.workspace
+        if: steps.workspaces.outputs.flags
         id: apply
         run: |
-          npm run template-oss-apply \${{ steps.flags.outputs.workspace }}
+          npm run template-oss-apply \${{ steps.workspaces.outputs.flags }}
           if [[ \`git status --porcelain\` ]]; then
-            echo "changes=true" >> $GITHUB_OUTPUT
+            if [[ "\${{ steps.metadata.outputs.update-type }}" == "version-update:semver-major" ]]; then
+              prefix='feat!'
+            else
+              prefix='chore'
+            fi
+            echo "message=$prefix: postinstall for dependabot template-oss PR" >> $GITHUB_OUTPUT
           fi
-          # This only sets the conventional commit prefix. This workflow can't reliably determine
-          # what the breaking change is though. If a BREAKING CHANGE message is required then
-          # this PR check will fail and the commit will be amended with stafftools
-          if [[ "\${{ steps.metadata.outputs.update-type }}" == "version-update:semver-major" ]]; then
-            prefix='feat!'
-          else
-            prefix='chore'
-          fi
-          echo "message=$prefix: postinstall for dependabot template-oss PR" >> $GITHUB_OUTPUT
 
       # This step will fail if template-oss has made any workflow updates. It is impossible
       # for a workflow to update other workflows. In the case it does fail, we continue
       # and then try to apply only a portion of the changes in the next step
       - name: Push All Changes
-        if: steps.apply.outputs.changes
+        if: steps.apply.outputs.message
         id: push
         continue-on-error: true
-        env:
-          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
           git commit -am "\${{ steps.apply.outputs.message }}"
           git push
@@ -2254,9 +2692,9 @@ jobs:
       # and attempt to commit and push again. This is helpful because we will have a commit
       # with the correct prefix that we can then --amend with @npmcli/stafftools later.
       - name: Push All Changes Except Workflows
-        if: steps.apply.outputs.changes && steps.push.outcome == 'failure'
-        env:
-          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        if: steps.apply.outputs.message && steps.push.outcome == 'failure'
+        id: push-on-error
+        continue-on-error: true
         run: |
           git reset HEAD~
           git checkout HEAD -- .github/workflows/
@@ -2264,25 +2702,53 @@ jobs:
           git commit -am "\${{ steps.apply.outputs.message }}"
           git push
 
-      # Check if all the necessary template-oss changes were applied. Since we continued
-      # on errors in one of the previous steps, this check will fail if our follow up
-      # only applied a portion of the changes and we need to followup manually.
-      #
-      # Note that this used to run \`lint\` and \`postlint\` but that will fail this action
-      # if we've also shipped any linting changes separate from template-oss. We do
-      # linting in another action, so we want to fail this one only if there are
-      # template-oss changes that could not be applied.
-      - name: Check Changes
-        if: steps.apply.outputs.changes
-        run: |
-          npm exec --offline \${{ steps.flags.outputs.workspace }} -- template-oss-check
-
+      # If template-oss is applying breaking changes, then we fail this PR with a message saying what to do. There's no need
+      # to run CI in this case because the PR will need to be fixed manually so CI will run on those commits.
       - name: Fail on Breaking Change
-        if: steps.apply.outputs.changes && startsWith(steps.apply.outputs.message, 'feat!')
+        if: startsWith(steps.apply.outputs.message, 'feat!')
         run: |
-          echo "This PR has a breaking change. Run 'npx -p @npmcli/stafftools gh template-oss-fix'"
-          echo "for more information on how to fix this with a BREAKING CHANGE footer."
+          TITLE="Breaking Changes"
+          MESSAGE="This PR has a breaking change. Run 'npx -p @npmcli/stafftools gh template-oss-fix'"
+          MESSAGE="$MESSAGE for more information on how to fix this with a BREAKING CHANGE footer."
+          echo "::error title=$TITLE::$MESSAGE"
           exit 1
+
+      - name: Get SHA
+        id: sha
+        run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
+  # If everything succeeded so far then we run our normal CI workflow since GitHub actions wont rerun after a bot
+  # pushes a new commit to a PR. We rerun all of CI because template-oss could affect any code in the repo including
+  # lint settings and test settings.
+  ci:
+    name: CI
+    needs: [ dependency ]
+    if: needs.dependency.outputs.sha
+    uses: ./.github/workflows/ci.yml
+    with:
+      ref: \${{ github.head_ref }}
+      check-sha: \${{ needs.dependency.outputs.sha }}
+      force: true
+
+  codeql-analysis:
+    name: CodeQL
+    needs: [ dependency ]
+    if: needs.dependency.outputs.sha
+    uses: ./.github/workflows/codeql-analysis.yml
+    with:
+      ref: \${{ github.head_ref }}
+      check-sha: \${{ needs.dependency.outputs.sha }}
+      force: true
+
+  pull-request:
+    name: Pull Request
+    needs: [ dependency ]
+    if: needs.dependency.outputs.sha
+    uses: ./.github/workflows/pull-request.yml
+    with:
+      ref: \${{ github.head_ref }}
+      check-sha: \${{ needs.dependency.outputs.sha }}
+      force: true
 
 .github/workflows/pull-request.yml
 ========================================
@@ -2291,7 +2757,19 @@ jobs:
 name: Pull Request
 
 on:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+      force:
+        type: boolean
+      check-sha:
+        type: string
   pull_request:
+    branches:
+      - main
+      - latest
+      - release/v*
     types:
       - opened
       - reopened
@@ -2301,7 +2779,7 @@ on:
 jobs:
   commitlint:
     name: Lint Commits
-    if: github.repository_owner == 'npm'
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -2311,64 +2789,60 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
+          ref: \${{ inputs.ref }}
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
         with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
+          sha: \${{ inputs.check-sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Lint Commits
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
       - name: Run Commitlint on Commits
         id: commit
         continue-on-error: true
         run: |
-          npx --offline commitlint -V --from 'origin/\${{ github.base_ref }}' --to \${{ github.event.pull_request.head.sha }}
+          npx --offline commitlint -V --from 'origin/\${{ github.base_ref }}' --to '\${{ github.event.pull_request.head.sha }}'
+
       - name: Run Commitlint on PR Title
         if: steps.commit.outcome == 'failure'
+        env:
+          PR_TITLE: \${{ github.event.pull_request.title }}
         run: |
-          echo '\${{ github.event.pull_request.title }}' | npx --offline commitlint -V
+          echo "$PR_TITLE" | npx --offline commitlint -V
 
-.github/workflows/release.yml
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check-id: \${{ steps.check.outputs.check-id }}
+
+.github/workflows/release-integration.yml
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
 
-name: Release
+name: Release Integration
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
-      release-pr:
-        description: a release PR number to rerun release jobs on
+      release:
+        required: true
         type: string
-  push:
-    branches:
-      - main
-      - latest
-      - release/v*
-
-permissions:
-  contents: write
-  pull-requests: write
-  checks: write
+      releases:
+        required: true
+        type: string
 
 jobs:
-  release:
-    outputs:
-      pr: \${{ steps.release.outputs.pr }}
-      release: \${{ steps.release.outputs.release }}
-      releases: \${{ steps.release.outputs.releases }}
-      branch: \${{ steps.release.outputs.pr-branch }}
-      pr-number: \${{ steps.release.outputs.pr-number }}
-      comment-id: \${{ steps.pr-comment.outputs.result }}
-      check-id: \${{ steps.check.outputs.check_id }}
-    name: Release
+  check-registry:
+    name: Check Registry
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
     defaults:
@@ -2377,297 +2851,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
+
+      - name: Setup
+        uses: ./.github/actions/setup
         with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Release Please
-        id: release
-        env:
-          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
-        run: |
-          npx --offline template-oss-release-please "\${{ github.ref_name }}" "\${{ inputs.release-pr }}"
-      - name: Post Pull Request Comment
-        if: steps.release.outputs.pr-number
-        uses: actions/github-script@v6
-        id: pr-comment
-        env:
-          PR_NUMBER: \${{ steps.release.outputs.pr-number }}
-          REF_NAME: \${{ github.ref_name }}
-        with:
-          script: |
-            const { REF_NAME, PR_NUMBER: issue_number } = process.env
-            const { runId, repo: { owner, repo } } = context
+          deps: false
 
-            const { data: workflow } = await github.rest.actions.getWorkflowRun({ owner, repo, run_id: runId })
-
-            let body = '## Release Manager/n/n'
-
-            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
-            let commentId = comments.find(c => c.user.login === 'github-actions[bot]' && c.body.startsWith(body))?.id
-
-            body += \`Release workflow run: \${workflow.html_url}/n/n#### Force CI to Update This Release/n/n\`
-            body += \`This PR will be updated and CI will run for every non-/\`chore:/\` commit that is pushed to /\`main/\`. \`
-            body += \`To force CI to update this PR, run this command:/n/n\`
-            body += \`/\`/\`/\`/ngh workflow run release.yml -r \${REF_NAME} -R \${owner}/\${repo} -f release-pr=\${issue_number}/n/\`/\`/\`\`
-
-            if (commentId) {
-              await github.rest.issues.updateComment({ owner, repo, comment_id: commentId, body })
-            } else {
-              const { data: comment } = await github.rest.issues.createComment({ owner, repo, issue_number, body })
-              commentId = comment?.id
-            }
-
-            return commentId
-      - name: Get Workflow Job
-        uses: actions/github-script@v6
-        if: steps.release.outputs.pr-sha
-        id: check-output
-        env:
-          JOB_NAME: "Release"
-          MATRIX_NAME: ""
-        with:
-          script: |
-            const { owner, repo } = context.repo
-
-            const { data } = await github.rest.actions.listJobsForWorkflowRun({
-              owner,
-              repo,
-              run_id: context.runId,
-              per_page: 100
-            })
-
-            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
-            const job = data.jobs.find(j => j.name.endsWith(jobName))
-            const jobUrl = job?.html_url
-
-            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ steps.release.outputs.pr-sha }}\`
-
-            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
-
-            if (jobUrl) {
-              summary += \`For run logs, click here: \${jobUrl}\`
-            } else {
-              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
-            }
-
-            return { summary }
-      - name: Create Check
-        uses: LouisBrunner/checks-action@v1.3.1
-        id: check
-        if: steps.release.outputs.pr-sha
-        with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          status: in_progress
-          name: Release
-          sha: \${{ steps.release.outputs.pr-sha }}
-          output: \${{ steps.check-output.outputs.result }}
-
-  update:
-    needs: release
-    outputs:
-      sha: \${{ steps.commit.outputs.sha }}
-      check-id: \${{ steps.check.outputs.check_id }}
-    name: Update - Release
-    if: github.repository_owner == 'npm' && needs.release.outputs.pr
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          ref: \${{ needs.release.outputs.branch }}
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Run Post Pull Request Actions
-        env:
-          RELEASE_PR_NUMBER: \${{ needs.release.outputs.pr-number }}
-          RELEASE_COMMENT_ID: \${{ needs.release.outputs.comment-id }}
-          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
-        run: |
-          npm exec --offline -- template-oss-release-manager --lockfile=false
-          npm run rp-pull-request --ignore-scripts -ws -iwr --if-present
-      - name: Commit
-        id: commit
-        env:
-          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git commit --all --amend --no-edit || true
-          git push --force-with-lease
-          echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-      - name: Get Workflow Job
-        uses: actions/github-script@v6
-        if: steps.commit.outputs.sha
-        id: check-output
-        env:
-          JOB_NAME: "Update - Release"
-          MATRIX_NAME: ""
-        with:
-          script: |
-            const { owner, repo } = context.repo
-
-            const { data } = await github.rest.actions.listJobsForWorkflowRun({
-              owner,
-              repo,
-              run_id: context.runId,
-              per_page: 100
-            })
-
-            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
-            const job = data.jobs.find(j => j.name.endsWith(jobName))
-            const jobUrl = job?.html_url
-
-            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ steps.commit.outputs.sha }}\`
-
-            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
-
-            if (jobUrl) {
-              summary += \`For run logs, click here: \${jobUrl}\`
-            } else {
-              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
-            }
-
-            return { summary }
-      - name: Create Check
-        uses: LouisBrunner/checks-action@v1.3.1
-        id: check
-        if: steps.commit.outputs.sha
-        with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          status: in_progress
-          name: Release
-          sha: \${{ steps.commit.outputs.sha }}
-          output: \${{ steps.check-output.outputs.result }}
-      - name: Conclude Check
-        uses: LouisBrunner/checks-action@v1.3.1
-        if: needs.release.outputs.check-id && always()
-        with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          conclusion: \${{ job.status }}
-          check_id: \${{ needs.release.outputs.check-id }}
-
-  ci:
-    name: CI - Release
-    needs: [ release, update ]
-    if: needs.release.outputs.pr
-    uses: ./.github/workflows/ci-release.yml
-    with:
-      ref: \${{ needs.release.outputs.branch }}
-      check-sha: \${{ needs.update.outputs.sha }}
-
-  post-ci:
-    needs: [ release, update, ci ]
-    name: Post CI - Release
-    if: github.repository_owner == 'npm' && needs.release.outputs.pr && always()
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Get Needs Result
-        id: needs-result
-        run: |
-          result=""
-          if [[ "\${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
-            result="failure"
-          elif [[ "\${{ contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
-            result="cancelled"
-          else
-            result="success"
-          fi
-          echo "result=$result" >> $GITHUB_OUTPUT
-      - name: Conclude Check
-        uses: LouisBrunner/checks-action@v1.3.1
-        if: needs.update.outputs.check-id && always()
-        with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          conclusion: \${{ steps.needs-result.outputs.result }}
-          check_id: \${{ needs.update.outputs.check-id }}
-
-  post-release:
-    needs: release
-    name: Post Release - Release
-    if: github.repository_owner == 'npm' && needs.release.outputs.releases
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Create Release PR Comment
-        uses: actions/github-script@v6
-        env:
-          RELEASES: \${{ needs.release.outputs.releases }}
-        with:
-          script: |
-            const releases = JSON.parse(process.env.RELEASES)
-            const { runId, repo: { owner, repo } } = context
-            const issue_number = releases[0].prNumber
-
-            let body = '## Release Workflow/n/n'
-            for (const { pkgName, version, url } of releases) {
-              body += \`- /\`\${pkgName}@\${version}/\` \${url}/n\`
-            }
-
-            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
-              .then(cs => cs.map(c => ({ id: c.id, login: c.user.login, body: c.body })))
-            console.log(\`Found comments: \${JSON.stringify(comments, null, 2)}\`)
-            const releaseComments = comments.filter(c => c.login === 'github-actions[bot]' && c.body.includes('Release is at'))
-
-            for (const comment of releaseComments) {
-              console.log(\`Release comment: \${JSON.stringify(comment, null, 2)}\`)
-              await github.rest.issues.deleteComment({ owner, repo, comment_id: comment.id })
-            }
-
-            const runUrl = \`https://github.com/\${owner}/\${repo}/actions/runs/\${runId}\`
-            await github.rest.issues.createComment({
-              owner,
-              repo,
-              issue_number,
-              body: \`\${body}- Workflow run: :arrows_counterclockwise: \${runUrl}\`,
-            })
-
-  release-integration:
-    needs: release
-    name: Release Integration
-    if: needs.release.outputs.release
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
       - name: View in Registry
         run: |
           EXIT_CODE=0
@@ -2695,15 +2884,275 @@ jobs:
 
           exit $EXIT_CODE
 
-  post-release-integration:
-    needs: [ release, release-integration ]
-    name: Post Release Integration - Release
-    if: github.repository_owner == 'npm' && needs.release.outputs.release && always()
+.github/workflows/release.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release-pr:
+        description: a release PR number to rerun release jobs on
+        type: string
+  push:
+    branches:
+      - main
+      - latest
+      - release/v*
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: write
+
+jobs:
+  release:
+    name: Release
+    if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
+    outputs:
+      pr: \${{ steps.release.outputs.pr }}
+      release: \${{ steps.release.outputs.release }}
+      releases: \${{ steps.release.outputs.releases }}
+      pr-branch: \${{ steps.release.outputs.pr-branch }}
+      pr-number: \${{ steps.release.outputs.pr-number }}
+      comment-id: \${{ steps.pr-comment.outputs.comment-id }}
+      check-id: \${{ steps.check.outputs.check-id }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Release Please
+        id: release
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npx --offline template-oss-release-please "\${{ github.ref_name }}" "\${{ inputs.release-pr }}"
+
+      # If we have opened a release PR, then immediately create an "in_progress"
+      # check for it so the GitHub UI doesn't report that its mergeable.
+      # This check will be swapped out for real CI checks once those are started.
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: steps.release.outputs.pr-sha
+        id: check
+        with:
+          sha: \${{ steps.release.outputs.pr-sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Release
+
+      - name: Comment Text
+        uses: actions/github-script@v6
+        if: steps.release.outputs.pr-number
+        id: comment-text
+        env:
+          PR_NUMBER: \${{ steps.release.outputs.pr-number }}
+          REF_NAME: \${{ github.ref_name }}
+        with:
+          result-encoding: string
+          script: |
+            const { runId, repo: { owner, repo } } = context
+            const { data: workflow } = await github.rest.actions.getWorkflowRun({ owner, repo, run_id: runId })
+            let body = '## Release Manager/n/n'
+            body += \`Release workflow run: \${workflow.html_url}/n/n#### Force CI to Update This Release/n/n\`
+            body += \`This PR will be updated and CI will run for every non-/\`chore:/\` commit that is pushed to /\`main/\`. \`
+            body += \`To force CI to update this PR, run this command:/n/n\`
+            body += \`/\`/\`/\`/ngh workflow run release.yml -r \${process.env.REF_NAME} -R \${owner}/\${repo} -f release-pr=\${process.env.PR_NUMBER}/n/\`/\`/\`\`
+            return body
+
+      - name: Post Pull Request Comment
+        if: steps.comment-text.outputs.result
+        uses: ./.github/actions/upsert-comment
+        id: pr-comment
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          body: \${{ steps.comment-text.outputs.result }}
+          number: \${{ steps.release.outputs.pr-number }}
+
+  update:
+    name: Release PR - Update
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    if: needs.release.outputs.pr
+    needs: release
+    outputs:
+      sha: \${{ steps.commit.outputs.sha }}
+      check-id: \${{ steps.check.outputs.check-id }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: \${{ needs.release.outputs.pr-branch }}
+          fetch-depth: 0
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Run Post Pull Request Actions
+        env:
+          RELEASE_PR_NUMBER: \${{ needs.release.outputs.pr-number }}
+          RELEASE_COMMENT_ID: \${{ needs.release.outputs.comment-id }}
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm exec --offline -- template-oss-release-manager --lockfile=false
+          npm run rp-pull-request --ignore-scripts -ws -iwr --if-present
+
+      - name: Commit
+        id: commit
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git commit --all --amend --no-edit || true
+          git push --force-with-lease
+          echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: steps.commit.outputs.sha
+        id: check
+        with:
+          sha: \${{ steps.vommit.outputs.sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Release
+
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: needs.release.outputs.check-id && (success() || failure())
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check-id: \${{ needs.release.outputs.check-id }}
+
+  ci:
+    name: Release PR - CI
+    needs: [ release, update ]
+    if: needs.release.outputs.pr
+    uses: ./.github/workflows/ci.yml
+    with:
+      ref: \${{ needs.release.outputs.pr-branch }}
+      check-sha: \${{ needs.update.outputs.sha }}
+      all: true
+
+  post-ci:
+    name: Release PR - Post CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    needs: [ release, update, ci ]
+    if: needs.update.outputs.check-id && (success() || failure())
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: \${{ needs.release.outputs.pr-branch }}
+
+      - name: Get Needs Result
+        id: needs-result
+        run: |
+          if [[ "\${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
+            result="failure"
+          elif [[ "\${{ contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
+            result="cancelled"
+          else
+            result="success"
+          fi
+          echo "result=$result" >> $GITHUB_OUTPUT
+
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ steps.needs-result.outputs.result }}
+          check-id: \${{ needs.update.outputs.check-id }}
+
+  post-release:
+    name: Post Release
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    needs: release
+    if: needs.release.outputs.releases
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Comment Text
+        uses: actions/github-script@v6
+        id: comment-text
+        env:
+          RELEASES: \${{ needs.release.outputs.releases }}
+        with:
+          result-encoding: string
+          script: |
+            const releases = JSON.parse(process.env.RELEASES)
+            const { runId, repo: { owner, repo } } = context
+            const issue_number = releases[0].prNumber
+
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
+              .then(comments => comments.map(c => ({ id: c.id, login: c.user.login, body: c.body })))
+
+            console.log(\`comments: \${JSON.stringify(comments, null, 2)}\`)
+
+            const releasePleaseComments = comments.filter(c =>
+              c.login === 'github-actions[bot]' &&
+              c.body.startsWith(':robot: Release is at ')
+            )
+
+            console.log(\`release please comments: \${JSON.stringify(releasePleaseComments, null, 2)}\`)
+
+            for (const comment of releasePleaseComments) {
+              await github.rest.issues.deleteComment({ owner, repo, comment_id: comment.id })
+            }
+
+            let body = '## Release Workflow/n/n'
+            for (const { pkgName, version, url } of releases) {
+              body += \`- /\`\${pkgName}@\${version}/\` \${url}/n\`
+            }
+            body += \`- Workflow run: :arrows_counterclockwise: https://github.com/\${owner}/\${repo}/actions/runs/\${runId}\`
+            return body
+
+      - name: Create Release PR Comment
+        if: steps.comment-text.outputs.result
+        uses: ./.github/actions/upsert-comment
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          body: \${{ steps.comment-text.outputs.result }}
+          number: \${{ fromJson(needs.release.outputs.release).prNumber }}
+          includes: \${{ github.run_id }}
+
+  release-integration:
+    name: Post Release - Integration
+    needs: release
+    if: needs.release.outputs.release
+    uses: ./.github/workflows/release-integration.yml
+    with:
+      release: needs.release.outputs.release
+      releases: needs.release.outputs.releases
+
+  post-release-integration:
+    name: Post Release - Post Integration
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    needs: [ release, release-integration ]
+    if: needs.release.outputs.release && (success() || failure())
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Get Needs Result
         id: needs-result
         run: |
@@ -2715,42 +3164,39 @@ jobs:
             result="white_check_mark"
           fi
           echo "result=$result" >> $GITHUB_OUTPUT
-      - name: Update Release PR Comment
+
+      - name: Comment Text
         uses: actions/github-script@v6
+        id: comment-text
         env:
           PR_NUMBER: \${{ fromJSON(needs.release.outputs.release).prNumber }}
+          REF_NAME: \${{ github.ref_name }}
           RESULT: \${{ steps.needs-result.outputs.result }}
         with:
           script: |
-            const { PR_NUMBER: issue_number, RESULT } = process.env
-            const { runId, repo: { owner, repo } } = context
-
-            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
-            const updateComment = comments.find(c =>
-              c.user.login === 'github-actions[bot]' &&
-              c.body.startsWith('## Release Workflow/n/n') &&
-              c.body.includes(runId)
-            )
-
-            if (updateComment) {
-              console.log('Found comment to update:', JSON.stringify(updateComment, null, 2))
-              let body = updateComment.body.replace(/Workflow run: :[a-z_]+:/, \`Workflow run: :\${RESULT}:\`)
-              const tagCodeowner = RESULT !== 'white_check_mark'
-              if (tagCodeowner) {
-                body += \`/n/n:rotating_light:\`
-                body += \` @npm/cli-team: The post-release workflow failed for this release.\`
-                body += \` Manual steps may need to be taken after examining the workflow output\`
-                body += \` from the above workflow run. :rotating_light:\`
-              }
-              await github.rest.issues.updateComment({
-                owner,
-                repo,
-                body,
-                comment_id: updateComment.id,
-              })
-            } else {
-              console.log('No matching comments found:', JSON.stringify(comments, null, 2))
+            const { RESULT, PR_NUMBER, REF_NAME } = process.env
+            const tagCodeowner = RESULT !== 'white_check_mark'
+            if (tagCodeowner) {
+              let body = ''
+              body += \`/n/n:rotating_light:\`
+              body += \` @npm/cli-team: The post-release workflow failed for this release.\`
+              body += \` Manual steps may need to be taken after examining the workflow output\`
+              body += \` from the above workflow run. :rotating_light:\`
+              body += \`/n/nTo rerun the workflow run the following command:/n/n\`
+              body += \`/\`/\`/\`/ngh workflow run release.yml -r \${REF_NAME} -R \${owner}/\${repo} -f release-pr=\${PR_NUMBER}/n/\`/\`/\`\`
+              return body
             }
+
+      - name: Update Release PR Comment
+        uses: ./.github/actions/upsert-comment
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          body: "## Release Workflow"
+          find: "Workflow run: :[a-z_]+:"
+          replace: "Workflow run :\${{ steps.needs-result.outputs.result }}:"
+          append: \${{ steps.comment-text.outputs.result }}
+          number: \${{ fromJson(needs.release.outputs.release).prNumber }}
+          includes: \${{ github.run_id }}
 
 .gitignore
 ========================================
@@ -2816,6 +3262,9 @@ package.json
 {
   "name": "testpkg",
   "version": "1.0.0",
+  "devDependencies": {
+    "@npmcli/template-oss": "{{VERSION}}"
+  },
   "workspaces": [
     "workspaces/a",
     "workspaces/b"
@@ -2839,10 +3288,6 @@ package.json
   "engines": {
     "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
   },
-  "templateOSS": {
-    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
-    "version": "{{VERSION}}"
-  },
   "tap": {
     "test-ignore": "^(workspaces/a|workspaces/b)/",
     "nyc-arg": [
@@ -2853,6 +3298,10 @@ package.json
       "--exclude",
       "tap-snapshots/**"
     ]
+  },
+  "templateOSS": {
+    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
+    "version": "{{VERSION}}"
   }
 }
 
@@ -2965,6 +3414,9 @@ workspaces/a/package.json
 {
   "name": "a",
   "version": "1.0.0",
+  "devDependencies": {
+    "@npmcli/template-oss": "{{VERSION}}"
+  },
   "scripts": {
     "lint": "eslint /"**/*.js/"",
     "postlint": "template-oss-check",
@@ -2982,15 +3434,15 @@ workspaces/a/package.json
   "engines": {
     "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
   },
-  "templateOSS": {
-    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
-    "version": "{{VERSION}}"
-  },
   "tap": {
     "nyc-arg": [
       "--exclude",
       "tap-snapshots/**"
     ]
+  },
+  "templateOSS": {
+    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
+    "version": "{{VERSION}}"
   }
 }
 
@@ -3043,6 +3495,9 @@ workspaces/b/package.json
 {
   "name": "b",
   "version": "1.0.0",
+  "devDependencies": {
+    "@npmcli/template-oss": "{{VERSION}}"
+  },
   "scripts": {
     "lint": "eslint /"**/*.js/"",
     "postlint": "template-oss-check",
@@ -3060,20 +3515,475 @@ workspaces/b/package.json
   "engines": {
     "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
   },
-  "templateOSS": {
-    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
-    "version": "{{VERSION}}"
-  },
   "tap": {
     "nyc-arg": [
       "--exclude",
       "tap-snapshots/**"
     ]
+  },
+  "templateOSS": {
+    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
+    "version": "{{VERSION}}"
   }
 }
 `
 
 exports[`test/apply/source-snapshots.js TAP workspaces only > expect resolving Promise 1`] = `
+.github/actions/audit/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Audit
+
+runs:
+  using: composite
+  steps:
+    - name: Run Full Audit
+      shell: bash
+      run: |
+        if ! npm audit; then
+          COUNT=$(npm audit --audit-level=none --json | jq -r '.metadata.vulnerabilities.total')
+          echo "::warning title=All Vulnerabilities::Found $COUNT"
+        fi
+
+    - name: Run Production Audit
+      shell: bash
+      run: |
+        if ! npm audit --omit=dev; then
+          COUNT=$(npm audit --omit=dev --audit-level=none --json | jq -r '.metadata.vulnerabilities.total')
+          echo "::error title=Production Vulnerabilities::Found $COUNT"
+          exit 1
+        fi
+
+.github/actions/changed-files/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Get Changed Files
+
+inputs:
+  token:
+    description: GitHub token to use
+    required: true
+
+outputs:
+  names:
+    value: \${{ steps.files.outputs.result }}
+
+runs:
+  using: composite
+  steps:
+    - name: Get Changed Files
+      uses: actions/github-script@v6
+      id: files
+      with:
+        github-token: \${{ inputs.token }}
+        script: |
+          const { repo: { owner, repo }, eventName, payload, sha } = context
+          let files
+          if (eventName === 'pull_request' || eventName === 'pull_request_target') {
+            files = await github.paginate(github.rest.pulls.listFiles, {
+              owner,
+              repo,
+              pull_number: payload.pull_request.number,
+            })
+          } else {
+            const { data: commit } = await github.rest.repos.getCommit({
+              owner,
+              repo,
+              ref: sha,
+            })
+            files = commit.files
+          }
+          return files.map(f => f.filename)
+
+.github/actions/changed-workspaces/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Get Changed Workspaces
+
+inputs:
+  token:
+    description: GitHub token to use
+  files:
+    description: json stringified array of file names or --all
+
+outputs:
+  flags:
+    value: \${{ steps.workspaces.outputs.flags }}
+
+runs:
+  using: composite
+  steps:
+    - name: Get Changed Files
+      uses: ./.github/actions/changed-files
+      if: \${{ !inputs.files }}
+      id: files
+      with:
+        token: \${{ inputs.token }}
+
+    - name: Get Workspaces
+      shell: bash
+      id: workspaces
+      run: |
+        flags=$(npm exec --offline -- template-oss-changed-workspaces '\${{ inputs.files || steps.files.outputs.names }}')
+        echo "flags=\${flags}" >> $GITHUB_OUTPUT
+
+.github/actions/conclude-check/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Conclude Check
+description: Conclude a check
+
+inputs:
+  token:
+    description: GitHub token to use
+    required: true
+  conclusion:
+    description: conclusion of check
+    require: true
+  check-id:
+    description: id of check to conclude
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Conclude Check
+      uses: LouisBrunner/checks-action@v1.5.0
+      with:
+        token: \${{ inputs.token }}
+        conclusion: \${{ inputs.conclusion }}
+        check_id: \${{ inputs.check-id }}
+
+.github/actions/create-check/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Create Check
+description: Create a check and associate it with a sha
+
+inputs:
+  token:
+    description: GitHub token to use
+    required: true
+  sha:
+    description: sha to attach the check to
+    required: true
+  job-name:
+    description: Name of the job to find
+    required: true
+  job-status:
+    description: Status of the check being created
+    default: 'in_progress'
+
+outputs:
+  check-id:
+    description: The ID of the check that was created
+    value: \${{ steps.check.outputs.check_id }}
+
+runs:
+  using: composite
+  steps:
+    - name: Get Workflow Job
+      uses: actions/github-script@v6
+      id: workflow-job
+      env:
+        JOB_NAME: \${{ inputs.job-name }}
+      with:
+        github-token: \${{ inputs.token }}
+        script: |
+          const { JOB_NAME } = process.env
+          const { repo: { owner, repo }, runId, serverUrl } = context
+
+          const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun, {
+            owner,
+            repo,
+            run_id: runId,
+          }).then(jobs => jobs.map(j => ({ name: j.name, html_url: j.html_url })))
+
+          console.log(\`found jobs: \${JSON.stringify(jobs, null, 2)}\`)
+
+          const job = jobs.find(j => j.name.endsWith(JOB_NAME))
+
+          console.log(\`found job: \${JSON.stringify(job, null, 2)}\`)
+
+          const shaUrl = \`\${serverUrl}/\${owner}/\${repo}/commit/\${{ inputs.sha }}\`
+          const summary = \`This check is assosciated with \${shaUrl}/n/n\`
+          const message = job?.html_url
+            ? \`For run logs, click here: \${job.html_url}\`
+            : \`Run logs could not be found for a job with name: "\${JOB_NAME}"\`
+
+          // Return a json object with properties that LouisBrunner/checks-actions
+          // expects as the output of the check
+          return { summary: summary + message }
+
+    - name: Create Check
+      uses: LouisBrunner/checks-action@v1.5.0
+      id: check
+      with:
+        token: \${{ inputs.token }}
+        status: \${{ inputs.job-status }}
+        name: \${{ inputs.job-name }}
+        sha: \${{ inputs.sha }}
+        output: \${{ steps.workflow-job.outputs.result }}
+
+.github/actions/deps/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Dependencies
+
+inputs:
+  command:
+    description: command to run for the dependencies step
+    default: 'install --ignore-scripts --no-audit --no-fund'
+  flags:
+    description: extra flags to pass to the dependencies step
+    default: ''
+  shell:
+    description: shell to run on
+    default: 'bash'
+
+runs:
+  using: composite
+  steps:
+    - name: Install Dependencies
+      shell: \${{ inputs.shell }}
+      run: npm \${{ inputs.command }} \${{ inputs.flags }}
+
+.github/actions/lint/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Lint
+
+inputs:
+  flags:
+    description: flags to pass to the commands
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Lint
+      shell: bash
+      run: |
+        npm run lint --ignore-scripts \${{ inputs.flags }}
+    - name: Post Lint
+      shell: bash
+      run: |
+        npm run postlint --ignore-scripts \${{ inputs.flags }}
+
+.github/actions/setup/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Setup Repo
+description: Setup a repo with standard tools
+
+inputs:
+  node-version:
+    description: node version to use
+    default: '18.x'
+  npm-version:
+    description: npm version to use
+    default: 'latest'
+  cache:
+    description: whether to cache npm install or not
+    default: 'false'
+  shell:
+    description: shell to run on
+    default: 'bash'
+  deps:
+    description: whether to run the deps step
+    default: 'true'
+  deps-command:
+    description: command to run for the dependencies step
+    default: 'install --ignore-scripts --no-audit --no-fund'
+  deps-flags:
+    description: extra flags to pass to the dependencies step
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Git User
+      shell: \${{ inputs.shell }}
+      run: |
+        git config --global user.email "npm-cli+bot@github.com"
+        git config --global user.name "npm CLI robot"
+
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: \${{ inputs.node-version }}
+        cache: \${{ (inputs.cache == 'true' && 'npm') || '' }}
+
+    - name: Check Node Version
+      if: inputs.npm-version
+      id: node-version
+      shell: bash
+      run: |
+        NODE_VERSION=$(node --version)
+        echo $NODE_VERSION
+        if npx semver@7 -r "<=10" "$NODE_VERSION"; then
+          echo "ten-or-lower=true" >> $GITHUB_OUTPUT
+        fi
+        if npx semver@7 -r "<=14" "$NODE_VERSION"; then
+          echo "fourteen-or-lower=true" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Update Windows npm
+      # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
+      if: inputs.npm-version && runner.os == 'Windows' && steps.node-version.outputs.fourteen-or-lower
+      shell: \${{ inputs.shell }}
+      run: |
+        curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
+        tar xf npm-7.5.4.tgz
+        cd package
+        node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
+        cd ..
+        rmdir /s /q package
+
+    - name: Install npm@7
+      if: inputs.npm-version && steps.node-version.outputs.ten-or-lower
+      shell: \${{ inputs.shell }}
+      run: npm i --prefer-online --no-fund --no-audit -g npm@7
+
+    - name: Install npm@\${{ inputs.npm-version }}
+      if: inputs.npm-version && !steps.node-version.outputs.ten-or-lower
+      shell: \${{ inputs.shell }}
+      run: npm i --prefer-online --no-fund --no-audit -g npm@\${{ inputs.npm-version }}
+
+    - name: npm Version
+      shell: \${{ inputs.shell }}
+      run: npm -v
+
+    - name: Setup Dependencies
+      if: inputs.deps == 'true'
+      uses: ./.github/actions/deps
+      with:
+        command: \${{ inputs.deps-command }}
+        flags: \${{ inputs.deps-flags }}
+        shell: \${{ inputs.shell }}
+
+    - name: Add Problem Matcher
+      shell: bash
+      run: |
+        [[ -f ./.github/matchers/tap.json ]] && echo "::add-matcher::.github/matchers/tap.json"
+
+.github/actions/test/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Test
+
+inputs:
+  flags:
+    description: flags to pass to the commands
+    default: ''
+  shell:
+    description: shell to run on
+    default: 'bash'
+
+runs:
+  using: composite
+  steps:
+    - name: Test
+      shell: \${{ inputs.shell }}
+      run: npm test --ignore-scripts \${{ inputs.flags }}
+
+.github/actions/upsert-comment/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Upsert Comment
+description: Update or create a comment
+
+inputs:
+  token:
+    description: GitHub token to use
+    required: true
+  number:
+    description: Number of the issue or pull request
+    required: true
+  login:
+    description: Login name of user to look for comments from
+    default: 'github-actions[bot]'
+    required: true
+  body:
+    description: Body of the comment, the first line will be used to match to an existing comment
+    required: true
+  find:
+    description: string to find in body
+  replace:
+    description: string to replace in body
+  append:
+    description: string to append to the body
+  includes:
+    description: A string that the comment needs to include
+
+outputs:
+  comment-id:
+    description: The ID of the comment
+    value: \${{ steps.comment.outputs.result }}
+
+runs:
+  using: composite
+  steps:
+    - name: Create or Update Comment
+      uses: actions/github-script@v6
+      id: comment
+      env:
+        NUMBER: \${{ inputs.number }}
+        BODY: \${{ inputs.body }}
+        FIND: \${{ inputs.find }}
+        REPLACE: \${{ inputs.replace }}
+        APPEND: \${{ inputs.append }}
+        LOGIN: \${{ inputs.login }}
+        INCLUDES: \${{ inputs.includes }}
+      with:
+        github-token: \${{ inputs.token }}
+        script: |
+          const { BODY, FIND, REPLACE, APPEND, LOGIN, NUMBER: issue_number, INCLUDES } = process.env
+          const { repo: { owner, repo } } = context
+          const TITLE = BODY.split('/n')[0].trim() + '/n'
+          const bodyIncludes = (c) => INCLUDES ? c.body.includes(INCLUDES) : true
+
+          const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
+            .then(comments => comments.map(c => ({ id: c.id, login: c.user.login, body: c.body })))
+
+          console.log(\`Looking for comment with: \${JSON.stringify({ LOGIN, TITLE, INCLUDES }, null, 2)}\`)
+          console.log(\`Found comments: \${JSON.stringify(comments, null, 2)}\`)
+
+          const comment = comments.find(c =>
+            c.login === LOGIN &&
+            c.body.startsWith(TITLE) &&
+            bodyIncludes(c)
+          )
+
+          if (comment) {
+            console.log(\`Found comment: \${JSON.stringify(comment, null, 2)}\`)
+            let newBody = FIND && REPLACE ? comment.body.replace(new RegExp(FIND, 'g'), REPLACE) : BODY
+            if (APPEND) {
+              newBody += APPEND
+            }
+            await github.rest.issues.updateComment({ owner, repo, comment_id: comment.id, body: newBody })
+            return comment.id
+          }
+
+          if (FIND || REPLACE || APPEND) {
+            console.log('Could not find a comment to use find/replace or append to')
+            return
+          }
+
+          console.log('Creating new comment')
+
+          const res = await github.rest.issues.createComment({ owner, repo, issue_number, body: BODY })
+          return res.data.id
+
 .github/dependabot.yml
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
@@ -3141,341 +4051,152 @@ updates:
   ]
 }
 
-.github/workflows/ci-a.yml
+.github/workflows/audit.yml
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
 
-name: CI - a
+name: Audit
 
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - workspaces/a/**
-  push:
-    branches:
-      - main
-      - latest
-    paths:
-      - workspaces/a/**
-  schedule:
-    # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
-    - cron: "0 9 * * 1"
-
-jobs:
-  lint:
-    name: Lint
-    if: github.repository_owner == 'npm'
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Lint
-        run: npm run lint --ignore-scripts -w a
-      - name: Post Lint
-        run: npm run postlint --ignore-scripts -w a
-
-  test:
-    name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
-    if: github.repository_owner == 'npm'
-    strategy:
-      fail-fast: false
-      matrix:
-        platform:
-          - name: Linux
-            os: ubuntu-latest
-            shell: bash
-          - name: macOS
-            os: macos-latest
-            shell: bash
-          - name: Windows
-            os: windows-latest
-            shell: cmd
-        node-version:
-          - 14.17.0
-          - 14.x
-          - 16.13.0
-          - 16.x
-          - 18.0.0
-          - 18.x
-    runs-on: \${{ matrix.platform.os }}
-    defaults:
-      run:
-        shell: \${{ matrix.platform.shell }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: \${{ matrix.node-version }}
-      - name: Update Windows npm
-        # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
-        if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
-        run: |
-          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
-          tar xf npm-7.5.4.tgz
-          cd package
-          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
-          cd ..
-          rmdir /s /q package
-      - name: Install npm@7
-        if: startsWith(matrix.node-version, '10.')
-        run: npm i --prefer-online --no-fund --no-audit -g npm@7
-      - name: Install npm@latest
-        if: \${{ !startsWith(matrix.node-version, '10.') }}
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Add Problem Matcher
-        run: echo "::add-matcher::.github/matchers/tap.json"
-      - name: Test
-        run: npm test --ignore-scripts -w a
-
-.github/workflows/ci-b.yml
-========================================
-# This file is automatically added by @npmcli/template-oss. Do not edit.
-
-name: CI - b
-
-on:
-  workflow_dispatch:
-  pull_request:
-    paths:
-      - workspaces/b/**
-  push:
-    branches:
-      - main
-      - latest
-    paths:
-      - workspaces/b/**
-  schedule:
-    # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
-    - cron: "0 9 * * 1"
-
-jobs:
-  lint:
-    name: Lint
-    if: github.repository_owner == 'npm'
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Lint
-        run: npm run lint --ignore-scripts -w b
-      - name: Post Lint
-        run: npm run postlint --ignore-scripts -w b
-
-  test:
-    name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
-    if: github.repository_owner == 'npm'
-    strategy:
-      fail-fast: false
-      matrix:
-        platform:
-          - name: Linux
-            os: ubuntu-latest
-            shell: bash
-          - name: macOS
-            os: macos-latest
-            shell: bash
-          - name: Windows
-            os: windows-latest
-            shell: cmd
-        node-version:
-          - 14.17.0
-          - 14.x
-          - 16.13.0
-          - 16.x
-          - 18.0.0
-          - 18.x
-    runs-on: \${{ matrix.platform.os }}
-    defaults:
-      run:
-        shell: \${{ matrix.platform.shell }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: \${{ matrix.node-version }}
-      - name: Update Windows npm
-        # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
-        if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
-        run: |
-          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
-          tar xf npm-7.5.4.tgz
-          cd package
-          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
-          cd ..
-          rmdir /s /q package
-      - name: Install npm@7
-        if: startsWith(matrix.node-version, '10.')
-        run: npm i --prefer-online --no-fund --no-audit -g npm@7
-      - name: Install npm@latest
-        if: \${{ !startsWith(matrix.node-version, '10.') }}
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Add Problem Matcher
-        run: echo "::add-matcher::.github/matchers/tap.json"
-      - name: Test
-        run: npm test --ignore-scripts -w b
-
-.github/workflows/ci-release.yml
-========================================
-# This file is automatically added by @npmcli/template-oss. Do not edit.
-
-name: CI - Release
-
-on:
-  workflow_dispatch:
-    inputs:
-      ref:
-        required: true
-        type: string
-        default: main
   workflow_call:
     inputs:
       ref:
-        required: true
         type: string
+      force:
+        type: boolean
       check-sha:
-        required: true
         type: string
+  schedule:
+    # "At 09:00 UTC (01:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
+    - cron: "0 9 * * 1"
 
 jobs:
-  lint-all:
-    name: Lint All
-    if: github.repository_owner == 'npm'
+  audit:
+    name: Audit Dependencies
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
     steps:
-      - name: Get Workflow Job
-        uses: actions/github-script@v6
-        if: inputs.check-sha
-        id: check-output
-        env:
-          JOB_NAME: "Lint All"
-          MATRIX_NAME: ""
-        with:
-          script: |
-            const { owner, repo } = context.repo
-
-            const { data } = await github.rest.actions.listJobsForWorkflowRun({
-              owner,
-              repo,
-              run_id: context.runId,
-              per_page: 100
-            })
-
-            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
-            const job = data.jobs.find(j => j.name.endsWith(jobName))
-            const jobUrl = job?.html_url
-
-            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ inputs.check-sha }}\`
-
-            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
-
-            if (jobUrl) {
-              summary += \`For run logs, click here: \${jobUrl}\`
-            } else {
-              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
-            }
-
-            return { summary }
-      - name: Create Check
-        uses: LouisBrunner/checks-action@v1.3.1
-        id: check
-        if: inputs.check-sha
-        with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          status: in_progress
-          name: Lint All
-          sha: \${{ inputs.check-sha }}
-          output: \${{ steps.check-output.outputs.result }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
           ref: \${{ inputs.ref }}
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
         with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Lint
-        run: npm run lint --ignore-scripts -ws -iwr --if-present
-      - name: Post Lint
-        run: npm run postlint --ignore-scripts -ws -iwr --if-present
+          sha: \${{ inputs.check-sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Audit Dependencies
+
+      - name: Setup
+        uses: ./.github/actions/setup
+        with:
+          deps-flags: "--package-lock"
+
+      - name: Audit
+        uses: ./.github/actions/audit
+
       - name: Conclude Check
-        uses: LouisBrunner/checks-action@v1.3.1
-        if: steps.check.outputs.check_id && always()
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
-          check_id: \${{ steps.check.outputs.check_id }}
+          check-id: \${{ steps.check.outputs.check-id }}
 
-  test-all:
-    name: Test All - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
-    if: github.repository_owner == 'npm'
+.github/workflows/ci.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      all:
+        type: boolean
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+      force:
+        type: boolean
+      check-sha:
+        type: string
+      all:
+        type: boolean
+  pull_request:
+    branches:
+      - main
+      - latest
+  push:
+    branches:
+      - main
+      - latest
+  schedule:
+    # "At 10:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_10_*_*_1
+    - cron: "0 10 * * 1"
+
+jobs:
+  lint:
+    name: Lint
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: \${{ inputs.ref }}
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
+        with:
+          sha: \${{ inputs.check-sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Lint
+
+      - name: Setup
+        id: setup
+        uses: ./.github/actions/setup
+
+      - name: Get Changed Workspaces
+        id: workspaces
+        uses: ./.github/actions/changed-workspaces
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          files: \${{ (inputs.all && '--all') || '' }}
+
+      - name: Lint
+        uses: ./.github/actions/lint
+        with:
+          flags: \${{ steps.workspaces.outputs.flags }}
+
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check-id: \${{ steps.check.outputs.check-id }}
+
+  test:
+    name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
+    runs-on: \${{ matrix.platform.os }}
+    defaults:
+      run:
+        shell: \${{ matrix.platform.shell }}
     strategy:
       fail-fast: false
       matrix:
@@ -3496,97 +4217,131 @@ jobs:
           - 16.x
           - 18.0.0
           - 18.x
-    runs-on: \${{ matrix.platform.os }}
-    defaults:
-      run:
-        shell: \${{ matrix.platform.shell }}
     steps:
-      - name: Get Workflow Job
-        uses: actions/github-script@v6
-        if: inputs.check-sha
-        id: check-output
-        env:
-          JOB_NAME: "Test All"
-          MATRIX_NAME: " - \${{ matrix.platform.name }} - \${{ matrix.node-version }}"
-        with:
-          script: |
-            const { owner, repo } = context.repo
-
-            const { data } = await github.rest.actions.listJobsForWorkflowRun({
-              owner,
-              repo,
-              run_id: context.runId,
-              per_page: 100
-            })
-
-            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
-            const job = data.jobs.find(j => j.name.endsWith(jobName))
-            const jobUrl = job?.html_url
-
-            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ inputs.check-sha }}\`
-
-            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
-
-            if (jobUrl) {
-              summary += \`For run logs, click here: \${jobUrl}\`
-            } else {
-              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
-            }
-
-            return { summary }
-      - name: Create Check
-        uses: LouisBrunner/checks-action@v1.3.1
-        id: check
-        if: inputs.check-sha
-        with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          status: in_progress
-          name: Test All - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
-          sha: \${{ inputs.check-sha }}
-          output: \${{ steps.check-output.outputs.result }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
           ref: \${{ inputs.ref }}
-      - name: Setup Git User
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
+        with:
+          sha: \${{ inputs.check-sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
+
+      - name: Continue Matrix Run
+        id: continue-matrix
+        shell: bash
         run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
+          if [[ "\${{ matrix.node-version }}" == "14.17.0" || "\${{ inputs.all }}" == "true" ]]; then
+            echo "result=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup
+        if: steps.continue-matrix.outputs.result
+        uses: ./.github/actions/setup
+        id: setup
         with:
           node-version: \${{ matrix.node-version }}
-      - name: Update Windows npm
-        # node 12 and 14 ship with npm@6, which is known to fail when updating itself in windows
-        if: matrix.platform.os == 'windows-latest' && (startsWith(matrix.node-version, '12.') || startsWith(matrix.node-version, '14.'))
-        run: |
-          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
-          tar xf npm-7.5.4.tgz
-          cd package
-          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
-          cd ..
-          rmdir /s /q package
-      - name: Install npm@7
-        if: startsWith(matrix.node-version, '10.')
-        run: npm i --prefer-online --no-fund --no-audit -g npm@7
-      - name: Install npm@latest
-        if: \${{ !startsWith(matrix.node-version, '10.') }}
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Add Problem Matcher
-        run: echo "::add-matcher::.github/matchers/tap.json"
+          shell: \${{ matrix.platform.shell }}
+
+      - name: Get Changed Workspaces
+        if: steps.continue-matrix.outputs.result
+        id: workspaces
+        uses: ./.github/actions/changed-workspaces
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          files: \${{ (inputs.all && '--all') || '' }}
+
       - name: Test
-        run: npm test --ignore-scripts -ws -iwr --if-present
+        if: steps.continue-matrix.outputs.result
+        uses: ./.github/actions/test
+        with:
+          flags: \${{ steps.workspaces.outputs.flags }}
+          shell: \${{ matrix.platform.shell }}
+
       - name: Conclude Check
-        uses: LouisBrunner/checks-action@v1.3.1
-        if: steps.check.outputs.check_id && always()
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
-          check_id: \${{ steps.check.outputs.check_id }}
+          check-id: \${{ steps.check.outputs.check-id }}
+
+.github/workflows/codeql-analysis.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: CodeQL
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+      force:
+        type: boolean
+      check-sha:
+        type: string
+  push:
+    branches:
+      - main
+      - latest
+  pull_request:
+    branches:
+      - main
+      - latest
+  schedule:
+    # "At 11:00 UTC (03:00 PT) on Monday" https://crontab.guru/#0_11_*_*_1
+    - cron: "0 11 * * 1"
+
+jobs:
+  analyze:
+    name: Analyze
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+      checks: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: \${{ inputs.ref }}
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
+        with:
+          sha: \${{ inputs.check-sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Analyze
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: javascript
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check-id: \${{ steps.check.outputs.check-id }}
 
 .github/workflows/post-dependabot.yml
 ========================================
@@ -3594,86 +4349,80 @@ jobs:
 
 name: Post Dependabot
 
-on: pull_request
-
-permissions:
-  contents: write
+on:
+  pull_request:
+    branches:
+      - main
+      - latest
+      - release/v*
 
 jobs:
-  template-oss:
-    name: template-oss
+  dependency:
+    name: "@npmcli/template-oss"
+    permissions:
+      contents: write
+    outputs:
+      sha: \${{ steps.sha.outputs.sha }}
+    # TODO: remove head_ref check after testing
     if: github.repository_owner == 'npm' && github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: \${{ github.event.pull_request.head.ref }}
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
       - name: Fetch Dependabot Metadata
         id: metadata
         uses: dependabot/fetch-metadata@v1
+        continue-on-error: true
         with:
           github-token: \${{ secrets.GITHUB_TOKEN }}
 
-      # Dependabot can update multiple directories so we output which directory
-      # it is acting on so we can run the command for the correct root or workspace
-      - name: Get Dependabot Directory
+      - name: Is Dependency
         if: contains(steps.metadata.outputs.dependency-names, '@npmcli/template-oss')
-        id: flags
-        run: |
-          dependabot_dir="\${{ steps.metadata.outputs.directory }}"
-          if [[ "$dependabot_dir" == "/" ]]; then
-            echo "workspace=-iwr" >> $GITHUB_OUTPUT
-          else
-            # strip leading slash from directory so it works as a
-            # a path to the workspace flag
-            echo "workspace=-w \${dependabot_dir#/}" >> $GITHUB_OUTPUT
-          fi
+        id: dependency
+        run: echo "continue=true" >> $GITHUB_OUTPUT
 
+      - name: Checkout
+        if: steps.dependency.outputs.continue
+        uses: actions/checkout@v3
+        with:
+          ref: \${{ (github.event_name == 'pull_request' && github.event.pull_request.head.ref) || '' }}
+
+      - name: Setup
+        if: steps.dependency.outputs.continue
+        uses: ./.github/actions/setup
+
+      - name: Get Workspaces
+        if: steps.dependency.outputs.continue
+        uses: ./.github/actions/changed-workspaces
+        id: workspaces
+        with:
+          files: '["\${{ steps.metadata.outputs.directory }}"]'
+
+      # This only sets the conventional commit prefix. This workflow can't reliably determine
+      # what the breaking change is though. If a BREAKING CHANGE message is required then
+      # this PR check will fail and the commit will be amended with stafftools
       - name: Apply Changes
-        if: steps.flags.outputs.workspace
+        if: steps.workspaces.outputs.flags
         id: apply
         run: |
-          npm run template-oss-apply \${{ steps.flags.outputs.workspace }}
+          npm run template-oss-apply \${{ steps.workspaces.outputs.flags }}
           if [[ \`git status --porcelain\` ]]; then
-            echo "changes=true" >> $GITHUB_OUTPUT
+            if [[ "\${{ steps.metadata.outputs.update-type }}" == "version-update:semver-major" ]]; then
+              prefix='feat!'
+            else
+              prefix='chore'
+            fi
+            echo "message=$prefix: postinstall for dependabot template-oss PR" >> $GITHUB_OUTPUT
           fi
-          # This only sets the conventional commit prefix. This workflow can't reliably determine
-          # what the breaking change is though. If a BREAKING CHANGE message is required then
-          # this PR check will fail and the commit will be amended with stafftools
-          if [[ "\${{ steps.metadata.outputs.update-type }}" == "version-update:semver-major" ]]; then
-            prefix='feat!'
-          else
-            prefix='chore'
-          fi
-          echo "message=$prefix: postinstall for dependabot template-oss PR" >> $GITHUB_OUTPUT
 
       # This step will fail if template-oss has made any workflow updates. It is impossible
       # for a workflow to update other workflows. In the case it does fail, we continue
       # and then try to apply only a portion of the changes in the next step
       - name: Push All Changes
-        if: steps.apply.outputs.changes
+        if: steps.apply.outputs.message
         id: push
         continue-on-error: true
-        env:
-          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
           git commit -am "\${{ steps.apply.outputs.message }}"
           git push
@@ -3682,9 +4431,9 @@ jobs:
       # and attempt to commit and push again. This is helpful because we will have a commit
       # with the correct prefix that we can then --amend with @npmcli/stafftools later.
       - name: Push All Changes Except Workflows
-        if: steps.apply.outputs.changes && steps.push.outcome == 'failure'
-        env:
-          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        if: steps.apply.outputs.message && steps.push.outcome == 'failure'
+        id: push-on-error
+        continue-on-error: true
         run: |
           git reset HEAD~
           git checkout HEAD -- .github/workflows/
@@ -3692,25 +4441,53 @@ jobs:
           git commit -am "\${{ steps.apply.outputs.message }}"
           git push
 
-      # Check if all the necessary template-oss changes were applied. Since we continued
-      # on errors in one of the previous steps, this check will fail if our follow up
-      # only applied a portion of the changes and we need to followup manually.
-      #
-      # Note that this used to run \`lint\` and \`postlint\` but that will fail this action
-      # if we've also shipped any linting changes separate from template-oss. We do
-      # linting in another action, so we want to fail this one only if there are
-      # template-oss changes that could not be applied.
-      - name: Check Changes
-        if: steps.apply.outputs.changes
-        run: |
-          npm exec --offline \${{ steps.flags.outputs.workspace }} -- template-oss-check
-
+      # If template-oss is applying breaking changes, then we fail this PR with a message saying what to do. There's no need
+      # to run CI in this case because the PR will need to be fixed manually so CI will run on those commits.
       - name: Fail on Breaking Change
-        if: steps.apply.outputs.changes && startsWith(steps.apply.outputs.message, 'feat!')
+        if: startsWith(steps.apply.outputs.message, 'feat!')
         run: |
-          echo "This PR has a breaking change. Run 'npx -p @npmcli/stafftools gh template-oss-fix'"
-          echo "for more information on how to fix this with a BREAKING CHANGE footer."
+          TITLE="Breaking Changes"
+          MESSAGE="This PR has a breaking change. Run 'npx -p @npmcli/stafftools gh template-oss-fix'"
+          MESSAGE="$MESSAGE for more information on how to fix this with a BREAKING CHANGE footer."
+          echo "::error title=$TITLE::$MESSAGE"
           exit 1
+
+      - name: Get SHA
+        id: sha
+        run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
+  # If everything succeeded so far then we run our normal CI workflow since GitHub actions wont rerun after a bot
+  # pushes a new commit to a PR. We rerun all of CI because template-oss could affect any code in the repo including
+  # lint settings and test settings.
+  ci:
+    name: CI
+    needs: [ dependency ]
+    if: needs.dependency.outputs.sha
+    uses: ./.github/workflows/ci.yml
+    with:
+      ref: \${{ github.head_ref }}
+      check-sha: \${{ needs.dependency.outputs.sha }}
+      force: true
+
+  codeql-analysis:
+    name: CodeQL
+    needs: [ dependency ]
+    if: needs.dependency.outputs.sha
+    uses: ./.github/workflows/codeql-analysis.yml
+    with:
+      ref: \${{ github.head_ref }}
+      check-sha: \${{ needs.dependency.outputs.sha }}
+      force: true
+
+  pull-request:
+    name: Pull Request
+    needs: [ dependency ]
+    if: needs.dependency.outputs.sha
+    uses: ./.github/workflows/pull-request.yml
+    with:
+      ref: \${{ github.head_ref }}
+      check-sha: \${{ needs.dependency.outputs.sha }}
+      force: true
 
 .github/workflows/pull-request.yml
 ========================================
@@ -3719,7 +4496,19 @@ jobs:
 name: Pull Request
 
 on:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+      force:
+        type: boolean
+      check-sha:
+        type: string
   pull_request:
+    branches:
+      - main
+      - latest
+      - release/v*
     types:
       - opened
       - reopened
@@ -3729,7 +4518,7 @@ on:
 jobs:
   commitlint:
     name: Lint Commits
-    if: github.repository_owner == 'npm'
+    if: github.repository_owner == 'npm' && !(!inputs.force && github.event_name == 'pull_request' && ((startsWith(github.head_ref, 'dependabot/') && contains(github.head_ref, '/npm-cli/template-oss')) || startsWith(github.head_ref, 'release/v*')))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -3739,64 +4528,60 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
+          ref: \${{ inputs.ref }}
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: inputs.check-sha
+        id: check
         with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
+          sha: \${{ inputs.check-sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Lint Commits
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
       - name: Run Commitlint on Commits
         id: commit
         continue-on-error: true
         run: |
-          npx --offline commitlint -V --from 'origin/\${{ github.base_ref }}' --to \${{ github.event.pull_request.head.sha }}
+          npx --offline commitlint -V --from 'origin/\${{ github.base_ref }}' --to '\${{ github.event.pull_request.head.sha }}'
+
       - name: Run Commitlint on PR Title
         if: steps.commit.outcome == 'failure'
+        env:
+          PR_TITLE: \${{ github.event.pull_request.title }}
         run: |
-          echo '\${{ github.event.pull_request.title }}' | npx --offline commitlint -V
+          echo "$PR_TITLE" | npx --offline commitlint -V
 
-.github/workflows/release.yml
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: steps.check.outputs.check-id && (success() || failure())
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check-id: \${{ steps.check.outputs.check-id }}
+
+.github/workflows/release-integration.yml
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
 
-name: Release
+name: Release Integration
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
-      release-pr:
-        description: a release PR number to rerun release jobs on
+      release:
+        required: true
         type: string
-  push:
-    branches:
-      - main
-      - latest
-      - release/v*
-
-permissions:
-  contents: write
-  pull-requests: write
-  checks: write
+      releases:
+        required: true
+        type: string
 
 jobs:
-  release:
-    outputs:
-      pr: \${{ steps.release.outputs.pr }}
-      release: \${{ steps.release.outputs.release }}
-      releases: \${{ steps.release.outputs.releases }}
-      branch: \${{ steps.release.outputs.pr-branch }}
-      pr-number: \${{ steps.release.outputs.pr-number }}
-      comment-id: \${{ steps.pr-comment.outputs.result }}
-      check-id: \${{ steps.check.outputs.check_id }}
-    name: Release
+  check-registry:
+    name: Check Registry
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
     defaults:
@@ -3805,297 +4590,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
+
+      - name: Setup
+        uses: ./.github/actions/setup
         with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Release Please
-        id: release
-        env:
-          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
-        run: |
-          npx --offline template-oss-release-please "\${{ github.ref_name }}" "\${{ inputs.release-pr }}"
-      - name: Post Pull Request Comment
-        if: steps.release.outputs.pr-number
-        uses: actions/github-script@v6
-        id: pr-comment
-        env:
-          PR_NUMBER: \${{ steps.release.outputs.pr-number }}
-          REF_NAME: \${{ github.ref_name }}
-        with:
-          script: |
-            const { REF_NAME, PR_NUMBER: issue_number } = process.env
-            const { runId, repo: { owner, repo } } = context
+          deps: false
 
-            const { data: workflow } = await github.rest.actions.getWorkflowRun({ owner, repo, run_id: runId })
-
-            let body = '## Release Manager/n/n'
-
-            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
-            let commentId = comments.find(c => c.user.login === 'github-actions[bot]' && c.body.startsWith(body))?.id
-
-            body += \`Release workflow run: \${workflow.html_url}/n/n#### Force CI to Update This Release/n/n\`
-            body += \`This PR will be updated and CI will run for every non-/\`chore:/\` commit that is pushed to /\`main/\`. \`
-            body += \`To force CI to update this PR, run this command:/n/n\`
-            body += \`/\`/\`/\`/ngh workflow run release.yml -r \${REF_NAME} -R \${owner}/\${repo} -f release-pr=\${issue_number}/n/\`/\`/\`\`
-
-            if (commentId) {
-              await github.rest.issues.updateComment({ owner, repo, comment_id: commentId, body })
-            } else {
-              const { data: comment } = await github.rest.issues.createComment({ owner, repo, issue_number, body })
-              commentId = comment?.id
-            }
-
-            return commentId
-      - name: Get Workflow Job
-        uses: actions/github-script@v6
-        if: steps.release.outputs.pr-sha
-        id: check-output
-        env:
-          JOB_NAME: "Release"
-          MATRIX_NAME: ""
-        with:
-          script: |
-            const { owner, repo } = context.repo
-
-            const { data } = await github.rest.actions.listJobsForWorkflowRun({
-              owner,
-              repo,
-              run_id: context.runId,
-              per_page: 100
-            })
-
-            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
-            const job = data.jobs.find(j => j.name.endsWith(jobName))
-            const jobUrl = job?.html_url
-
-            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ steps.release.outputs.pr-sha }}\`
-
-            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
-
-            if (jobUrl) {
-              summary += \`For run logs, click here: \${jobUrl}\`
-            } else {
-              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
-            }
-
-            return { summary }
-      - name: Create Check
-        uses: LouisBrunner/checks-action@v1.3.1
-        id: check
-        if: steps.release.outputs.pr-sha
-        with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          status: in_progress
-          name: Release
-          sha: \${{ steps.release.outputs.pr-sha }}
-          output: \${{ steps.check-output.outputs.result }}
-
-  update:
-    needs: release
-    outputs:
-      sha: \${{ steps.commit.outputs.sha }}
-      check-id: \${{ steps.check.outputs.check_id }}
-    name: Update - Release
-    if: github.repository_owner == 'npm' && needs.release.outputs.pr
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          ref: \${{ needs.release.outputs.branch }}
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
-      - name: Install Dependencies
-        run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Run Post Pull Request Actions
-        env:
-          RELEASE_PR_NUMBER: \${{ needs.release.outputs.pr-number }}
-          RELEASE_COMMENT_ID: \${{ needs.release.outputs.comment-id }}
-          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
-        run: |
-          npm exec --offline -- template-oss-release-manager --lockfile=false
-          npm run rp-pull-request --ignore-scripts -ws -iwr --if-present
-      - name: Commit
-        id: commit
-        env:
-          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git commit --all --amend --no-edit || true
-          git push --force-with-lease
-          echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-      - name: Get Workflow Job
-        uses: actions/github-script@v6
-        if: steps.commit.outputs.sha
-        id: check-output
-        env:
-          JOB_NAME: "Update - Release"
-          MATRIX_NAME: ""
-        with:
-          script: |
-            const { owner, repo } = context.repo
-
-            const { data } = await github.rest.actions.listJobsForWorkflowRun({
-              owner,
-              repo,
-              run_id: context.runId,
-              per_page: 100
-            })
-
-            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
-            const job = data.jobs.find(j => j.name.endsWith(jobName))
-            const jobUrl = job?.html_url
-
-            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ steps.commit.outputs.sha }}\`
-
-            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
-
-            if (jobUrl) {
-              summary += \`For run logs, click here: \${jobUrl}\`
-            } else {
-              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
-            }
-
-            return { summary }
-      - name: Create Check
-        uses: LouisBrunner/checks-action@v1.3.1
-        id: check
-        if: steps.commit.outputs.sha
-        with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          status: in_progress
-          name: Release
-          sha: \${{ steps.commit.outputs.sha }}
-          output: \${{ steps.check-output.outputs.result }}
-      - name: Conclude Check
-        uses: LouisBrunner/checks-action@v1.3.1
-        if: needs.release.outputs.check-id && always()
-        with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          conclusion: \${{ job.status }}
-          check_id: \${{ needs.release.outputs.check-id }}
-
-  ci:
-    name: CI - Release
-    needs: [ release, update ]
-    if: needs.release.outputs.pr
-    uses: ./.github/workflows/ci-release.yml
-    with:
-      ref: \${{ needs.release.outputs.branch }}
-      check-sha: \${{ needs.update.outputs.sha }}
-
-  post-ci:
-    needs: [ release, update, ci ]
-    name: Post CI - Release
-    if: github.repository_owner == 'npm' && needs.release.outputs.pr && always()
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Get Needs Result
-        id: needs-result
-        run: |
-          result=""
-          if [[ "\${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
-            result="failure"
-          elif [[ "\${{ contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
-            result="cancelled"
-          else
-            result="success"
-          fi
-          echo "result=$result" >> $GITHUB_OUTPUT
-      - name: Conclude Check
-        uses: LouisBrunner/checks-action@v1.3.1
-        if: needs.update.outputs.check-id && always()
-        with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          conclusion: \${{ steps.needs-result.outputs.result }}
-          check_id: \${{ needs.update.outputs.check-id }}
-
-  post-release:
-    needs: release
-    name: Post Release - Release
-    if: github.repository_owner == 'npm' && needs.release.outputs.releases
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Create Release PR Comment
-        uses: actions/github-script@v6
-        env:
-          RELEASES: \${{ needs.release.outputs.releases }}
-        with:
-          script: |
-            const releases = JSON.parse(process.env.RELEASES)
-            const { runId, repo: { owner, repo } } = context
-            const issue_number = releases[0].prNumber
-
-            let body = '## Release Workflow/n/n'
-            for (const { pkgName, version, url } of releases) {
-              body += \`- /\`\${pkgName}@\${version}/\` \${url}/n\`
-            }
-
-            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
-              .then(cs => cs.map(c => ({ id: c.id, login: c.user.login, body: c.body })))
-            console.log(\`Found comments: \${JSON.stringify(comments, null, 2)}\`)
-            const releaseComments = comments.filter(c => c.login === 'github-actions[bot]' && c.body.includes('Release is at'))
-
-            for (const comment of releaseComments) {
-              console.log(\`Release comment: \${JSON.stringify(comment, null, 2)}\`)
-              await github.rest.issues.deleteComment({ owner, repo, comment_id: comment.id })
-            }
-
-            const runUrl = \`https://github.com/\${owner}/\${repo}/actions/runs/\${runId}\`
-            await github.rest.issues.createComment({
-              owner,
-              repo,
-              issue_number,
-              body: \`\${body}- Workflow run: :arrows_counterclockwise: \${runUrl}\`,
-            })
-
-  release-integration:
-    needs: release
-    name: Release Integration
-    if: needs.release.outputs.release
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
-      - name: Install npm@latest
-        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
-      - name: npm Version
-        run: npm -v
       - name: View in Registry
         run: |
           EXIT_CODE=0
@@ -4123,15 +4623,275 @@ jobs:
 
           exit $EXIT_CODE
 
-  post-release-integration:
-    needs: [ release, release-integration ]
-    name: Post Release Integration - Release
-    if: github.repository_owner == 'npm' && needs.release.outputs.release && always()
+.github/workflows/release.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release-pr:
+        description: a release PR number to rerun release jobs on
+        type: string
+  push:
+    branches:
+      - main
+      - latest
+      - release/v*
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: write
+
+jobs:
+  release:
+    name: Release
+    if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
+    outputs:
+      pr: \${{ steps.release.outputs.pr }}
+      release: \${{ steps.release.outputs.release }}
+      releases: \${{ steps.release.outputs.releases }}
+      pr-branch: \${{ steps.release.outputs.pr-branch }}
+      pr-number: \${{ steps.release.outputs.pr-number }}
+      comment-id: \${{ steps.pr-comment.outputs.comment-id }}
+      check-id: \${{ steps.check.outputs.check-id }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Release Please
+        id: release
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npx --offline template-oss-release-please "\${{ github.ref_name }}" "\${{ inputs.release-pr }}"
+
+      # If we have opened a release PR, then immediately create an "in_progress"
+      # check for it so the GitHub UI doesn't report that its mergeable.
+      # This check will be swapped out for real CI checks once those are started.
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: steps.release.outputs.pr-sha
+        id: check
+        with:
+          sha: \${{ steps.release.outputs.pr-sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Release
+
+      - name: Comment Text
+        uses: actions/github-script@v6
+        if: steps.release.outputs.pr-number
+        id: comment-text
+        env:
+          PR_NUMBER: \${{ steps.release.outputs.pr-number }}
+          REF_NAME: \${{ github.ref_name }}
+        with:
+          result-encoding: string
+          script: |
+            const { runId, repo: { owner, repo } } = context
+            const { data: workflow } = await github.rest.actions.getWorkflowRun({ owner, repo, run_id: runId })
+            let body = '## Release Manager/n/n'
+            body += \`Release workflow run: \${workflow.html_url}/n/n#### Force CI to Update This Release/n/n\`
+            body += \`This PR will be updated and CI will run for every non-/\`chore:/\` commit that is pushed to /\`main/\`. \`
+            body += \`To force CI to update this PR, run this command:/n/n\`
+            body += \`/\`/\`/\`/ngh workflow run release.yml -r \${process.env.REF_NAME} -R \${owner}/\${repo} -f release-pr=\${process.env.PR_NUMBER}/n/\`/\`/\`\`
+            return body
+
+      - name: Post Pull Request Comment
+        if: steps.comment-text.outputs.result
+        uses: ./.github/actions/upsert-comment
+        id: pr-comment
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          body: \${{ steps.comment-text.outputs.result }}
+          number: \${{ steps.release.outputs.pr-number }}
+
+  update:
+    name: Release PR - Update
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    if: needs.release.outputs.pr
+    needs: release
+    outputs:
+      sha: \${{ steps.commit.outputs.sha }}
+      check-id: \${{ steps.check.outputs.check-id }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: \${{ needs.release.outputs.pr-branch }}
+          fetch-depth: 0
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Run Post Pull Request Actions
+        env:
+          RELEASE_PR_NUMBER: \${{ needs.release.outputs.pr-number }}
+          RELEASE_COMMENT_ID: \${{ needs.release.outputs.comment-id }}
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm exec --offline -- template-oss-release-manager --lockfile=false
+          npm run rp-pull-request --ignore-scripts -ws -iwr --if-present
+
+      - name: Commit
+        id: commit
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git commit --all --amend --no-edit || true
+          git push --force-with-lease
+          echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Create Check
+        uses: ./.github/actions/create-check
+        if: steps.commit.outputs.sha
+        id: check
+        with:
+          sha: \${{ steps.vommit.outputs.sha }}
+          token: \${{ secrets.GITHUB_TOKEN }}
+          job-name: Release
+
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        if: needs.release.outputs.check-id && (success() || failure())
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ job.status }}
+          check-id: \${{ needs.release.outputs.check-id }}
+
+  ci:
+    name: Release PR - CI
+    needs: [ release, update ]
+    if: needs.release.outputs.pr
+    uses: ./.github/workflows/ci.yml
+    with:
+      ref: \${{ needs.release.outputs.pr-branch }}
+      check-sha: \${{ needs.update.outputs.sha }}
+      all: true
+
+  post-ci:
+    name: Release PR - Post CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    needs: [ release, update, ci ]
+    if: needs.update.outputs.check-id && (success() || failure())
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: \${{ needs.release.outputs.pr-branch }}
+
+      - name: Get Needs Result
+        id: needs-result
+        run: |
+          if [[ "\${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
+            result="failure"
+          elif [[ "\${{ contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
+            result="cancelled"
+          else
+            result="success"
+          fi
+          echo "result=$result" >> $GITHUB_OUTPUT
+
+      - name: Conclude Check
+        uses: ./.github/actions/conclude-check
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          conclusion: \${{ steps.needs-result.outputs.result }}
+          check-id: \${{ needs.update.outputs.check-id }}
+
+  post-release:
+    name: Post Release
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    needs: release
+    if: needs.release.outputs.releases
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Comment Text
+        uses: actions/github-script@v6
+        id: comment-text
+        env:
+          RELEASES: \${{ needs.release.outputs.releases }}
+        with:
+          result-encoding: string
+          script: |
+            const releases = JSON.parse(process.env.RELEASES)
+            const { runId, repo: { owner, repo } } = context
+            const issue_number = releases[0].prNumber
+
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
+              .then(comments => comments.map(c => ({ id: c.id, login: c.user.login, body: c.body })))
+
+            console.log(\`comments: \${JSON.stringify(comments, null, 2)}\`)
+
+            const releasePleaseComments = comments.filter(c =>
+              c.login === 'github-actions[bot]' &&
+              c.body.startsWith(':robot: Release is at ')
+            )
+
+            console.log(\`release please comments: \${JSON.stringify(releasePleaseComments, null, 2)}\`)
+
+            for (const comment of releasePleaseComments) {
+              await github.rest.issues.deleteComment({ owner, repo, comment_id: comment.id })
+            }
+
+            let body = '## Release Workflow/n/n'
+            for (const { pkgName, version, url } of releases) {
+              body += \`- /\`\${pkgName}@\${version}/\` \${url}/n\`
+            }
+            body += \`- Workflow run: :arrows_counterclockwise: https://github.com/\${owner}/\${repo}/actions/runs/\${runId}\`
+            return body
+
+      - name: Create Release PR Comment
+        if: steps.comment-text.outputs.result
+        uses: ./.github/actions/upsert-comment
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          body: \${{ steps.comment-text.outputs.result }}
+          number: \${{ fromJson(needs.release.outputs.release).prNumber }}
+          includes: \${{ github.run_id }}
+
+  release-integration:
+    name: Post Release - Integration
+    needs: release
+    if: needs.release.outputs.release
+    uses: ./.github/workflows/release-integration.yml
+    with:
+      release: needs.release.outputs.release
+      releases: needs.release.outputs.releases
+
+  post-release-integration:
+    name: Post Release - Post Integration
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    needs: [ release, release-integration ]
+    if: needs.release.outputs.release && (success() || failure())
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Get Needs Result
         id: needs-result
         run: |
@@ -4143,42 +4903,39 @@ jobs:
             result="white_check_mark"
           fi
           echo "result=$result" >> $GITHUB_OUTPUT
-      - name: Update Release PR Comment
+
+      - name: Comment Text
         uses: actions/github-script@v6
+        id: comment-text
         env:
           PR_NUMBER: \${{ fromJSON(needs.release.outputs.release).prNumber }}
+          REF_NAME: \${{ github.ref_name }}
           RESULT: \${{ steps.needs-result.outputs.result }}
         with:
           script: |
-            const { PR_NUMBER: issue_number, RESULT } = process.env
-            const { runId, repo: { owner, repo } } = context
-
-            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
-            const updateComment = comments.find(c =>
-              c.user.login === 'github-actions[bot]' &&
-              c.body.startsWith('## Release Workflow/n/n') &&
-              c.body.includes(runId)
-            )
-
-            if (updateComment) {
-              console.log('Found comment to update:', JSON.stringify(updateComment, null, 2))
-              let body = updateComment.body.replace(/Workflow run: :[a-z_]+:/, \`Workflow run: :\${RESULT}:\`)
-              const tagCodeowner = RESULT !== 'white_check_mark'
-              if (tagCodeowner) {
-                body += \`/n/n:rotating_light:\`
-                body += \` @npm/cli-team: The post-release workflow failed for this release.\`
-                body += \` Manual steps may need to be taken after examining the workflow output\`
-                body += \` from the above workflow run. :rotating_light:\`
-              }
-              await github.rest.issues.updateComment({
-                owner,
-                repo,
-                body,
-                comment_id: updateComment.id,
-              })
-            } else {
-              console.log('No matching comments found:', JSON.stringify(comments, null, 2))
+            const { RESULT, PR_NUMBER, REF_NAME } = process.env
+            const tagCodeowner = RESULT !== 'white_check_mark'
+            if (tagCodeowner) {
+              let body = ''
+              body += \`/n/n:rotating_light:\`
+              body += \` @npm/cli-team: The post-release workflow failed for this release.\`
+              body += \` Manual steps may need to be taken after examining the workflow output\`
+              body += \` from the above workflow run. :rotating_light:\`
+              body += \`/n/nTo rerun the workflow run the following command:/n/n\`
+              body += \`/\`/\`/\`/ngh workflow run release.yml -r \${REF_NAME} -R \${owner}/\${repo} -f release-pr=\${PR_NUMBER}/n/\`/\`/\`\`
+              return body
             }
+
+      - name: Update Release PR Comment
+        uses: ./.github/actions/upsert-comment
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          body: "## Release Workflow"
+          find: "Workflow run: :[a-z_]+:"
+          replace: "Workflow run :\${{ steps.needs-result.outputs.result }}:"
+          append: \${{ steps.comment-text.outputs.result }}
+          number: \${{ fromJson(needs.release.outputs.release).prNumber }}
+          includes: \${{ github.run_id }}
 
 .release-please-manifest.json
 ========================================
@@ -4197,6 +4954,9 @@ package.json
   },
   "name": "testpkg",
   "version": "1.0.0",
+  "devDependencies": {
+    "@npmcli/template-oss": "{{VERSION}}"
+  },
   "workspaces": [
     "workspaces/a",
     "workspaces/b"
@@ -4293,6 +5053,9 @@ workspaces/a/package.json
 {
   "name": "a",
   "version": "1.0.0",
+  "devDependencies": {
+    "@npmcli/template-oss": "{{VERSION}}"
+  },
   "scripts": {
     "lint": "eslint /"**/*.js/"",
     "postlint": "template-oss-check",
@@ -4310,15 +5073,15 @@ workspaces/a/package.json
   "engines": {
     "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
   },
-  "templateOSS": {
-    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
-    "version": "{{VERSION}}"
-  },
   "tap": {
     "nyc-arg": [
       "--exclude",
       "tap-snapshots/**"
     ]
+  },
+  "templateOSS": {
+    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
+    "version": "{{VERSION}}"
   }
 }
 
@@ -4371,6 +5134,9 @@ workspaces/b/package.json
 {
   "name": "b",
   "version": "1.0.0",
+  "devDependencies": {
+    "@npmcli/template-oss": "{{VERSION}}"
+  },
   "scripts": {
     "lint": "eslint /"**/*.js/"",
     "postlint": "template-oss-check",
@@ -4388,15 +5154,15 @@ workspaces/b/package.json
   "engines": {
     "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
   },
-  "templateOSS": {
-    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
-    "version": "{{VERSION}}"
-  },
   "tap": {
     "nyc-arg": [
       "--exclude",
       "tap-snapshots/**"
     ]
+  },
+  "templateOSS": {
+    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
+    "version": "{{VERSION}}"
   }
 }
 `
@@ -4420,6 +5186,9 @@ package.json
   },
   "name": "testpkg",
   "version": "1.0.0",
+  "devDependencies": {
+    "@npmcli/template-oss": "{{VERSION}}"
+  },
   "workspaces": [
     "workspaces/a"
   ]
@@ -4433,6 +5202,9 @@ workspaces/a/package.json
     "version": "{{VERSION}}"
   },
   "name": "a",
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "devDependencies": {
+    "@npmcli/template-oss": "{{VERSION}}"
+  }
 }
 `

@@ -1,0 +1,13 @@
+name: 'Get Workspaces'
+
+inputs:
+  files:
+    description: 'files'
+
+outputs:
+  flags:
+    description: 'workspace flags'
+
+runs:
+  using: 'node16'
+  main: 'index.js'
