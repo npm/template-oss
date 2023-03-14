@@ -42,7 +42,7 @@
     "@npmcli/package-json": "^3.0.0",
     "@octokit/rest": "^19.0.4",
     "diff": "^5.0.0",
-    "glob": "^8.0.1",
+    "glob": "^9.3.0",
     "handlebars": "^4.7.7",
     "hosted-git-info": "^6.0.0",
     "ini": "^3.0.1",
