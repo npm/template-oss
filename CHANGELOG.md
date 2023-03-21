@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.12.1](https://github.com/npm/template-oss/compare/v4.12.0...v4.12.1) (2023-03-21)
+
+### Dependencies
+
+* [`07bec3b`](https://github.com/npm/template-oss/commit/07bec3b404af1ae329f284985edfa2f363668c4e) [#293](https://github.com/npm/template-oss/pull/293) bump glob from 8.1.0 to 9.3.1 (#293)
+* [`fb95639`](https://github.com/npm/template-oss/commit/fb956392cfcdf0cc3679ce7cb3911e00f058adcc) [#290](https://github.com/npm/template-oss/pull/290) bump just-diff from 5.2.0 to 6.0.0 (#290)
+
 ## [4.12.0](https://github.com/npm/template-oss/compare/v4.11.4...v4.12.0) (2023-02-13)
 
 ### Features
