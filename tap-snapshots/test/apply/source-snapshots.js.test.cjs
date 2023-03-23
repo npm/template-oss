@@ -925,7 +925,7 @@ jobs:
           RELEASE_COMMENT_ID: \${{ needs.release.outputs.comment-id }}
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm exec --offline -- template-oss-release-manager --lockfile=false
+          npm exec --offline -- template-oss-release-manager --lockfile=false --publish=false
           npm run rp-pull-request --ignore-scripts --if-present
       - name: Commit
         id: commit
@@ -2510,7 +2510,7 @@ jobs:
           RELEASE_COMMENT_ID: \${{ needs.release.outputs.comment-id }}
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm exec --offline -- template-oss-release-manager --lockfile=false
+          npm exec --offline -- template-oss-release-manager --lockfile=false --publish=false
           npm run rp-pull-request --ignore-scripts -ws -iwr --if-present
       - name: Commit
         id: commit
@@ -3938,7 +3938,7 @@ jobs:
           RELEASE_COMMENT_ID: \${{ needs.release.outputs.comment-id }}
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm exec --offline -- template-oss-release-manager --lockfile=false
+          npm exec --offline -- template-oss-release-manager --lockfile=false --publish=false
           npm run rp-pull-request --ignore-scripts -ws -iwr --if-present
       - name: Commit
         id: commit

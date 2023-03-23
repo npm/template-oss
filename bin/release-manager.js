@@ -16,17 +16,7 @@ const args = process.argv.slice(2).reduce((acc, a) => {
   return acc
 }, {})
 
-/* eslint-disable max-len */
-const DEFAULT_RELEASE_PROCESS = `
-1. Checkout the release branch and test
-
-    \`\`\`sh
-    gh pr checkout <PR-NUMBER> --force
-    npm ${args.lockfile ? 'ci' : 'update'}
-    npm test
-    gh pr checks --watch
-    \`\`\`
-
+const PUBLISH_STEPS = `
 1. Publish workspaces
 
     \`\`\`sh
@@ -38,8 +28,22 @@ const DEFAULT_RELEASE_PROCESS = `
     \`\`\`sh
     npm publish <PUBLISH-FLAGS>
     \`\`\`
+`
 
-1. Merge release PR
+/* eslint-disable max-len */
+const DEFAULT_RELEASE_PROCESS = `
+1. Checkout the release branch and test
+
+    \`\`\`sh
+    gh pr checkout <PR-NUMBER> --force
+    npm ${args.lockfile ? 'ci' : 'update'}
+    npm test
+    gh pr checks --watch
+    \`\`\`
+
+${!args.publish ? PUBLISH_STEPS : ''}
+
+1. Merge release PR ${args.publish ? `:rotating_light: Merging this will auto publish :rotating_light:` : ''}
 
     \`\`\`sh
     gh pr merge --rebase

@@ -76,7 +76,8 @@
     "test-ignore": "^(workspace/test-workspace)/"
   },
   "templateOSS": {
-    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten."
+    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
+    "publish": true
   },
   "engines": {
     "node": "^14.17.0 || ^16.13.0 || >=18.0.0"

@@ -85,7 +85,7 @@ jobs:
           RELEASE_COMMENT_ID: $\{{ needs.release.outputs.comment-id }}
           GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}
         run: |
-          {{ rootNpmPath }} exec --offline -- template-oss-release-manager --lockfile={{ lockfile }}
+          {{ rootNpmPath }} exec --offline -- template-oss-release-manager --lockfile={{ lockfile }} --publish={{ publish }}
           {{ rootNpmPath }} run rp-pull-request --ignore-scripts {{~#if allFlags}} {{ allFlags }}{{else}} --if-present{{/if}}
       - name: Commit
         id: commit
