@@ -16,7 +16,17 @@ const args = process.argv.slice(2).reduce((acc, a) => {
   return acc
 }, {})
 
-const PUBLISH_STEPS = `
+/* eslint-disable max-len */
+const MANUAL_PUBLISH_STEPS = `
+1. Checkout the release branch and test
+
+    \`\`\`sh
+    gh pr checkout <PR-NUMBER> --force
+    npm ${args.lockfile ? 'ci' : 'update'}
+    npm test
+    gh pr checks <PR-NUMBER> -R {NWO} --watch
+    \`\`\`
+
 1. Publish workspaces
 
     \`\`\`sh
@@ -28,30 +38,26 @@ const PUBLISH_STEPS = `
     \`\`\`sh
     npm publish <PUBLISH-FLAGS>
     \`\`\`
-`
 
-/* eslint-disable max-len */
-const DEFAULT_RELEASE_PROCESS = `
-1. Checkout the release branch and test
+1. Merge release PR
 
     \`\`\`sh
-    gh pr checkout <PR-NUMBER> --force
-    npm ${args.lockfile ? 'ci' : 'update'}
-    npm test
-    gh pr checks --watch
-    \`\`\`
-
-${!args.publish ? PUBLISH_STEPS : ''}
-
-1. Merge release PR ${args.publish ? `:rotating_light: Merging this will auto publish :rotating_light:` : ''}
-
-    \`\`\`sh
-    gh pr merge --rebase
+    gh pr merge <PR-NUMBER> -R {NWO} --rebase
     git checkout <BASE-BRANCH>
     git fetch
     git reset --hard origin/<BASE-BRANCH>
     \`\`\`
+`
 
+const AUTO_PUBLISH_STEPS = `
+1. Merge release PR :rotating_light: Merging this will auto publish :rotating_light:
+
+    \`\`\`sh
+    gh pr merge <PR-NUMBER> -R {NWO} --rebase
+    \`\`\`
+`
+
+const DEFAULT_RELEASE_PROCESS = (args.publish ? AUTO_PUBLISH_STEPS : MANUAL_PUBLISH_STEPS) + `
 1. Check For Release Tags
 
     Release Please will run on the just pushed release commit and create GitHub releases and tags for each package.
@@ -59,7 +65,8 @@ ${!args.publish ? PUBLISH_STEPS : ''}
     \`\`\`
     gh run watch \`gh run list -R {NWO} -w release -b <BASE-BRANCH> -L 1 --json databaseId -q ".[0].databaseId"\`
     \`\`\`
-` /* eslint-enable max-len */
+`
+/* eslint-enable max-len */
 
 const getReleaseProcess = async ({ owner, repo }) => {
   const RELEASE_LIST_ITEM = /^\d+\.\s/gm
