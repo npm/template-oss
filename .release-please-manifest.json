@@ -1,6 +1,3 @@
 {
-  ".": "4.11.4",
-  "workspaces/config": "1.0.0",
-  "workspaces/get-workspaces": "1.0.0",
-  "workspaces/release-manager": "1.0.0"
+  ".": "4.11.4"
 }

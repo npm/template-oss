@@ -1,4 +1,4 @@
-const { parsers } = require('@npmcli/template-oss-rules/lib/rules/files')
+const { Parsers } = require('@npmcli/template-oss-rules/lib/rules/files')
 const { data, postData } = require('./data.js')
 
 const isPublic = (o) => o.pkg.isPublic
@@ -14,13 +14,12 @@ const filesOptions = {
   parser: {
     matches: {
       // '.github/workflows/*.yml': parsers.WorkflowYml,
-      '*release-please-*.json': class ReleasePleaseConfig extends parsers.JsonMerge {
+      '*release-please-*.json': class ReleasePleaseConfig extends Parsers.JsonMerge {
         clean = true
         comment = null
       },
-      '.github/actions/*/index.js': parsers.Esbuild,
+      '.github/actions/*/index.js': Parsers.Esbuild,
     },
-    options: {},
   },
   files: {
     add: {
@@ -119,17 +118,17 @@ const filesOptions = {
     },
   },
   workspace: {
-    rootFiles: {
-      rm: [
-        // These are the old release please and ci files that should be removed now
-        '.github/workflows/release-please{$ pkg.nameFs $}.yml',
-        '.github/workflows/ci{$ pkg.nameFs $}.yml',
-      ],
-    },
     files: {
       rm: [
         '.npmrc',
         'SECURITY.md',
+      ],
+    },
+    rootFiles: {
+      rm: [
+        // These are the old release please and ci files that should be removed now
+        '.github/workflows/release-please{$ pkg.nameFs $}.yml',
+        '.github/workflows/ci-{$ pkg.nameFs $}.yml',
       ],
     },
   },

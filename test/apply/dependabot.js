@@ -18,11 +18,17 @@ const allCases = {
   'workspace only': [{
     package: {
       templateOSS: {
-        rootRepo: false,
+        rules: {
+          '@npmcli/template-oss-rules/lib/rules/files': {
+            options: {
+              rootFiles: false,
+            },
+          },
+        },
       },
     },
     workspaces: { a: 'a', b: 'b', c: 'c' },
-  }, (t, { dependabot }) => {
+  }, async (t, { dependabot }) => {
     t.notMatch(dependabot, /directory: \//)
     t.match(dependabot, 'directory: workspaces/a/')
     t.match(dependabot, 'directory: workspaces/b/')

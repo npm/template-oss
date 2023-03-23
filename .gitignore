@@ -33,10 +33,3 @@
 !/workspaces/release-manager/
 !/workspaces/release-please/
 !/workspaces/rules/
-!/workspaces/
-/workspaces/*
-!/workspaces/config/
-!/workspaces/get-workspaces/
-!/workspaces/release-manager/
-!/workspaces/release-please/
-!/workspaces/rules/

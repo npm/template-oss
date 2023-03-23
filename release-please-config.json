@@ -34,9 +34,6 @@
   "packages": {
     ".": {
       "package-name": ""
-    },
-    "workspaces/config": {},
-    "workspaces/get-workspaces": {},
-    "workspaces/release-manager": {}
+    }
   }
 }

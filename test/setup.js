@@ -1,6 +1,7 @@
 const t = require('tap')
+const { inspect } = require('util')
 const { join, resolve, posix } = require('path')
-const { merge, defaults, escapeRegExp: esc } = require('lodash')
+const { merge, defaults, escapeRegExp: esc, has: hasOwn } = require('lodash')
 const fs = require('fs/promises')
 const Git = require('@npmcli/git')
 const localeCompare = require('@isaacs/string-locale-compare')('en')
@@ -8,7 +9,8 @@ const npa = require('npm-package-arg')
 const { output } = require('../lib/cli.js')
 const run = require('../lib/index.js')
 const { defaultConfig: DEFAULT_CONTENT, name: NAME, version: VERSION } = require('../lib/constants')
-const { requiredPackages } = require(DEFAULT_CONTENT)
+const requiredPackages = require(DEFAULT_CONTENT)
+  .rules['@npmcli/template-oss-rules/lib/rules/required-packages'].options
 
 const apply = (root) => run(root, { command: 'apply' })
 const check = (root) => run(root, { command: 'check' })
@@ -114,7 +116,28 @@ const setup = async (t, {
   testdir = {},
   ok,
   requireSelf = true,
+  debug = false,
 } = {}) => {
+  if (debug) {
+    const logger = (...args) => {
+      let hasOpts = false
+      const last = args[args.length - 1]
+      const inspectOpts = ['depth', 'colors'].reduce((acc, key) => {
+        if (hasOwn(last, key)) {
+          hasOpts = true
+          acc[key] = last[key]
+        }
+        return acc
+      }, { depth: 1, colors: true })
+      if (hasOpts) {
+        args.pop()
+      }
+      console.error(...args.map(a => inspect(a, inspectOpts)))
+    }
+    process.on('log', logger)
+    t.teardown(() => process.off('log', logger))
+  }
+
   const mergePkg = (name, defName) => merge(
     {},
     pkgWithName(name, defName),

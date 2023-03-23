@@ -58,36 +58,30 @@ const localCmdPath = (key, data, { pkg }) => {
 }
 
 const postData = (data, options) => {
+  const parentData = [options.pkg.isRoot ? null : options.rootPkg.data, defaults].filter(Boolean)
+
   const values = {}
 
-  const localNpm = localCmdPath('npm', data, options)
-  const localNpx = localCmdPath('npx', data, options)
-
   // whether to install and update npm in ci, only do this if we aren't using a custom path to bin
-  values.updateNpm = !localNpm
+  const localNpm = localCmdPath('npm', data, options)
+  Object.assign(values, {
+    updateNpm: !localNpm,
+    rootNpmPath: localNpm?.root ?? defaults.npm,
+    pkgNpmPath: localNpm?.pkg ?? defaults.npm,
+  })
 
-  if (localNpm) {
-    values.rootNpmPath = localNpm.root
-    values.pkgNpmPath = localNpm.pkg
-  } else {
-    values.rootNpmPath = defaults.npm
-    values.pkgNpmPath = defaults.npm
-  }
-
-  if (localNpx) {
-    values.rootNpxPath = localNpx.root
-    values.pkgNpxPath = localNpx.pkg
-  } else {
-    values.rootNpxPath = defaults.npx
-    values.pkgNpxPath = defaults.npx
-  }
+  const localNpx = localCmdPath('npx', data, options)
+  Object.assign(values, {
+    rootNpxPath: localNpx?.root ?? defaults.npx,
+    pkgNpxPath: localNpx?.pkg ?? defaults.npx,
+  })
 
   let ciVersions = data.ciVersions
   let ciEngines = null
 
   if (ciVersions) {
     if (ciVersions === 'latest') {
-      const defaultVersions = [options.rootData, defaults].find(c => Array.isArray(c.ciVersions))
+      const defaultVersions = parentData.find(c => Array.isArray(c.ciVersions))
       if (defaultVersions) {
         ciVersions = defaultVersions.ciVersions.slice(-1)
       }

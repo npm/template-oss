@@ -1,5 +1,5 @@
 const { join, isAbsolute } = require('path')
-const { defaultsDeep, pick, omit, partition } = require('lodash')
+const { defaultsDeep, pick, omit, partition, merge } = require('lodash')
 const deepMapValues = require('just-deep-map-values')
 const localeCompare = require('@isaacs/string-locale-compare')('en')
 const fs = require('fs/promises')
@@ -12,6 +12,8 @@ const util = require('./util')
 const FILE_KEYS = ['files', 'rootFiles']
 const ADD = 'add'
 const REMOVE = 'rm'
+const FILE_TYPE_KEYS = [ADD, REMOVE]
+const EMPTY_FILES = () => ({ [ADD]: {}, [REMOVE]: {} })
 const solution = 'npx template-oss-apply --force'
 
 const applyFiles = async (fileOptions, options) => {
@@ -97,35 +99,61 @@ const resolveFile = (file, baseDir = '') => {
 }
 
 const filesConfig = (ruleOptions, baseDir) => {
-  const normalizeFiles = (o) => pick(deepMapValues(o, (value, key) => {
-    if (key === REMOVE && Array.isArray(value)) {
-      return value.reduce((acc, k) => {
-        acc[k] = true
-        return acc
-      }, {})
+  const normalizedFiles = deepMapValues(pick(ruleOptions, FILE_KEYS), (value, key) => {
+    if (FILE_TYPE_KEYS.includes(key)) {
+      if (key === REMOVE && Array.isArray(value)) {
+        return value.reduce((acc, k) => {
+          acc[k] = true
+          return acc
+        }, {})
+      }
+      if (value === true) {
+        return {}
+      }
+      if (value === false || value === null) {
+        return false
+      }
+    }
+    if (FILE_KEYS.includes(key)) {
+      if (value === true) {
+        return EMPTY_FILES()
+      }
+      if (value === false || value === null) {
+        return false
+      }
     }
     if (typeof value === 'string') {
       const file = resolveFile(value, baseDir)
       return key === 'file' ? file : { file }
     }
-    if (value === true && FILE_KEYS.includes(key)) {
-      return { [ADD]: {}, [REMOVE]: {} }
-    }
-    if (value === true && (key === ADD || key === REMOVE)) {
-      return {}
-    }
     return value
-  }), FILE_KEYS)
-
-  const defaultFiles = FILE_KEYS.reduce((acc, k) => {
-    acc[k] = { [ADD]: {}, [REMOVE]: {} }
-    return acc
-  }, {})
+  })
 
   return {
     ...omit(ruleOptions, FILE_KEYS),
-    ...defaultsDeep(normalizeFiles(ruleOptions), defaultFiles),
+    ...normalizedFiles,
   }
+}
+
+const filesMerge = (...fileConfigs) => {
+  const merged = deepMapValues(merge({}, ...fileConfigs), (value, key) => {
+    if (value === false) {
+      if (FILE_TYPE_KEYS.includes(key)) {
+        return {}
+      }
+      if (FILE_KEYS.includes(key)) {
+        return EMPTY_FILES()
+      }
+    }
+    return value
+  })
+
+  const defaultFiles = FILE_KEYS.reduce((acc, k) => {
+    acc[k] = EMPTY_FILES()
+    return acc
+  }, {})
+
+  return defaultsDeep(merged, defaultFiles)
 }
 
 const filesData = (rule, options) => {
@@ -159,34 +187,36 @@ const filesData = (rule, options) => {
 
 module.exports = {
   name: 'files',
-  apply: [{
-    name: 'root',
-    when: ({ options }) => options.needsUpdate,
-    run: (o) => applyFiles({
-      dir: o.rootPkg.path,
-      files: o.rule.rootFiles,
-    }, o),
-  }, {
-    name: 'module',
-    when: ({ options }) => options.needsUpdate,
-    run: (o) => applyFiles({
-      dir: o.pkg.path,
-      files: o.rule.files,
-    }, o),
-  }],
-  check: [{
-    name: 'root',
-    run: (o) => checkFiles({
-      dir: o.rootPkg.path,
-      files: o.rule.rootFiles,
-    }, o),
-  }, {
-    name: 'module',
-    run: (o) => checkFiles({
-      dir: o.pkg.path,
-      files: o.rule.files,
-    }, o),
-  }],
+  commands: {
+    apply: [{
+      name: 'root',
+      when: ({ options }) => options.needsUpdate,
+      run: (o) => applyFiles({
+        dir: o.rootPkg.path,
+        files: o.rule.rootFiles,
+      }, o),
+    }, {
+      name: 'module',
+      when: (o) => o.needsUpdate(o.pkg),
+      run: (o) => applyFiles({
+        dir: o.pkg.path,
+        files: o.rule.files,
+      }, o),
+    }],
+    check: [{
+      name: 'root',
+      run: (o) => checkFiles({
+        dir: o.rootPkg.path,
+        files: o.rule.rootFiles,
+      }, o),
+    }, {
+      name: 'module',
+      run: (o) => checkFiles({
+        dir: o.pkg.path,
+        files: o.rule.files,
+      }, o),
+    }],
+  },
   data: {
     values: filesData,
     options: {
@@ -194,9 +224,10 @@ module.exports = {
     },
   },
   config: filesConfig,
-  parsers: {
+  merge: filesMerge,
+  Parsers: {
     ...parsers,
     Base,
   },
-  util,
+  Util: util,
 }
