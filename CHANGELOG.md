@@ -1,5 +1,19 @@
 # Changelog
 
+## [4.13.0](https://github.com/npm/template-oss/compare/v4.12.1...v4.13.0) (2023-03-23)
+
+### Features
+
+* [`7102893`](https://github.com/npm/template-oss/commit/7102893c56e12edff3b236379e13cf11d3e4dca7) [#296](https://github.com/npm/template-oss/pull/296) add autopublish (#296) (@lukekarrys)
+
+### Bug Fixes
+
+* [`9a21a17`](https://github.com/npm/template-oss/commit/9a21a17f565588706d8073f7e14c29cf0d65f18b) [#297](https://github.com/npm/template-oss/pull/297) only show test step for manual publish (#297) (@lukekarrys)
+
+### Dependencies
+
+* [`f92b1ca`](https://github.com/npm/template-oss/commit/f92b1ca2bfc29dfc8c7144dce4bf1d1ae8dd8262) [#294](https://github.com/npm/template-oss/pull/294) bump ini from 3.0.1 to 4.0.0 (#294)
+
 ## [4.12.1](https://github.com/npm/template-oss/compare/v4.12.0...v4.12.1) (2023-03-21)
 
 ### Dependencies
