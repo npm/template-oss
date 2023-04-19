@@ -1,5 +1,15 @@
 # Changelog
 
+## [4.14.0](https://github.com/npm/template-oss/compare/v4.13.0...v4.14.0) (2023-04-19)
+
+### Features
+
+* [`31ce960`](https://github.com/npm/template-oss/commit/31ce960dd269d0560fe9496b287efd1bbe4f01aa) [#302](https://github.com/npm/template-oss/pull/302) publish with provenance (#302) (@wraithgar)
+
+### Dependencies
+
+* [`d17e7d9`](https://github.com/npm/template-oss/commit/d17e7d9b7593f6a97038c8b01c35cf9b3fae9497) [#300](https://github.com/npm/template-oss/pull/300) bump glob from 9.3.5 to 10.1.0 (#300)
+
 ## [4.13.0](https://github.com/npm/template-oss/compare/v4.12.1...v4.13.0) (2023-03-23)
 
 ### Features
