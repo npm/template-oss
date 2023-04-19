@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.14.1](https://github.com/npm/template-oss/compare/v4.14.0...v4.14.1) (2023-04-19)
+
+### Bug Fixes
+
+* [`f8976ca`](https://github.com/npm/template-oss/commit/f8976ca3a18ff6924c656cd486c9691f613d833f) [#303](https://github.com/npm/template-oss/pull/303) add id-token access to publish action (#303) (@wraithgar)
+
 ## [4.14.0](https://github.com/npm/template-oss/compare/v4.13.0...v4.14.0) (2023-04-19)
 
 ### Features
