@@ -34,7 +34,7 @@
       return { summary }
 {{/if}}
 - name: {{#if jobCheck.sha}}Create{{else}}Conclude{{/if}} Check
-  uses: LouisBrunner/checks-action@v1.3.1
+  uses: LouisBrunner/checks-action@v1.6.0
   {{#if jobCheck.sha}}
   id: check
   if: {{ jobCheck.sha }}

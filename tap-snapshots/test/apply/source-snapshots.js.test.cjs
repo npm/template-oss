@@ -270,7 +270,7 @@ jobs:
 
             return { summary }
       - name: Create Check
-        uses: LouisBrunner/checks-action@v1.3.1
+        uses: LouisBrunner/checks-action@v1.6.0
         id: check
         if: inputs.check-sha
         with:
@@ -302,7 +302,7 @@ jobs:
       - name: Post Lint
         run: npm run postlint --ignore-scripts
       - name: Conclude Check
-        uses: LouisBrunner/checks-action@v1.3.1
+        uses: LouisBrunner/checks-action@v1.6.0
         if: steps.check.outputs.check_id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
@@ -371,7 +371,7 @@ jobs:
 
             return { summary }
       - name: Create Check
-        uses: LouisBrunner/checks-action@v1.3.1
+        uses: LouisBrunner/checks-action@v1.6.0
         id: check
         if: inputs.check-sha
         with:
@@ -417,7 +417,7 @@ jobs:
       - name: Test
         run: npm test --ignore-scripts
       - name: Conclude Check
-        uses: LouisBrunner/checks-action@v1.3.1
+        uses: LouisBrunner/checks-action@v1.6.0
         if: steps.check.outputs.check_id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
@@ -878,7 +878,7 @@ jobs:
 
             return { summary }
       - name: Create Check
-        uses: LouisBrunner/checks-action@v1.3.1
+        uses: LouisBrunner/checks-action@v1.6.0
         id: check
         if: steps.release.outputs.pr-sha
         with:
@@ -969,7 +969,7 @@ jobs:
 
             return { summary }
       - name: Create Check
-        uses: LouisBrunner/checks-action@v1.3.1
+        uses: LouisBrunner/checks-action@v1.6.0
         id: check
         if: steps.commit.outputs.sha
         with:
@@ -979,7 +979,7 @@ jobs:
           sha: \${{ steps.commit.outputs.sha }}
           output: \${{ steps.check-output.outputs.result }}
       - name: Conclude Check
-        uses: LouisBrunner/checks-action@v1.3.1
+        uses: LouisBrunner/checks-action@v1.6.0
         if: needs.release.outputs.check-id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
@@ -1017,7 +1017,7 @@ jobs:
           fi
           echo "result=$result" >> $GITHUB_OUTPUT
       - name: Conclude Check
-        uses: LouisBrunner/checks-action@v1.3.1
+        uses: LouisBrunner/checks-action@v1.6.0
         if: needs.update.outputs.check-id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
@@ -1849,7 +1849,7 @@ jobs:
 
             return { summary }
       - name: Create Check
-        uses: LouisBrunner/checks-action@v1.3.1
+        uses: LouisBrunner/checks-action@v1.6.0
         id: check
         if: inputs.check-sha
         with:
@@ -1881,7 +1881,7 @@ jobs:
       - name: Post Lint
         run: npm run postlint --ignore-scripts -ws -iwr --if-present
       - name: Conclude Check
-        uses: LouisBrunner/checks-action@v1.3.1
+        uses: LouisBrunner/checks-action@v1.6.0
         if: steps.check.outputs.check_id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
@@ -1950,7 +1950,7 @@ jobs:
 
             return { summary }
       - name: Create Check
-        uses: LouisBrunner/checks-action@v1.3.1
+        uses: LouisBrunner/checks-action@v1.6.0
         id: check
         if: inputs.check-sha
         with:
@@ -1996,7 +1996,7 @@ jobs:
       - name: Test
         run: npm test --ignore-scripts -ws -iwr --if-present
       - name: Conclude Check
-        uses: LouisBrunner/checks-action@v1.3.1
+        uses: LouisBrunner/checks-action@v1.6.0
         if: steps.check.outputs.check_id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
@@ -2463,7 +2463,7 @@ jobs:
 
             return { summary }
       - name: Create Check
-        uses: LouisBrunner/checks-action@v1.3.1
+        uses: LouisBrunner/checks-action@v1.6.0
         id: check
         if: steps.release.outputs.pr-sha
         with:
@@ -2554,7 +2554,7 @@ jobs:
 
             return { summary }
       - name: Create Check
-        uses: LouisBrunner/checks-action@v1.3.1
+        uses: LouisBrunner/checks-action@v1.6.0
         id: check
         if: steps.commit.outputs.sha
         with:
@@ -2564,7 +2564,7 @@ jobs:
           sha: \${{ steps.commit.outputs.sha }}
           output: \${{ steps.check-output.outputs.result }}
       - name: Conclude Check
-        uses: LouisBrunner/checks-action@v1.3.1
+        uses: LouisBrunner/checks-action@v1.6.0
         if: needs.release.outputs.check-id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
@@ -2602,7 +2602,7 @@ jobs:
           fi
           echo "result=$result" >> $GITHUB_OUTPUT
       - name: Conclude Check
-        uses: LouisBrunner/checks-action@v1.3.1
+        uses: LouisBrunner/checks-action@v1.6.0
         if: needs.update.outputs.check-id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
@@ -3434,7 +3434,7 @@ jobs:
 
             return { summary }
       - name: Create Check
-        uses: LouisBrunner/checks-action@v1.3.1
+        uses: LouisBrunner/checks-action@v1.6.0
         id: check
         if: inputs.check-sha
         with:
@@ -3466,7 +3466,7 @@ jobs:
       - name: Post Lint
         run: npm run postlint --ignore-scripts -ws -iwr --if-present
       - name: Conclude Check
-        uses: LouisBrunner/checks-action@v1.3.1
+        uses: LouisBrunner/checks-action@v1.6.0
         if: steps.check.outputs.check_id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
@@ -3535,7 +3535,7 @@ jobs:
 
             return { summary }
       - name: Create Check
-        uses: LouisBrunner/checks-action@v1.3.1
+        uses: LouisBrunner/checks-action@v1.6.0
         id: check
         if: inputs.check-sha
         with:
@@ -3581,7 +3581,7 @@ jobs:
       - name: Test
         run: npm test --ignore-scripts -ws -iwr --if-present
       - name: Conclude Check
-        uses: LouisBrunner/checks-action@v1.3.1
+        uses: LouisBrunner/checks-action@v1.6.0
         if: steps.check.outputs.check_id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
@@ -3891,7 +3891,7 @@ jobs:
 
             return { summary }
       - name: Create Check
-        uses: LouisBrunner/checks-action@v1.3.1
+        uses: LouisBrunner/checks-action@v1.6.0
         id: check
         if: steps.release.outputs.pr-sha
         with:
@@ -3982,7 +3982,7 @@ jobs:
 
             return { summary }
       - name: Create Check
-        uses: LouisBrunner/checks-action@v1.3.1
+        uses: LouisBrunner/checks-action@v1.6.0
         id: check
         if: steps.commit.outputs.sha
         with:
@@ -3992,7 +3992,7 @@ jobs:
           sha: \${{ steps.commit.outputs.sha }}
           output: \${{ steps.check-output.outputs.result }}
       - name: Conclude Check
-        uses: LouisBrunner/checks-action@v1.3.1
+        uses: LouisBrunner/checks-action@v1.6.0
         if: needs.release.outputs.check-id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
@@ -4030,7 +4030,7 @@ jobs:
           fi
           echo "result=$result" >> $GITHUB_OUTPUT
       - name: Conclude Check
-        uses: LouisBrunner/checks-action@v1.3.1
+        uses: LouisBrunner/checks-action@v1.6.0
         if: needs.update.outputs.check-id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
