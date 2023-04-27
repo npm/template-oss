@@ -63,7 +63,7 @@ const DEFAULT_RELEASE_PROCESS = (args.publish ? AUTO_PUBLISH_STEPS : MANUAL_PUBL
     Release Please will run on the just pushed release commit and create GitHub releases and tags for each package.
 
     \`\`\`
-    gh run watch $(gh run list -R {NWO} -w release -b <BASE-BRANCH> -L 1 --json databaseId -q ".[0].databaseId")
+    gh run watch -R {NWO} $(gh run list -R {NWO} -w release -b <BASE-BRANCH> -L 1 --json databaseId -q ".[0].databaseId")
     \`\`\`
 `
 /* eslint-enable max-len */
