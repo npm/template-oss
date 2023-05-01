@@ -747,8 +747,10 @@ jobs:
           npx --offline commitlint -V --from 'origin/\${{ github.base_ref }}' --to \${{ github.event.pull_request.head.sha }}
       - name: Run Commitlint on PR Title
         if: steps.commit.outcome == 'failure'
+        env:
+          PR_TITLE: \${{ github.event.pull_request.title }}
         run: |
-          echo '\${{ github.event.pull_request.title }}' | npx --offline commitlint -V
+          echo '$PR_TITLE' | npx --offline commitlint -V
 
 .github/workflows/release.yml
 ========================================
@@ -2332,8 +2334,10 @@ jobs:
           npx --offline commitlint -V --from 'origin/\${{ github.base_ref }}' --to \${{ github.event.pull_request.head.sha }}
       - name: Run Commitlint on PR Title
         if: steps.commit.outcome == 'failure'
+        env:
+          PR_TITLE: \${{ github.event.pull_request.title }}
         run: |
-          echo '\${{ github.event.pull_request.title }}' | npx --offline commitlint -V
+          echo '$PR_TITLE' | npx --offline commitlint -V
 
 .github/workflows/release.yml
 ========================================
@@ -3760,8 +3764,10 @@ jobs:
           npx --offline commitlint -V --from 'origin/\${{ github.base_ref }}' --to \${{ github.event.pull_request.head.sha }}
       - name: Run Commitlint on PR Title
         if: steps.commit.outcome == 'failure'
+        env:
+          PR_TITLE: \${{ github.event.pull_request.title }}
         run: |
-          echo '\${{ github.event.pull_request.title }}' | npx --offline commitlint -V
+          echo '$PR_TITLE' | npx --offline commitlint -V
 
 .github/workflows/release.yml
 ========================================
