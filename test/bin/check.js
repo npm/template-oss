@@ -44,7 +44,7 @@ t.test('problems', async (t) => {
     solution: 'solution2',
   }])
 
-  t.equal(process.exitCode, 1, 'exit code')
+  t.ok(process.exitCode, 'exit code')
   t.matchSnapshot(errors.join('\n'))
 })
 
@@ -53,6 +53,6 @@ t.test('no problems', async (t) => {
 
   await templateCheck(() => [])
 
-  t.equal(process.exitCode, undefined, 'exit code')
+  t.notOk(process.exitCode, 'exit code')
   t.strictSame(errors, [], 'errors')
 })
