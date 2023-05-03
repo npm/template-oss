@@ -35,6 +35,7 @@ The following repo files need to be added:
   .github/ISSUE_TEMPLATE/bug.yml
   .github/ISSUE_TEMPLATE/config.yml
   .github/matchers/tap.json
+  .github/settings.yml
   .github/workflows/audit.yml
   .github/workflows/ci-release.yml
   .github/workflows/ci.yml
@@ -282,6 +283,7 @@ The following repo files need to be added:
   .github/ISSUE_TEMPLATE/bug.yml
   .github/ISSUE_TEMPLATE/config.yml
   .github/matchers/tap.json
+  .github/settings.yml
   .github/workflows/audit.yml
   .github/workflows/ci-release.yml
   .github/workflows/ci.yml
@@ -365,6 +367,7 @@ The following repo files need to be added:
 
   .github/dependabot.yml
   .github/matchers/tap.json
+  .github/settings.yml
   .github/workflows/ci-name-aaaa.yml
   .github/workflows/ci-release.yml
   .github/workflows/post-dependabot.yml
@@ -436,6 +439,7 @@ The following repo files need to be added:
 
   .github/dependabot.yml
   .github/matchers/tap.json
+  .github/settings.yml
   .github/workflows/ci-bbb.yml
   .github/workflows/ci-release.yml
   .github/workflows/post-dependabot.yml

@@ -13,6 +13,7 @@ exports[`test/apply/files-snapshots.js TAP private workspace > expect resolving 
 .github/ISSUE_TEMPLATE/bug.yml
 .github/ISSUE_TEMPLATE/config.yml
 .github/matchers/tap.json
+.github/settings.yml
 .github/workflows/audit.yml
 .github/workflows/ci-a.yml
 .github/workflows/ci-b.yml
@@ -44,6 +45,7 @@ exports[`test/apply/files-snapshots.js TAP turn off add/rm types > expect resolv
 .github/ISSUE_TEMPLATE/bug.yml
 .github/ISSUE_TEMPLATE/config.yml
 .github/matchers/tap.json
+.github/settings.yml
 .github/workflows/audit.yml
 .github/workflows/ci-release.yml
 .github/workflows/ci.yml
@@ -63,6 +65,7 @@ exports[`test/apply/files-snapshots.js TAP turn off module > expect resolving Pr
 .github/ISSUE_TEMPLATE/bug.yml
 .github/ISSUE_TEMPLATE/config.yml
 .github/matchers/tap.json
+.github/settings.yml
 .github/workflows/audit.yml
 .github/workflows/ci-release.yml
 .github/workflows/ci.yml
@@ -95,6 +98,7 @@ exports[`test/apply/files-snapshots.js TAP turn off specific files > expect reso
 .github/ISSUE_TEMPLATE/bug.yml
 .github/ISSUE_TEMPLATE/config.yml
 .github/matchers/tap.json
+.github/settings.yml
 .github/workflows/audit.yml
 .github/workflows/ci-release.yml
 .github/workflows/ci.yml
@@ -115,6 +119,7 @@ SECURITY.md
 exports[`test/apply/files-snapshots.js TAP workspaces > expect resolving Promise 1`] = `
 .github/dependabot.yml
 .github/matchers/tap.json
+.github/settings.yml
 .github/workflows/ci-d.yml
 .github/workflows/ci-release.yml
 .github/workflows/post-dependabot.yml
@@ -138,6 +143,7 @@ workspaces/d/package.json
 exports[`test/apply/files-snapshots.js TAP workspaces only (like npm/cli) > expect resolving Promise 1`] = `
 .github/dependabot.yml
 .github/matchers/tap.json
+.github/settings.yml
 .github/workflows/ci-a.yml
 .github/workflows/ci-b.yml
 .github/workflows/ci-release.yml
