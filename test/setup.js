@@ -150,7 +150,7 @@ const setupGit = async (...args) => {
 
   const gca = async () => {
     await git('add -A .')
-    await git('commit -m "init"')
+    await git('commit --no-gpg-sign -m "init"')
   }
 
   await git('init')
