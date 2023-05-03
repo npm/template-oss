@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.15.1](https://github.com/npm/template-oss/compare/v4.15.0...v4.15.1) (2023-05-03)
+
+### Bug Fixes
+
+* [`6f5a253`](https://github.com/npm/template-oss/commit/6f5a2533dadb48edc822a798a2cdda3dcd3e20b0) [#313](https://github.com/npm/template-oss/pull/313) make settings file actually work (#313) (@nlf)
+
 ## [4.15.0](https://github.com/npm/template-oss/compare/v4.14.1...v4.15.0) (2023-05-03)
 
 ### Features
