@@ -191,19 +191,6 @@ branches:
         apps: []
         users: []
         teams: [ "cli-team" ]
-  - name: latest
-    protection:
-      required_status_checks: null
-      enforce_admins: true
-      required_pull_request_reviews:
-        required_approving_review_count: 1
-        require_code_owner_reviews: true
-        require_last_push_approval: true
-        dismiss_stale_reviews: true
-      restrictions:
-        apps: []
-        users: []
-        teams: [ "cli-team" ]
 
 .github/workflows/audit.yml
 ========================================
@@ -1628,19 +1615,6 @@ repository:
 
 branches:
   - name: main
-    protection:
-      required_status_checks: null
-      enforce_admins: true
-      required_pull_request_reviews:
-        required_approving_review_count: 1
-        require_code_owner_reviews: true
-        require_last_push_approval: true
-        dismiss_stale_reviews: true
-      restrictions:
-        apps: []
-        users: []
-        teams: [ "cli-team" ]
-  - name: latest
     protection:
       required_status_checks: null
       enforce_admins: true
@@ -3353,19 +3327,6 @@ repository:
 
 branches:
   - name: main
-    protection:
-      required_status_checks: null
-      enforce_admins: true
-      required_pull_request_reviews:
-        required_approving_review_count: 1
-        require_code_owner_reviews: true
-        require_last_push_approval: true
-        dismiss_stale_reviews: true
-      restrictions:
-        apps: []
-        users: []
-        teams: [ "cli-team" ]
-  - name: latest
     protection:
       required_status_checks: null
       enforce_admins: true
