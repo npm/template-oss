@@ -27,6 +27,7 @@ exports[`test/apply/files-snapshots.js TAP private workspace > expect resolving 
 .npmrc
 .release-please-manifest.json
 CODE_OF_CONDUCT.md
+CONTRIBUTING.md
 package.json
 release-please-config.json
 SECURITY.md
@@ -83,6 +84,7 @@ exports[`test/apply/files-snapshots.js TAP turn off repo > expect resolving Prom
 .gitignore
 .npmrc
 CODE_OF_CONDUCT.md
+CONTRIBUTING.md
 package.json
 SECURITY.md
 `
@@ -111,6 +113,7 @@ exports[`test/apply/files-snapshots.js TAP turn off specific files > expect reso
 .npmrc
 .release-please-manifest.json
 CODE_OF_CONDUCT.md
+CONTRIBUTING.md
 package.json
 release-please-config.json
 SECURITY.md

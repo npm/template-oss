@@ -56,6 +56,7 @@ The following module files need to be added:
   .gitignore
   .npmrc
   CODE_OF_CONDUCT.md
+  CONTRIBUTING.md
   SECURITY.md
 
 To correct it: npx template-oss-apply --force
@@ -133,6 +134,7 @@ To correct it: move files to not match one of the following patterns:
   !/bin/
   !/CHANGELOG*
   !/CODE_OF_CONDUCT.md
+  !/CONTRIBUTING.md
   !/docs/
   !/lib/
   !/LICENSE*
@@ -171,6 +173,7 @@ To correct it: move files to not match one of the following patterns:
   !/bin/
   !/CHANGELOG*
   !/CODE_OF_CONDUCT.md
+  !/CONTRIBUTING.md
   !/docs/
   !/lib/
   !/LICENSE*
@@ -304,6 +307,7 @@ The following module files need to be added:
   .gitignore
   .npmrc
   CODE_OF_CONDUCT.md
+  CONTRIBUTING.md
   SECURITY.md
 
 To correct it: npx template-oss-apply --force
