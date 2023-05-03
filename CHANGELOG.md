@@ -1,5 +1,19 @@
 # Changelog
 
+## [4.15.0](https://github.com/npm/template-oss/compare/v4.14.1...v4.15.0) (2023-05-03)
+
+### Features
+
+* [`96776b4`](https://github.com/npm/template-oss/commit/96776b44d73e4695d1ddad07d9104830baa61f11) [#312](https://github.com/npm/template-oss/pull/312) add CONTRIBUTING.md (#312) (@wraithgar)
+* [`be7f16a`](https://github.com/npm/template-oss/commit/be7f16a3662fbd2c0c5dacdf0b559f88dde81f7a) [#310](https://github.com/npm/template-oss/pull/310) add probot settings template (#310) (@nlf)
+
+### Bug Fixes
+
+* [`238fc4a`](https://github.com/npm/template-oss/commit/238fc4ae07fc9d05454c7f478dfe980b393c10f5) [#309](https://github.com/npm/template-oss/pull/309) pull PR_TITLE into env (@wraithgar)
+* [`1edde27`](https://github.com/npm/template-oss/commit/1edde270606255276dc30ef1526970cac1b30644) [#308](https://github.com/npm/template-oss/pull/308) add the -R flag to the post-publish action for easier copy/paste (#308) (@nlf)
+* [`1babe54`](https://github.com/npm/template-oss/commit/1babe54a8db71b40cf0eaabf3ee056796ba333ae) [#306](https://github.com/npm/template-oss/pull/306) use a more portable means of spawning subshells (#306) (@nlf)
+* [`7a2481c`](https://github.com/npm/template-oss/commit/7a2481c7312a539bfdba6881ac8fbadae41c64b9) [#305](https://github.com/npm/template-oss/pull/305) update the LouisBrunner/checks-action to latest (#305) (@nlf)
+
 ## [4.14.1](https://github.com/npm/template-oss/compare/v4.14.0...v4.14.1) (2023-04-19)
 
 ### Bug Fixes
