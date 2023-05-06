@@ -14,4 +14,16 @@ module.exports = {
     '@npmcli',
     ...localConfigs,
   ],
+  rules: {
+    'import/no-extraneous-dependencies': ['error', { devDependencies: false }],
+  },
+  overrides: [
+    {
+      files: ['**/test/**', '.eslintrc.js', '.eslintrc.local.js'],
+      rules: {
+        // back to default options
+        'import/no-extraneous-dependencies': ['error', {}],
+      },
+    },
+  ],
 }
