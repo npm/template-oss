@@ -1325,7 +1325,7 @@ package.json
     "lib/"
   ],
   "engines": {
-    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
+    "node": "^14.17 || ^16.13 || >=18"
   },
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
@@ -3007,7 +3007,7 @@ package.json
     "lib/"
   ],
   "engines": {
-    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
+    "node": "^14.17 || ^16.13 || >=18"
   },
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
@@ -3150,7 +3150,7 @@ workspaces/a/package.json
     "lib/"
   ],
   "engines": {
-    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
+    "node": "^14.17 || ^16.13 || >=18"
   },
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
@@ -3228,7 +3228,7 @@ workspaces/b/package.json
     "lib/"
   ],
   "engines": {
-    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
+    "node": "^14.17 || ^16.13 || >=18"
   },
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
@@ -4509,7 +4509,7 @@ workspaces/a/package.json
     "lib/"
   ],
   "engines": {
-    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
+    "node": "^14.17 || ^16.13 || >=18"
   },
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
@@ -4587,7 +4587,7 @@ workspaces/b/package.json
     "lib/"
   ],
   "engines": {
-    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
+    "node": "^14.17 || ^16.13 || >=18"
   },
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
