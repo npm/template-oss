@@ -11,6 +11,7 @@ on:
     branches:
       - main
       - latest
+      - release/v*
     paths-ignore:
       - workspace/test-workspace/**
   schedule:
