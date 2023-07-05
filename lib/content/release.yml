@@ -11,7 +11,6 @@ on:
       {{#each branches}}
       - {{ . }}
       {{/each}}
-      - release/v*
 
 permissions:
   contents: write

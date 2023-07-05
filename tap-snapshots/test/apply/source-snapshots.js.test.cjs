@@ -466,6 +466,7 @@ on:
     branches:
       - main
       - latest
+      - release/v*
   schedule:
     # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
     - cron: "0 9 * * 1"
@@ -574,10 +575,12 @@ on:
     branches:
       - main
       - latest
+      - release/v*
   pull_request:
     branches:
       - main
       - latest
+      - release/v*
   schedule:
     # "At 10:00 UTC (03:00 PT) on Monday" https://crontab.guru/#0_10_*_*_1
     - cron: "0 10 * * 1"
@@ -1685,6 +1688,7 @@ on:
     branches:
       - main
       - latest
+      - release/v*
     paths:
       - workspaces/a/**
   schedule:
@@ -1799,6 +1803,7 @@ on:
     branches:
       - main
       - latest
+      - release/v*
     paths:
       - workspaces/b/**
   schedule:
@@ -2133,6 +2138,7 @@ on:
     branches:
       - main
       - latest
+      - release/v*
     paths-ignore:
       - workspaces/a/**
       - workspaces/b/**
@@ -2244,10 +2250,12 @@ on:
     branches:
       - main
       - latest
+      - release/v*
   pull_request:
     branches:
       - main
       - latest
+      - release/v*
   schedule:
     # "At 10:00 UTC (03:00 PT) on Monday" https://crontab.guru/#0_10_*_*_1
     - cron: "0 10 * * 1"
@@ -3355,6 +3363,7 @@ on:
     branches:
       - main
       - latest
+      - release/v*
     paths:
       - workspaces/a/**
   schedule:
@@ -3469,6 +3478,7 @@ on:
     branches:
       - main
       - latest
+      - release/v*
     paths:
       - workspaces/b/**
   schedule:
