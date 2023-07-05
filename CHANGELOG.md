@@ -1,5 +1,14 @@
 # Changelog
 
+## [4.16.0](https://github.com/npm/template-oss/compare/v4.15.1...v4.16.0) (2023-07-05)
+
+### Features
+
+* [`6e02268`](https://github.com/npm/template-oss/commit/6e02268f12cc65da2180527a6a18f5d737bab6c3) [#321](https://github.com/npm/template-oss/pull/321) allow adding latest to other ci versions (@lukekarrys)
+* [`b83a19a`](https://github.com/npm/template-oss/commit/b83a19a98ec5db85b96e645916dcb65dbc64fbbd) [#321](https://github.com/npm/template-oss/pull/321) add config option to disable eslint (@lukekarrys)
+* [`9606606`](https://github.com/npm/template-oss/commit/9606606f0163d56b785620881d5b01985f9218e3) [#321](https://github.com/npm/template-oss/pull/321) add config option to not update npm (@lukekarrys)
+* [`73d7bf1`](https://github.com/npm/template-oss/commit/73d7bf174d34c5d51b87f937daf52b94c9e803c4) [#321](https://github.com/npm/template-oss/pull/321) add release/v branches to all branch CI (@lukekarrys)
+
 ## [4.15.1](https://github.com/npm/template-oss/compare/v4.15.0...v4.15.1) (2023-05-03)
 
 ### Bug Fixes
