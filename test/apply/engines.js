@@ -20,6 +20,26 @@ t.test('can set engines and ci separately', async (t) => {
   t.notOk(ci.includes('- 12'))
 })
 
+t.test('can set ci to latest plus other versions', async (t) => {
+  const s = await setup(t, {
+    package: {
+      templateOSS: {
+        ciVersions: ['6', '8', 'latest'],
+        engines: '*',
+      },
+    },
+  })
+  await s.apply()
+
+  const pkg = await s.readJson('package.json')
+  const ci = await s.readFile(join('.github', 'workflows', 'ci.yml'))
+
+  t.equal(pkg.engines.node, '*')
+  t.ok(ci.includes('- 6'))
+  t.ok(ci.includes('- 8'))
+  t.ok(ci.includes('- 18.x'))
+})
+
 t.test('latest ci versions', async (t) => {
   const s = await setup(t, {
     package: {
