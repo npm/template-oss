@@ -9,7 +9,8 @@ repository:
   enable_vulnerability_alerts: true
 
 branches:
-  - name: {{ defaultBranch }}
+  {{#each branches}}
+  - name: {{ . }}
     protection:
       required_status_checks: null
       enforce_admins: true
@@ -22,3 +23,4 @@ branches:
         apps: []
         users: []
         teams: ["cli-team"]
+  {{/each}}

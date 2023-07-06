@@ -191,6 +191,32 @@ branches:
         apps: []
         users: []
         teams: [ "cli-team" ]
+  - name: latest
+    protection:
+      required_status_checks: null
+      enforce_admins: true
+      required_pull_request_reviews:
+        required_approving_review_count: 1
+        require_code_owner_reviews: true
+        require_last_push_approval: true
+        dismiss_stale_reviews: true
+      restrictions:
+        apps: []
+        users: []
+        teams: [ "cli-team" ]
+  - name: release/v*
+    protection:
+      required_status_checks: null
+      enforce_admins: true
+      required_pull_request_reviews:
+        required_approving_review_count: 1
+        require_code_owner_reviews: true
+        require_last_push_approval: true
+        dismiss_stale_reviews: true
+      restrictions:
+        apps: []
+        users: []
+        teams: [ "cli-team" ]
 
 .github/workflows/audit.yml
 ========================================
@@ -866,7 +892,7 @@ jobs:
             let commentId = comments.find(c => c.user.login === 'github-actions[bot]' && c.body.startsWith(body))?.id
 
             body += \`Release workflow run: \${workflow.html_url}/n/n#### Force CI to Update This Release/n/n\`
-            body += \`This PR will be updated and CI will run for every non-/\`chore:/\` commit that is pushed to /\`main/\`. \`
+            body += \`This PR will be updated and CI will run for every non-/\`chore:/\` commit that is pushed to /\`\${REF_NAME}/\`. \`
             body += \`To force CI to update this PR, run this command:/n/n\`
             body += \`/\`/\`/\`/ngh workflow run release.yml -r \${REF_NAME} -R \${owner}/\${repo} -f release-pr=\${issue_number}/n/\`/\`/\`\`
 
@@ -1618,6 +1644,32 @@ repository:
 
 branches:
   - name: main
+    protection:
+      required_status_checks: null
+      enforce_admins: true
+      required_pull_request_reviews:
+        required_approving_review_count: 1
+        require_code_owner_reviews: true
+        require_last_push_approval: true
+        dismiss_stale_reviews: true
+      restrictions:
+        apps: []
+        users: []
+        teams: [ "cli-team" ]
+  - name: latest
+    protection:
+      required_status_checks: null
+      enforce_admins: true
+      required_pull_request_reviews:
+        required_approving_review_count: 1
+        require_code_owner_reviews: true
+        require_last_push_approval: true
+        dismiss_stale_reviews: true
+      restrictions:
+        apps: []
+        users: []
+        teams: [ "cli-team" ]
+  - name: release/v*
     protection:
       required_status_checks: null
       enforce_admins: true
@@ -2541,7 +2593,7 @@ jobs:
             let commentId = comments.find(c => c.user.login === 'github-actions[bot]' && c.body.startsWith(body))?.id
 
             body += \`Release workflow run: \${workflow.html_url}/n/n#### Force CI to Update This Release/n/n\`
-            body += \`This PR will be updated and CI will run for every non-/\`chore:/\` commit that is pushed to /\`main/\`. \`
+            body += \`This PR will be updated and CI will run for every non-/\`chore:/\` commit that is pushed to /\`\${REF_NAME}/\`. \`
             body += \`To force CI to update this PR, run this command:/n/n\`
             body += \`/\`/\`/\`/ngh workflow run release.yml -r \${REF_NAME} -R \${owner}/\${repo} -f release-pr=\${issue_number}/n/\`/\`/\`\`
 
@@ -3347,6 +3399,32 @@ branches:
         apps: []
         users: []
         teams: [ "cli-team" ]
+  - name: latest
+    protection:
+      required_status_checks: null
+      enforce_admins: true
+      required_pull_request_reviews:
+        required_approving_review_count: 1
+        require_code_owner_reviews: true
+        require_last_push_approval: true
+        dismiss_stale_reviews: true
+      restrictions:
+        apps: []
+        users: []
+        teams: [ "cli-team" ]
+  - name: release/v*
+    protection:
+      required_status_checks: null
+      enforce_admins: true
+      required_pull_request_reviews:
+        required_approving_review_count: 1
+        require_code_owner_reviews: true
+        require_last_push_approval: true
+        dismiss_stale_reviews: true
+      restrictions:
+        apps: []
+        users: []
+        teams: [ "cli-team" ]
 
 .github/workflows/ci-a.yml
 ========================================
@@ -4056,7 +4134,7 @@ jobs:
             let commentId = comments.find(c => c.user.login === 'github-actions[bot]' && c.body.startsWith(body))?.id
 
             body += \`Release workflow run: \${workflow.html_url}/n/n#### Force CI to Update This Release/n/n\`
-            body += \`This PR will be updated and CI will run for every non-/\`chore:/\` commit that is pushed to /\`main/\`. \`
+            body += \`This PR will be updated and CI will run for every non-/\`chore:/\` commit that is pushed to /\`\${REF_NAME}/\`. \`
             body += \`To force CI to update this PR, run this command:/n/n\`
             body += \`/\`/\`/\`/ngh workflow run release.yml -r \${REF_NAME} -R \${owner}/\${repo} -f release-pr=\${issue_number}/n/\`/\`/\`\`
 
