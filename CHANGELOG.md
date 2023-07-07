@@ -1,5 +1,21 @@
 # Changelog
 
+## [4.17.0](https://github.com/npm/template-oss/compare/v4.16.0...v4.17.0) (2023-07-07)
+
+### Features
+
+* [`4624d9c`](https://github.com/npm/template-oss/commit/4624d9c17e30b4783ef6bfc28a72603cc076f0e7) [#323](https://github.com/npm/template-oss/pull/323) add overwrite false property to added files (@lukekarrys)
+
+### Bug Fixes
+
+* [`710c25e`](https://github.com/npm/template-oss/commit/710c25e404df0f5be2ef1a487704e7235db3c348) [#327](https://github.com/npm/template-oss/pull/327) do not add dependabot files when config is falsy (@lukekarrys)
+* [`449066e`](https://github.com/npm/template-oss/commit/449066e1917b5ff113aba396b12986f5db5d25da) [#323](https://github.com/npm/template-oss/pull/323) determine parser based on target filename (@lukekarrys)
+* [`7300da4`](https://github.com/npm/template-oss/commit/7300da491ec1e596c5ad82434f7975a5e5a70f23) [#325](https://github.com/npm/template-oss/pull/325) apply settings to all requested branches (@lukekarrys)
+
+### Dependencies
+
+* [`2a5cd53`](https://github.com/npm/template-oss/commit/2a5cd532ce26b4fe66a6cb5a8b195c77e2520929) [#324](https://github.com/npm/template-oss/pull/324) bump @npmcli/package-json from 3.1.1 to 4.0.0
+
 ## [4.16.0](https://github.com/npm/template-oss/compare/v4.15.1...v4.16.0) (2023-07-05)
 
 ### Features
