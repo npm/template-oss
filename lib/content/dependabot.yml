@@ -1,15 +1,24 @@
 version: 2
 
 updates:
+  {{#each dependabot}}
   - package-ecosystem: npm
-    directory: {{ pkgDir }}
+    directory: /
     schedule:
       interval: daily
+    target-branch: "{{ branch }}"
     allow:
       - dependency-type: direct
-    versioning-strategy: {{ dependabot }}
+        {{#each allowNames }}
+        dependency-name: "{{ . }}"
+        {{/each}}
+    versioning-strategy: {{ strategy }}
     commit-message:
       prefix: deps
       prefix-development: chore
     labels:
       - "Dependencies"
+      {{#each labels }}
+      - "{{ . }}"
+      {{/each}}
+  {{/each}}

@@ -56,6 +56,20 @@ updates:
     directory: /
     schedule:
       interval: daily
+    target-branch: "main"
+    allow:
+      - dependency-type: direct
+    versioning-strategy: increase-if-necessary
+    commit-message:
+      prefix: deps
+      prefix-development: chore
+    labels:
+      - "Dependencies"
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: daily
+    target-branch: "latest"
     allow:
       - dependency-type: direct
     versioning-strategy: increase-if-necessary
@@ -193,20 +207,6 @@ branches:
         users: []
         teams: [ "cli-team" ]
   - name: latest
-    protection:
-      required_status_checks: null
-      enforce_admins: true
-      block_creations: true
-      required_pull_request_reviews:
-        required_approving_review_count: 1
-        require_code_owner_reviews: true
-        require_last_push_approval: true
-        dismiss_stale_reviews: true
-      restrictions:
-        apps: []
-        users: []
-        teams: [ "cli-team" ]
-  - name: release/v*
     protection:
       required_status_checks: null
       enforce_admins: true
@@ -1500,6 +1500,7 @@ updates:
     directory: /
     schedule:
       interval: daily
+    target-branch: "main"
     allow:
       - dependency-type: direct
     versioning-strategy: increase-if-necessary
@@ -1509,21 +1510,10 @@ updates:
     labels:
       - "Dependencies"
   - package-ecosystem: npm
-    directory: workspaces/a/
+    directory: /
     schedule:
       interval: daily
-    allow:
-      - dependency-type: direct
-    versioning-strategy: increase-if-necessary
-    commit-message:
-      prefix: deps
-      prefix-development: chore
-    labels:
-      - "Dependencies"
-  - package-ecosystem: npm
-    directory: workspaces/b/
-    schedule:
-      interval: daily
+    target-branch: "latest"
     allow:
       - dependency-type: direct
     versioning-strategy: increase-if-necessary
@@ -1661,20 +1651,6 @@ branches:
         users: []
         teams: [ "cli-team" ]
   - name: latest
-    protection:
-      required_status_checks: null
-      enforce_admins: true
-      block_creations: true
-      required_pull_request_reviews:
-        required_approving_review_count: 1
-        require_code_owner_reviews: true
-        require_last_push_approval: true
-        dismiss_stale_reviews: true
-      restrictions:
-        apps: []
-        users: []
-        teams: [ "cli-team" ]
-  - name: release/v*
     protection:
       required_status_checks: null
       enforce_admins: true
@@ -3318,9 +3294,10 @@ version: 2
 
 updates:
   - package-ecosystem: npm
-    directory: workspaces/a/
+    directory: /
     schedule:
       interval: daily
+    target-branch: "main"
     allow:
       - dependency-type: direct
     versioning-strategy: increase-if-necessary
@@ -3330,9 +3307,10 @@ updates:
     labels:
       - "Dependencies"
   - package-ecosystem: npm
-    directory: workspaces/b/
+    directory: /
     schedule:
       interval: daily
+    target-branch: "latest"
     allow:
       - dependency-type: direct
     versioning-strategy: increase-if-necessary
@@ -3407,20 +3385,6 @@ branches:
         users: []
         teams: [ "cli-team" ]
   - name: latest
-    protection:
-      required_status_checks: null
-      enforce_admins: true
-      block_creations: true
-      required_pull_request_reviews:
-        required_approving_review_count: 1
-        require_code_owner_reviews: true
-        require_last_push_approval: true
-        dismiss_stale_reviews: true
-      restrictions:
-        apps: []
-        users: []
-        teams: [ "cli-team" ]
-  - name: release/v*
     protection:
       required_status_checks: null
       enforce_admins: true

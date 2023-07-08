@@ -6,8 +6,6 @@ const Git = require('@npmcli/git')
 const localeCompare = require('@isaacs/string-locale-compare')('en')
 const npa = require('npm-package-arg')
 const output = require('../lib/util/output.js')
-const apply = require('../lib/apply/index.js')
-const check = require('../lib/check/index.js')
 const CONTENT = require('..')
 const { name: NAME, version: VERSION } = require('../package.json')
 
@@ -43,7 +41,7 @@ const okPackage = () => Object.entries(CONTENT.requiredPackages)
     },
   })
 
-const setupRoot = async (root) => {
+const setupRoot = async (t, root, mocks) => {
   const rootPath = (...p) => join(root, ...p)
 
   // fs methods for reading from the root
@@ -83,6 +81,9 @@ const setupRoot = async (root) => {
     return Object.fromEntries(files.map((f, i) => [f, contents[i]]))
   }
 
+  const apply = t.mock('../lib/apply/index.js', mocks)
+  const check = t.mock('../lib/check/index.js', mocks)
+
   return {
     root,
     ...rootFs,
@@ -101,6 +102,7 @@ const setup = async (t, {
   package = {},
   workspaces = {},
   testdir = {},
+  mocks = {},
   ok,
 } = {}) => {
   const wsLookup = {}
@@ -139,7 +141,7 @@ const setup = async (t, {
   ))
 
   return {
-    ...(await setupRoot(root)),
+    ...(await setupRoot(t, root, mocks)),
     workspaces: wsLookup,
   }
 }

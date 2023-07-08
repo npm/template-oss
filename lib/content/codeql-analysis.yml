@@ -3,12 +3,12 @@ name: CodeQL
 on:
   push:
     branches:
-      {{#each branches}}
+      {{#each branchPatterns}}
       - {{ . }}
       {{/each}}
   pull_request:
     branches:
-      {{#each branches}}
+      {{#each branchPatterns}}
       - {{ . }}
       {{/each}}
   schedule:

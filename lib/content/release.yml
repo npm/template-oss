@@ -8,7 +8,7 @@ on:
         type: string
   push:
     branches:
-      {{#each branches}}
+      {{#each branchPatterns}}
       - {{ . }}
       {{/each}}
 

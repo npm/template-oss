@@ -12,7 +12,7 @@ pull_request:
   {{/if}}
 push:
   branches:
-    {{#each branches}}
+    {{#each branchPatterns}}
     - {{ . }}
     {{/each}}
   {{#if isWorkspace}}

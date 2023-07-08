@@ -10,8 +10,6 @@ on:
   push:
     branches:
       - main
-      - latest
-      - release/v*
     paths:
       - workspace/test-workspace/**
   schedule:

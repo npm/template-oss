@@ -8,6 +8,14 @@ module.exports = {
           id = 'id'
         },
       },
+      'clean-target.yml': {
+        file: 'source.yml',
+        clean: () => true,
+        parser: (p) => class extends p.YmlMerge {
+          key = 'key'
+          id = 'id'
+        },
+      },
     },
   },
 }
