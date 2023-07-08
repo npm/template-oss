@@ -7,18 +7,7 @@ updates:
     directory: /
     schedule:
       interval: daily
-    allow:
-      - dependency-type: direct
-    versioning-strategy: increase-if-necessary
-    commit-message:
-      prefix: deps
-      prefix-development: chore
-    labels:
-      - "Dependencies"
-  - package-ecosystem: npm
-    directory: workspace/test-workspace/
-    schedule:
-      interval: daily
+    target-branch: "main"
     allow:
       - dependency-type: direct
     versioning-strategy: increase-if-necessary
