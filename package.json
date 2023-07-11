@@ -40,7 +40,7 @@
     "@npmcli/git": "^4.0.0",
     "@npmcli/map-workspaces": "^3.0.0",
     "@npmcli/package-json": "^4.0.0",
-    "@octokit/rest": "^19.0.4",
+    "@octokit/rest": "^20.0.0",
     "diff": "^5.0.0",
     "glob": "^10.1.0",
     "handlebars": "^4.7.7",
