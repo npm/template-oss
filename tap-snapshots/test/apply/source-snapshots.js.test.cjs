@@ -811,7 +811,7 @@ jobs:
         env:
           PR_TITLE: \${{ github.event.pull_request.title }}
         run: |
-          echo '$PR_TITLE' | npx --offline commitlint -V
+          echo "$PR_TITLE" | npx --offline commitlint -V
 
 .github/workflows/release.yml
 ========================================
@@ -2491,7 +2491,7 @@ jobs:
         env:
           PR_TITLE: \${{ github.event.pull_request.title }}
         run: |
-          echo '$PR_TITLE' | npx --offline commitlint -V
+          echo "$PR_TITLE" | npx --offline commitlint -V
 
 .github/workflows/release.yml
 ========================================
@@ -4023,7 +4023,7 @@ jobs:
         env:
           PR_TITLE: \${{ github.event.pull_request.title }}
         run: |
-          echo '$PR_TITLE' | npx --offline commitlint -V
+          echo "$PR_TITLE" | npx --offline commitlint -V
 
 .github/workflows/release.yml
 ========================================
