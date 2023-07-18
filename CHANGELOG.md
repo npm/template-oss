@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.18.0](https://github.com/npm/template-oss/compare/v4.17.0...v4.18.0) (2023-07-18)
+
+### Features
+
+* [`f04a76d`](https://github.com/npm/template-oss/commit/f04a76d48e373fb03249973983e45472b26a9691) [#330](https://github.com/npm/template-oss/pull/330) use git remote for branch related config (@lukekarrys)
+
+### Bug Fixes
+
+* [`dd9aadf`](https://github.com/npm/template-oss/commit/dd9aadf8d96c31066c84905cad07ac89a68ceead) [#337](https://github.com/npm/template-oss/pull/337) properly quote PR_TITLE (#337) (@wraithgar)
+* [`4662ec3`](https://github.com/npm/template-oss/commit/4662ec31afc77f0e5fdac13d0bf14e23e0e9cb43) [#331](https://github.com/npm/template-oss/pull/331) block protected branch creations (@lukekarrys)
+
 ## [4.17.0](https://github.com/npm/template-oss/compare/v4.16.0...v4.17.0) (2023-07-07)
 
 ### Features
