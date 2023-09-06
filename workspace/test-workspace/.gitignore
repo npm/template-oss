@@ -19,3 +19,4 @@
 !/scripts/
 !/tap-snapshots/
 !/test/
+tap-testdir-*/
