@@ -27,6 +27,7 @@
 !/SECURITY.md
 !/tap-snapshots/
 !/test/
+tap-testdir-*/
 !/workspace/
 /workspace/*
 !/workspace/test-workspace/

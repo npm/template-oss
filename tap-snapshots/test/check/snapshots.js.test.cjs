@@ -143,6 +143,7 @@ To correct it: move files to not match one of the following patterns:
   !/SECURITY.md
   !/tap-snapshots/
   !/test/
+  tap-testdir-*/
 
 -------------------------------------------------------------------
 `
@@ -182,6 +183,7 @@ To correct it: move files to not match one of the following patterns:
   !/SECURITY.md
   !/tap-snapshots/
   !/test/
+  tap-testdir-*/
   !/workspaces/
   /workspaces/*
   !/workspaces/a/
@@ -211,6 +213,7 @@ To correct it: move files to not match one of the following patterns:
   !/scripts/
   !/tap-snapshots/
   !/test/
+  tap-testdir-*/
 
 -------------------------------------------------------------------
 
@@ -236,6 +239,7 @@ To correct it: move files to not match one of the following patterns:
   !/scripts/
   !/tap-snapshots/
   !/test/
+  tap-testdir-*/
 
 -------------------------------------------------------------------
 `

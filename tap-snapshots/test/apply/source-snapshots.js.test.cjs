@@ -1663,6 +1663,7 @@ jobs:
 !/SECURITY.md
 !/tap-snapshots/
 !/test/
+tap-testdir-*/
 
 .npmrc
 ========================================
@@ -3880,6 +3881,7 @@ jobs:
 !/SECURITY.md
 !/tap-snapshots/
 !/test/
+tap-testdir-*/
 !/workspaces/
 /workspaces/*
 !/workspaces/a/
@@ -4107,6 +4109,7 @@ workspaces/a/.gitignore
 !/scripts/
 !/tap-snapshots/
 !/test/
+tap-testdir-*/
 
 workspaces/a/package.json
 ========================================
@@ -4182,6 +4185,7 @@ workspaces/b/.gitignore
 !/scripts/
 !/tap-snapshots/
 !/test/
+tap-testdir-*/
 
 workspaces/b/package.json
 ========================================
@@ -5906,6 +5910,7 @@ workspaces/a/.gitignore
 !/scripts/
 !/tap-snapshots/
 !/test/
+tap-testdir-*/
 
 workspaces/a/package.json
 ========================================
@@ -5981,6 +5986,7 @@ workspaces/b/.gitignore
 !/scripts/
 !/tap-snapshots/
 !/test/
+tap-testdir-*/
 
 workspaces/b/package.json
 ========================================
