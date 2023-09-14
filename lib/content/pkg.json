@@ -21,11 +21,6 @@
     "postpublish": {{{ del }}}
   },
   "repository": {{#if repository}}{{{ json repository }}}{{else}}{{{ del }}}{{/if}},
-  "engines": {
-    {{#if engines}}
-    "node": {{{ json engines }}}
-    {{/if}}
-  },
   {{{ json __CONFIG_KEY__ }}}: {
     "version": {{#if isDogFood}}{{{ del }}}{{else}}{{{ json __VERSION__ }}}{{/if}}
   },

@@ -153,8 +153,8 @@ The repo file audit.yml needs to be updated:
           uses: actions/setup-node@v3
           id: node
           with:
-            node-version: 18.x
-            check-latest: contains('18.x', '.x')
+            node-version: 20.x
+            check-latest: contains('20.x', '.x')
   
         # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
         - name: Update Windows npm
@@ -217,7 +217,7 @@ The repo file ci.yml needs to be updated:
 
   .github/workflows/ci.yml
   ========================================
-  @@ -158,4 +158,25 @@
+  @@ -159,4 +159,25 @@
            id: npm-8
            run: |
              npm i --prefer-online --no-fund --no-audit -g npm@8

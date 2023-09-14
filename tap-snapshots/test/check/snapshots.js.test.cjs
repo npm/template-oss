@@ -68,9 +68,6 @@ The module file package.json needs to be updated:
   package.json
   ========================================
   "author" is missing, expected "GitHub Inc."
-  "engines" is missing, expected {
-    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
-  }
   "files" is missing, expected [
     "bin/",
     "lib/"
@@ -319,9 +316,6 @@ The module file package.json needs to be updated:
   package.json
   ========================================
   "author" is missing, expected "GitHub Inc."
-  "engines" is missing, expected {
-    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
-  }
   "files" is missing, expected [
     "bin/",
     "lib/"
@@ -398,9 +392,6 @@ The module file package.json needs to be updated:
   workspaces/a/package.json
   ========================================
   "author" is missing, expected "GitHub Inc."
-  "engines" is missing, expected {
-    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
-  }
   "files" is missing, expected [
     "bin/",
     "lib/"
@@ -470,9 +461,6 @@ The module file package.json needs to be updated:
   workspaces/b/package.json
   ========================================
   "author" is missing, expected "GitHub Inc."
-  "engines" is missing, expected {
-    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
-  }
   "files" is missing, expected [
     "bin/",
     "lib/"
