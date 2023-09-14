@@ -20,7 +20,9 @@ t.afterEach(() => {
   process.env.npm_config_local_prefix = _prefix
   errors.length = 0
   global.console = _console
-  delete process.exitCode
+  if (process.exitCode) {
+    process.exitCode = 0
+  }
 })
 
 t.test('no local prefix', async (t) => {
