@@ -21,16 +21,33 @@ t.test('relative npm bin with workspaces', async (t) => {
     ok: true,
     package: {
       templateOSS: {
-        npm: 'cli.js',
+        content: 'rootContent',
       },
     },
-    workspaces: { a: '@name/aaaa', b: 'bbb' },
+    workspaces: {
+      a: 'a',
+      b: { name: 'b', templateOSS: { npm: './local-workspace-cli.js' } },
+      c: { name: 'c', templateOSS: { npm: 'npm' } },
+      d: { name: 'd', templateOSS: { content: '../../wsContent' } },
+      e: { name: 'e', templateOSS: { content: '../../wsContent', npm: 'npm' } },
+    },
+    testdir: {
+      rootContent: { 'index.js': 'module.exports={ npm: "./cli.js" }' },
+      wsContent: { 'index.js': 'module.exports={ npm: "../../cli.js" }' },
+    },
   })
   await s.apply()
-  const { scripts } = await s.readJson('package.json')
-  const { scripts: scriptsA } = await s.readJson(join(s.workspaces.a, 'package.json'))
-  const { scripts: scriptsB } = await s.readJson(join(s.workspaces.b, 'package.json'))
-  t.equal(scripts.posttest, 'node cli.js run lint')
-  t.equal(scriptsA.posttest, 'node ../../cli.js run lint')
-  t.equal(scriptsB.posttest, 'node ../../cli.js run lint')
+
+  const readScripts = (p) => s.readJson(join(p, 'package.json')).then(r => r.scripts)
+
+  const ws = s.workspaces
+  const pkgs = ['', ws.a, ws.b, ws.c, ws.d, ws.e]
+  const [root, a, b, c, d, e] = await Promise.all(pkgs.map(readScripts))
+
+  t.equal(root.posttest, 'node ./cli.js run lint')
+  t.equal(a.posttest, 'node ../../cli.js run lint')
+  t.equal(b.posttest, 'node ./local-workspace-cli.js run lint')
+  t.equal(c.posttest, 'npm run lint')
+  t.equal(d.posttest, 'node ../../cli.js run lint')
+  t.equal(e.posttest, 'npm run lint')
 })
