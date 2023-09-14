@@ -2,6 +2,8 @@
 
 # ignore everything in the root
 /*
+# transient test directories
+tap-testdir*/
 
 # keep these
 !**/.gitignore
@@ -27,7 +29,6 @@
 !/SECURITY.md
 !/tap-snapshots/
 !/test/
-tap-testdir-*/
 !/workspace/
 /workspace/*
 !/workspace/test-workspace/

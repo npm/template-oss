@@ -1638,6 +1638,8 @@ jobs:
 
 # ignore everything in the root
 /*
+# transient test directories
+tap-testdir*/
 
 # keep these
 !**/.gitignore
@@ -1663,7 +1665,6 @@ jobs:
 !/SECURITY.md
 !/tap-snapshots/
 !/test/
-tap-testdir-*/
 
 .npmrc
 ========================================
@@ -3856,6 +3857,8 @@ jobs:
 
 # ignore everything in the root
 /*
+# transient test directories
+tap-testdir*/
 
 # keep these
 !**/.gitignore
@@ -3881,7 +3884,6 @@ jobs:
 !/SECURITY.md
 !/tap-snapshots/
 !/test/
-tap-testdir-*/
 !/workspaces/
 /workspaces/*
 !/workspaces/a/
@@ -4092,6 +4094,8 @@ workspaces/a/.gitignore
 
 # ignore everything in the root
 /*
+# transient test directories
+tap-testdir*/
 
 # keep these
 !**/.gitignore
@@ -4109,7 +4113,6 @@ workspaces/a/.gitignore
 !/scripts/
 !/tap-snapshots/
 !/test/
-tap-testdir-*/
 
 workspaces/a/package.json
 ========================================
@@ -4168,6 +4171,8 @@ workspaces/b/.gitignore
 
 # ignore everything in the root
 /*
+# transient test directories
+tap-testdir*/
 
 # keep these
 !**/.gitignore
@@ -4185,7 +4190,6 @@ workspaces/b/.gitignore
 !/scripts/
 !/tap-snapshots/
 !/test/
-tap-testdir-*/
 
 workspaces/b/package.json
 ========================================
@@ -5893,6 +5897,8 @@ workspaces/a/.gitignore
 
 # ignore everything in the root
 /*
+# transient test directories
+tap-testdir*/
 
 # keep these
 !**/.gitignore
@@ -5910,7 +5916,6 @@ workspaces/a/.gitignore
 !/scripts/
 !/tap-snapshots/
 !/test/
-tap-testdir-*/
 
 workspaces/a/package.json
 ========================================
@@ -5969,6 +5974,8 @@ workspaces/b/.gitignore
 
 # ignore everything in the root
 /*
+# transient test directories
+tap-testdir*/
 
 # keep these
 !**/.gitignore
@@ -5986,7 +5993,6 @@ workspaces/b/.gitignore
 !/scripts/
 !/tap-snapshots/
 !/test/
-tap-testdir-*/
 
 workspaces/b/package.json
 ========================================

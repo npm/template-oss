@@ -120,6 +120,7 @@ The following files are tracked by git but matching a pattern in .gitignore:
 To correct it: move files to not match one of the following patterns:
 
   /*
+  tap-testdir*/
   !**/.gitignore
   !/.commitlintrc.js
   !/.eslintrc.js
@@ -143,7 +144,6 @@ To correct it: move files to not match one of the following patterns:
   !/SECURITY.md
   !/tap-snapshots/
   !/test/
-  tap-testdir-*/
 
 -------------------------------------------------------------------
 `
@@ -160,6 +160,7 @@ The following files are tracked by git but matching a pattern in .gitignore:
 To correct it: move files to not match one of the following patterns:
 
   /*
+  tap-testdir*/
   !**/.gitignore
   !/.commitlintrc.js
   !/.eslintrc.js
@@ -183,7 +184,6 @@ To correct it: move files to not match one of the following patterns:
   !/SECURITY.md
   !/tap-snapshots/
   !/test/
-  tap-testdir-*/
   !/workspaces/
   /workspaces/*
   !/workspaces/a/
@@ -198,6 +198,7 @@ The following files are tracked by git but matching a pattern in workspaces/a/.g
 To correct it: move files to not match one of the following patterns:
 
   /*
+  tap-testdir*/
   !**/.gitignore
   !/.eslintrc.js
   !/.eslintrc.local.*
@@ -213,7 +214,6 @@ To correct it: move files to not match one of the following patterns:
   !/scripts/
   !/tap-snapshots/
   !/test/
-  tap-testdir-*/
 
 -------------------------------------------------------------------
 
@@ -224,6 +224,7 @@ The following files are tracked by git but matching a pattern in workspaces/b/.g
 To correct it: move files to not match one of the following patterns:
 
   /*
+  tap-testdir*/
   !**/.gitignore
   !/.eslintrc.js
   !/.eslintrc.local.*
@@ -239,7 +240,6 @@ To correct it: move files to not match one of the following patterns:
   !/scripts/
   !/tap-snapshots/
   !/test/
-  tap-testdir-*/
 
 -------------------------------------------------------------------
 `
