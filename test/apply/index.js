@@ -161,7 +161,7 @@ t.test('workspace config can override root', async (t) => {
       a: {
         templateOSS: {
           workspaceModule: {
-            add: { '.eslintrc.js': 'eslintrc.js' },
+            add: { '.eslintrc.js': 'eslintrc.js.handlebars' },
             rm: { '.npmrc': true },
           },
         },
