@@ -33,6 +33,9 @@ const okPackage = () => Object.entries(CONTENT.requiredPackages)
     }))
     return acc
   }, {
+    engines: {
+      node: '^14.17.0 || ^16.13.0 || >=18.0.0',
+    },
     tap: {
       'nyc-arg': [
         '--exclude',
@@ -107,8 +110,8 @@ const setup = async (t, {
 } = {}) => {
   const wsLookup = {}
   const pkg = merge(
-    pkgWithName(package, 'testpkg'),
-    ok ? okPackage() : {}
+    ok ? okPackage() : {},
+    pkgWithName(package, 'testpkg')
   )
 
   // convenience for passing in workspaces as an object

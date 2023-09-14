@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.18.1](https://github.com/npm/template-oss/compare/v4.18.0...v4.18.1) (2023-09-12)
+
+### Bug Fixes
+
+* [`44123b8`](https://github.com/npm/template-oss/commit/44123b8719bb95a2addec741b1937c2f985cffa6) [#354](https://github.com/npm/template-oss/pull/354) install npm in CI based on node version (@lukekarrys)
+
 ## [4.18.0](https://github.com/npm/template-oss/compare/v4.17.0...v4.18.0) (2023-07-18)
 
 ### Features

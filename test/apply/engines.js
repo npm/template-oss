@@ -1,43 +1,100 @@
 const t = require('tap')
 const { join } = require('path')
+const yaml = require('yaml')
 const setup = require('../setup.js')
 
-t.test('can set engines and ci separately', async (t) => {
+const getCiJobs = async (s) => {
+  const file = await s.readFile(join('.github', 'workflows', 'ci.yml'))
+  const { jobs } = yaml.parse(file)
+  return {
+    lint: jobs.lint.steps[2].with['node-version'],
+    test: jobs.test.strategy.matrix['node-version'],
+  }
+}
+
+t.test('sets ci versions from engines', async (t) => {
   const s = await setup(t, {
     package: {
+      engines: { node: '>=10' },
       templateOSS: {
-        engines: '>=10',
+        ciVersions: {
+          '12.x': false,
+        },
       },
     },
   })
   await s.apply()
 
   const pkg = await s.readJson('package.json')
-  const ci = await s.readFile(join('.github', 'workflows', 'ci.yml'))
-
   t.equal(pkg.engines.node, '>=10')
-  t.notOk(ci.includes('- 10'))
-  t.notOk(ci.includes('- 12'))
+
+  const versions = await getCiJobs(s)
+  t.equal(versions.lint, '20.x')
+  t.strictSame(versions.test, [
+    '10.0.0',
+    '10.x',
+    '14.x',
+    '16.x',
+    '18.x',
+    '20.x',
+  ])
 })
 
 t.test('can set ci to latest plus other versions', async (t) => {
   const s = await setup(t, {
     package: {
+      engines: { node: '*' },
       templateOSS: {
-        ciVersions: ['6', '8', 'latest'],
-        engines: '*',
+        ciVersions: ['6.x', '8.x', 'latest'],
       },
     },
   })
   await s.apply()
 
   const pkg = await s.readJson('package.json')
-  const ci = await s.readFile(join('.github', 'workflows', 'ci.yml'))
-
   t.equal(pkg.engines.node, '*')
-  t.ok(ci.includes('- 6'))
-  t.ok(ci.includes('- 8'))
-  t.ok(ci.includes('- 18.x'))
+
+  const versions = await getCiJobs(s)
+  t.equal(versions.lint, '20.x')
+  t.strictSame(versions.test, [
+    '6.x',
+    '8.x',
+    '20.x',
+  ])
+})
+
+t.test('sort by major', async (t) => {
+  const s = await setup(t, {
+    package: {
+      engines: { node: '*' },
+      templateOSS: {
+        latestCiVersion: null,
+        ciVersions: [
+          '7.x',
+          '6.0.0',
+          '6.x',
+          '7.0.0',
+          '8.x',
+          '8.0.0',
+        ],
+      },
+    },
+  })
+  await s.apply()
+
+  const pkg = await s.readJson('package.json')
+  t.equal(pkg.engines.node, '*')
+
+  const versions = await getCiJobs(s)
+  t.equal(versions.lint, '8.x')
+  t.strictSame(versions.test, [
+    '6.0.0',
+    '6.x',
+    '7.0.0',
+    '7.x',
+    '8.0.0',
+    '8.x',
+  ])
 })
 
 t.test('latest ci versions', async (t) => {
@@ -51,40 +108,11 @@ t.test('latest ci versions', async (t) => {
   await s.apply()
 
   const pkg = await s.readJson('package.json')
+  t.equal(pkg.engines, undefined)
 
-  t.equal(pkg.engines.node, '>=18.0.0')
-})
-
-t.test('latest ci versions in workspace', async (t) => {
-  const s = await setup(t, {
-    package: {
-      templateOSS: {
-        content: 'content',
-        ciVersions: ['12.x', '14.x', '16.x'],
-      },
-    },
-    workspaces: {
-      a: {
-        templateOSS: {
-          ciVersions: 'latest',
-        },
-      },
-    },
-    testdir: {
-      content: {
-        'source.json': '{ "node": {{{ json engines }}} }',
-        'index.js': `module.exports={
-          rootRepo:{add:{'target.json':'source.json'}},
-          workspaceRepo:{add:{'target-{{ pkgNameFs }}.json':'source.json'}}
-        }`,
-      },
-    },
-  })
-  await s.apply()
-
-  const root = await s.readJson('target.json')
-  const workspace = await s.readJson('target-a.json')
-
-  t.equal(root.node, '^12.0.0 || ^14.0.0 || >=16.0.0')
-  t.equal(workspace.node, '>=16.0.0')
+  const versions = await getCiJobs(s)
+  t.equal(versions.lint, '20.x')
+  t.strictSame(versions.test, [
+    '20.x',
+  ])
 })

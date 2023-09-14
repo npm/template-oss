@@ -22,7 +22,9 @@ t.afterEach(() => {
   process.env.npm_config_global = _global
   process.env.npm_config_local_prefix = _prefix
   global.console = _console
-  delete process.exitCode
+  if (process.exitCode) {
+    process.exitCode = 0
+  }
 })
 
 t.test('when npm_config_local_prefix is unset, does nothing', async (t) => {
