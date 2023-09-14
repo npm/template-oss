@@ -33,6 +33,9 @@ const localConfigs = readdir(__dirname)
 
 module.exports = {
   root: true,
+  ignorePatterns: [
+    'tap-testdir*/',
+  ],
   extends: [
     '@npmcli',
     ...localConfigs,
@@ -1875,6 +1878,7 @@ const localConfigs = readdir(__dirname)
 module.exports = {
   root: true,
   ignorePatterns: [
+    'tap-testdir*/',
     'workspaces/a/**',
     'workspaces/b/**',
   ],
@@ -4082,6 +4086,9 @@ const localConfigs = readdir(__dirname)
 
 module.exports = {
   root: true,
+  ignorePatterns: [
+    'tap-testdir*/',
+  ],
   extends: [
     '@npmcli',
     ...localConfigs,
@@ -4159,6 +4166,9 @@ const localConfigs = readdir(__dirname)
 
 module.exports = {
   root: true,
+  ignorePatterns: [
+    'tap-testdir*/',
+  ],
   extends: [
     '@npmcli',
     ...localConfigs,
@@ -5885,6 +5895,9 @@ const localConfigs = readdir(__dirname)
 
 module.exports = {
   root: true,
+  ignorePatterns: [
+    'tap-testdir*/',
+  ],
   extends: [
     '@npmcli',
     ...localConfigs,
@@ -5962,6 +5975,9 @@ const localConfigs = readdir(__dirname)
 
 module.exports = {
   root: true,
+  ignorePatterns: [
+    'tap-testdir*/',
+  ],
   extends: [
     '@npmcli',
     ...localConfigs,
