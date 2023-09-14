@@ -4,8 +4,8 @@ const setup = require('../setup.js')
 const setupEngines = ({ engines, omitEngines }) => setup(t, {
   ok: true,
   package: {
+    engines: { node: engines },
     templateOSS: {
-      engines,
       omitEngines,
     },
     dependencies: {

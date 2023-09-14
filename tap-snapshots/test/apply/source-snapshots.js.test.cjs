@@ -252,8 +252,8 @@ jobs:
         uses: actions/setup-node@v3
         id: node
         with:
-          node-version: 18.x
-          check-latest: contains('18.x', '.x')
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
 
       # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
       - name: Update Windows npm
@@ -393,8 +393,8 @@ jobs:
         uses: actions/setup-node@v3
         id: node
         with:
-          node-version: 18.x
-          check-latest: contains('18.x', '.x')
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
 
       # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
       - name: Update Windows npm
@@ -472,12 +472,7 @@ jobs:
             os: windows-latest
             shell: cmd
         node-version:
-          - 14.17.0
-          - 14.x
-          - 16.13.0
-          - 16.x
-          - 18.0.0
-          - 18.x
+          - 20.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
       run:
@@ -637,8 +632,8 @@ jobs:
         uses: actions/setup-node@v3
         id: node
         with:
-          node-version: 18.x
-          check-latest: contains('18.x', '.x')
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
 
       # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
       - name: Update Windows npm
@@ -709,12 +704,7 @@ jobs:
             os: windows-latest
             shell: cmd
         node-version:
-          - 14.17.0
-          - 14.x
-          - 16.13.0
-          - 16.x
-          - 18.0.0
-          - 18.x
+          - 20.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
       run:
@@ -860,8 +850,8 @@ jobs:
         uses: actions/setup-node@v3
         id: node
         with:
-          node-version: 18.x
-          check-latest: contains('18.x', '.x')
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
 
       # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
       - name: Update Windows npm
@@ -1031,8 +1021,8 @@ jobs:
         uses: actions/setup-node@v3
         id: node
         with:
-          node-version: 18.x
-          check-latest: contains('18.x', '.x')
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
 
       # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
       - name: Update Windows npm
@@ -1143,8 +1133,8 @@ jobs:
         uses: actions/setup-node@v3
         id: node
         with:
-          node-version: 18.x
-          check-latest: contains('18.x', '.x')
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
 
       # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
       - name: Update Windows npm
@@ -1300,8 +1290,8 @@ jobs:
         uses: actions/setup-node@v3
         id: node
         with:
-          node-version: 18.x
-          check-latest: contains('18.x', '.x')
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
 
       # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
       - name: Update Windows npm
@@ -1510,8 +1500,8 @@ jobs:
         uses: actions/setup-node@v3
         id: node
         with:
-          node-version: 18.x
-          check-latest: contains('18.x', '.x')
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
 
       # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
       - name: Update Windows npm
@@ -1768,9 +1758,6 @@ package.json
     "bin/",
     "lib/"
   ],
-  "engines": {
-    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
-  },
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
     "version": "{{VERSION}}"
@@ -2108,8 +2095,8 @@ jobs:
         uses: actions/setup-node@v3
         id: node
         with:
-          node-version: 18.x
-          check-latest: contains('18.x', '.x')
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
 
       # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
       - name: Update Windows npm
@@ -2204,8 +2191,8 @@ jobs:
         uses: actions/setup-node@v3
         id: node
         with:
-          node-version: 18.x
-          check-latest: contains('18.x', '.x')
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
 
       # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
       - name: Update Windows npm
@@ -2276,12 +2263,7 @@ jobs:
             os: windows-latest
             shell: cmd
         node-version:
-          - 14.17.0
-          - 14.x
-          - 16.13.0
-          - 16.x
-          - 18.0.0
-          - 18.x
+          - 20.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
       run:
@@ -2393,8 +2375,8 @@ jobs:
         uses: actions/setup-node@v3
         id: node
         with:
-          node-version: 18.x
-          check-latest: contains('18.x', '.x')
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
 
       # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
       - name: Update Windows npm
@@ -2465,12 +2447,7 @@ jobs:
             os: windows-latest
             shell: cmd
         node-version:
-          - 14.17.0
-          - 14.x
-          - 16.13.0
-          - 16.x
-          - 18.0.0
-          - 18.x
+          - 20.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
       run:
@@ -2627,8 +2604,8 @@ jobs:
         uses: actions/setup-node@v3
         id: node
         with:
-          node-version: 18.x
-          check-latest: contains('18.x', '.x')
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
 
       # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
       - name: Update Windows npm
@@ -2706,12 +2683,7 @@ jobs:
             os: windows-latest
             shell: cmd
         node-version:
-          - 14.17.0
-          - 14.x
-          - 16.13.0
-          - 16.x
-          - 18.0.0
-          - 18.x
+          - 20.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
       run:
@@ -2877,8 +2849,8 @@ jobs:
         uses: actions/setup-node@v3
         id: node
         with:
-          node-version: 18.x
-          check-latest: contains('18.x', '.x')
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
 
       # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
       - name: Update Windows npm
@@ -2949,12 +2921,7 @@ jobs:
             os: windows-latest
             shell: cmd
         node-version:
-          - 14.17.0
-          - 14.x
-          - 16.13.0
-          - 16.x
-          - 18.0.0
-          - 18.x
+          - 20.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
       run:
@@ -3100,8 +3067,8 @@ jobs:
         uses: actions/setup-node@v3
         id: node
         with:
-          node-version: 18.x
-          check-latest: contains('18.x', '.x')
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
 
       # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
       - name: Update Windows npm
@@ -3271,8 +3238,8 @@ jobs:
         uses: actions/setup-node@v3
         id: node
         with:
-          node-version: 18.x
-          check-latest: contains('18.x', '.x')
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
 
       # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
       - name: Update Windows npm
@@ -3383,8 +3350,8 @@ jobs:
         uses: actions/setup-node@v3
         id: node
         with:
-          node-version: 18.x
-          check-latest: contains('18.x', '.x')
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
 
       # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
       - name: Update Windows npm
@@ -3540,8 +3507,8 @@ jobs:
         uses: actions/setup-node@v3
         id: node
         with:
-          node-version: 18.x
-          check-latest: contains('18.x', '.x')
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
 
       # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
       - name: Update Windows npm
@@ -3750,8 +3717,8 @@ jobs:
         uses: actions/setup-node@v3
         id: node
         with:
-          node-version: 18.x
-          check-latest: contains('18.x', '.x')
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
 
       # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
       - name: Update Windows npm
@@ -4020,9 +3987,6 @@ package.json
     "bin/",
     "lib/"
   ],
-  "engines": {
-    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
-  },
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
     "version": "{{VERSION}}"
@@ -4163,9 +4127,6 @@ workspaces/a/package.json
     "bin/",
     "lib/"
   ],
-  "engines": {
-    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
-  },
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
     "version": "{{VERSION}}"
@@ -4241,9 +4202,6 @@ workspaces/b/package.json
     "bin/",
     "lib/"
   ],
-  "engines": {
-    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
-  },
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
     "version": "{{VERSION}}"
@@ -4412,8 +4370,8 @@ jobs:
         uses: actions/setup-node@v3
         id: node
         with:
-          node-version: 18.x
-          check-latest: contains('18.x', '.x')
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
 
       # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
       - name: Update Windows npm
@@ -4484,12 +4442,7 @@ jobs:
             os: windows-latest
             shell: cmd
         node-version:
-          - 14.17.0
-          - 14.x
-          - 16.13.0
-          - 16.x
-          - 18.0.0
-          - 18.x
+          - 20.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
       run:
@@ -4601,8 +4554,8 @@ jobs:
         uses: actions/setup-node@v3
         id: node
         with:
-          node-version: 18.x
-          check-latest: contains('18.x', '.x')
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
 
       # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
       - name: Update Windows npm
@@ -4673,12 +4626,7 @@ jobs:
             os: windows-latest
             shell: cmd
         node-version:
-          - 14.17.0
-          - 14.x
-          - 16.13.0
-          - 16.x
-          - 18.0.0
-          - 18.x
+          - 20.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
       run:
@@ -4835,8 +4783,8 @@ jobs:
         uses: actions/setup-node@v3
         id: node
         with:
-          node-version: 18.x
-          check-latest: contains('18.x', '.x')
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
 
       # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
       - name: Update Windows npm
@@ -4914,12 +4862,7 @@ jobs:
             os: windows-latest
             shell: cmd
         node-version:
-          - 14.17.0
-          - 14.x
-          - 16.13.0
-          - 16.x
-          - 18.0.0
-          - 18.x
+          - 20.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
       run:
@@ -5074,8 +5017,8 @@ jobs:
         uses: actions/setup-node@v3
         id: node
         with:
-          node-version: 18.x
-          check-latest: contains('18.x', '.x')
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
 
       # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
       - name: Update Windows npm
@@ -5245,8 +5188,8 @@ jobs:
         uses: actions/setup-node@v3
         id: node
         with:
-          node-version: 18.x
-          check-latest: contains('18.x', '.x')
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
 
       # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
       - name: Update Windows npm
@@ -5357,8 +5300,8 @@ jobs:
         uses: actions/setup-node@v3
         id: node
         with:
-          node-version: 18.x
-          check-latest: contains('18.x', '.x')
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
 
       # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
       - name: Update Windows npm
@@ -5514,8 +5457,8 @@ jobs:
         uses: actions/setup-node@v3
         id: node
         with:
-          node-version: 18.x
-          check-latest: contains('18.x', '.x')
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
 
       # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
       - name: Update Windows npm
@@ -5724,8 +5667,8 @@ jobs:
         uses: actions/setup-node@v3
         id: node
         with:
-          node-version: 18.x
-          check-latest: contains('18.x', '.x')
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
 
       # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
       - name: Update Windows npm
@@ -5983,9 +5926,6 @@ workspaces/a/package.json
     "bin/",
     "lib/"
   ],
-  "engines": {
-    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
-  },
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
     "version": "{{VERSION}}"
@@ -6061,9 +6001,6 @@ workspaces/b/package.json
     "bin/",
     "lib/"
   ],
-  "engines": {
-    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
-  },
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
     "version": "{{VERSION}}"
