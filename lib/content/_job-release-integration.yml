@@ -22,7 +22,7 @@ steps:
   - name: Publish
     env:
       PUBLISH_TOKEN: $\{{ secrets.PUBLISH_TOKEN }}
-    run: npm publish --provenance
+    run: npm publish --provenance --tag={{ publishTag }}
 {{else}}
 runs-on: ubuntu-latest
 defaults:
