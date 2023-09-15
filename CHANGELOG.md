@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.19.0](https://github.com/npm/template-oss/compare/v4.18.1...v4.19.0) (2023-09-15)
+
+### Features
+
+* [`994a278`](https://github.com/npm/template-oss/commit/994a2784df4b76c5e0362e9877fb6ae63e94bd77) [#356](https://github.com/npm/template-oss/pull/356) set ci versions from engines (@lukekarrys)
+* [`cad156a`](https://github.com/npm/template-oss/commit/cad156a3a929ab30c5d9e595443b22f399f3941c) [#360](https://github.com/npm/template-oss/pull/360) set backport release from config instead of current branch (@lukekarrys)
+
+### Bug Fixes
+
+* [`de319e8`](https://github.com/npm/template-oss/commit/de319e8b20e5ab64770add7a9b847a2c76d22159) [#358](https://github.com/npm/template-oss/pull/358) allow overriding path to npm bin in workspaces (@lukekarrys)
+
 ## [4.18.1](https://github.com/npm/template-oss/compare/v4.18.0...v4.18.1) (2023-09-12)
 
 ### Bug Fixes
