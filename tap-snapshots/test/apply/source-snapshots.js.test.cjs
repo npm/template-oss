@@ -33,6 +33,9 @@ const localConfigs = readdir(__dirname)
 
 module.exports = {
   root: true,
+  ignorePatterns: [
+    'tap-testdir*/',
+  ],
   extends: [
     '@npmcli',
     ...localConfigs,
@@ -1638,6 +1641,8 @@ jobs:
 
 # ignore everything in the root
 /*
+# transient test directories
+tap-testdir*/
 
 # keep these
 !**/.gitignore
@@ -1873,6 +1878,7 @@ const localConfigs = readdir(__dirname)
 module.exports = {
   root: true,
   ignorePatterns: [
+    'tap-testdir*/',
     'workspaces/a/**',
     'workspaces/b/**',
   ],
@@ -3855,6 +3861,8 @@ jobs:
 
 # ignore everything in the root
 /*
+# transient test directories
+tap-testdir*/
 
 # keep these
 !**/.gitignore
@@ -4078,6 +4086,9 @@ const localConfigs = readdir(__dirname)
 
 module.exports = {
   root: true,
+  ignorePatterns: [
+    'tap-testdir*/',
+  ],
   extends: [
     '@npmcli',
     ...localConfigs,
@@ -4090,6 +4101,8 @@ workspaces/a/.gitignore
 
 # ignore everything in the root
 /*
+# transient test directories
+tap-testdir*/
 
 # keep these
 !**/.gitignore
@@ -4153,6 +4166,9 @@ const localConfigs = readdir(__dirname)
 
 module.exports = {
   root: true,
+  ignorePatterns: [
+    'tap-testdir*/',
+  ],
   extends: [
     '@npmcli',
     ...localConfigs,
@@ -4165,6 +4181,8 @@ workspaces/b/.gitignore
 
 # ignore everything in the root
 /*
+# transient test directories
+tap-testdir*/
 
 # keep these
 !**/.gitignore
@@ -5877,6 +5895,9 @@ const localConfigs = readdir(__dirname)
 
 module.exports = {
   root: true,
+  ignorePatterns: [
+    'tap-testdir*/',
+  ],
   extends: [
     '@npmcli',
     ...localConfigs,
@@ -5889,6 +5910,8 @@ workspaces/a/.gitignore
 
 # ignore everything in the root
 /*
+# transient test directories
+tap-testdir*/
 
 # keep these
 !**/.gitignore
@@ -5952,6 +5975,9 @@ const localConfigs = readdir(__dirname)
 
 module.exports = {
   root: true,
+  ignorePatterns: [
+    'tap-testdir*/',
+  ],
   extends: [
     '@npmcli',
     ...localConfigs,
@@ -5964,6 +5990,8 @@ workspaces/b/.gitignore
 
 # ignore everything in the root
 /*
+# transient test directories
+tap-testdir*/
 
 # keep these
 !**/.gitignore
