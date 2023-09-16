@@ -8,5 +8,5 @@ on:
 
 jobs:
   audit:
-    {{> job jobName="Audit Dependencies" jobDepFlags="--package-lock" }}
-      {{> stepAudit }}
+    {{> jobYml jobName="Audit Dependencies" jobDepFlags="--package-lock" }}
+      {{> stepAuditYml }}

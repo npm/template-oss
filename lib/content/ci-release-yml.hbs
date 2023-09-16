@@ -19,19 +19,19 @@ on:
 
 jobs:
   lint-all:
-    {{> job
+    {{> jobYml
       jobName="Lint All"
       jobCheck=(obj sha="inputs.check-sha")
       jobCheckout=(obj ref="${{ inputs.ref }}")
     }}
-      {{> stepLint jobRunFlags=allFlags }}
-      {{> stepChecks jobCheck=true }}
+      {{> stepLintYml jobRunFlags=allFlags }}
+      {{> stepChecksYml jobCheck=true }}
 
   test-all:
-    {{> jobMatrix
+    {{> jobMatrixYml
       jobName="Test All"
       jobCheck=(obj sha="inputs.check-sha")
       jobCheckout=(obj ref="${{ inputs.ref }}")
     }}
-      {{> stepTest jobRunFlags=allFlags }}
-      {{> stepChecks jobCheck=true }}
+      {{> stepTestYml jobRunFlags=allFlags }}
+      {{> stepChecksYml jobCheck=true }}

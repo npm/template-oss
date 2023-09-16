@@ -29,7 +29,7 @@ defaults:
   run:
     shell: bash
 steps:
-  {{> stepNode lockfile=false }}
+  {{> stepNodeYml lockfile=false }}
   - name: View in Registry
     run: |
       EXIT_CODE=0

@@ -1,0 +1,13 @@
+name: CI {{~#if isWorkspace}} - {{ pkgName }}{{/if}}
+
+on:
+  {{> onCiYml }}
+
+jobs:
+  lint:
+    {{> jobYml jobName="Lint" }}
+      {{> stepLintYml jobRunFlags=pkgFlags }}
+
+  test:
+    {{> jobMatrixYml jobName="Test" }}
+      {{> stepTestYml jobRunFlags=pkgFlags }}

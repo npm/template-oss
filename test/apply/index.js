@@ -161,7 +161,7 @@ t.test('workspace config can override root', async (t) => {
       a: {
         templateOSS: {
           workspaceModule: {
-            add: { '.eslintrc.js': 'eslintrc.js.handlebars' },
+            add: { '.eslintrc.js': 'eslintrc-js.hbs' },
             rm: { '.npmrc': true },
           },
         },
@@ -224,9 +224,9 @@ t.test('content can override partials', async (t) => {
             add:{'.github/workflows/ci-release.yml': 'ci-release.yml'}
           }
         }`,
-        'ci-release.yml': '{{> ciRelease }}\n  job: 1',
+        'ci-release.yml': '{{> ciReleaseYml }}\n  job: 1',
         '_step-deps.yml': '- run: INSTALL\n',
-        '_step-test.yml': '- run: TEST\n{{> defaultStepTest }}\n',
+        '_step-test.yml': '- run: TEST\n{{> defaultStepTestYml }}\n',
       },
     },
   })
@@ -251,7 +251,7 @@ t.test('content can extend files', async (t) => {
       content_dir: {
         // eslint-disable-next-line max-len
         'index.js': 'module.exports={rootRepo:{add:{".github/workflows/release.yml": "release.yml"}}}',
-        'release.yml': '{{> ciRelease}}\n  smoke-publish:\n    runs-on: ubuntu-latest',
+        'release.yml': '{{> ciReleaseYml}}\n  smoke-publish:\n    runs-on: ubuntu-latest',
       },
     },
   })
