@@ -34,8 +34,8 @@ t.test('works with custom content', async (t) => {
     },
     testdir: {
       content_dir: {
-        'paths.json': '{{{json allowPaths}}}',
-        'index.js': 'module.exports={rootRepo:{add:{"paths.json":"paths.json"}}}',
+        'paths-json.hbs': '{{{json allowPaths}}}',
+        'index.js': 'module.exports={rootRepo:{add:{"paths.json":"paths-json.hbs"}}}',
       },
     },
   })

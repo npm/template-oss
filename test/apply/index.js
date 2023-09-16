@@ -199,8 +199,8 @@ t.test('workspaces can override content', async (t) => {
     testdir: {
       content_dir: { 'index.js': 'module.exports={}' },
       content_dir2: {
-        'x.js': 'exists',
-        'index.js': 'module.exports={workspaceRepo:{add:{"x.js":"x.js"}}}',
+        'x-js.hbs': 'exists',
+        'index.js': 'module.exports={workspaceRepo:{add:{"x.js":"x-js.hbs"}}}',
       },
     },
   })
@@ -221,12 +221,12 @@ t.test('content can override partials', async (t) => {
       content_dir: {
         'index.js': `module.exports={
           rootRepo:{
-            add:{'.github/workflows/ci-release.yml': 'ci-release.yml'}
+            add:{'.github/workflows/ci-release.yml': 'ci-release-yml.hbs'}
           }
         }`,
-        'ci-release.yml': '{{> ciReleaseYml }}\n  job: 1',
-        '_step-deps.yml': '- run: INSTALL\n',
-        '_step-test.yml': '- run: TEST\n{{> defaultStepTestYml }}\n',
+        'ci-release-yml.hbs': '{{> ciReleaseYml }}\n  job: 1',
+        '_step-deps-yml.hbs': '- run: INSTALL\n',
+        '_step-test-yml.hbs': '- run: TEST\n{{> defaultStepTestYml }}\n',
       },
     },
   })
@@ -250,8 +250,8 @@ t.test('content can extend files', async (t) => {
     testdir: {
       content_dir: {
         // eslint-disable-next-line max-len
-        'index.js': 'module.exports={rootRepo:{add:{".github/workflows/release.yml": "release.yml"}}}',
-        'release.yml': '{{> ciReleaseYml}}\n  smoke-publish:\n    runs-on: ubuntu-latest',
+        'index.js': 'module.exports={rootRepo:{add:{".github/workflows/release.yml": "release-yml.hbs"}}}',
+        'release-yml.hbs': '{{> ciReleaseYml}}\n  smoke-publish:\n    runs-on: ubuntu-latest',
       },
     },
   })
