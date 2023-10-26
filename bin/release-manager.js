@@ -50,6 +50,12 @@ const MANUAL_PUBLISH_STEPS = `
 `
 
 const AUTO_PUBLISH_STEPS = `
+1. Approve this PR
+
+    \`\`\`sh
+    gh pr review <PR-NUMBER> -R {NWO} --approve
+    \`\`\`
+
 1. Merge release PR :rotating_light: Merging this will auto publish :rotating_light:
 
     \`\`\`sh
