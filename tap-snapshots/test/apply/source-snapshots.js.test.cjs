@@ -1632,7 +1632,7 @@ package.json
   "name": "testpkg",
   "version": "1.0.0",
   "scripts": {
-    "lint": "eslint /"**/*.js/"",
+    "lint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
     "lintfix": "npm run lint -- --fix",
@@ -3716,7 +3716,7 @@ package.json
     "workspaces/b"
   ],
   "scripts": {
-    "lint": "eslint /"**/*.js/"",
+    "lint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
     "lintfix": "npm run lint -- --fix",
@@ -3863,7 +3863,7 @@ workspaces/a/package.json
   "name": "a",
   "version": "1.0.0",
   "scripts": {
-    "lint": "eslint /"**/*.js/"",
+    "lint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
     "lintfix": "npm run lint -- --fix",
@@ -3943,7 +3943,7 @@ workspaces/b/package.json
   "name": "b",
   "version": "1.0.0",
   "scripts": {
-    "lint": "eslint /"**/*.js/"",
+    "lint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
     "lintfix": "npm run lint -- --fix",
@@ -5555,7 +5555,7 @@ workspaces/a/package.json
   "name": "a",
   "version": "1.0.0",
   "scripts": {
-    "lint": "eslint /"**/*.js/"",
+    "lint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
     "lintfix": "npm run lint -- --fix",
@@ -5635,7 +5635,7 @@ workspaces/b/package.json
   "name": "b",
   "version": "1.0.0",
   "scripts": {
-    "lint": "eslint /"**/*.js/"",
+    "lint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
     "lintfix": "npm run lint -- --fix",

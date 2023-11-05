@@ -73,7 +73,7 @@ The module file package.json needs to be updated:
     "lib/"
   ]
   "scripts" is missing, expected {
-    "lint": "eslint /"**/*.js/"",
+    "lint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
     "lintfix": "npm run lint -- --fix",
@@ -325,7 +325,7 @@ The module file package.json needs to be updated:
     "lib/"
   ]
   "scripts" is missing, expected {
-    "lint": "eslint /"**/*.js/"",
+    "lint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
     "lintfix": "npm run lint -- --fix",
@@ -401,7 +401,7 @@ The module file package.json needs to be updated:
     "lib/"
   ]
   "scripts" is missing, expected {
-    "lint": "eslint /"**/*.js/"",
+    "lint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
     "lintfix": "npm run lint -- --fix",
@@ -470,7 +470,7 @@ The module file package.json needs to be updated:
     "lib/"
   ]
   "scripts" is missing, expected {
-    "lint": "eslint /"**/*.js/"",
+    "lint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
     "lintfix": "npm run lint -- --fix",

@@ -2,7 +2,7 @@
   "author": "GitHub Inc.",
   "files": {{{ json distPaths }}},
   "scripts": {
-    "lint": "{{#if eslint}}eslint \"**/*.js\"{{else}}echo linting disabled{{/if}}",
+    "lint": "{{#if eslint}}eslint \"**/*.{js,cjs,ts,mjs,jsx,tsx}\"{{else}}echo linting disabled{{/if}}",
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
     "lintfix": "{{ localNpmPath }} run lint -- --fix",
