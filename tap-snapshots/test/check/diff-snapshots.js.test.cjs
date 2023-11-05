@@ -99,23 +99,23 @@ The repo file audit.yml needs to be updated:
   [@npmcli/template-oss ERROR] There was an erroring getting the target file
   [@npmcli/template-oss ERROR] Error: {{ROOT}}/test/check/tap-testdir-diff-snapshots-update-and-remove-errors/.github/workflows/audit.yml
   
-  YAMLParseError: Implicit keys need to be on a single line at line 84, column 1:
+  YAMLParseError: Implicit keys need to be on a single line at line 69, column 1:
   
           run: npm audit --audit-level=none
   >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
   ^
   
-  YAMLParseError: Block scalar header includes extra characters: >>>>I at line 84, column 2:
+  YAMLParseError: Block scalar header includes extra characters: >>>>I at line 69, column 2:
   
   >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
    ^
   
-  YAMLParseError: Not a YAML token: HOPE THIS IS NOT VALID YAML<<<<<<<<<<< at line 84, column 7:
+  YAMLParseError: Not a YAML token: HOPE THIS IS NOT VALID YAML<<<<<<<<<<< at line 69, column 7:
   
   >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   
-  YAMLParseError: Implicit map keys need to be followed by map values at line 84, column 1:
+  YAMLParseError: Implicit map keys need to be followed by map values at line 69, column 1:
   
           run: npm audit --audit-level=none
   >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
@@ -156,48 +156,33 @@ The repo file audit.yml needs to be updated:
             node-version: 20.x
             check-latest: contains('20.x', '.x')
   
-        # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
-        - name: Update Windows npm
-          if: |
-            matrix.platform.os == 'windows-latest' && (
-              startsWith(steps.node.outputs.node-version, 'v10.') || startsWith(steps.node.outputs.node-version, 'v12.') || startsWith(steps.node.outputs.node-version, 'v14.')
-            )
-          run: |
-            curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
-            tar xf npm-7.5.4.tgz
-            cd package
-            node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
-            cd ..
-            rmdir /s /q package
-  
-        # Start on Node 10 because we dont test on anything lower
-        - name: Install npm@7 on Node 10
+        - name: Install Latest npm
           shell: bash
-          if: startsWith(steps.node.outputs.node-version, 'v10.')
-          id: npm-7
+          env:
+            NODE_VERSION: \${{ steps.node.outputs.node-version }}
           run: |
-            npm i --prefer-online --no-fund --no-audit -g npm@7
-            echo "updated=true" >> "$GITHUB_OUTPUT"
+            MATCH=""
+            SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
   
-        - name: Install npm@8 on Node 12
-          shell: bash
-          if: startsWith(steps.node.outputs.node-version, 'v12.')
-          id: npm-8
-          run: |
-            npm i --prefer-online --no-fund --no-audit -g npm@8
-            echo "updated=true" >> "$GITHUB_OUTPUT"
+            echo "node@$NODE_VERSION"
   
-        - name: Install npm@9 on Node 14/16/18.0
-          shell: bash
-          if: startsWith(steps.node.outputs.node-version, 'v14.') || startsWith(steps.node.outputs.node-version, 'v16.') || startsWith(steps.node.outputs.node-version, 'v18.0.')
-          id: npm-9
-          run: |
-            npm i --prefer-online --no-fund --no-audit -g npm@9
-            echo "updated=true" >> "$GITHUB_OUTPUT"
+            for SPEC in \${SPECS[@]}; do
+              ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
+              echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
   
-        - name: Install npm@latest on Node
-          if: \${{ !(steps.npm-7.outputs.updated || steps.npm-8.outputs.updated || steps.npm-9.outputs.updated) }}
-          run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+              if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
+                MATCH=$SPEC
+                echo "Found compatible version: npm@$MATCH"
+                break
+              fi  
+            done
+  
+            if [ -z $MATCH ]; then
+              echo "Could not find a compatible version of npm for node@$NODE_VERSION"
+              exit 1
+            fi
+  
+            npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
   
         - name: npm Version
           run: npm -v
@@ -217,23 +202,22 @@ The repo file ci.yml needs to be updated:
 
   .github/workflows/ci.yml
   ========================================
-  @@ -159,4 +159,25 @@
-           id: npm-8
-           run: |
-             npm i --prefer-online --no-fund --no-audit -g npm@8
-             echo "updated=true" >> "$GITHUB_OUTPUT"
+  @@ -146,4 +146,24 @@
+               echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
+   
+               if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
+                 MATCH=$SPEC
+  +              echo "Found compatible version: npm@$MATCH"
+  +              break
+  +            fi  
+  +          done
   +
-  +      - name: Install npm@9 on Node 14/16/18.0
-  +        shell: bash
-  +        if: startsWith(steps.node.outputs.node-version, 'v14.') || startsWith(steps.node.outputs.node-version, 'v16.') || startsWith(steps.node.outputs.node-version, 'v18.0.')
-  +        id: npm-9
-  +        run: |
-  +          npm i --prefer-online --no-fund --no-audit -g npm@9
-  +          echo "updated=true" >> "$GITHUB_OUTPUT"
+  +          if [ -z $MATCH ]; then
+  +            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
+  +            exit 1
+  +          fi
   +
-  +      - name: Install npm@latest on Node
-  +        if: \${{ !(steps.npm-7.outputs.updated || steps.npm-8.outputs.updated || steps.npm-9.outputs.updated) }}
-  +        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+  +          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
   +
   +      - name: npm Version
   +        run: npm -v
