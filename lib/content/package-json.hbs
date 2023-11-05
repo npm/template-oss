@@ -34,13 +34,13 @@
     {{#if workspacePaths}}
     "test-ignore": "^({{ join workspacePaths "|" }})/",
     {{/if}}
-    "nyc-arg": [
+    "nyc-arg": {{#if tap18}}{{{ del }}}{{else}}[
       {{#each workspaceGlobs}}
       "--exclude",
       "{{ . }}",
       {{/each}}
       "--exclude",
       "tap-snapshots/**"
-    ]
+    ]{{/if}}
   }
 }
