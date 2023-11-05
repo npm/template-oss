@@ -13,7 +13,18 @@ module.exports = {
     {{#each workspaceGlobs}}
     '{{ . }}',
     {{/each}}
+    {{#if typescript}}
+    'dist/',
+    {{/if}}
   ],
+  {{#if typescript}}
+  parser: '@typescript-eslint/parser',
+  settings: {
+    'import/resolver': {
+      typescript: {},
+    },
+  },
+  {{/if}}
   extends: [
     '@npmcli',
     ...localConfigs,

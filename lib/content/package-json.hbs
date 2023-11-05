@@ -1,6 +1,7 @@
 {
   "author": "GitHub Inc.",
-  "files": {{{ json distPaths }}},
+  "files": {{#if typescript}}{{{ del }}}{{else}}{{{ json distPaths }}}{{/if}},
+  "type": {{#if esm}}"module"{{else}}{{{ del }}}{{/if}},
   "scripts": {
     "lint": "{{#if eslint}}eslint \"**/*.{js,cjs,ts,mjs,jsx,tsx}\"{{else}}echo linting disabled{{/if}}",
     "postlint": "template-oss-check",
@@ -12,6 +13,9 @@
     {{#if isRootMono}}
     "test-all": "{{ localNpmPath }} run test {{ allFlags }}",
     "lint-all": "{{ localNpmPath }} run lint {{ allFlags }}",
+    {{/if}}
+    {{#if typescript}}
+    "prepare": "tshy",
     {{/if}}
     "template-copy": {{{ del }}},
     "lint:fix": {{{ del }}},

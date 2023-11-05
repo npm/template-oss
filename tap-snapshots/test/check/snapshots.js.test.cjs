@@ -144,6 +144,7 @@ To correct it: move files to not match one of the following patterns:
   !/SECURITY.md
   !/tap-snapshots/
   !/test/
+  !/tsconfig.json
 
 -------------------------------------------------------------------
 `
@@ -184,6 +185,7 @@ To correct it: move files to not match one of the following patterns:
   !/SECURITY.md
   !/tap-snapshots/
   !/test/
+  !/tsconfig.json
   !/workspaces/
   /workspaces/*
   !/workspaces/a/
