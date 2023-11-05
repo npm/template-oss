@@ -1,5 +1,4 @@
 const t = require('tap')
-const fs = require('fs')
 const { join } = require('path')
 const setup = require('../setup.js')
 
@@ -21,10 +20,10 @@ t.test('turn off root files', async (t) => {
     },
   })
   await s.apply()
-  t.notOk(fs.existsSync(s.join('.commitlintrc.js')))
-  t.notOk(fs.existsSync(s.join('.eslintrc.js')))
-  t.ok(fs.existsSync(s.join('.github', 'workflows', 'release-test.yml')))
-  t.ok(fs.existsSync(s.join('.eslintrc.yml')))
+  t.notOk(await s.exists('.commitlintrc.js'))
+  t.notOk(await s.exists('.eslintrc.js'))
+  t.ok(await s.exists('.github', 'workflows', 'release-test.yml'))
+  t.ok(await s.exists('.eslintrc.yml'))
 })
 
 t.test('turn off root rm only', async (t) => {
@@ -49,10 +48,10 @@ t.test('turn off root rm only', async (t) => {
     },
   })
   await s.apply()
-  t.ok(fs.existsSync(s.join('.commitlintrc.js')))
-  t.ok(fs.existsSync(s.join('.eslintrc.js')))
-  t.ok(fs.existsSync(s.join('.github', 'workflows', 'release-test.yml')))
-  t.ok(fs.existsSync(s.join('.eslintrc.yml')))
+  t.ok(await s.exists('.commitlintrc.js'))
+  t.ok(await s.exists('.eslintrc.js'))
+  t.ok(await s.exists('.github', 'workflows', 'release-test.yml'))
+  t.ok(await s.exists('.eslintrc.yml'))
 })
 
 t.test('turn off root add only', async (t) => {
@@ -77,10 +76,10 @@ t.test('turn off root add only', async (t) => {
     },
   })
   await s.apply()
-  t.notOk(fs.existsSync(s.join('.commitlintrc.js')))
-  t.notOk(fs.existsSync(s.join('.eslintrc.js')))
-  t.notOk(fs.existsSync(s.join('.github', 'workflows', 'release-test.yml')))
-  t.notOk(fs.existsSync(s.join('.eslintrc.yml')))
+  t.notOk(await s.exists('.commitlintrc.js'))
+  t.notOk(await s.exists('.eslintrc.js'))
+  t.notOk(await s.exists('.github', 'workflows', 'release-test.yml'))
+  t.notOk(await s.exists('.eslintrc.yml'))
 })
 
 t.test('turn off specific files', async (t) => {
@@ -115,10 +114,10 @@ t.test('turn off specific files', async (t) => {
     },
   })
   await s.apply()
-  t.notOk(fs.existsSync(s.join('.commitlintrc.js')))
-  t.notOk(fs.existsSync(s.join('.eslintrc.js')))
-  t.ok(fs.existsSync(s.join('.github', 'workflows', 'release-test.yml')))
-  t.ok(fs.existsSync(s.join('.eslintrc.yml')))
+  t.notOk(await s.exists('.commitlintrc.js'))
+  t.notOk(await s.exists('.eslintrc.js'))
+  t.ok(await s.exists('.github', 'workflows', 'release-test.yml'))
+  t.ok(await s.exists('.eslintrc.yml'))
 })
 
 t.test('root can set workspace files', async (t) => {
@@ -143,8 +142,8 @@ t.test('root can set workspace files', async (t) => {
     },
   })
   await s.apply()
-  t.notOk(fs.existsSync(s.join(s.workspaces.a, '.eslintrc.js')))
-  t.ok(fs.existsSync(s.join(s.workspaces.a, '.npmrc')))
+  t.notOk(await s.exists(s.workspaces.a, '.eslintrc.js'))
+  t.ok(await s.exists(s.workspaces.a, '.npmrc'))
 })
 
 t.test('workspace config can override root', async (t) => {
@@ -176,8 +175,8 @@ t.test('workspace config can override root', async (t) => {
     },
   })
   await s.apply()
-  t.ok(fs.existsSync(s.join(s.workspaces.a, '.eslintrc.js')))
-  t.notOk(fs.existsSync(s.join(s.workspaces.a, '.npmrc')))
+  t.ok(await s.exists(s.workspaces.a, '.eslintrc.js'))
+  t.notOk(await s.exists(s.workspaces.a, '.npmrc'))
 })
 
 t.test('workspaces can override content', async (t) => {
@@ -205,9 +204,9 @@ t.test('workspaces can override content', async (t) => {
     },
   })
   await s.apply()
-  t.notOk(fs.existsSync(s.join('.eslintrc.js')))
-  t.ok(fs.existsSync(s.join(s.workspaces.a, '.eslintrc.js')))
-  t.ok(fs.existsSync(s.join('x.js')))
+  t.notOk(await s.exists('.eslintrc.js'))
+  t.ok(await s.exists(s.workspaces.a, '.eslintrc.js'))
+  t.ok(await s.exists('x.js'))
 })
 
 t.test('content can override partials', async (t) => {
@@ -339,8 +338,7 @@ t.test('private workspace', async (t) => {
   t.ok(rpConfig.packages['workspaces/b'])
   t.notOk(rpConfig.packages['workspaces/a'])
 
-  const rp = s.join('.github', 'workflows')
-  t.ok(fs.existsSync(join(rp, 'release.yml')))
-  t.notOk(fs.existsSync(join(rp, 'release-please-b.yml')))
-  t.notOk(fs.existsSync(join(rp, 'release-please-a.yml')))
+  t.ok(await s.exists('.github', 'workflows', 'release.yml'))
+  t.notOk(await s.exists('.github', 'workflows', 'release-please-b.yml'))
+  t.notOk(await s.exists('.github', 'workflows', 'release-please-a.yml'))
 })

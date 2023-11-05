@@ -94,6 +94,7 @@ const setupRoot = async (t, root, mocks) => {
     readdir,
     readJson: async (f) => JSON.parse(await rootFs.readFile(f)),
     writeJson: (p, d) => rootFs.writeFile(p, JSON.stringify(d, null, 2)),
+    exists: (...p) => fs.access(rootPath(...p)).then(() => true).catch(() => false),
     join: rootPath,
     apply: () => apply(root),
     check: () => check(root),

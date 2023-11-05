@@ -1,5 +1,4 @@
 const t = require('tap')
-const { existsSync } = require('fs')
 const setup = require('../setup.js')
 
 t.test('root only', async (t) => {
@@ -19,7 +18,7 @@ t.test('root only', async (t) => {
       await s.apply()
 
       const releaseConfig = await s.readJson('release-please-config.json').catch(() => ({}))
-      const pr = existsSync(s.join('.github', 'workflows', 'pull-request.yml'))
+      const pr = await s.exists('.github', 'workflows', 'pull-request.yml')
 
       t.strictSame(releaseConfig.plugins, expected.plugins ? ['node-workspace'] : undefined)
       t.equal(pr, expected.pr)

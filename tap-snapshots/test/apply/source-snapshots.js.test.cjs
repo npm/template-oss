@@ -1550,6 +1550,7 @@ tap-testdir*/
 !/SECURITY.md
 !/tap-snapshots/
 !/test/
+!/tsconfig.json
 
 .npmrc
 ========================================
@@ -3624,6 +3625,7 @@ tap-testdir*/
 !/SECURITY.md
 !/tap-snapshots/
 !/test/
+!/tsconfig.json
 !/workspaces/
 /workspaces/*
 !/workspaces/a/
