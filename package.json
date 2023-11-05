@@ -10,7 +10,7 @@
     "template-oss-release-manager": "bin/release-manager.js"
   },
   "scripts": {
-    "lint": "eslint \"**/*.js\"",
+    "lint": "eslint \"**/*.{js,cjs,ts,mjs,jsx,tsx}\"",
     "lintfix": "npm run lint -- --fix",
     "posttest": "npm run lint",
     "snap": "tap",
