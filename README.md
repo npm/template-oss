@@ -3,7 +3,11 @@
 This module bundles the npm CLI team's basics for package development into a
 single devDependency.
 
-**CAUTION: THESE CHANGES WILL OVERWRITE LOCAL FILES AND SETTINGS**
+> [!WARNING]  
+> THESE CHANGES WILL OVERWRITE LOCAL FILES AND SETTINGS
+
+> [!IMPORTANT]  
+> This package does not follow semantic versioning for its API. This package is designed to be installed with `--save-exact` and therefore will make breaking API changes outside of major versions, including `engines` narrowing. Major versions are reserved for breaking changes to files written to a repo by this package.
 
 ### Configuration
 
