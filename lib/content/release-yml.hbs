@@ -27,7 +27,7 @@ jobs:
       pr-number: $\{{ steps.release.outputs.pr-number }}
       comment-id: $\{{ steps.pr-comment.outputs.result }}
       check-id: $\{{ steps.check.outputs.check_id }}
-    {{> job jobName="Release" }}
+    {{> jobYml jobName="Release" }}
       - name: Release Please
         id: release
         env:
@@ -66,14 +66,14 @@ jobs:
             }
 
             return commentId
-      {{> stepChecks jobCheck=(obj name="Release" sha="steps.release.outputs.pr-sha") }}
+      {{> stepChecksYml jobCheck=(obj name="Release" sha="steps.release.outputs.pr-sha") }}
 
   update:
     needs: release
     outputs:
       sha: $\{{ steps.commit.outputs.sha }}
       check-id: $\{{ steps.check.outputs.check_id }}
-    {{> job
+    {{> jobYml
       jobName="Update - Release"
       jobIf="needs.release.outputs.pr"
       jobCheckout=(obj ref="${{ needs.release.outputs.branch }}" fetch-depth=0)
@@ -94,8 +94,8 @@ jobs:
           git commit --all --amend --no-edit || true
           git push --force-with-lease
           echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-      {{> stepChecks jobName="Update - Release" jobCheck=(obj sha="steps.commit.outputs.sha" name="Release" )}}
-      {{> stepChecks jobCheck=(obj id="needs.release.outputs.check-id" )}}
+      {{> stepChecksYml jobName="Update - Release" jobCheck=(obj sha="steps.commit.outputs.sha" name="Release" )}}
+      {{> stepChecksYml jobCheck=(obj id="needs.release.outputs.check-id" )}}
 
   ci:
     name: CI - Release
@@ -108,7 +108,7 @@ jobs:
 
   post-ci:
     needs: [release, update, ci]
-    {{> job jobName="Post CI - Release" jobIf="needs.release.outputs.pr && always()" jobSkipSetup=true }}
+    {{> jobYml jobName="Post CI - Release" jobIf="needs.release.outputs.pr && always()" jobSkipSetup=true }}
       - name: Get Needs Result
         id: needs-result
         run: |
@@ -121,11 +121,11 @@ jobs:
             result="success"
           fi
           echo "result=$result" >> $GITHUB_OUTPUT
-      {{> stepChecks jobCheck=(obj id="needs.update.outputs.check-id" status="steps.needs-result.outputs.result") }}
+      {{> stepChecksYml jobCheck=(obj id="needs.update.outputs.check-id" status="steps.needs-result.outputs.result") }}
 
   post-release:
     needs: release
-    {{> job jobName="Post Release - Release" jobIf="needs.release.outputs.releases" jobSkipSetup=true  }}
+    {{> jobYml jobName="Post Release - Release" jobIf="needs.release.outputs.releases" jobSkipSetup=true  }}
       - name: Create Release PR Comment
         uses: actions/github-script@v6
         env:
@@ -163,11 +163,11 @@ jobs:
     needs: release
     name: Release Integration
     if: needs.release.outputs.release
-    {{> jobReleaseIntegration }}
+    {{> jobReleaseIntegrationYml }}
 
   post-release-integration:
     needs: [release, release-integration]
-    {{> job jobName="Post Release Integration - Release" jobIf="needs.release.outputs.release && always()" jobSkipSetup=true }}
+    {{> jobYml jobName="Post Release Integration - Release" jobIf="needs.release.outputs.release && always()" jobSkipSetup=true }}
       - name: Get Needs Result
         id: needs-result
         run: |

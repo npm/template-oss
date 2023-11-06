@@ -10,7 +10,7 @@ on:
 
 jobs:
   commitlint:
-    {{> job jobName="Lint Commits" jobCheckout=(obj fetch-depth=0) }}
+    {{> jobYml jobName="Lint Commits" jobCheckout=(obj fetch-depth=0) }}
       - name: Run Commitlint on Commits
         id: commit
         continue-on-error: true

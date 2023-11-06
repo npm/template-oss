@@ -106,7 +106,7 @@ const setup = async (t, {
   workspaces = {},
   testdir = {},
   mocks = {},
-  ok,
+  ok = false,
 } = {}) => {
   const wsLookup = {}
   const pkg = merge(

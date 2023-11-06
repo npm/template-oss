@@ -26,4 +26,4 @@ defaults:
   run:
     shell: $\{{ matrix.platform.shell }}
 steps:
-  {{> stepsSetup jobIsMatrix=true }}
+  {{> stepsSetupYml jobIsMatrix=true }}

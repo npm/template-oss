@@ -1,0 +1,6 @@
+{{~#if jobCheck}}{{> stepChecksYml }}{{/if}}
+{{~#unless jobSkipSetup}}
+{{> stepGitYml }}
+{{> stepNodeYml }}
+{{> stepDepsYml }}
+{{/unless}}

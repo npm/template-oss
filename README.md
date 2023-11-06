@@ -3,7 +3,7 @@
 This module bundles the npm CLI team's basics for package development into a
 single devDependency.
 
-**CAUTION: THESE CHANGES WILL OVERWRITE ANY LOCAL FILES AND SETTINGS**
+**CAUTION: THESE CHANGES WILL OVERWRITE LOCAL FILES AND SETTINGS**
 
 ### Configuration
 
@@ -60,21 +60,21 @@ any of the same settings in the root.
 ### Content
 
 All the templated content for this repo lives in
-[`lib/content/`](./lib/content/). The `index.js`[./lib/content/index.js] file
+[`lib/content/`](./lib/content/). The [`index.js`](./lib/content/index.js) file
 controls how and where this content is written.
 
 Content files can be overwritten or merged with the existing target file.
-Currently mergining is only supported for `package.json` files.
+Merging is only supported for some types of files (ini, yaml, json, package.json)
 
 Each content file goes through the following pipeline:
 
 1. It is read from its source location
-1. It is are templated using Handlebars with the variables from each packages's
-   config (with some derived values generated in [`config.js`](./lib/config.js)
-1. It is parsed based on its file extension in
+2. It is compiled using [Handlebars](https://handlebarsjs.com/) with the variables from each packages's
+   config (with some derived values generated in [`config.js`](./lib/config.js))
+3. It is parsed based on its file extension in
    [`parser.js`](./lib/util/parser.js)
-1. Additional logic is applied by the parser
-1. It is written to its target location
+4. Additional logic is applied by the parser
+5. It is written to its target location
 
 ### Usage
 
@@ -82,7 +82,7 @@ This package provides two bin scripts:
 
 #### `template-oss-check`
 
-This will check if any of the applied files different from the target content,
+This will check if any of the applied files differ from the target content,
 or if any of the other associated checks fail. The diffs of each file or check
 will be reported with instructions on how to fix it.
 
@@ -92,7 +92,7 @@ This will write all source files to their target locations in the cwd. It will
 do nothing if `package.json#templateOSS.version` is the same as the version
 being run. This can be overridden by `--force`.
 
-This is the script that is run on `postinsall`.
+This is the script that is run on `postinstall`.
 
 ### Extending
 
@@ -100,7 +100,7 @@ This is the script that is run on `postinsall`.
 
 This directory is where all the logic for applying files lives. It should be
 possible to add new files without modifying anything in this directory. To add a
-file, add the templated file to `lib/content/$FILENAME` and add entry for it in
+file, add the templated file to `lib/content/$FILENAME` and an entry for it in
 `lib/content/index.js` depending on where and when it should be written (root vs
 workspace, repo vs module, add vs remove, etc).
 
