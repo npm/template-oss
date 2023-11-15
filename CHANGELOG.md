@@ -1,5 +1,36 @@
 # Changelog
 
+## [4.20.0](https://github.com/npm/template-oss/compare/v4.19.0...v4.20.0) (2023-11-15)
+
+### Features
+
+* [`17ea62d`](https://github.com/npm/template-oss/commit/17ea62ddae905344c50458e10a204cf13cb56aaf) [#371](https://github.com/npm/template-oss/pull/371) add typescript and esm support (@lukekarrys)
+* [`ea0e866`](https://github.com/npm/template-oss/commit/ea0e8661e0a9759fed1a4044cb1f5905dad1942c) [#373](https://github.com/npm/template-oss/pull/373) update engines (#373) (@lukekarrys)
+
+### Bug Fixes
+
+* [`74331b4`](https://github.com/npm/template-oss/commit/74331b4a815fb83c69ee57c05d299c1a647b46c0) [#371](https://github.com/npm/template-oss/pull/371) remove tap 16 specific config when using tap 18 (@lukekarrys)
+* [`3fca74f`](https://github.com/npm/template-oss/commit/3fca74f484b683ec204350d491a4eb201e882b85) [#371](https://github.com/npm/template-oss/pull/371) always lint all js-ish extensions (@lukekarrys)
+* [`37e9e0e`](https://github.com/npm/template-oss/commit/37e9e0ed8eb5a0ff49531d5b9cb2105f81004358) [#371](https://github.com/npm/template-oss/pull/371) use npx semver to better determine latest npm (@lukekarrys)
+* [`3e1792c`](https://github.com/npm/template-oss/commit/3e1792c441752d52bb3b446698dc6a0850b3b4de) [#362](https://github.com/npm/template-oss/pull/362) add suffix to template files (#362) (@rotu)
+* [`ebb48ec`](https://github.com/npm/template-oss/commit/ebb48ecbf3dfffb6e21634528723267018f324af) [#368](https://github.com/npm/template-oss/pull/368) add PR approval to auto publish flow (#368) (@wraithgar)
+* [`f065bcb`](https://github.com/npm/template-oss/commit/f065bcb147e8a8104848e594363540e1b056b548) [#366](https://github.com/npm/template-oss/pull/366) prefer upstream over origin when getting remote (@lukekarrys)
+* [`29bf19d`](https://github.com/npm/template-oss/commit/29bf19d5b809b573185753321f5e498155c55f5b) [#364](https://github.com/npm/template-oss/pull/364) Ignore transient tap test directories (#364) (@wraithgar)
+
+### Documentation
+
+* [`2a8d79e`](https://github.com/npm/template-oss/commit/2a8d79ef33c939af4ee909dd7c851ce96db16d93) [#372](https://github.com/npm/template-oss/pull/372) add note about semver and breaking changes (#372) (@lukekarrys)
+
+### Dependencies
+
+* [`ec65582`](https://github.com/npm/template-oss/commit/ec65582767348658bb8a6f9040099ff704c03d1d) [#375](https://github.com/npm/template-oss/pull/375) bump @commitlint/config-conventional from 17.8.1 to 18.1.0
+* [`c8420a6`](https://github.com/npm/template-oss/commit/c8420a6755609eba54886e6af5a123c57f2002eb) [#374](https://github.com/npm/template-oss/pull/374) bump @commitlint/cli from 17.8.1 to 18.2.0
+* [`f2521ed`](https://github.com/npm/template-oss/commit/f2521edc63fd6bd313fdc3fdac8e3a3c0bd70af9) [#370](https://github.com/npm/template-oss/pull/370) bump @npmcli/arborist from 6.5.0 to 7.2.1
+* [`8c20554`](https://github.com/npm/template-oss/commit/8c2055457c112e616a0529bfb5baa296d3bdecc9) [#346](https://github.com/npm/template-oss/pull/346) bump @npmcli/git from 4.1.0 to 5.0.3
+* [`f25926a`](https://github.com/npm/template-oss/commit/f25926ab282975ea371700c6e8d17d454ab93777) [#343](https://github.com/npm/template-oss/pull/343) bump @npmcli/package-json from 4.0.1 to 5.0.0
+* [`af30dbe`](https://github.com/npm/template-oss/commit/af30dbe3bbf4f410f31473f3df89b5893c01be62) [#357](https://github.com/npm/template-oss/pull/357) bump hosted-git-info from 6.1.1 to 7.0.1
+* [`0b59cd6`](https://github.com/npm/template-oss/commit/0b59cd6bc32a48f69a7a46b6a7e9c28a106fcffe) [#349](https://github.com/npm/template-oss/pull/349) bump npm-package-arg from 10.1.0 to 11.0.1
+
 ## [4.19.0](https://github.com/npm/template-oss/compare/v4.18.1...v4.19.0) (2023-09-15)
 
 ### Features
