@@ -21,17 +21,29 @@ jobs:
   lint-all:
     {{> jobYml
       jobName="Lint All"
-      jobCheck=(obj sha="inputs.check-sha")
       jobCheckout=(obj ref="${{ inputs.ref }}")
+      jobCreateCheck=(obj sha="${{ inputs.check-sha }}")
     }}
       {{> stepLintYml jobRunFlags=allFlags }}
-      {{> stepChecksYml jobCheck=true }}
+      - name: Conclude Check
+        uses: LouisBrunner/checks-action@v1.6.0
+        if: always()
+        with:
+          token: $\{{ secrets.GITHUB_TOKEN }}
+          conclusion: $\{{ job.status }}
+          check_id: $\{{ steps.create-check.outputs.check-id }}
 
   test-all:
     {{> jobMatrixYml
       jobName="Test All"
-      jobCheck=(obj sha="inputs.check-sha")
       jobCheckout=(obj ref="${{ inputs.ref }}")
+      jobCreateCheck=(obj sha="${{ inputs.check-sha }}")
     }}
       {{> stepTestYml jobRunFlags=allFlags }}
-      {{> stepChecksYml jobCheck=true }}
+      - name: Conclude Check
+        uses: LouisBrunner/checks-action@v1.6.0
+        if: always()
+        with:
+          token: $\{{ secrets.GITHUB_TOKEN }}
+          conclusion: $\{{ job.status }}
+          check_id: $\{{ steps.create-check.outputs.check-id }}

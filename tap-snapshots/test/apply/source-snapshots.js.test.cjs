@@ -42,6 +42,121 @@ module.exports = {
   ],
 }
 
+.github/actions/create-check/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: 'Create Check'
+inputs:
+  name:
+    required: true
+  token:
+    required: true
+  sha:
+    required: true
+  check-name:
+    default: ''
+outputs:
+  check-id:
+    value: \${{ steps.create-check.outputs.check_id }}
+runs:
+  using: "composite"
+  steps:
+    - name: Get Workflow Job
+      uses: actions/github-script@v6
+      id: workflow
+      env:
+        JOB_NAME: "\${{ inputs.name }}"
+        SHA: "\${{ inputs.sha }}"
+      with:
+        result-encoding: string
+        script: |
+          const { repo: { owner, repo}, runId, serverUrl } = context          
+          const { JOB_NAME, SHA } = process.env
+
+          const job = await github.rest.actions.listJobsForWorkflowRun({
+            owner,
+            repo,
+            run_id: runId,
+            per_page: 100
+          }).then(r => r.data.jobs.find(j => j.name.endsWith(JOB_NAME)))
+
+          return [
+            \`This check is assosciated with \${serverUrl}/\${owner}/\${repo}/commit/\${SHA}.\`,
+            'Run logs:',
+            job?.html_url || \`could not be found for a job ending with: "\${JOB_NAME}"\`,
+          ].join(' ')
+    - name: Create Check
+      uses: LouisBrunner/checks-action@v1.6.0
+      id: create-check
+      with:
+        token: \${{ inputs.token }}
+        sha: \${{ inputs.sha }}
+        status: in_progress
+        name: \${{ inputs.check-name || inputs.name }}
+        output: |
+          {"summary":"\${{ steps.workflow.outputs.result }}"}
+
+.github/actions/install-latest-npm/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: 'Install Latest npm'
+description: 'Install the latest version of npm compatible with the Node version'
+inputs:
+  node:
+    description: 'Current Node version'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
+    - name: Update Windows npm
+      if: |
+        runner.os == 'Windows' && (
+          startsWith(inputs.node, 'v10.') ||
+          startsWith(inputs.node, 'v12.') ||
+          startsWith(inputs.node, 'v14.')
+        )
+      shell: cmd
+      run: |
+        curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
+        tar xf npm-7.5.4.tgz
+        cd package
+        node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
+        cd ..
+        rmdir /s /q package
+    - name: Install Latest npm
+      shell: bash
+      env:
+        NODE_VERSION: \${{ inputs.node }}
+      run: |
+        MATCH=""
+        SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
+
+        echo "node@$NODE_VERSION"
+
+        for SPEC in \${SPECS[@]}; do
+          ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
+          echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
+
+          if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
+            MATCH=$SPEC
+            echo "Found compatible version: npm@$MATCH"
+            break
+          fi  
+        done
+
+        if [ -z $MATCH ]; then
+          echo "Could not find a compatible version of npm for node@$NODE_VERSION"
+          exit 1
+        fi
+
+        npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
+    - name: npm Version
+      shell: bash
+      run: npm -v
+
 .github/CODEOWNERS
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
@@ -257,37 +372,10 @@ jobs:
         with:
           node-version: 20.x
           check-latest: contains('20.x', '.x')
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund --package-lock
       - name: Run Production Audit
@@ -326,49 +414,6 @@ jobs:
       run:
         shell: bash
     steps:
-      - name: Get Workflow Job
-        uses: actions/github-script@v6
-        if: inputs.check-sha
-        id: check-output
-        env:
-          JOB_NAME: "Lint All"
-          MATRIX_NAME: ""
-        with:
-          script: |
-            const { owner, repo } = context.repo
-
-            const { data } = await github.rest.actions.listJobsForWorkflowRun({
-              owner,
-              repo,
-              run_id: context.runId,
-              per_page: 100
-            })
-
-            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
-            const job = data.jobs.find(j => j.name.endsWith(jobName))
-            const jobUrl = job?.html_url
-
-            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ inputs.check-sha }}\`
-
-            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
-
-            if (jobUrl) {
-              summary += \`For run logs, click here: \${jobUrl}\`
-            } else {
-              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
-            }
-
-            return { summary }
-      - name: Create Check
-        uses: LouisBrunner/checks-action@v1.6.0
-        id: check
-        if: inputs.check-sha
-        with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          status: in_progress
-          name: Lint All
-          sha: \${{ inputs.check-sha }}
-          output: \${{ steps.check-output.outputs.result }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -377,43 +422,24 @@ jobs:
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
+      - name: Create Check
+        id: create-check
+        if: \${{ inputs.check-sha }}
+        uses: ./.github/actions/create-check
+        with:
+          name: "Lint All"
+          token: \${{ secrets.GITHUB_TOKEN }}
+          sha: \${{ inputs.check-sha }}
       - name: Setup Node
         uses: actions/setup-node@v3
         id: node
         with:
           node-version: 20.x
           check-latest: contains('20.x', '.x')
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
@@ -422,11 +448,11 @@ jobs:
         run: npm run postlint --ignore-scripts
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.6.0
-        if: steps.check.outputs.check_id && always()
+        if: always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
-          check_id: \${{ steps.check.outputs.check_id }}
+          check_id: \${{ steps.create-check.outputs.check-id }}
 
   test-all:
     name: Test All - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
@@ -451,49 +477,6 @@ jobs:
       run:
         shell: \${{ matrix.platform.shell }}
     steps:
-      - name: Get Workflow Job
-        uses: actions/github-script@v6
-        if: inputs.check-sha
-        id: check-output
-        env:
-          JOB_NAME: "Test All"
-          MATRIX_NAME: " - \${{ matrix.platform.name }} - \${{ matrix.node-version }}"
-        with:
-          script: |
-            const { owner, repo } = context.repo
-
-            const { data } = await github.rest.actions.listJobsForWorkflowRun({
-              owner,
-              repo,
-              run_id: context.runId,
-              per_page: 100
-            })
-
-            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
-            const job = data.jobs.find(j => j.name.endsWith(jobName))
-            const jobUrl = job?.html_url
-
-            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ inputs.check-sha }}\`
-
-            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
-
-            if (jobUrl) {
-              summary += \`For run logs, click here: \${jobUrl}\`
-            } else {
-              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
-            }
-
-            return { summary }
-      - name: Create Check
-        uses: LouisBrunner/checks-action@v1.6.0
-        id: check
-        if: inputs.check-sha
-        with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          status: in_progress
-          name: Test All - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
-          sha: \${{ inputs.check-sha }}
-          output: \${{ steps.check-output.outputs.result }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -502,59 +485,24 @@ jobs:
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
+      - name: Create Check
+        id: create-check
+        if: \${{ inputs.check-sha }}
+        uses: ./.github/actions/create-check
+        with:
+          name: "Test All - \${{ matrix.platform.name }} - \${{ matrix.node-version }}"
+          token: \${{ secrets.GITHUB_TOKEN }}
+          sha: \${{ inputs.check-sha }}
       - name: Setup Node
         uses: actions/setup-node@v3
         id: node
         with:
           node-version: \${{ matrix.node-version }}
           check-latest: contains(matrix.node-version, '.x')
-
-      # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
-      - name: Update Windows npm
-        if: |
-          matrix.platform.os == 'windows-latest' && (
-            startsWith(steps.node.outputs.node-version, 'v10.') ||
-            startsWith(steps.node.outputs.node-version, 'v12.') ||
-            startsWith(steps.node.outputs.node-version, 'v14.')
-          )
-        run: |
-          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
-          tar xf npm-7.5.4.tgz
-          cd package
-          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
-          cd ..
-          rmdir /s /q package
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Add Problem Matcher
@@ -563,11 +511,11 @@ jobs:
         run: npm test --ignore-scripts
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.6.0
-        if: steps.check.outputs.check_id && always()
+        if: always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
-          check_id: \${{ steps.check.outputs.check_id }}
+          check_id: \${{ steps.create-check.outputs.check-id }}
 
 .github/workflows/ci.yml
 ========================================
@@ -608,37 +556,10 @@ jobs:
         with:
           node-version: 20.x
           check-latest: contains('20.x', '.x')
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
@@ -681,53 +602,10 @@ jobs:
         with:
           node-version: \${{ matrix.node-version }}
           check-latest: contains(matrix.node-version, '.x')
-
-      # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
-      - name: Update Windows npm
-        if: |
-          matrix.platform.os == 'windows-latest' && (
-            startsWith(steps.node.outputs.node-version, 'v10.') ||
-            startsWith(steps.node.outputs.node-version, 'v12.') ||
-            startsWith(steps.node.outputs.node-version, 'v14.')
-          )
-        run: |
-          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
-          tar xf npm-7.5.4.tgz
-          cd package
-          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
-          cd ..
-          rmdir /s /q package
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Add Problem Matcher
@@ -812,37 +690,10 @@ jobs:
         with:
           node-version: 20.x
           check-latest: contains('20.x', '.x')
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Fetch Dependabot Metadata
@@ -968,50 +819,92 @@ jobs:
         with:
           node-version: 20.x
           check-latest: contains('20.x', '.x')
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Run Commitlint on Commits
         id: commit
         continue-on-error: true
-        run: |
-          npx --offline commitlint -V --from 'origin/\${{ github.base_ref }}' --to \${{ github.event.pull_request.head.sha }}
+        run: npx --offline commitlint -V --from 'origin/\${{ github.base_ref }}' --to \${{ github.event.pull_request.head.sha }}
       - name: Run Commitlint on PR Title
         if: steps.commit.outcome == 'failure'
         env:
           PR_TITLE: \${{ github.event.pull_request.title }}
+        run: echo "$PR_TITLE" | npx --offline commitlint -V
+
+.github/workflows/release-integration.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Release Integration
+
+on:
+  workflow_dispatch:
+    inputs:
+      releases:
+        required: true
+        type: string
+        description: 'A json array of releases. Required fields: publish: tagName, publishTag. publish check: pkgName, version'
+  workflow_call:
+    inputs:
+      releases:
+        required: true
+        type: string
+        description: 'A json array of releases. Required fields: publish: tagName, publishTag. publish check: pkgName, version'
+
+jobs:
+  publish:
+    name: Check Publish
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Git User
         run: |
-          echo "$PR_TITLE" | npx --offline commitlint -V
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        id: node
+        with:
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
+      - name: Install Latest npm
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
+      - name: Install Dependencies
+        run: npm i --ignore-scripts --no-audit --no-fund
+      - name: Check If Published
+        run: |
+          EXIT_CODE=0
+
+          function each_release {
+            if npm view "$@" --loglevel=error > /dev/null; then
+              echo 0
+            else
+              echo 1
+            fi
+          }
+
+          for release in $(echo '\${{ inputs.releases }}' | jq -r '.[] | @base64'); do
+            SPEC="$(echo "$release" | base64 --decode | jq -r .pkgName)@$(echo "$release" | base64 --decode | jq -r .version)"
+            STATUS=$(each_release "$SPEC")
+            if [[ "$STATUS" -eq 1 ]]; then
+              echo "$SPEC ERROR"
+              EXIT_CODE=$STATUS
+            else
+              echo "$SPEC OK"
+            fi
+          done
+
+          exit $EXIT_CODE
 
 .github/workflows/release.yml
 ========================================
@@ -1020,11 +913,6 @@ jobs:
 name: Release
 
 on:
-  workflow_dispatch:
-    inputs:
-      release-pr:
-        description: a release PR number to rerun release jobs on
-        type: string
   push:
     branches:
       - main
@@ -1040,12 +928,12 @@ jobs:
   release:
     outputs:
       pr: \${{ steps.release.outputs.pr }}
-      release: \${{ steps.release.outputs.release }}
-      releases: \${{ steps.release.outputs.releases }}
-      branch: \${{ steps.release.outputs.pr-branch }}
+      pr-branch: \${{ steps.release.outputs.pr-branch }}
       pr-number: \${{ steps.release.outputs.pr-number }}
-      comment-id: \${{ steps.pr-comment.outputs.result }}
-      check-id: \${{ steps.check.outputs.check_id }}
+      pr-sha: \${{ steps.release.outputs.pr-sha }}
+      releases: \${{ steps.release.outputs.releases }}
+      comment-id: \${{ steps.create-comment.outputs.comment-id || steps.update-comment.outputs.comment-id }}
+      check-id: \${{ steps.create-check.outputs.check-id }}
     name: Release
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
@@ -1065,126 +953,64 @@ jobs:
         with:
           node-version: 20.x
           check-latest: contains('20.x', '.x')
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Release Please
         id: release
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
-        run: |
-          npx --offline template-oss-release-please "\${{ github.ref_name }}" "\${{ inputs.release-pr }}"
-      - name: Post Pull Request Comment
+        run: npx --offline template-oss-release-please --branch="\${{ github.ref_name }}" --backport="" --defaultTag="latest"
+      - name: Create Release Manager Comment Text
         if: steps.release.outputs.pr-number
         uses: actions/github-script@v6
-        id: pr-comment
-        env:
-          PR_NUMBER: \${{ steps.release.outputs.pr-number }}
-          REF_NAME: \${{ github.ref_name }}
+        id: comment-text
         with:
+          result-encoding: string
           script: |
-            const { REF_NAME, PR_NUMBER: issue_number } = process.env
             const { runId, repo: { owner, repo } } = context
-
             const { data: workflow } = await github.rest.actions.getWorkflowRun({ owner, repo, run_id: runId })
-
-            let body = '## Release Manager/n/n'
-
-            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
-            let commentId = comments.find(c => c.user.login === 'github-actions[bot]' && c.body.startsWith(body))?.id
-
-            body += \`Release workflow run: \${workflow.html_url}/n/n#### Force CI to Update This Release/n/n\`
-            body += \`This PR will be updated and CI will run for every non-/\`chore:/\` commit that is pushed to /\`\${REF_NAME}/\`. \`
-            body += \`To force CI to update this PR, run this command:/n/n\`
-            body += \`/\`/\`/\`/ngh workflow run release.yml -r \${REF_NAME} -R \${owner}/\${repo} -f release-pr=\${issue_number}/n/\`/\`/\`\`
-
-            if (commentId) {
-              await github.rest.issues.updateComment({ owner, repo, comment_id: commentId, body })
-            } else {
-              const { data: comment } = await github.rest.issues.createComment({ owner, repo, issue_number, body })
-              commentId = comment?.id
-            }
-
-            return commentId
-      - name: Get Workflow Job
-        uses: actions/github-script@v6
-        if: steps.release.outputs.pr-sha
-        id: check-output
-        env:
-          JOB_NAME: "Release"
-          MATRIX_NAME: ""
+            return['## Release Manager', \`Release workflow run: \${workflow.html_url}\`].join('/n/n')
+      - name: Find Release Manager Comment
+        uses: peter-evans/find-comment@v2
+        if: steps.release.outputs.pr-number
+        id: found-comment
         with:
-          script: |
-            const { owner, repo } = context.repo
-
-            const { data } = await github.rest.actions.listJobsForWorkflowRun({
-              owner,
-              repo,
-              run_id: context.runId,
-              per_page: 100
-            })
-
-            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
-            const job = data.jobs.find(j => j.name.endsWith(jobName))
-            const jobUrl = job?.html_url
-
-            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ steps.release.outputs.pr-sha }}\`
-
-            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
-
-            if (jobUrl) {
-              summary += \`For run logs, click here: \${jobUrl}\`
-            } else {
-              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
-            }
-
-            return { summary }
+          issue-number: \${{ steps.release.outputs.pr-number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '## Release Manager'
+      - name: Create Release Manager Comment
+        id: create-comment
+        if: steps.release.outputs.pr-number && !steps.found-comment.outputs.comment-id
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          issue-number: \${{ steps.release.outputs.pr-number }}
+          body: \${{ steps.comment-text.outputs.result }}
+      - name: Update Release Manager Comment
+        id: update-comment
+        if: steps.release.outputs.pr-number && steps.found-comment.outputs.comment-id
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          comment-id: \${{ steps.found-comment.outputs.comment-id }}
+          body: \${{ steps.comment-text.outputs.result }}
+          edit-mode: 'replace'
       - name: Create Check
-        uses: LouisBrunner/checks-action@v1.6.0
-        id: check
+        id: create-check
+        uses: ./.github/actions/create-check
         if: steps.release.outputs.pr-sha
         with:
+          name: "Release"
           token: \${{ secrets.GITHUB_TOKEN }}
-          status: in_progress
-          name: Release
           sha: \${{ steps.release.outputs.pr-sha }}
-          output: \${{ steps.check-output.outputs.result }}
 
   update:
     needs: release
     outputs:
       sha: \${{ steps.commit.outputs.sha }}
-      check-id: \${{ steps.check.outputs.check_id }}
+      check-id: \${{ steps.create-check.outputs.check-id }}
     name: Update - Release
     if: github.repository_owner == 'npm' && needs.release.outputs.pr
     runs-on: ubuntu-latest
@@ -1196,7 +1022,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          ref: \${{ needs.release.outputs.branch }}
+          ref: \${{ needs.release.outputs.pr-branch }}
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
@@ -1207,47 +1033,27 @@ jobs:
         with:
           node-version: 20.x
           check-latest: contains('20.x', '.x')
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
+      - name: Create Release Manager Checklist Text
+        id: comment-text
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        run: npm exec --offline -- template-oss-release-manager --pr="\${{ needs.release.outputs.pr-number }}" --backport="" --defaultTag="latest"
+      - name: Append Release Manager Comment
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          comment-id: \${{ needs.release.outputs.comment-id }}
+          body: \${{ steps.comment-text.outputs.result }}
+          edit-mode: 'append'
       - name: Run Post Pull Request Actions
         env:
-          RELEASE_PR_NUMBER: \${{ needs.release.outputs.pr-number }}
-          RELEASE_COMMENT_ID: \${{ needs.release.outputs.comment-id }}
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
-        run: |
-          npm exec --offline -- template-oss-release-manager --lockfile=false --publish=false
-          npm run rp-pull-request --ignore-scripts --if-present
+        run: npm run rp-pull-request --ignore-scripts --if-present -- --pr="\${{ needs.release.outputs.pr-number }}" --commentId="\${{ needs.release.outputs.comment-id }}"
       - name: Commit
         id: commit
         env:
@@ -1256,52 +1062,16 @@ jobs:
           git commit --all --amend --no-edit || true
           git push --force-with-lease
           echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-      - name: Get Workflow Job
-        uses: actions/github-script@v6
-        if: steps.commit.outputs.sha
-        id: check-output
-        env:
-          JOB_NAME: "Update - Release"
-          MATRIX_NAME: ""
-        with:
-          script: |
-            const { owner, repo } = context.repo
-
-            const { data } = await github.rest.actions.listJobsForWorkflowRun({
-              owner,
-              repo,
-              run_id: context.runId,
-              per_page: 100
-            })
-
-            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
-            const job = data.jobs.find(j => j.name.endsWith(jobName))
-            const jobUrl = job?.html_url
-
-            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ steps.commit.outputs.sha }}\`
-
-            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
-
-            if (jobUrl) {
-              summary += \`For run logs, click here: \${jobUrl}\`
-            } else {
-              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
-            }
-
-            return { summary }
       - name: Create Check
-        uses: LouisBrunner/checks-action@v1.6.0
-        id: check
-        if: steps.commit.outputs.sha
+        id: create-check
+        uses: ./.github/actions/create-check
         with:
+          name: "Update - Release"
+          check-name: "Release"
           token: \${{ secrets.GITHUB_TOKEN }}
-          status: in_progress
-          name: Release
           sha: \${{ steps.commit.outputs.sha }}
-          output: \${{ steps.check-output.outputs.result }}
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.6.0
-        if: needs.release.outputs.check-id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
@@ -1313,7 +1083,7 @@ jobs:
     if: needs.release.outputs.pr
     uses: ./.github/workflows/ci-release.yml
     with:
-      ref: \${{ needs.release.outputs.branch }}
+      ref: \${{ needs.release.outputs.pr-branch }}
       check-sha: \${{ needs.update.outputs.sha }}
 
   post-ci:
@@ -1325,8 +1095,8 @@ jobs:
       run:
         shell: bash
     steps:
-      - name: Get Needs Result
-        id: needs-result
+      - name: Get CI Conclusion
+        id: conclusion
         run: |
           result=""
           if [[ "\${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
@@ -1339,14 +1109,15 @@ jobs:
           echo "result=$result" >> $GITHUB_OUTPUT
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.6.0
-        if: needs.update.outputs.check-id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
-          conclusion: \${{ steps.needs-result.outputs.result }}
+          conclusion: \${{ steps.conclusion.outputs.result }}
           check_id: \${{ needs.update.outputs.check-id }}
 
   post-release:
     needs: release
+    outputs:
+      comment-id: \${{ steps.create-comment.outputs.comment-id }}
     name: Post Release - Release
     if: github.repository_owner == 'npm' && needs.release.outputs.releases
     runs-on: ubuntu-latest
@@ -1354,123 +1125,50 @@ jobs:
       run:
         shell: bash
     steps:
-      - name: Create Release PR Comment
+      - name: Create Release PR Comment Text
+        id: comment-text
         uses: actions/github-script@v6
         env:
           RELEASES: \${{ needs.release.outputs.releases }}
         with:
+          result-encoding: string
           script: |
             const releases = JSON.parse(process.env.RELEASES)
             const { runId, repo: { owner, repo } } = context
             const issue_number = releases[0].prNumber
-
-            let body = '## Release Workflow/n/n'
-            for (const { pkgName, version, url } of releases) {
-              body += \`- /\`\${pkgName}@\${version}/\` \${url}/n\`
-            }
-
-            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
-              .then(cs => cs.map(c => ({ id: c.id, login: c.user.login, body: c.body })))
-            console.log(\`Found comments: \${JSON.stringify(comments, null, 2)}\`)
-            const releaseComments = comments.filter(c => c.login === 'github-actions[bot]' && c.body.includes('Release is at'))
-
-            for (const comment of releaseComments) {
-              console.log(\`Release comment: \${JSON.stringify(comment, null, 2)}\`)
-              await github.rest.issues.deleteComment({ owner, repo, comment_id: comment.id })
-            }
-
             const runUrl = \`https://github.com/\${owner}/\${repo}/actions/runs/\${runId}\`
-            await github.rest.issues.createComment({
-              owner,
-              repo,
-              issue_number,
-              body: \`\${body}- Workflow run: :arrows_counterclockwise: \${runUrl}\`,
-            })
+
+            return [
+              '## Release Workflow/n',
+              ...releases.map(r => \`- /\`\${r.pkgName}@\${r.version}/\` \${r.url}\`),
+              \`- Workflow run: :arrows_counterclockwise: \${runUrl}\`,
+            ].join('/n')
+      - name: Create Release PR Comment
+        id: create-comment
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          issue-number: \${{ fromJSON(needs.release.outputs.releases)[0].prNumber }}
+          body: \${{ steps.comment-text.outputs.result }}
 
   release-integration:
     needs: release
     name: Release Integration
-    if: needs.release.outputs.release
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        id: node
-        with:
-          node-version: 20.x
-          check-latest: contains('20.x', '.x')
-
-      - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
-      - name: View in Registry
-        run: |
-          EXIT_CODE=0
-
-          function is_published {
-            if npm view "$@" --loglevel=error > /dev/null; then
-              echo 0
-            else
-              echo 1
-            fi
-          }
-
-          for release in $(echo '\${{ needs.release.outputs.releases }}' | jq -r '.[] | @base64'); do
-            name=$(echo "$release" | base64 --decode | jq -r .pkgName)
-            version=$(echo "$release" | base64 --decode | jq -r .version)
-            spec="$name@$version"
-            status=$(is_published "$spec")
-            if [[ "$status" -eq 1 ]]; then
-              echo "$spec ERROR"
-              EXIT_CODE=$status
-            else
-              echo "$spec OK"
-            fi
-          done
-
-          exit $EXIT_CODE
+    if: needs.release.outputs.releases
+    uses: ./.github/workflows/release-integration.yml
+    with:
+      releases: \${{ needs.release.outputs.releases }}
 
   post-release-integration:
-    needs: [ release, release-integration ]
+    needs: [ release, release-integration, post-release ]
     name: Post Release Integration - Release
-    if: github.repository_owner == 'npm' && needs.release.outputs.release && always()
+    if: github.repository_owner == 'npm' && needs.release.outputs.releases && always()
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
     steps:
-      - name: Get Needs Result
-        id: needs-result
+      - name: Get Post Release Conclusion
+        id: conclusion
         run: |
           if [[ "\${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
             result="x"
@@ -1480,42 +1178,41 @@ jobs:
             result="white_check_mark"
           fi
           echo "result=$result" >> $GITHUB_OUTPUT
-      - name: Update Release PR Comment
+      - name: Find Release PR Comment
+        uses: peter-evans/find-comment@v2
+        id: found-comment
+        with:
+          issue-number: \${{ fromJSON(needs.release.outputs.releases)[0].prNumber }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '## Release Workflow'
+      - name: Create Release PR Comment Text
+        id: comment-text
+        if: steps.found-comment.outputs.comment-id
         uses: actions/github-script@v6
         env:
-          PR_NUMBER: \${{ fromJSON(needs.release.outputs.release).prNumber }}
-          RESULT: \${{ steps.needs-result.outputs.result }}
+          RESULT: \${{ steps.conclusion.outputs.result }}
+          BODY: \${{ steps.found-comment.outputs.comment-body }}
         with:
+          result-encoding: string
           script: |
-            const { PR_NUMBER: issue_number, RESULT } = process.env
-            const { runId, repo: { owner, repo } } = context
-
-            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
-            const updateComment = comments.find(c =>
-              c.user.login === 'github-actions[bot]' &&
-              c.body.startsWith('## Release Workflow/n/n') &&
-              c.body.includes(runId)
-            )
-
-            if (updateComment) {
-              console.log('Found comment to update:', JSON.stringify(updateComment, null, 2))
-              let body = updateComment.body.replace(/Workflow run: :[a-z_]+:/, \`Workflow run: :\${RESULT}:\`)
-              const tagCodeowner = RESULT !== 'white_check_mark'
-              if (tagCodeowner) {
-                body += \`/n/n:rotating_light:\`
-                body += \` @npm/cli-team: The post-release workflow failed for this release.\`
-                body += \` Manual steps may need to be taken after examining the workflow output\`
-                body += \` from the above workflow run. :rotating_light:\`
-              }
-              await github.rest.issues.updateComment({
-                owner,
-                repo,
-                body,
-                comment_id: updateComment.id,
-              })
-            } else {
-              console.log('No matching comments found:', JSON.stringify(comments, null, 2))
+            const { RESULT, BODY } = process.env
+            const body = [BODY.replace(/(Workflow run: :)[a-z_]+(:)/, \`$1\${RESULT}$2\`)]
+            if (RESULT !== 'white_check_mark') {
+              body.push(':rotating_light::rotating_light::rotating_light:')
+              body.push([
+                '@npm/cli-team: The post-release workflow failed for this release.',
+                'Manual steps may need to be taken after examining the workflow output.'
+              ].join(' '))
+              body.push(':rotating_light::rotating_light::rotating_light:')
             }
+            return body.join('/n/n').trim()
+      - name: Update Release PR Comment
+        if: steps.comment-text.outputs.result
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          comment-id: \${{ steps.found-comment.outputs.comment-id }}
+          body: \${{ steps.comment-text.outputs.result }}
+          edit-mode: 'replace'
 
 .gitignore
 ========================================
@@ -1687,7 +1384,8 @@ release-please-config.json
     },
     {
       "type": "chore",
-      "hidden": true
+      "section": "Chores",
+      "hidden": false
     }
   ],
   "packages": {
@@ -1770,6 +1468,121 @@ module.exports = {
     ...localConfigs,
   ],
 }
+
+.github/actions/create-check/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: 'Create Check'
+inputs:
+  name:
+    required: true
+  token:
+    required: true
+  sha:
+    required: true
+  check-name:
+    default: ''
+outputs:
+  check-id:
+    value: \${{ steps.create-check.outputs.check_id }}
+runs:
+  using: "composite"
+  steps:
+    - name: Get Workflow Job
+      uses: actions/github-script@v6
+      id: workflow
+      env:
+        JOB_NAME: "\${{ inputs.name }}"
+        SHA: "\${{ inputs.sha }}"
+      with:
+        result-encoding: string
+        script: |
+          const { repo: { owner, repo}, runId, serverUrl } = context          
+          const { JOB_NAME, SHA } = process.env
+
+          const job = await github.rest.actions.listJobsForWorkflowRun({
+            owner,
+            repo,
+            run_id: runId,
+            per_page: 100
+          }).then(r => r.data.jobs.find(j => j.name.endsWith(JOB_NAME)))
+
+          return [
+            \`This check is assosciated with \${serverUrl}/\${owner}/\${repo}/commit/\${SHA}.\`,
+            'Run logs:',
+            job?.html_url || \`could not be found for a job ending with: "\${JOB_NAME}"\`,
+          ].join(' ')
+    - name: Create Check
+      uses: LouisBrunner/checks-action@v1.6.0
+      id: create-check
+      with:
+        token: \${{ inputs.token }}
+        sha: \${{ inputs.sha }}
+        status: in_progress
+        name: \${{ inputs.check-name || inputs.name }}
+        output: |
+          {"summary":"\${{ steps.workflow.outputs.result }}"}
+
+.github/actions/install-latest-npm/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: 'Install Latest npm'
+description: 'Install the latest version of npm compatible with the Node version'
+inputs:
+  node:
+    description: 'Current Node version'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
+    - name: Update Windows npm
+      if: |
+        runner.os == 'Windows' && (
+          startsWith(inputs.node, 'v10.') ||
+          startsWith(inputs.node, 'v12.') ||
+          startsWith(inputs.node, 'v14.')
+        )
+      shell: cmd
+      run: |
+        curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
+        tar xf npm-7.5.4.tgz
+        cd package
+        node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
+        cd ..
+        rmdir /s /q package
+    - name: Install Latest npm
+      shell: bash
+      env:
+        NODE_VERSION: \${{ inputs.node }}
+      run: |
+        MATCH=""
+        SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
+
+        echo "node@$NODE_VERSION"
+
+        for SPEC in \${SPECS[@]}; do
+          ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
+          echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
+
+          if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
+            MATCH=$SPEC
+            echo "Found compatible version: npm@$MATCH"
+            break
+          fi  
+        done
+
+        if [ -z $MATCH ]; then
+          echo "Could not find a compatible version of npm for node@$NODE_VERSION"
+          exit 1
+        fi
+
+        npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
+    - name: npm Version
+      shell: bash
+      run: npm -v
 
 .github/CODEOWNERS
 ========================================
@@ -1986,37 +1799,10 @@ jobs:
         with:
           node-version: 20.x
           check-latest: contains('20.x', '.x')
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund --package-lock
       - name: Run Production Audit
@@ -2067,37 +1853,10 @@ jobs:
         with:
           node-version: 20.x
           check-latest: contains('20.x', '.x')
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
@@ -2140,53 +1899,10 @@ jobs:
         with:
           node-version: \${{ matrix.node-version }}
           check-latest: contains(matrix.node-version, '.x')
-
-      # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
-      - name: Update Windows npm
-        if: |
-          matrix.platform.os == 'windows-latest' && (
-            startsWith(steps.node.outputs.node-version, 'v10.') ||
-            startsWith(steps.node.outputs.node-version, 'v12.') ||
-            startsWith(steps.node.outputs.node-version, 'v14.')
-          )
-        run: |
-          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
-          tar xf npm-7.5.4.tgz
-          cd package
-          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
-          cd ..
-          rmdir /s /q package
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Add Problem Matcher
@@ -2237,37 +1953,10 @@ jobs:
         with:
           node-version: 20.x
           check-latest: contains('20.x', '.x')
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
@@ -2310,53 +1999,10 @@ jobs:
         with:
           node-version: \${{ matrix.node-version }}
           check-latest: contains(matrix.node-version, '.x')
-
-      # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
-      - name: Update Windows npm
-        if: |
-          matrix.platform.os == 'windows-latest' && (
-            startsWith(steps.node.outputs.node-version, 'v10.') ||
-            startsWith(steps.node.outputs.node-version, 'v12.') ||
-            startsWith(steps.node.outputs.node-version, 'v14.')
-          )
-        run: |
-          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
-          tar xf npm-7.5.4.tgz
-          cd package
-          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
-          cd ..
-          rmdir /s /q package
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Add Problem Matcher
@@ -2395,49 +2041,6 @@ jobs:
       run:
         shell: bash
     steps:
-      - name: Get Workflow Job
-        uses: actions/github-script@v6
-        if: inputs.check-sha
-        id: check-output
-        env:
-          JOB_NAME: "Lint All"
-          MATRIX_NAME: ""
-        with:
-          script: |
-            const { owner, repo } = context.repo
-
-            const { data } = await github.rest.actions.listJobsForWorkflowRun({
-              owner,
-              repo,
-              run_id: context.runId,
-              per_page: 100
-            })
-
-            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
-            const job = data.jobs.find(j => j.name.endsWith(jobName))
-            const jobUrl = job?.html_url
-
-            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ inputs.check-sha }}\`
-
-            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
-
-            if (jobUrl) {
-              summary += \`For run logs, click here: \${jobUrl}\`
-            } else {
-              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
-            }
-
-            return { summary }
-      - name: Create Check
-        uses: LouisBrunner/checks-action@v1.6.0
-        id: check
-        if: inputs.check-sha
-        with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          status: in_progress
-          name: Lint All
-          sha: \${{ inputs.check-sha }}
-          output: \${{ steps.check-output.outputs.result }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -2446,43 +2049,24 @@ jobs:
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
+      - name: Create Check
+        id: create-check
+        if: \${{ inputs.check-sha }}
+        uses: ./.github/actions/create-check
+        with:
+          name: "Lint All"
+          token: \${{ secrets.GITHUB_TOKEN }}
+          sha: \${{ inputs.check-sha }}
       - name: Setup Node
         uses: actions/setup-node@v3
         id: node
         with:
           node-version: 20.x
           check-latest: contains('20.x', '.x')
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
@@ -2491,11 +2075,11 @@ jobs:
         run: npm run postlint --ignore-scripts -ws -iwr --if-present
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.6.0
-        if: steps.check.outputs.check_id && always()
+        if: always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
-          check_id: \${{ steps.check.outputs.check_id }}
+          check_id: \${{ steps.create-check.outputs.check-id }}
 
   test-all:
     name: Test All - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
@@ -2520,49 +2104,6 @@ jobs:
       run:
         shell: \${{ matrix.platform.shell }}
     steps:
-      - name: Get Workflow Job
-        uses: actions/github-script@v6
-        if: inputs.check-sha
-        id: check-output
-        env:
-          JOB_NAME: "Test All"
-          MATRIX_NAME: " - \${{ matrix.platform.name }} - \${{ matrix.node-version }}"
-        with:
-          script: |
-            const { owner, repo } = context.repo
-
-            const { data } = await github.rest.actions.listJobsForWorkflowRun({
-              owner,
-              repo,
-              run_id: context.runId,
-              per_page: 100
-            })
-
-            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
-            const job = data.jobs.find(j => j.name.endsWith(jobName))
-            const jobUrl = job?.html_url
-
-            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ inputs.check-sha }}\`
-
-            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
-
-            if (jobUrl) {
-              summary += \`For run logs, click here: \${jobUrl}\`
-            } else {
-              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
-            }
-
-            return { summary }
-      - name: Create Check
-        uses: LouisBrunner/checks-action@v1.6.0
-        id: check
-        if: inputs.check-sha
-        with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          status: in_progress
-          name: Test All - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
-          sha: \${{ inputs.check-sha }}
-          output: \${{ steps.check-output.outputs.result }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -2571,59 +2112,24 @@ jobs:
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
+      - name: Create Check
+        id: create-check
+        if: \${{ inputs.check-sha }}
+        uses: ./.github/actions/create-check
+        with:
+          name: "Test All - \${{ matrix.platform.name }} - \${{ matrix.node-version }}"
+          token: \${{ secrets.GITHUB_TOKEN }}
+          sha: \${{ inputs.check-sha }}
       - name: Setup Node
         uses: actions/setup-node@v3
         id: node
         with:
           node-version: \${{ matrix.node-version }}
           check-latest: contains(matrix.node-version, '.x')
-
-      # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
-      - name: Update Windows npm
-        if: |
-          matrix.platform.os == 'windows-latest' && (
-            startsWith(steps.node.outputs.node-version, 'v10.') ||
-            startsWith(steps.node.outputs.node-version, 'v12.') ||
-            startsWith(steps.node.outputs.node-version, 'v14.')
-          )
-        run: |
-          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
-          tar xf npm-7.5.4.tgz
-          cd package
-          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
-          cd ..
-          rmdir /s /q package
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Add Problem Matcher
@@ -2632,11 +2138,11 @@ jobs:
         run: npm test --ignore-scripts -ws -iwr --if-present
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.6.0
-        if: steps.check.outputs.check_id && always()
+        if: always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
-          check_id: \${{ steps.check.outputs.check_id }}
+          check_id: \${{ steps.create-check.outputs.check-id }}
 
 .github/workflows/ci.yml
 ========================================
@@ -2683,37 +2189,10 @@ jobs:
         with:
           node-version: 20.x
           check-latest: contains('20.x', '.x')
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
@@ -2756,53 +2235,10 @@ jobs:
         with:
           node-version: \${{ matrix.node-version }}
           check-latest: contains(matrix.node-version, '.x')
-
-      # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
-      - name: Update Windows npm
-        if: |
-          matrix.platform.os == 'windows-latest' && (
-            startsWith(steps.node.outputs.node-version, 'v10.') ||
-            startsWith(steps.node.outputs.node-version, 'v12.') ||
-            startsWith(steps.node.outputs.node-version, 'v14.')
-          )
-        run: |
-          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
-          tar xf npm-7.5.4.tgz
-          cd package
-          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
-          cd ..
-          rmdir /s /q package
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Add Problem Matcher
@@ -2887,37 +2323,10 @@ jobs:
         with:
           node-version: 20.x
           check-latest: contains('20.x', '.x')
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Fetch Dependabot Metadata
@@ -3043,50 +2452,92 @@ jobs:
         with:
           node-version: 20.x
           check-latest: contains('20.x', '.x')
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Run Commitlint on Commits
         id: commit
         continue-on-error: true
-        run: |
-          npx --offline commitlint -V --from 'origin/\${{ github.base_ref }}' --to \${{ github.event.pull_request.head.sha }}
+        run: npx --offline commitlint -V --from 'origin/\${{ github.base_ref }}' --to \${{ github.event.pull_request.head.sha }}
       - name: Run Commitlint on PR Title
         if: steps.commit.outcome == 'failure'
         env:
           PR_TITLE: \${{ github.event.pull_request.title }}
+        run: echo "$PR_TITLE" | npx --offline commitlint -V
+
+.github/workflows/release-integration.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Release Integration
+
+on:
+  workflow_dispatch:
+    inputs:
+      releases:
+        required: true
+        type: string
+        description: 'A json array of releases. Required fields: publish: tagName, publishTag. publish check: pkgName, version'
+  workflow_call:
+    inputs:
+      releases:
+        required: true
+        type: string
+        description: 'A json array of releases. Required fields: publish: tagName, publishTag. publish check: pkgName, version'
+
+jobs:
+  publish:
+    name: Check Publish
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Git User
         run: |
-          echo "$PR_TITLE" | npx --offline commitlint -V
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        id: node
+        with:
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
+      - name: Install Latest npm
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
+      - name: Install Dependencies
+        run: npm i --ignore-scripts --no-audit --no-fund
+      - name: Check If Published
+        run: |
+          EXIT_CODE=0
+
+          function each_release {
+            if npm view "$@" --loglevel=error > /dev/null; then
+              echo 0
+            else
+              echo 1
+            fi
+          }
+
+          for release in $(echo '\${{ inputs.releases }}' | jq -r '.[] | @base64'); do
+            SPEC="$(echo "$release" | base64 --decode | jq -r .pkgName)@$(echo "$release" | base64 --decode | jq -r .version)"
+            STATUS=$(each_release "$SPEC")
+            if [[ "$STATUS" -eq 1 ]]; then
+              echo "$SPEC ERROR"
+              EXIT_CODE=$STATUS
+            else
+              echo "$SPEC OK"
+            fi
+          done
+
+          exit $EXIT_CODE
 
 .github/workflows/release.yml
 ========================================
@@ -3095,11 +2546,6 @@ jobs:
 name: Release
 
 on:
-  workflow_dispatch:
-    inputs:
-      release-pr:
-        description: a release PR number to rerun release jobs on
-        type: string
   push:
     branches:
       - main
@@ -3115,12 +2561,12 @@ jobs:
   release:
     outputs:
       pr: \${{ steps.release.outputs.pr }}
-      release: \${{ steps.release.outputs.release }}
-      releases: \${{ steps.release.outputs.releases }}
-      branch: \${{ steps.release.outputs.pr-branch }}
+      pr-branch: \${{ steps.release.outputs.pr-branch }}
       pr-number: \${{ steps.release.outputs.pr-number }}
-      comment-id: \${{ steps.pr-comment.outputs.result }}
-      check-id: \${{ steps.check.outputs.check_id }}
+      pr-sha: \${{ steps.release.outputs.pr-sha }}
+      releases: \${{ steps.release.outputs.releases }}
+      comment-id: \${{ steps.create-comment.outputs.comment-id || steps.update-comment.outputs.comment-id }}
+      check-id: \${{ steps.create-check.outputs.check-id }}
     name: Release
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
@@ -3140,126 +2586,64 @@ jobs:
         with:
           node-version: 20.x
           check-latest: contains('20.x', '.x')
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Release Please
         id: release
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
-        run: |
-          npx --offline template-oss-release-please "\${{ github.ref_name }}" "\${{ inputs.release-pr }}"
-      - name: Post Pull Request Comment
+        run: npx --offline template-oss-release-please --branch="\${{ github.ref_name }}" --backport="" --defaultTag="latest"
+      - name: Create Release Manager Comment Text
         if: steps.release.outputs.pr-number
         uses: actions/github-script@v6
-        id: pr-comment
-        env:
-          PR_NUMBER: \${{ steps.release.outputs.pr-number }}
-          REF_NAME: \${{ github.ref_name }}
+        id: comment-text
         with:
+          result-encoding: string
           script: |
-            const { REF_NAME, PR_NUMBER: issue_number } = process.env
             const { runId, repo: { owner, repo } } = context
-
             const { data: workflow } = await github.rest.actions.getWorkflowRun({ owner, repo, run_id: runId })
-
-            let body = '## Release Manager/n/n'
-
-            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
-            let commentId = comments.find(c => c.user.login === 'github-actions[bot]' && c.body.startsWith(body))?.id
-
-            body += \`Release workflow run: \${workflow.html_url}/n/n#### Force CI to Update This Release/n/n\`
-            body += \`This PR will be updated and CI will run for every non-/\`chore:/\` commit that is pushed to /\`\${REF_NAME}/\`. \`
-            body += \`To force CI to update this PR, run this command:/n/n\`
-            body += \`/\`/\`/\`/ngh workflow run release.yml -r \${REF_NAME} -R \${owner}/\${repo} -f release-pr=\${issue_number}/n/\`/\`/\`\`
-
-            if (commentId) {
-              await github.rest.issues.updateComment({ owner, repo, comment_id: commentId, body })
-            } else {
-              const { data: comment } = await github.rest.issues.createComment({ owner, repo, issue_number, body })
-              commentId = comment?.id
-            }
-
-            return commentId
-      - name: Get Workflow Job
-        uses: actions/github-script@v6
-        if: steps.release.outputs.pr-sha
-        id: check-output
-        env:
-          JOB_NAME: "Release"
-          MATRIX_NAME: ""
+            return['## Release Manager', \`Release workflow run: \${workflow.html_url}\`].join('/n/n')
+      - name: Find Release Manager Comment
+        uses: peter-evans/find-comment@v2
+        if: steps.release.outputs.pr-number
+        id: found-comment
         with:
-          script: |
-            const { owner, repo } = context.repo
-
-            const { data } = await github.rest.actions.listJobsForWorkflowRun({
-              owner,
-              repo,
-              run_id: context.runId,
-              per_page: 100
-            })
-
-            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
-            const job = data.jobs.find(j => j.name.endsWith(jobName))
-            const jobUrl = job?.html_url
-
-            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ steps.release.outputs.pr-sha }}\`
-
-            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
-
-            if (jobUrl) {
-              summary += \`For run logs, click here: \${jobUrl}\`
-            } else {
-              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
-            }
-
-            return { summary }
+          issue-number: \${{ steps.release.outputs.pr-number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '## Release Manager'
+      - name: Create Release Manager Comment
+        id: create-comment
+        if: steps.release.outputs.pr-number && !steps.found-comment.outputs.comment-id
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          issue-number: \${{ steps.release.outputs.pr-number }}
+          body: \${{ steps.comment-text.outputs.result }}
+      - name: Update Release Manager Comment
+        id: update-comment
+        if: steps.release.outputs.pr-number && steps.found-comment.outputs.comment-id
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          comment-id: \${{ steps.found-comment.outputs.comment-id }}
+          body: \${{ steps.comment-text.outputs.result }}
+          edit-mode: 'replace'
       - name: Create Check
-        uses: LouisBrunner/checks-action@v1.6.0
-        id: check
+        id: create-check
+        uses: ./.github/actions/create-check
         if: steps.release.outputs.pr-sha
         with:
+          name: "Release"
           token: \${{ secrets.GITHUB_TOKEN }}
-          status: in_progress
-          name: Release
           sha: \${{ steps.release.outputs.pr-sha }}
-          output: \${{ steps.check-output.outputs.result }}
 
   update:
     needs: release
     outputs:
       sha: \${{ steps.commit.outputs.sha }}
-      check-id: \${{ steps.check.outputs.check_id }}
+      check-id: \${{ steps.create-check.outputs.check-id }}
     name: Update - Release
     if: github.repository_owner == 'npm' && needs.release.outputs.pr
     runs-on: ubuntu-latest
@@ -3271,7 +2655,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          ref: \${{ needs.release.outputs.branch }}
+          ref: \${{ needs.release.outputs.pr-branch }}
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
@@ -3282,47 +2666,27 @@ jobs:
         with:
           node-version: 20.x
           check-latest: contains('20.x', '.x')
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
+      - name: Create Release Manager Checklist Text
+        id: comment-text
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        run: npm exec --offline -- template-oss-release-manager --pr="\${{ needs.release.outputs.pr-number }}" --backport="" --defaultTag="latest"
+      - name: Append Release Manager Comment
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          comment-id: \${{ needs.release.outputs.comment-id }}
+          body: \${{ steps.comment-text.outputs.result }}
+          edit-mode: 'append'
       - name: Run Post Pull Request Actions
         env:
-          RELEASE_PR_NUMBER: \${{ needs.release.outputs.pr-number }}
-          RELEASE_COMMENT_ID: \${{ needs.release.outputs.comment-id }}
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
-        run: |
-          npm exec --offline -- template-oss-release-manager --lockfile=false --publish=false
-          npm run rp-pull-request --ignore-scripts -ws -iwr --if-present
+        run: npm run rp-pull-request --ignore-scripts -ws -iwr --if-present -- --pr="\${{ needs.release.outputs.pr-number }}" --commentId="\${{ needs.release.outputs.comment-id }}"
       - name: Commit
         id: commit
         env:
@@ -3331,52 +2695,16 @@ jobs:
           git commit --all --amend --no-edit || true
           git push --force-with-lease
           echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-      - name: Get Workflow Job
-        uses: actions/github-script@v6
-        if: steps.commit.outputs.sha
-        id: check-output
-        env:
-          JOB_NAME: "Update - Release"
-          MATRIX_NAME: ""
-        with:
-          script: |
-            const { owner, repo } = context.repo
-
-            const { data } = await github.rest.actions.listJobsForWorkflowRun({
-              owner,
-              repo,
-              run_id: context.runId,
-              per_page: 100
-            })
-
-            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
-            const job = data.jobs.find(j => j.name.endsWith(jobName))
-            const jobUrl = job?.html_url
-
-            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ steps.commit.outputs.sha }}\`
-
-            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
-
-            if (jobUrl) {
-              summary += \`For run logs, click here: \${jobUrl}\`
-            } else {
-              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
-            }
-
-            return { summary }
       - name: Create Check
-        uses: LouisBrunner/checks-action@v1.6.0
-        id: check
-        if: steps.commit.outputs.sha
+        id: create-check
+        uses: ./.github/actions/create-check
         with:
+          name: "Update - Release"
+          check-name: "Release"
           token: \${{ secrets.GITHUB_TOKEN }}
-          status: in_progress
-          name: Release
           sha: \${{ steps.commit.outputs.sha }}
-          output: \${{ steps.check-output.outputs.result }}
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.6.0
-        if: needs.release.outputs.check-id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
@@ -3388,7 +2716,7 @@ jobs:
     if: needs.release.outputs.pr
     uses: ./.github/workflows/ci-release.yml
     with:
-      ref: \${{ needs.release.outputs.branch }}
+      ref: \${{ needs.release.outputs.pr-branch }}
       check-sha: \${{ needs.update.outputs.sha }}
 
   post-ci:
@@ -3400,8 +2728,8 @@ jobs:
       run:
         shell: bash
     steps:
-      - name: Get Needs Result
-        id: needs-result
+      - name: Get CI Conclusion
+        id: conclusion
         run: |
           result=""
           if [[ "\${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
@@ -3414,14 +2742,15 @@ jobs:
           echo "result=$result" >> $GITHUB_OUTPUT
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.6.0
-        if: needs.update.outputs.check-id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
-          conclusion: \${{ steps.needs-result.outputs.result }}
+          conclusion: \${{ steps.conclusion.outputs.result }}
           check_id: \${{ needs.update.outputs.check-id }}
 
   post-release:
     needs: release
+    outputs:
+      comment-id: \${{ steps.create-comment.outputs.comment-id }}
     name: Post Release - Release
     if: github.repository_owner == 'npm' && needs.release.outputs.releases
     runs-on: ubuntu-latest
@@ -3429,123 +2758,50 @@ jobs:
       run:
         shell: bash
     steps:
-      - name: Create Release PR Comment
+      - name: Create Release PR Comment Text
+        id: comment-text
         uses: actions/github-script@v6
         env:
           RELEASES: \${{ needs.release.outputs.releases }}
         with:
+          result-encoding: string
           script: |
             const releases = JSON.parse(process.env.RELEASES)
             const { runId, repo: { owner, repo } } = context
             const issue_number = releases[0].prNumber
-
-            let body = '## Release Workflow/n/n'
-            for (const { pkgName, version, url } of releases) {
-              body += \`- /\`\${pkgName}@\${version}/\` \${url}/n\`
-            }
-
-            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
-              .then(cs => cs.map(c => ({ id: c.id, login: c.user.login, body: c.body })))
-            console.log(\`Found comments: \${JSON.stringify(comments, null, 2)}\`)
-            const releaseComments = comments.filter(c => c.login === 'github-actions[bot]' && c.body.includes('Release is at'))
-
-            for (const comment of releaseComments) {
-              console.log(\`Release comment: \${JSON.stringify(comment, null, 2)}\`)
-              await github.rest.issues.deleteComment({ owner, repo, comment_id: comment.id })
-            }
-
             const runUrl = \`https://github.com/\${owner}/\${repo}/actions/runs/\${runId}\`
-            await github.rest.issues.createComment({
-              owner,
-              repo,
-              issue_number,
-              body: \`\${body}- Workflow run: :arrows_counterclockwise: \${runUrl}\`,
-            })
+
+            return [
+              '## Release Workflow/n',
+              ...releases.map(r => \`- /\`\${r.pkgName}@\${r.version}/\` \${r.url}\`),
+              \`- Workflow run: :arrows_counterclockwise: \${runUrl}\`,
+            ].join('/n')
+      - name: Create Release PR Comment
+        id: create-comment
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          issue-number: \${{ fromJSON(needs.release.outputs.releases)[0].prNumber }}
+          body: \${{ steps.comment-text.outputs.result }}
 
   release-integration:
     needs: release
     name: Release Integration
-    if: needs.release.outputs.release
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        id: node
-        with:
-          node-version: 20.x
-          check-latest: contains('20.x', '.x')
-
-      - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
-      - name: View in Registry
-        run: |
-          EXIT_CODE=0
-
-          function is_published {
-            if npm view "$@" --loglevel=error > /dev/null; then
-              echo 0
-            else
-              echo 1
-            fi
-          }
-
-          for release in $(echo '\${{ needs.release.outputs.releases }}' | jq -r '.[] | @base64'); do
-            name=$(echo "$release" | base64 --decode | jq -r .pkgName)
-            version=$(echo "$release" | base64 --decode | jq -r .version)
-            spec="$name@$version"
-            status=$(is_published "$spec")
-            if [[ "$status" -eq 1 ]]; then
-              echo "$spec ERROR"
-              EXIT_CODE=$status
-            else
-              echo "$spec OK"
-            fi
-          done
-
-          exit $EXIT_CODE
+    if: needs.release.outputs.releases
+    uses: ./.github/workflows/release-integration.yml
+    with:
+      releases: \${{ needs.release.outputs.releases }}
 
   post-release-integration:
-    needs: [ release, release-integration ]
+    needs: [ release, release-integration, post-release ]
     name: Post Release Integration - Release
-    if: github.repository_owner == 'npm' && needs.release.outputs.release && always()
+    if: github.repository_owner == 'npm' && needs.release.outputs.releases && always()
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
     steps:
-      - name: Get Needs Result
-        id: needs-result
+      - name: Get Post Release Conclusion
+        id: conclusion
         run: |
           if [[ "\${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
             result="x"
@@ -3555,42 +2811,41 @@ jobs:
             result="white_check_mark"
           fi
           echo "result=$result" >> $GITHUB_OUTPUT
-      - name: Update Release PR Comment
+      - name: Find Release PR Comment
+        uses: peter-evans/find-comment@v2
+        id: found-comment
+        with:
+          issue-number: \${{ fromJSON(needs.release.outputs.releases)[0].prNumber }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '## Release Workflow'
+      - name: Create Release PR Comment Text
+        id: comment-text
+        if: steps.found-comment.outputs.comment-id
         uses: actions/github-script@v6
         env:
-          PR_NUMBER: \${{ fromJSON(needs.release.outputs.release).prNumber }}
-          RESULT: \${{ steps.needs-result.outputs.result }}
+          RESULT: \${{ steps.conclusion.outputs.result }}
+          BODY: \${{ steps.found-comment.outputs.comment-body }}
         with:
+          result-encoding: string
           script: |
-            const { PR_NUMBER: issue_number, RESULT } = process.env
-            const { runId, repo: { owner, repo } } = context
-
-            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
-            const updateComment = comments.find(c =>
-              c.user.login === 'github-actions[bot]' &&
-              c.body.startsWith('## Release Workflow/n/n') &&
-              c.body.includes(runId)
-            )
-
-            if (updateComment) {
-              console.log('Found comment to update:', JSON.stringify(updateComment, null, 2))
-              let body = updateComment.body.replace(/Workflow run: :[a-z_]+:/, \`Workflow run: :\${RESULT}:\`)
-              const tagCodeowner = RESULT !== 'white_check_mark'
-              if (tagCodeowner) {
-                body += \`/n/n:rotating_light:\`
-                body += \` @npm/cli-team: The post-release workflow failed for this release.\`
-                body += \` Manual steps may need to be taken after examining the workflow output\`
-                body += \` from the above workflow run. :rotating_light:\`
-              }
-              await github.rest.issues.updateComment({
-                owner,
-                repo,
-                body,
-                comment_id: updateComment.id,
-              })
-            } else {
-              console.log('No matching comments found:', JSON.stringify(comments, null, 2))
+            const { RESULT, BODY } = process.env
+            const body = [BODY.replace(/(Workflow run: :)[a-z_]+(:)/, \`$1\${RESULT}$2\`)]
+            if (RESULT !== 'white_check_mark') {
+              body.push(':rotating_light::rotating_light::rotating_light:')
+              body.push([
+                '@npm/cli-team: The post-release workflow failed for this release.',
+                'Manual steps may need to be taken after examining the workflow output.'
+              ].join(' '))
+              body.push(':rotating_light::rotating_light::rotating_light:')
             }
+            return body.join('/n/n').trim()
+      - name: Update Release PR Comment
+        if: steps.comment-text.outputs.result
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          comment-id: \${{ steps.found-comment.outputs.comment-id }}
+          body: \${{ steps.comment-text.outputs.result }}
+          edit-mode: 'replace'
 
 .gitignore
 ========================================
@@ -3782,7 +3037,8 @@ release-please-config.json
     },
     {
       "type": "chore",
-      "hidden": true
+      "section": "Chores",
+      "hidden": false
     }
   ],
   "packages": {
@@ -3972,6 +3228,121 @@ workspaces/b/package.json
 `
 
 exports[`test/apply/source-snapshots.js TAP workspaces only > expect resolving Promise 1`] = `
+.github/actions/create-check/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: 'Create Check'
+inputs:
+  name:
+    required: true
+  token:
+    required: true
+  sha:
+    required: true
+  check-name:
+    default: ''
+outputs:
+  check-id:
+    value: \${{ steps.create-check.outputs.check_id }}
+runs:
+  using: "composite"
+  steps:
+    - name: Get Workflow Job
+      uses: actions/github-script@v6
+      id: workflow
+      env:
+        JOB_NAME: "\${{ inputs.name }}"
+        SHA: "\${{ inputs.sha }}"
+      with:
+        result-encoding: string
+        script: |
+          const { repo: { owner, repo}, runId, serverUrl } = context          
+          const { JOB_NAME, SHA } = process.env
+
+          const job = await github.rest.actions.listJobsForWorkflowRun({
+            owner,
+            repo,
+            run_id: runId,
+            per_page: 100
+          }).then(r => r.data.jobs.find(j => j.name.endsWith(JOB_NAME)))
+
+          return [
+            \`This check is assosciated with \${serverUrl}/\${owner}/\${repo}/commit/\${SHA}.\`,
+            'Run logs:',
+            job?.html_url || \`could not be found for a job ending with: "\${JOB_NAME}"\`,
+          ].join(' ')
+    - name: Create Check
+      uses: LouisBrunner/checks-action@v1.6.0
+      id: create-check
+      with:
+        token: \${{ inputs.token }}
+        sha: \${{ inputs.sha }}
+        status: in_progress
+        name: \${{ inputs.check-name || inputs.name }}
+        output: |
+          {"summary":"\${{ steps.workflow.outputs.result }}"}
+
+.github/actions/install-latest-npm/action.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: 'Install Latest npm'
+description: 'Install the latest version of npm compatible with the Node version'
+inputs:
+  node:
+    description: 'Current Node version'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
+    - name: Update Windows npm
+      if: |
+        runner.os == 'Windows' && (
+          startsWith(inputs.node, 'v10.') ||
+          startsWith(inputs.node, 'v12.') ||
+          startsWith(inputs.node, 'v14.')
+        )
+      shell: cmd
+      run: |
+        curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
+        tar xf npm-7.5.4.tgz
+        cd package
+        node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
+        cd ..
+        rmdir /s /q package
+    - name: Install Latest npm
+      shell: bash
+      env:
+        NODE_VERSION: \${{ inputs.node }}
+      run: |
+        MATCH=""
+        SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
+
+        echo "node@$NODE_VERSION"
+
+        for SPEC in \${SPECS[@]}; do
+          ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
+          echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
+
+          if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
+            MATCH=$SPEC
+            echo "Found compatible version: npm@$MATCH"
+            break
+          fi  
+        done
+
+        if [ -z $MATCH ]; then
+          echo "Could not find a compatible version of npm for node@$NODE_VERSION"
+          exit 1
+        fi
+
+        npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
+    - name: npm Version
+      shell: bash
+      run: npm -v
+
 .github/dependabot.yml
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
@@ -4128,37 +3499,10 @@ jobs:
         with:
           node-version: 20.x
           check-latest: contains('20.x', '.x')
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
@@ -4201,53 +3545,10 @@ jobs:
         with:
           node-version: \${{ matrix.node-version }}
           check-latest: contains(matrix.node-version, '.x')
-
-      # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
-      - name: Update Windows npm
-        if: |
-          matrix.platform.os == 'windows-latest' && (
-            startsWith(steps.node.outputs.node-version, 'v10.') ||
-            startsWith(steps.node.outputs.node-version, 'v12.') ||
-            startsWith(steps.node.outputs.node-version, 'v14.')
-          )
-        run: |
-          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
-          tar xf npm-7.5.4.tgz
-          cd package
-          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
-          cd ..
-          rmdir /s /q package
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Add Problem Matcher
@@ -4298,37 +3599,10 @@ jobs:
         with:
           node-version: 20.x
           check-latest: contains('20.x', '.x')
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
@@ -4371,53 +3645,10 @@ jobs:
         with:
           node-version: \${{ matrix.node-version }}
           check-latest: contains(matrix.node-version, '.x')
-
-      # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
-      - name: Update Windows npm
-        if: |
-          matrix.platform.os == 'windows-latest' && (
-            startsWith(steps.node.outputs.node-version, 'v10.') ||
-            startsWith(steps.node.outputs.node-version, 'v12.') ||
-            startsWith(steps.node.outputs.node-version, 'v14.')
-          )
-        run: |
-          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
-          tar xf npm-7.5.4.tgz
-          cd package
-          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
-          cd ..
-          rmdir /s /q package
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Add Problem Matcher
@@ -4456,49 +3687,6 @@ jobs:
       run:
         shell: bash
     steps:
-      - name: Get Workflow Job
-        uses: actions/github-script@v6
-        if: inputs.check-sha
-        id: check-output
-        env:
-          JOB_NAME: "Lint All"
-          MATRIX_NAME: ""
-        with:
-          script: |
-            const { owner, repo } = context.repo
-
-            const { data } = await github.rest.actions.listJobsForWorkflowRun({
-              owner,
-              repo,
-              run_id: context.runId,
-              per_page: 100
-            })
-
-            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
-            const job = data.jobs.find(j => j.name.endsWith(jobName))
-            const jobUrl = job?.html_url
-
-            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ inputs.check-sha }}\`
-
-            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
-
-            if (jobUrl) {
-              summary += \`For run logs, click here: \${jobUrl}\`
-            } else {
-              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
-            }
-
-            return { summary }
-      - name: Create Check
-        uses: LouisBrunner/checks-action@v1.6.0
-        id: check
-        if: inputs.check-sha
-        with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          status: in_progress
-          name: Lint All
-          sha: \${{ inputs.check-sha }}
-          output: \${{ steps.check-output.outputs.result }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -4507,43 +3695,24 @@ jobs:
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
+      - name: Create Check
+        id: create-check
+        if: \${{ inputs.check-sha }}
+        uses: ./.github/actions/create-check
+        with:
+          name: "Lint All"
+          token: \${{ secrets.GITHUB_TOKEN }}
+          sha: \${{ inputs.check-sha }}
       - name: Setup Node
         uses: actions/setup-node@v3
         id: node
         with:
           node-version: 20.x
           check-latest: contains('20.x', '.x')
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
@@ -4552,11 +3721,11 @@ jobs:
         run: npm run postlint --ignore-scripts -ws -iwr --if-present
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.6.0
-        if: steps.check.outputs.check_id && always()
+        if: always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
-          check_id: \${{ steps.check.outputs.check_id }}
+          check_id: \${{ steps.create-check.outputs.check-id }}
 
   test-all:
     name: Test All - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
@@ -4581,49 +3750,6 @@ jobs:
       run:
         shell: \${{ matrix.platform.shell }}
     steps:
-      - name: Get Workflow Job
-        uses: actions/github-script@v6
-        if: inputs.check-sha
-        id: check-output
-        env:
-          JOB_NAME: "Test All"
-          MATRIX_NAME: " - \${{ matrix.platform.name }} - \${{ matrix.node-version }}"
-        with:
-          script: |
-            const { owner, repo } = context.repo
-
-            const { data } = await github.rest.actions.listJobsForWorkflowRun({
-              owner,
-              repo,
-              run_id: context.runId,
-              per_page: 100
-            })
-
-            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
-            const job = data.jobs.find(j => j.name.endsWith(jobName))
-            const jobUrl = job?.html_url
-
-            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ inputs.check-sha }}\`
-
-            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
-
-            if (jobUrl) {
-              summary += \`For run logs, click here: \${jobUrl}\`
-            } else {
-              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
-            }
-
-            return { summary }
-      - name: Create Check
-        uses: LouisBrunner/checks-action@v1.6.0
-        id: check
-        if: inputs.check-sha
-        with:
-          token: \${{ secrets.GITHUB_TOKEN }}
-          status: in_progress
-          name: Test All - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
-          sha: \${{ inputs.check-sha }}
-          output: \${{ steps.check-output.outputs.result }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -4632,59 +3758,24 @@ jobs:
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
+      - name: Create Check
+        id: create-check
+        if: \${{ inputs.check-sha }}
+        uses: ./.github/actions/create-check
+        with:
+          name: "Test All - \${{ matrix.platform.name }} - \${{ matrix.node-version }}"
+          token: \${{ secrets.GITHUB_TOKEN }}
+          sha: \${{ inputs.check-sha }}
       - name: Setup Node
         uses: actions/setup-node@v3
         id: node
         with:
           node-version: \${{ matrix.node-version }}
           check-latest: contains(matrix.node-version, '.x')
-
-      # node 10/12/14 ship with npm@6, which is known to fail when updating itself in windows
-      - name: Update Windows npm
-        if: |
-          matrix.platform.os == 'windows-latest' && (
-            startsWith(steps.node.outputs.node-version, 'v10.') ||
-            startsWith(steps.node.outputs.node-version, 'v12.') ||
-            startsWith(steps.node.outputs.node-version, 'v14.')
-          )
-        run: |
-          curl -sO https://registry.npmjs.org/npm/-/npm-7.5.4.tgz
-          tar xf npm-7.5.4.tgz
-          cd package
-          node lib/npm.js install --no-fund --no-audit -g ../npm-7.5.4.tgz
-          cd ..
-          rmdir /s /q package
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Add Problem Matcher
@@ -4693,11 +3784,11 @@ jobs:
         run: npm test --ignore-scripts -ws -iwr --if-present
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.6.0
-        if: steps.check.outputs.check_id && always()
+        if: always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
-          check_id: \${{ steps.check.outputs.check_id }}
+          check_id: \${{ steps.create-check.outputs.check-id }}
 
 .github/workflows/post-dependabot.yml
 ========================================
@@ -4733,37 +3824,10 @@ jobs:
         with:
           node-version: 20.x
           check-latest: contains('20.x', '.x')
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Fetch Dependabot Metadata
@@ -4889,50 +3953,92 @@ jobs:
         with:
           node-version: 20.x
           check-latest: contains('20.x', '.x')
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Run Commitlint on Commits
         id: commit
         continue-on-error: true
-        run: |
-          npx --offline commitlint -V --from 'origin/\${{ github.base_ref }}' --to \${{ github.event.pull_request.head.sha }}
+        run: npx --offline commitlint -V --from 'origin/\${{ github.base_ref }}' --to \${{ github.event.pull_request.head.sha }}
       - name: Run Commitlint on PR Title
         if: steps.commit.outcome == 'failure'
         env:
           PR_TITLE: \${{ github.event.pull_request.title }}
+        run: echo "$PR_TITLE" | npx --offline commitlint -V
+
+.github/workflows/release-integration.yml
+========================================
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+name: Release Integration
+
+on:
+  workflow_dispatch:
+    inputs:
+      releases:
+        required: true
+        type: string
+        description: 'A json array of releases. Required fields: publish: tagName, publishTag. publish check: pkgName, version'
+  workflow_call:
+    inputs:
+      releases:
+        required: true
+        type: string
+        description: 'A json array of releases. Required fields: publish: tagName, publishTag. publish check: pkgName, version'
+
+jobs:
+  publish:
+    name: Check Publish
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Git User
         run: |
-          echo "$PR_TITLE" | npx --offline commitlint -V
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        id: node
+        with:
+          node-version: 20.x
+          check-latest: contains('20.x', '.x')
+      - name: Install Latest npm
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
+      - name: Install Dependencies
+        run: npm i --ignore-scripts --no-audit --no-fund
+      - name: Check If Published
+        run: |
+          EXIT_CODE=0
+
+          function each_release {
+            if npm view "$@" --loglevel=error > /dev/null; then
+              echo 0
+            else
+              echo 1
+            fi
+          }
+
+          for release in $(echo '\${{ inputs.releases }}' | jq -r '.[] | @base64'); do
+            SPEC="$(echo "$release" | base64 --decode | jq -r .pkgName)@$(echo "$release" | base64 --decode | jq -r .version)"
+            STATUS=$(each_release "$SPEC")
+            if [[ "$STATUS" -eq 1 ]]; then
+              echo "$SPEC ERROR"
+              EXIT_CODE=$STATUS
+            else
+              echo "$SPEC OK"
+            fi
+          done
+
+          exit $EXIT_CODE
 
 .github/workflows/release.yml
 ========================================
@@ -4941,11 +4047,6 @@ jobs:
 name: Release
 
 on:
-  workflow_dispatch:
-    inputs:
-      release-pr:
-        description: a release PR number to rerun release jobs on
-        type: string
   push:
     branches:
       - main
@@ -4961,12 +4062,12 @@ jobs:
   release:
     outputs:
       pr: \${{ steps.release.outputs.pr }}
-      release: \${{ steps.release.outputs.release }}
-      releases: \${{ steps.release.outputs.releases }}
-      branch: \${{ steps.release.outputs.pr-branch }}
+      pr-branch: \${{ steps.release.outputs.pr-branch }}
       pr-number: \${{ steps.release.outputs.pr-number }}
-      comment-id: \${{ steps.pr-comment.outputs.result }}
-      check-id: \${{ steps.check.outputs.check_id }}
+      pr-sha: \${{ steps.release.outputs.pr-sha }}
+      releases: \${{ steps.release.outputs.releases }}
+      comment-id: \${{ steps.create-comment.outputs.comment-id || steps.update-comment.outputs.comment-id }}
+      check-id: \${{ steps.create-check.outputs.check-id }}
     name: Release
     if: github.repository_owner == 'npm'
     runs-on: ubuntu-latest
@@ -4986,126 +4087,64 @@ jobs:
         with:
           node-version: 20.x
           check-latest: contains('20.x', '.x')
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Release Please
         id: release
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
-        run: |
-          npx --offline template-oss-release-please "\${{ github.ref_name }}" "\${{ inputs.release-pr }}"
-      - name: Post Pull Request Comment
+        run: npx --offline template-oss-release-please --branch="\${{ github.ref_name }}" --backport="" --defaultTag="latest"
+      - name: Create Release Manager Comment Text
         if: steps.release.outputs.pr-number
         uses: actions/github-script@v6
-        id: pr-comment
-        env:
-          PR_NUMBER: \${{ steps.release.outputs.pr-number }}
-          REF_NAME: \${{ github.ref_name }}
+        id: comment-text
         with:
+          result-encoding: string
           script: |
-            const { REF_NAME, PR_NUMBER: issue_number } = process.env
             const { runId, repo: { owner, repo } } = context
-
             const { data: workflow } = await github.rest.actions.getWorkflowRun({ owner, repo, run_id: runId })
-
-            let body = '## Release Manager/n/n'
-
-            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
-            let commentId = comments.find(c => c.user.login === 'github-actions[bot]' && c.body.startsWith(body))?.id
-
-            body += \`Release workflow run: \${workflow.html_url}/n/n#### Force CI to Update This Release/n/n\`
-            body += \`This PR will be updated and CI will run for every non-/\`chore:/\` commit that is pushed to /\`\${REF_NAME}/\`. \`
-            body += \`To force CI to update this PR, run this command:/n/n\`
-            body += \`/\`/\`/\`/ngh workflow run release.yml -r \${REF_NAME} -R \${owner}/\${repo} -f release-pr=\${issue_number}/n/\`/\`/\`\`
-
-            if (commentId) {
-              await github.rest.issues.updateComment({ owner, repo, comment_id: commentId, body })
-            } else {
-              const { data: comment } = await github.rest.issues.createComment({ owner, repo, issue_number, body })
-              commentId = comment?.id
-            }
-
-            return commentId
-      - name: Get Workflow Job
-        uses: actions/github-script@v6
-        if: steps.release.outputs.pr-sha
-        id: check-output
-        env:
-          JOB_NAME: "Release"
-          MATRIX_NAME: ""
+            return['## Release Manager', \`Release workflow run: \${workflow.html_url}\`].join('/n/n')
+      - name: Find Release Manager Comment
+        uses: peter-evans/find-comment@v2
+        if: steps.release.outputs.pr-number
+        id: found-comment
         with:
-          script: |
-            const { owner, repo } = context.repo
-
-            const { data } = await github.rest.actions.listJobsForWorkflowRun({
-              owner,
-              repo,
-              run_id: context.runId,
-              per_page: 100
-            })
-
-            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
-            const job = data.jobs.find(j => j.name.endsWith(jobName))
-            const jobUrl = job?.html_url
-
-            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ steps.release.outputs.pr-sha }}\`
-
-            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
-
-            if (jobUrl) {
-              summary += \`For run logs, click here: \${jobUrl}\`
-            } else {
-              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
-            }
-
-            return { summary }
+          issue-number: \${{ steps.release.outputs.pr-number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '## Release Manager'
+      - name: Create Release Manager Comment
+        id: create-comment
+        if: steps.release.outputs.pr-number && !steps.found-comment.outputs.comment-id
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          issue-number: \${{ steps.release.outputs.pr-number }}
+          body: \${{ steps.comment-text.outputs.result }}
+      - name: Update Release Manager Comment
+        id: update-comment
+        if: steps.release.outputs.pr-number && steps.found-comment.outputs.comment-id
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          comment-id: \${{ steps.found-comment.outputs.comment-id }}
+          body: \${{ steps.comment-text.outputs.result }}
+          edit-mode: 'replace'
       - name: Create Check
-        uses: LouisBrunner/checks-action@v1.6.0
-        id: check
+        id: create-check
+        uses: ./.github/actions/create-check
         if: steps.release.outputs.pr-sha
         with:
+          name: "Release"
           token: \${{ secrets.GITHUB_TOKEN }}
-          status: in_progress
-          name: Release
           sha: \${{ steps.release.outputs.pr-sha }}
-          output: \${{ steps.check-output.outputs.result }}
 
   update:
     needs: release
     outputs:
       sha: \${{ steps.commit.outputs.sha }}
-      check-id: \${{ steps.check.outputs.check_id }}
+      check-id: \${{ steps.create-check.outputs.check-id }}
     name: Update - Release
     if: github.repository_owner == 'npm' && needs.release.outputs.pr
     runs-on: ubuntu-latest
@@ -5117,7 +4156,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          ref: \${{ needs.release.outputs.branch }}
+          ref: \${{ needs.release.outputs.pr-branch }}
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
@@ -5128,47 +4167,27 @@ jobs:
         with:
           node-version: 20.x
           check-latest: contains('20.x', '.x')
-
       - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
+        uses: ./.github/actions/install-latest-npm
+        with:
+          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
+      - name: Create Release Manager Checklist Text
+        id: comment-text
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        run: npm exec --offline -- template-oss-release-manager --pr="\${{ needs.release.outputs.pr-number }}" --backport="" --defaultTag="latest"
+      - name: Append Release Manager Comment
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          comment-id: \${{ needs.release.outputs.comment-id }}
+          body: \${{ steps.comment-text.outputs.result }}
+          edit-mode: 'append'
       - name: Run Post Pull Request Actions
         env:
-          RELEASE_PR_NUMBER: \${{ needs.release.outputs.pr-number }}
-          RELEASE_COMMENT_ID: \${{ needs.release.outputs.comment-id }}
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
-        run: |
-          npm exec --offline -- template-oss-release-manager --lockfile=false --publish=false
-          npm run rp-pull-request --ignore-scripts -ws -iwr --if-present
+        run: npm run rp-pull-request --ignore-scripts -ws -iwr --if-present -- --pr="\${{ needs.release.outputs.pr-number }}" --commentId="\${{ needs.release.outputs.comment-id }}"
       - name: Commit
         id: commit
         env:
@@ -5177,52 +4196,16 @@ jobs:
           git commit --all --amend --no-edit || true
           git push --force-with-lease
           echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-      - name: Get Workflow Job
-        uses: actions/github-script@v6
-        if: steps.commit.outputs.sha
-        id: check-output
-        env:
-          JOB_NAME: "Update - Release"
-          MATRIX_NAME: ""
-        with:
-          script: |
-            const { owner, repo } = context.repo
-
-            const { data } = await github.rest.actions.listJobsForWorkflowRun({
-              owner,
-              repo,
-              run_id: context.runId,
-              per_page: 100
-            })
-
-            const jobName = process.env.JOB_NAME + process.env.MATRIX_NAME
-            const job = data.jobs.find(j => j.name.endsWith(jobName))
-            const jobUrl = job?.html_url
-
-            const shaUrl = \`\${context.serverUrl}/\${owner}/\${repo}/commit/\${{ steps.commit.outputs.sha }}\`
-
-            let summary = \`This check is assosciated with \${shaUrl}/n/n\`
-
-            if (jobUrl) {
-              summary += \`For run logs, click here: \${jobUrl}\`
-            } else {
-              summary += \`Run logs could not be found for a job with name: "\${jobName}"\`
-            }
-
-            return { summary }
       - name: Create Check
-        uses: LouisBrunner/checks-action@v1.6.0
-        id: check
-        if: steps.commit.outputs.sha
+        id: create-check
+        uses: ./.github/actions/create-check
         with:
+          name: "Update - Release"
+          check-name: "Release"
           token: \${{ secrets.GITHUB_TOKEN }}
-          status: in_progress
-          name: Release
           sha: \${{ steps.commit.outputs.sha }}
-          output: \${{ steps.check-output.outputs.result }}
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.6.0
-        if: needs.release.outputs.check-id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
           conclusion: \${{ job.status }}
@@ -5234,7 +4217,7 @@ jobs:
     if: needs.release.outputs.pr
     uses: ./.github/workflows/ci-release.yml
     with:
-      ref: \${{ needs.release.outputs.branch }}
+      ref: \${{ needs.release.outputs.pr-branch }}
       check-sha: \${{ needs.update.outputs.sha }}
 
   post-ci:
@@ -5246,8 +4229,8 @@ jobs:
       run:
         shell: bash
     steps:
-      - name: Get Needs Result
-        id: needs-result
+      - name: Get CI Conclusion
+        id: conclusion
         run: |
           result=""
           if [[ "\${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
@@ -5260,14 +4243,15 @@ jobs:
           echo "result=$result" >> $GITHUB_OUTPUT
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.6.0
-        if: needs.update.outputs.check-id && always()
         with:
           token: \${{ secrets.GITHUB_TOKEN }}
-          conclusion: \${{ steps.needs-result.outputs.result }}
+          conclusion: \${{ steps.conclusion.outputs.result }}
           check_id: \${{ needs.update.outputs.check-id }}
 
   post-release:
     needs: release
+    outputs:
+      comment-id: \${{ steps.create-comment.outputs.comment-id }}
     name: Post Release - Release
     if: github.repository_owner == 'npm' && needs.release.outputs.releases
     runs-on: ubuntu-latest
@@ -5275,123 +4259,50 @@ jobs:
       run:
         shell: bash
     steps:
-      - name: Create Release PR Comment
+      - name: Create Release PR Comment Text
+        id: comment-text
         uses: actions/github-script@v6
         env:
           RELEASES: \${{ needs.release.outputs.releases }}
         with:
+          result-encoding: string
           script: |
             const releases = JSON.parse(process.env.RELEASES)
             const { runId, repo: { owner, repo } } = context
             const issue_number = releases[0].prNumber
-
-            let body = '## Release Workflow/n/n'
-            for (const { pkgName, version, url } of releases) {
-              body += \`- /\`\${pkgName}@\${version}/\` \${url}/n\`
-            }
-
-            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
-              .then(cs => cs.map(c => ({ id: c.id, login: c.user.login, body: c.body })))
-            console.log(\`Found comments: \${JSON.stringify(comments, null, 2)}\`)
-            const releaseComments = comments.filter(c => c.login === 'github-actions[bot]' && c.body.includes('Release is at'))
-
-            for (const comment of releaseComments) {
-              console.log(\`Release comment: \${JSON.stringify(comment, null, 2)}\`)
-              await github.rest.issues.deleteComment({ owner, repo, comment_id: comment.id })
-            }
-
             const runUrl = \`https://github.com/\${owner}/\${repo}/actions/runs/\${runId}\`
-            await github.rest.issues.createComment({
-              owner,
-              repo,
-              issue_number,
-              body: \`\${body}- Workflow run: :arrows_counterclockwise: \${runUrl}\`,
-            })
+
+            return [
+              '## Release Workflow/n',
+              ...releases.map(r => \`- /\`\${r.pkgName}@\${r.version}/\` \${r.url}\`),
+              \`- Workflow run: :arrows_counterclockwise: \${runUrl}\`,
+            ].join('/n')
+      - name: Create Release PR Comment
+        id: create-comment
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          issue-number: \${{ fromJSON(needs.release.outputs.releases)[0].prNumber }}
+          body: \${{ steps.comment-text.outputs.result }}
 
   release-integration:
     needs: release
     name: Release Integration
-    if: needs.release.outputs.release
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        id: node
-        with:
-          node-version: 20.x
-          check-latest: contains('20.x', '.x')
-
-      - name: Install Latest npm
-        shell: bash
-        env:
-          NODE_VERSION: \${{ steps.node.outputs.node-version }}
-        run: |
-          MATCH=""
-          SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
-
-          echo "node@$NODE_VERSION"
-
-          for SPEC in \${SPECS[@]}; do
-            ENGINES=$(npm view npm@$SPEC --json | jq -r '.engines.node')
-            echo "Checking if node@$NODE_VERSION satisfies npm@$SPEC ($ENGINES)"
-
-            if npx semver -r "$ENGINES" "$NODE_VERSION" > /dev/null; then
-              MATCH=$SPEC
-              echo "Found compatible version: npm@$MATCH"
-              break
-            fi  
-          done
-
-          if [ -z $MATCH ]; then
-            echo "Could not find a compatible version of npm for node@$NODE_VERSION"
-            exit 1
-          fi
-
-          npm i --prefer-online --no-fund --no-audit -g npm@$MATCH
-
-      - name: npm Version
-        run: npm -v
-      - name: View in Registry
-        run: |
-          EXIT_CODE=0
-
-          function is_published {
-            if npm view "$@" --loglevel=error > /dev/null; then
-              echo 0
-            else
-              echo 1
-            fi
-          }
-
-          for release in $(echo '\${{ needs.release.outputs.releases }}' | jq -r '.[] | @base64'); do
-            name=$(echo "$release" | base64 --decode | jq -r .pkgName)
-            version=$(echo "$release" | base64 --decode | jq -r .version)
-            spec="$name@$version"
-            status=$(is_published "$spec")
-            if [[ "$status" -eq 1 ]]; then
-              echo "$spec ERROR"
-              EXIT_CODE=$status
-            else
-              echo "$spec OK"
-            fi
-          done
-
-          exit $EXIT_CODE
+    if: needs.release.outputs.releases
+    uses: ./.github/workflows/release-integration.yml
+    with:
+      releases: \${{ needs.release.outputs.releases }}
 
   post-release-integration:
-    needs: [ release, release-integration ]
+    needs: [ release, release-integration, post-release ]
     name: Post Release Integration - Release
-    if: github.repository_owner == 'npm' && needs.release.outputs.release && always()
+    if: github.repository_owner == 'npm' && needs.release.outputs.releases && always()
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
     steps:
-      - name: Get Needs Result
-        id: needs-result
+      - name: Get Post Release Conclusion
+        id: conclusion
         run: |
           if [[ "\${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
             result="x"
@@ -5401,42 +4312,41 @@ jobs:
             result="white_check_mark"
           fi
           echo "result=$result" >> $GITHUB_OUTPUT
-      - name: Update Release PR Comment
+      - name: Find Release PR Comment
+        uses: peter-evans/find-comment@v2
+        id: found-comment
+        with:
+          issue-number: \${{ fromJSON(needs.release.outputs.releases)[0].prNumber }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '## Release Workflow'
+      - name: Create Release PR Comment Text
+        id: comment-text
+        if: steps.found-comment.outputs.comment-id
         uses: actions/github-script@v6
         env:
-          PR_NUMBER: \${{ fromJSON(needs.release.outputs.release).prNumber }}
-          RESULT: \${{ steps.needs-result.outputs.result }}
+          RESULT: \${{ steps.conclusion.outputs.result }}
+          BODY: \${{ steps.found-comment.outputs.comment-body }}
         with:
+          result-encoding: string
           script: |
-            const { PR_NUMBER: issue_number, RESULT } = process.env
-            const { runId, repo: { owner, repo } } = context
-
-            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
-            const updateComment = comments.find(c =>
-              c.user.login === 'github-actions[bot]' &&
-              c.body.startsWith('## Release Workflow/n/n') &&
-              c.body.includes(runId)
-            )
-
-            if (updateComment) {
-              console.log('Found comment to update:', JSON.stringify(updateComment, null, 2))
-              let body = updateComment.body.replace(/Workflow run: :[a-z_]+:/, \`Workflow run: :\${RESULT}:\`)
-              const tagCodeowner = RESULT !== 'white_check_mark'
-              if (tagCodeowner) {
-                body += \`/n/n:rotating_light:\`
-                body += \` @npm/cli-team: The post-release workflow failed for this release.\`
-                body += \` Manual steps may need to be taken after examining the workflow output\`
-                body += \` from the above workflow run. :rotating_light:\`
-              }
-              await github.rest.issues.updateComment({
-                owner,
-                repo,
-                body,
-                comment_id: updateComment.id,
-              })
-            } else {
-              console.log('No matching comments found:', JSON.stringify(comments, null, 2))
+            const { RESULT, BODY } = process.env
+            const body = [BODY.replace(/(Workflow run: :)[a-z_]+(:)/, \`$1\${RESULT}$2\`)]
+            if (RESULT !== 'white_check_mark') {
+              body.push(':rotating_light::rotating_light::rotating_light:')
+              body.push([
+                '@npm/cli-team: The post-release workflow failed for this release.',
+                'Manual steps may need to be taken after examining the workflow output.'
+              ].join(' '))
+              body.push(':rotating_light::rotating_light::rotating_light:')
             }
+            return body.join('/n/n').trim()
+      - name: Update Release PR Comment
+        if: steps.comment-text.outputs.result
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          comment-id: \${{ steps.found-comment.outputs.comment-id }}
+          body: \${{ steps.comment-text.outputs.result }}
+          edit-mode: 'replace'
 
 .release-please-manifest.json
 ========================================
@@ -5493,7 +4403,8 @@ release-please-config.json
     },
     {
       "type": "chore",
-      "hidden": true
+      "section": "Chores",
+      "hidden": false
     }
   ],
   "packages": {

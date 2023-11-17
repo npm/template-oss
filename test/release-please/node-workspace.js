@@ -1,12 +1,46 @@
 const t = require('tap')
-const { setLogger } = require('release-please') // this avoids a release-please cycle when testing
+// silence all logs during tests from release-please. this needs to come before
+// the rest of the release-please requires to avoid a require cycle.
+require('release-please').setLogger({
+  error () {},
+  warn () {},
+  info () {},
+  debug () {},
+  trace () {},
+})
 const { Node } = require('release-please/build/src/strategies/node')
 const { Version } = require('release-please/build/src/version')
 const { TagName } = require('release-please/build/src/util/tag-name')
-const NodeWorkspace = require('../../lib/release-please/node-workspace')
-const Changelog = require('../../lib/release-please/changelog')
+const NodeWorkspace = require('../../lib/release/node-workspace')
+const Changelog = require('../../lib/release/changelog')
 
-setLogger({ error () {}, warn () {}, info () {}, debug () {}, trace () {} })
+const mockGitHub = ({ names, versions, paths }) => ({
+  repository: { owner: 'npm', repo: 'cli' },
+  graphql: () => ({
+    repository: {},
+  }),
+  octokit: {
+    rest: {
+      repos: {
+        listPullRequestsAssociatedWithCommit: async () => {},
+      },
+    },
+  },
+  getFileContentsOnBranch: (file) => {
+    const path = file.replace(/\/?package.json$/, '') || '.'
+    const dependencies = path === '.' ? paths.filter(p => p !== '.').reduce((acc, ws) => {
+      acc[names[ws]] = `^${versions[ws]}`
+      return acc
+    }, {}) : {}
+    return {
+      parsedContent: JSON.stringify({
+        name: names[path],
+        version: versions[path].toString(),
+        dependencies,
+      }),
+    }
+  },
+})
 
 const mockNodeWorkspace = async (workspaceNames = ['a']) => {
   const names = { '.': 'npm' }
@@ -18,24 +52,7 @@ const mockNodeWorkspace = async (workspaceNames = ['a']) => {
   }
 
   const paths = Object.keys(names)
-
-  const github = {
-    repository: { owner: 'npm', repo: 'cli' },
-    getFileContentsOnBranch: (file) => {
-      const path = file.replace(/\/?package.json$/, '') || '.'
-      const dependencies = path === '.' ? paths.filter(p => p !== '.').reduce((acc, ws) => {
-        acc[names[ws]] = `^${versions[ws]}`
-        return acc
-      }, {}) : {}
-      return {
-        parsedContent: JSON.stringify({
-          name: names[path],
-          version: versions[path].toString(),
-          dependencies,
-        }),
-      }
-    },
-  }
+  const github = mockGitHub({ names, versions, paths })
 
   const workspaces = (fn) => paths.reduce((acc, p) => {
     acc[p] = fn(p)
@@ -61,7 +78,7 @@ const mockPullRequests = async (workspace, updates = workspace.paths) => {
       { type: 'deps', section: 'Dependencies' },
       { type: 'fix', section: 'Fixes' },
     ],
-    changelogNotes: new Changelog({ github }),
+    changelogNotes: new Changelog(github),
   }))
 
   const commitsByPath = workspaces((path) => updates.includes(path) ? [{

@@ -1,5 +1,40 @@
 const t = require('tap')
-const ChangelogNotes = require('../../lib/release-please/changelog.js')
+const ChangelogNotes = require('../../lib/release/changelog.js')
+
+const mockGitHub = ({ commits, authors }) => ({
+  repository: { owner: 'npm', repo: 'cli' },
+  graphql: () => ({
+    repository: commits.reduce((acc, c, i) => {
+      if (c.sha) {
+        if (c.sha === 'd' || c.type === 'deps') {
+          // simulate a bad sha passed in that doesnt return a commit
+          acc[`_${c.sha}`] = null
+        } else {
+          const author = i % 2
+            ? { user: { login: 'username' } }
+            : { name: 'Name' }
+          acc[`_${c.sha}`] = { authors: { nodes: authors ? [author] : [] } }
+        }
+      }
+      return acc
+    }, {}),
+  }),
+  octokit: {
+    rest: {
+      repos: {
+        listPullRequestsAssociatedWithCommit: async (commit) => {
+          if (commit.commit_sha === 'd') {
+            return {
+              data: [{
+                number: 50,
+              }],
+            }
+          }
+        },
+      },
+    },
+  },
+})
 
 const mockChangelog = async ({ shas = true, authors = true, previousTag = true } = {}) => {
   const commits = [{
@@ -28,42 +63,8 @@ const mockChangelog = async ({ shas = true, authors = true, previousTag = true }
     notes: [],
   }].map(({ sha, ...rest }) => shas ? { sha, ...rest } : rest)
 
-  const github = {
-    repository: { owner: 'npm', repo: 'cli' },
-    graphql: () => ({
-      repository: commits.reduce((acc, c, i) => {
-        if (c.sha) {
-          if (c.sha === 'd') {
-            // simulate a bad sha passed in that doesnt return a commit
-            acc[`_${c.sha}`] = null
-          } else {
-            const author = i % 2
-              ? { user: { login: 'username' } }
-              : { name: 'Name' }
-            acc[`_${c.sha}`] = { authors: { nodes: authors ? [author] : [] } }
-          }
-        }
-        return acc
-      }, {}),
-    }),
-    octokit: {
-      rest: {
-        repos: {
-          listPullRequestsAssociatedWithCommit: async (commit) => {
-            if (commit.commit_sha === 'd') {
-              return {
-                data: [{
-                  number: 50,
-                }],
-              }
-            }
-          },
-        },
-      },
-    },
-  }
-
-  const changelog = new ChangelogNotes({ github })
+  const github = mockGitHub({ commits, authors })
+  const changelog = new ChangelogNotes(github)
 
   const notes = await changelog.buildNotes(commits, {
     version: '1.0.0',

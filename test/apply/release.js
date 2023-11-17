@@ -18,7 +18,8 @@ t.test('no workspace flags in commands', async (t) => {
   t.notMatch(ciRelease, '--ignore-scripts -ws -iwr --if-present\n')
 
   const release = await s.readFile(join('.github', 'workflows', 'release.yml'))
-  t.match(release, 'npm publish --provenance --tag=latest\n')
+  t.match(release, '--publish')
+  t.match(release, '--backport=""')
 })
 
 t.test('uses workspace flags in commands', async (t) => {
@@ -51,5 +52,6 @@ t.test('backport', async (t) => {
   t.match(ciRelease, 'default: release/v8\n')
 
   const release = await s.readFile(join('.github', 'workflows', 'release.yml'))
-  t.match(release, 'npm publish --provenance --tag=next-8\n')
+  t.match(release, '--publish')
+  t.match(release, '--backport="8"')
 })

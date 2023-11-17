@@ -30,6 +30,8 @@ Some problems were detected:
 The following repo files need to be added:
 
   .commitlintrc.js
+  .github/actions/create-check/action.yml
+  .github/actions/install-latest-npm/action.yml
   .github/CODEOWNERS
   .github/dependabot.yml
   .github/ISSUE_TEMPLATE/bug.yml
@@ -42,6 +44,7 @@ The following repo files need to be added:
   .github/workflows/codeql-analysis.yml
   .github/workflows/post-dependabot.yml
   .github/workflows/pull-request.yml
+  .github/workflows/release-integration.yml
   .github/workflows/release.yml
   .release-please-manifest.json
   release-please-config.json
@@ -284,6 +287,8 @@ Some problems were detected:
 The following repo files need to be added:
 
   .commitlintrc.js
+  .github/actions/create-check/action.yml
+  .github/actions/install-latest-npm/action.yml
   .github/CODEOWNERS
   .github/dependabot.yml
   .github/ISSUE_TEMPLATE/bug.yml
@@ -296,6 +301,7 @@ The following repo files need to be added:
   .github/workflows/codeql-analysis.yml
   .github/workflows/post-dependabot.yml
   .github/workflows/pull-request.yml
+  .github/workflows/release-integration.yml
   .github/workflows/release.yml
   .release-please-manifest.json
   release-please-config.json
@@ -369,6 +375,8 @@ To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @n
 
 The following repo files need to be added:
 
+  .github/actions/create-check/action.yml
+  .github/actions/install-latest-npm/action.yml
   .github/dependabot.yml
   .github/matchers/tap.json
   .github/settings.yml
@@ -376,6 +384,7 @@ The following repo files need to be added:
   .github/workflows/ci-release.yml
   .github/workflows/post-dependabot.yml
   .github/workflows/pull-request.yml
+  .github/workflows/release-integration.yml
   .github/workflows/release.yml
   .release-please-manifest.json
   release-please-config.json
@@ -438,6 +447,8 @@ To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @n
 
 The following repo files need to be added:
 
+  .github/actions/create-check/action.yml
+  .github/actions/install-latest-npm/action.yml
   .github/dependabot.yml
   .github/matchers/tap.json
   .github/settings.yml
@@ -445,6 +456,7 @@ The following repo files need to be added:
   .github/workflows/ci-release.yml
   .github/workflows/post-dependabot.yml
   .github/workflows/pull-request.yml
+  .github/workflows/release-integration.yml
   .github/workflows/release.yml
   .release-please-manifest.json
   release-please-config.json

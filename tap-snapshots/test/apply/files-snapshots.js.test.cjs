@@ -8,6 +8,8 @@
 exports[`test/apply/files-snapshots.js TAP private workspace > expect resolving Promise 1`] = `
 .commitlintrc.js
 .eslintrc.js
+.github/actions/create-check/action.yml
+.github/actions/install-latest-npm/action.yml
 .github/CODEOWNERS
 .github/dependabot.yml
 .github/ISSUE_TEMPLATE/bug.yml
@@ -22,6 +24,7 @@ exports[`test/apply/files-snapshots.js TAP private workspace > expect resolving 
 .github/workflows/codeql-analysis.yml
 .github/workflows/post-dependabot.yml
 .github/workflows/pull-request.yml
+.github/workflows/release-integration.yml
 .github/workflows/release.yml
 .gitignore
 .npmrc
@@ -41,6 +44,8 @@ workspaces/b/package.json
 
 exports[`test/apply/files-snapshots.js TAP turn off add/rm types > expect resolving Promise 1`] = `
 .commitlintrc.js
+.github/actions/create-check/action.yml
+.github/actions/install-latest-npm/action.yml
 .github/CODEOWNERS
 .github/dependabot.yml
 .github/ISSUE_TEMPLATE/bug.yml
@@ -53,6 +58,7 @@ exports[`test/apply/files-snapshots.js TAP turn off add/rm types > expect resolv
 .github/workflows/codeql-analysis.yml
 .github/workflows/post-dependabot.yml
 .github/workflows/pull-request.yml
+.github/workflows/release-integration.yml
 .github/workflows/release.yml
 .release-please-manifest.json
 package.json
@@ -61,6 +67,8 @@ release-please-config.json
 
 exports[`test/apply/files-snapshots.js TAP turn off module > expect resolving Promise 1`] = `
 .commitlintrc.js
+.github/actions/create-check/action.yml
+.github/actions/install-latest-npm/action.yml
 .github/CODEOWNERS
 .github/dependabot.yml
 .github/ISSUE_TEMPLATE/bug.yml
@@ -73,6 +81,7 @@ exports[`test/apply/files-snapshots.js TAP turn off module > expect resolving Pr
 .github/workflows/codeql-analysis.yml
 .github/workflows/post-dependabot.yml
 .github/workflows/pull-request.yml
+.github/workflows/release-integration.yml
 .github/workflows/release.yml
 .release-please-manifest.json
 package.json
@@ -95,6 +104,8 @@ package.json
 
 exports[`test/apply/files-snapshots.js TAP turn off specific files > expect resolving Promise 1`] = `
 .eslintrc.yml
+.github/actions/create-check/action.yml
+.github/actions/install-latest-npm/action.yml
 .github/CODEOWNERS
 .github/dependabot.yml
 .github/ISSUE_TEMPLATE/bug.yml
@@ -107,6 +118,7 @@ exports[`test/apply/files-snapshots.js TAP turn off specific files > expect reso
 .github/workflows/codeql-analysis.yml
 .github/workflows/post-dependabot.yml
 .github/workflows/pull-request.yml
+.github/workflows/release-integration.yml
 .github/workflows/release-test.yml
 .github/workflows/release.yml
 .gitignore
@@ -120,6 +132,8 @@ SECURITY.md
 `
 
 exports[`test/apply/files-snapshots.js TAP workspaces > expect resolving Promise 1`] = `
+.github/actions/create-check/action.yml
+.github/actions/install-latest-npm/action.yml
 .github/dependabot.yml
 .github/matchers/tap.json
 .github/settings.yml
@@ -127,6 +141,7 @@ exports[`test/apply/files-snapshots.js TAP workspaces > expect resolving Promise
 .github/workflows/ci-release.yml
 .github/workflows/post-dependabot.yml
 .github/workflows/pull-request.yml
+.github/workflows/release-integration.yml
 .github/workflows/release.yml
 .release-please-manifest.json
 package.json
@@ -144,6 +159,8 @@ workspaces/d/package.json
 `
 
 exports[`test/apply/files-snapshots.js TAP workspaces only (like npm/cli) > expect resolving Promise 1`] = `
+.github/actions/create-check/action.yml
+.github/actions/install-latest-npm/action.yml
 .github/dependabot.yml
 .github/matchers/tap.json
 .github/settings.yml
@@ -152,6 +169,7 @@ exports[`test/apply/files-snapshots.js TAP workspaces only (like npm/cli) > expe
 .github/workflows/ci-release.yml
 .github/workflows/post-dependabot.yml
 .github/workflows/pull-request.yml
+.github/workflows/release-integration.yml
 .github/workflows/release.yml
 .release-please-manifest.json
 package.json

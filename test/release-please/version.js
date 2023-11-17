@@ -1,5 +1,5 @@
 const t = require('tap')
-const Version = require('../../lib/release-please/version.js')
+const Version = require('../../lib/release/version.js')
 
 const COMMITS = {
   major: [{ type: 'feat' }, {}, {}, { breaking: true }],
@@ -52,7 +52,7 @@ t.test('bumps', async (t) => {
 
   for (const [version, commits, prerelease, expected] of checks) {
     const name = [version, COMMIT_NAME(commits), prerelease ? 'pre' : 'normal', expected]
-    const r = new Version({ prerelease }).bump(version, commits)
+    const r = new Version(null, { prerelease }).bump(version, commits)
     t.equal(
       `${r.major}.${r.minor}.${r.patch}${r.preRelease ? `-${r.preRelease}` : ''}`,
       expected,

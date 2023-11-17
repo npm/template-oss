@@ -1,6 +1,6 @@
 {
   "author": "GitHub Inc.",
-  "files": {{#if typescript}}{{{ del }}}{{else}}{{{ json distPaths }}}{{/if}},
+  "files": {{{ json distPaths }}},
   "type": {{#if esm}}"module"{{else}}{{{ del }}}{{/if}},
   "scripts": {
     "lint": "{{#if eslint}}eslint \"**/*.{js,cjs,ts,mjs,jsx,tsx}\"{{else}}echo linting disabled{{/if}}",
