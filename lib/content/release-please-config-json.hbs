@@ -1,13 +1,25 @@
 {
   "separate-pull-requests": {{{ del }}},
-  "plugins": {{#if isMonoPublic }}["node-workspace"]{{ else }}{{{ del }}}{{/if}},
-  "exclude-packages-from-root": true,
+  {{#if isMonoPublic }}
+  "plugins": [
+    "node-workspace",
+    "node-workspace-format"
+  ],
+  {{/if}}
+  "exclude-packages-from-root": {{{ del }}},
   "group-pull-request-title-pattern": "chore: release ${version}",
   "pull-request-title-pattern": "chore: release${component} ${version}",
   "changelog-sections": {{{ json changelogTypes }}},
+  "prerelease-type": "pre",
+  "pull-request-header": " ",
+  "pull-request-footer": " ",
   "packages": {
     "{{ pkgPath }}": {
-      {{#if isRoot}}"package-name": ""{{/if}}
+      {{#if isRoot}}
+      "package-name": ""{{#if workspacePaths}},
+      "exclude-paths": {{{ json workspacePaths }}}
+      {{/if}}
+      {{/if}}
     }
   }
 }

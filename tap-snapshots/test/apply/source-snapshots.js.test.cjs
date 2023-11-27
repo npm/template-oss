@@ -1358,7 +1358,6 @@ package.json
 release-please-config.json
 ========================================
 {
-  "exclude-packages-from-root": true,
   "group-pull-request-title-pattern": "chore: release \${version}",
   "pull-request-title-pattern": "chore: release\${component} \${version}",
   "changelog-sections": [
@@ -1388,6 +1387,9 @@ release-please-config.json
       "hidden": false
     }
   ],
+  "prerelease-type": "pre",
+  "pull-request-header": " ",
+  "pull-request-footer": " ",
   "packages": {
     ".": {
       "package-name": ""
@@ -3009,9 +3011,9 @@ release-please-config.json
 ========================================
 {
   "plugins": [
-    "node-workspace"
+    "node-workspace",
+    "node-workspace-format"
   ],
-  "exclude-packages-from-root": true,
   "group-pull-request-title-pattern": "chore: release \${version}",
   "pull-request-title-pattern": "chore: release\${component} \${version}",
   "changelog-sections": [
@@ -3041,9 +3043,16 @@ release-please-config.json
       "hidden": false
     }
   ],
+  "prerelease-type": "pre",
+  "pull-request-header": " ",
+  "pull-request-footer": " ",
   "packages": {
     ".": {
-      "package-name": ""
+      "package-name": "",
+      "exclude-paths": [
+        "workspaces/a",
+        "workspaces/b"
+      ]
     },
     "workspaces/a": {},
     "workspaces/b": {}
@@ -4375,9 +4384,9 @@ release-please-config.json
 ========================================
 {
   "plugins": [
-    "node-workspace"
+    "node-workspace",
+    "node-workspace-format"
   ],
-  "exclude-packages-from-root": true,
   "group-pull-request-title-pattern": "chore: release \${version}",
   "pull-request-title-pattern": "chore: release\${component} \${version}",
   "changelog-sections": [
@@ -4407,6 +4416,9 @@ release-please-config.json
       "hidden": false
     }
   ],
+  "prerelease-type": "pre",
+  "pull-request-header": " ",
+  "pull-request-footer": " ",
   "packages": {
     "workspaces/a": {},
     "workspaces/b": {}
