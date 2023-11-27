@@ -897,8 +897,8 @@ jobs:
             SPEC="$(echo "$release" | base64 --decode | jq -r .pkgName)@$(echo "$release" | base64 --decode | jq -r .version)"
             STATUS=$(each_release "$SPEC")
             if [[ "$STATUS" -eq 1 ]]; then
-              echo "$SPEC ERROR"
               EXIT_CODE=$STATUS
+              echo "$SPEC ERROR"
             else
               echo "$SPEC OK"
             fi
@@ -2530,8 +2530,8 @@ jobs:
             SPEC="$(echo "$release" | base64 --decode | jq -r .pkgName)@$(echo "$release" | base64 --decode | jq -r .version)"
             STATUS=$(each_release "$SPEC")
             if [[ "$STATUS" -eq 1 ]]; then
-              echo "$SPEC ERROR"
               EXIT_CODE=$STATUS
+              echo "$SPEC ERROR"
             else
               echo "$SPEC OK"
             fi
@@ -4031,8 +4031,8 @@ jobs:
             SPEC="$(echo "$release" | base64 --decode | jq -r .pkgName)@$(echo "$release" | base64 --decode | jq -r .version)"
             STATUS=$(each_release "$SPEC")
             if [[ "$STATUS" -eq 1 ]]; then
-              echo "$SPEC ERROR"
               EXIT_CODE=$STATUS
+              echo "$SPEC ERROR"
             else
               echo "$SPEC OK"
             fi

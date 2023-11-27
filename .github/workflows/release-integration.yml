@@ -47,11 +47,11 @@ jobs:
           node: ${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Set PUBLISH_TOKEN
-        env:
-          PUBLISH_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
+      - name: Set npm authToken
         run: npm config set '//registry.npmjs.org/:_authToken'=\${PUBLISH_TOKEN}
       - name: Publish
+        env:
+          PUBLISH_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
         run: |
           EXIT_CODE=0
 
@@ -68,7 +68,6 @@ jobs:
             STATUS=$(each_release "$PUBLISH_TAG")
             if [[ "$STATUS" -eq 1 ]]; then
               EXIT_CODE=$STATUS
-            else
             fi
           done
 

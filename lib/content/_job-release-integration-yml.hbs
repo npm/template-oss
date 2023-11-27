@@ -11,11 +11,11 @@ permissions:
 steps:
   {{#if publish}}
   {{> stepsSetupYml jobCheckout=(obj ref="${{ fromJSON(inputs.releases)[0].tagName }}") }}
-  - name: Set PUBLISH_TOKEN
-    env:
-      PUBLISH_TOKEN: $\{{ secrets.PUBLISH_TOKEN }}
+  - name: Set npm authToken
     run: npm config set '//registry.npmjs.org/:_authToken'=\${PUBLISH_TOKEN}
   - name: Publish
+    env:
+      PUBLISH_TOKEN: $\{{ secrets.PUBLISH_TOKEN }}
   {{else}}
   {{> stepsSetupYml }}
   - name: Check If Published
@@ -40,14 +40,12 @@ steps:
         STATUS=$(each_release "$SPEC")
         {{/if}}
         if [[ "$STATUS" -eq 1 ]]; then
-          {{#unless publish}}
-          echo "$SPEC ERROR"
-          {{/unless}}
           EXIT_CODE=$STATUS
+        {{#unless publish}}
+          echo "$SPEC ERROR"
         else
-          {{#unless publish}}
           echo "$SPEC OK"
-          {{/unless}}              
+        {{/unless}}       
         fi
       done
 
