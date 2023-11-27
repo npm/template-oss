@@ -55,3 +55,25 @@ t.test('no default content', async (t) => {
 
   t.strictSame(checks[0].body, ['typescript', 'tshy', '@typescript-eslint/parser'])
 })
+
+t.test('with tap 16', async (t) => {
+  const s = await setup(t, {
+    ok: true,
+    package: {
+      devDependencies: {
+        tap: '^16',
+      },
+      templateOSS: {
+        typescript: true,
+      },
+    },
+  })
+  await s.apply()
+  const checks = await s.check()
+  const pkg = await s.readJson('package.json')
+
+  t.equal(pkg.scripts.test, 'c8 tap')
+  t.equal(pkg.scripts.snap, 'c8 tap')
+  t.strictSame(pkg.tap['node-arg'], ['--no-warnings', '--loader', 'ts-node/esm'])
+  t.strictSame(checks[0].body, ['typescript', 'tshy', '@typescript-eslint/parser', 'c8', 'ts-node'])
+})

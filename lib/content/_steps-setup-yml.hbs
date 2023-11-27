@@ -1,6 +1,15 @@
-{{~#if jobCheck}}{{> stepChecksYml }}{{/if}}
 {{~#unless jobSkipSetup}}
 {{> stepGitYml }}
+{{~#if jobCreateCheck}}
+- name: Create Check
+  id: create-check
+  if: {{ jobCreateCheck.sha }}
+  uses: ./.github/actions/create-check
+  with:
+    name: "{{ jobName }}{{#if jobIsMatrix}} - $\{{ matrix.platform.name }} - $\{{ matrix.node-version }}{{/if}}"
+    token: $\{{ secrets.GITHUB_TOKEN }}
+    sha: {{ jobCreateCheck.sha }}
+{{/if}}
 {{> stepNodeYml }}
 {{> stepDepsYml }}
 {{/unless}}

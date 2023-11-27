@@ -1,59 +1,52 @@
-{{#if publish}}
+name: {{#if publish}}Publish{{else}}Check Publish{{/if}}
 runs-on: ubuntu-latest
 defaults:
   run:
     shell: bash
+{{#if publish}}
 permissions:
   deployments: write
   id-token: write
+{{/if}}
 steps:
-  - name: Checkout
-    uses: actions/checkout@v3
-    with:
-      ref: $\{{ fromJSON(needs.release.outputs.release).tagName }}
-  - name: Setup Node
-    uses: actions/setup-node@v3
-    with:
-      node-version: 18.x
-  - name: Install npm@latest
-    run: |
-      npm i --prefer-online --no-fund --no-audit -g npm@latest
-      npm config set '//registry.npmjs.org/:_authToken'=\${PUBLISH_TOKEN}
+  {{#if publish}}
+  {{> stepsSetupYml jobCheckout=(obj ref="${{ fromJSON(inputs.releases)[0].tagName }}") }}
+  - name: Set npm authToken
+    run: npm config set '//registry.npmjs.org/:_authToken'=\${PUBLISH_TOKEN}
   - name: Publish
     env:
       PUBLISH_TOKEN: $\{{ secrets.PUBLISH_TOKEN }}
-    run: npm publish --provenance --tag={{ publishTag }}
-{{else}}
-runs-on: ubuntu-latest
-defaults:
-  run:
-    shell: bash
-steps:
-  {{> stepNodeYml lockfile=false }}
-  - name: View in Registry
+  {{else}}
+  {{> stepsSetupYml }}
+  - name: Check If Published
+  {{/if}}
     run: |
       EXIT_CODE=0
 
-      function is_published {
-        if npm view "$@" --loglevel=error > /dev/null; then
+      function each_release {
+        if {{#if publish}}npm publish --provenance --tag="$1"{{else}}npm view "$@" --loglevel=error > /dev/null{{/if}}; then
           echo 0
         else
           echo 1
         fi
       }
 
-      for release in $(echo '$\{{ needs.release.outputs.releases }}' | jq -r '.[] | @base64'); do
-        name=$(echo "$release" | base64 --decode | jq -r .pkgName)
-        version=$(echo "$release" | base64 --decode | jq -r .version)
-        spec="$name@$version"
-        status=$(is_published "$spec")
-        if [[ "$status" -eq 1 ]]; then
-          echo "$spec ERROR"
-          EXIT_CODE=$status
+      for release in $(echo '$\{{ inputs.releases }}' | jq -r '.[] | @base64'); do
+        {{#if publish}}
+        PUBLISH_TAG=$(echo "$release" | base64 --decode | jq -r .publishTag)
+        STATUS=$(each_release "$PUBLISH_TAG")
+        {{else}}
+        SPEC="$(echo "$release" | base64 --decode | jq -r .pkgName)@$(echo "$release" | base64 --decode | jq -r .version)"
+        STATUS=$(each_release "$SPEC")
+        {{/if}}
+        if [[ "$STATUS" -eq 1 ]]; then
+          EXIT_CODE=$STATUS
+        {{#unless publish}}
+          echo "$SPEC ERROR"
         else
-          echo "$spec OK"
+          echo "$SPEC OK"
+        {{/unless}}       
         fi
       done
 
       exit $EXIT_CODE
-{{/if}}

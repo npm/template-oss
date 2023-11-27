@@ -1,0 +1,19 @@
+name: Release Integration
+
+on:
+  workflow_dispatch:
+    inputs:
+      releases:
+        required: true
+        type: string
+        description: 'A json array of releases. Required fields: publish: tagName, publishTag. publish check: pkgName, version'
+  workflow_call:
+    inputs:
+      releases:
+        required: true
+        type: string
+        description: 'A json array of releases. Required fields: publish: tagName, publishTag. publish check: pkgName, version'
+
+jobs:
+  publish:
+    {{> jobReleaseIntegrationYml }}

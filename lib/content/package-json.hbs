@@ -1,14 +1,14 @@
 {
   "author": "GitHub Inc.",
-  "files": {{#if typescript}}{{{ del }}}{{else}}{{{ json distPaths }}}{{/if}},
+  "files": {{{ json distPaths }}},
   "type": {{#if esm}}"module"{{else}}{{{ del }}}{{/if}},
   "scripts": {
     "lint": "{{#if eslint}}eslint \"**/*.{js,cjs,ts,mjs,jsx,tsx}\"{{else}}echo linting disabled{{/if}}",
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
     "lintfix": "{{ localNpmPath }} run lint -- --fix",
-    "snap": "tap",
-    "test": "tap",
+    "snap": "{{#if typescript}}{{#if tap16}}c8 {{/if}}{{/if}}tap",
+    "test": "{{#if typescript}}{{#if tap16}}c8 {{/if}}{{/if}}tap",
     "posttest": "{{ localNpmPath }} run lint",
     {{#if isRootMono}}
     "test-all": "{{ localNpmPath }} run test {{ allFlags }}",
@@ -33,6 +33,16 @@
   "tap": {
     {{#if workspacePaths}}
     "test-ignore": "^({{ join workspacePaths "|" }})/",
+    {{/if}}
+    {{#if typescript}}
+    {{#if tap16}}
+    "coverage": false,
+    "node-arg": [
+      "--no-warnings",
+      "--loader",
+      "ts-node/esm"
+    ],
+    {{/if}}
     {{/if}}
     "nyc-arg": {{#if tap18}}{{{ del }}}{{else}}[
       {{#each workspaceGlobs}}
