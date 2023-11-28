@@ -69,7 +69,7 @@
     "@npmcli/eslint-config": "^4.0.0",
     "@npmcli/template-oss": "file:./",
     "nock": "^13.3.8",
-    "tap": "^16.0.0"
+    "tap": "^18.6.1"
   },
   "tap": {
     "timeout": 600,
