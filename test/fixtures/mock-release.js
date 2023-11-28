@@ -69,6 +69,7 @@ const releasePlease = async (t, { setup: s, ...opts } = {}) => {
       branch: BRANCH,
       silent: !s.record,
       trace: true,
+      defaultTag: 'latest',
       ...opts,
     })
   } catch (e) {
@@ -90,6 +91,7 @@ const releaseManager = (t, {
     repo: REPO,
     silent: !s.record,
     cwd,
+    defaultTag: 'latest',
     ...opts,
   })
 }

@@ -6,14 +6,15 @@ const { releasePlease, setup, BRANCH, REPO_DIR } = require('../fixtures/mock-rel
 const { join, resolve } = require('path')
 
 t.test('init', async t => {
-  t.rejects(ReleasePlease.run())
-  t.rejects(ReleasePlease.run({}))
-  t.rejects(ReleasePlease.run({ token: 'ok' }))
-  t.rejects(ReleasePlease.run({ token: 'ok', repo: 'ok' }))
-  t.rejects(new ReleasePlease({
+  await t.rejects(ReleasePlease.run())
+  await t.rejects(ReleasePlease.run({}))
+  await t.rejects(ReleasePlease.run({ token: 'ok' }))
+  await t.rejects(ReleasePlease.run({ token: 'ok', repo: 'ok' }))
+  await t.rejects(new ReleasePlease({
     token: 'ok',
     repo: 'ok',
     branch: 'ok',
+    defaultTag: 'ok',
   }).init())
 })
 

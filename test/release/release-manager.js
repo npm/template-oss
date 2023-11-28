@@ -13,6 +13,7 @@ t.test('init', async t => {
     repo: 'ok',
     pr: 'ok',
     silent: false,
+    defaultTag: 'latest',
   }))
 })
 

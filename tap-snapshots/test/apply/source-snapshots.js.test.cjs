@@ -1388,8 +1388,6 @@ release-please-config.json
     }
   ],
   "prerelease-type": "pre",
-  "pull-request-header": " ",
-  "pull-request-footer": " ",
   "packages": {
     ".": {
       "package-name": ""
@@ -3044,8 +3042,6 @@ release-please-config.json
     }
   ],
   "prerelease-type": "pre",
-  "pull-request-header": " ",
-  "pull-request-footer": " ",
   "packages": {
     ".": {
       "package-name": "",
@@ -4417,8 +4413,6 @@ release-please-config.json
     }
   ],
   "prerelease-type": "pre",
-  "pull-request-header": " ",
-  "pull-request-footer": " ",
   "packages": {
     "workspaces/a": {},
     "workspaces/b": {}
