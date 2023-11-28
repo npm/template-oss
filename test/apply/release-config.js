@@ -1,6 +1,11 @@
 const t = require('tap')
 const setup = require('../setup.js')
 
+const PLUGINS = [
+  'node-workspace',
+  'node-workspace-format',
+]
+
 t.test('root only', async (t) => {
   const prvt = { private: true }
   const cases = [
@@ -20,7 +25,7 @@ t.test('root only', async (t) => {
       const releaseConfig = await s.readJson('release-please-config.json').catch(() => ({}))
       const pr = await s.exists('.github', 'workflows', 'pull-request.yml')
 
-      t.strictSame(releaseConfig.plugins, expected.plugins ? ['node-workspace'] : undefined)
+      t.strictSame(releaseConfig.plugins, expected.plugins ? PLUGINS : undefined)
       t.equal(pr, expected.pr)
     })
   }

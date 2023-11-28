@@ -123,3 +123,23 @@ trivial to swap out this content directory for a different one as it is only
 referenced in a single place in `lib/config.js`. However, it's not currently
 possible to change this value at runtime, but that might become possible in
 future versions of this package.
+
+### Testing
+
+The files `test/release/release-manager.js` and `test/release/release-please.js`
+use recorded `nock` fixtures to generate snapshots. To update these fixtures run:
+
+```sh
+GITHUB_TOKEN=<YOUR_PAT> npm run test:record --- test/release/release-{please,manager}.js
+```
+
+If you only need to update fixtures for one, it's best to only run that single
+test file.
+
+#### `test/release/release-please.js`
+
+This test file uses the repo `npm/npm-cli-release-please` to record its
+fixtures. It expects `https://github.com/npm/npm-cli-release-please` to be
+checked out in a sibling directory to this repo. It also needs the current
+branch set to `template-oss-mock-testing-branch-do-not-delete` before the tests
+are run.

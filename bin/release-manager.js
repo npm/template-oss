@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-const { join } = require('path')
 const core = require('@actions/core')
 const { parseArgs } = require('util')
 const ReleaseManager = require('../lib/release/release-manager')
@@ -10,7 +9,6 @@ ReleaseManager.run({
   token: process.env.GITHUB_TOKEN,
   repo: process.env.GITHUB_REPOSITORY,
   cwd: process.cwd(),
-  pkg: require(join(process.cwd(), 'package.json')),
   ...parseArgs({
     options: {
       pr: { type: 'string' },
