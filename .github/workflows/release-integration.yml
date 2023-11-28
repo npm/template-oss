@@ -15,6 +15,9 @@ on:
         required: true
         type: string
         description: 'A json array of releases. Required fields: publish: tagName, publishTag. publish check: pkgName, version'
+    secrets:
+      PUBLISH_TOKEN:
+        required: true
 
 jobs:
   publish:
@@ -24,7 +27,6 @@ jobs:
       run:
         shell: bash
     permissions:
-      deployments: write
       id-token: write
     steps:
       - name: Checkout

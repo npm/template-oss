@@ -184,6 +184,12 @@ jobs:
     name: Release Integration
     if: needs.release.outputs.releases
     uses: ./.github/workflows/release-integration.yml
+    {{#if publish}}
+    permissions:
+      id-token: write
+    secrets:
+      PUBLISH_TOKEN: $\{{ secrets.PUBLISH_TOKEN }}
+    {{/if}}
     with:
       releases: $\{{ needs.release.outputs.releases }}
 
