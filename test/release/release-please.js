@@ -28,7 +28,7 @@ t.test('cases', async t => {
     fs.writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8')
   }
 
-  const matchPr = async (t, s, { flags, msg }) => {
+  const matchPr = async (t, s, { flags, msg, prerelease }) => {
     if (s.record) {
       execRepo('git pull')
       updateJSON(join(REPO_DIR, 'release-please-config.json'), (d) => ({
@@ -38,6 +38,7 @@ t.test('cases', async t => {
         'commit-search-depth': 1,
         'sequential-calls': true,
         'release-as': undefined,
+        prerelease: prerelease ?? undefined,
       }))
       execRepo(`npm pkg set touch1=$RANDOM ${flags}`)
       execRepo('git add -A')
@@ -72,5 +73,15 @@ t.test('cases', async t => {
     const s = setup(t)
     await matchPr(t, s, { flags: '-w @npmcli/pkg3', msg: 'fix: update pkg3' })
     await matchReleases(t, s, { msg: 'update pkg3' })
+  })
+
+  await t.test('prerelease', async t => {
+    const s = setup(t)
+    await matchPr(t, s, {
+      flags: '-ws -iwr',
+      msg: 'feat!: update all packages',
+      prerelease: true,
+    })
+    await matchReleases(t, s, { msg: 'prerelease all' })
   })
 })
