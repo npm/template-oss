@@ -1,5 +1,19 @@
 # Changelog
 
+## [4.21.0](https://github.com/npm/template-oss/compare/v4.20.0...v4.21.0) (2023-12-01)
+
+### Features
+
+* [`2daff23`](https://github.com/npm/template-oss/commit/2daff2347868ae2f711236515f8d6ef9ab70a811) [#334](https://github.com/npm/template-oss/pull/334) use upstream release-please (#334) (@lukekarrys)
+* [`3d76fc4`](https://github.com/npm/template-oss/commit/3d76fc48ca2c73265737c3408cf7ccab75879cd8) [#380](https://github.com/npm/template-oss/pull/380) release workflow uses composite actions (#380) (@lukekarrys)
+
+### Bug Fixes
+
+* [`fbe355c`](https://github.com/npm/template-oss/commit/fbe355cfb4764d9b441a2af79eeba39e0a301a1c) [#388](https://github.com/npm/template-oss/pull/388) pin release-please version (#388) (@lukekarrys)
+* [`4fad5d8`](https://github.com/npm/template-oss/commit/4fad5d899328ad59978dad248b40ca37c21e55fe) [#387](https://github.com/npm/template-oss/pull/387) make prerelease config switch versioning strategy (#387) (@lukekarrys)
+* [`c892260`](https://github.com/npm/template-oss/commit/c89226086f536e1687a9ebf2d17cb7f6bad3b01a) [#386](https://github.com/npm/template-oss/pull/386) fallback to default release process of 404 from hosted version (#386) (@lukekarrys)
+* [`9b22b83`](https://github.com/npm/template-oss/commit/9b22b83341003e4beb039e650097a4b94785dc42) [#384](https://github.com/npm/template-oss/pull/384) give release integration workflow correct permissions and secrets (#384) (@lukekarrys)
+
 ## [4.20.0](https://github.com/npm/template-oss/compare/v4.19.0...v4.20.0) (2023-11-15)
 
 ### Features
