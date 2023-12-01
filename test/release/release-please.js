@@ -31,6 +31,7 @@ t.test('cases', async t => {
   const matchPr = async (t, s, { flags, msg, prerelease }) => {
     if (s.record) {
       execRepo('git pull')
+      execRepo(`git reset --hard origin/${BRANCH}`)
       updateJSON(join(REPO_DIR, 'release-please-config.json'), (d) => ({
         ...d,
         'last-release-sha': execRepo('git log --grep="chore: release" --format=format:%H -n1'),

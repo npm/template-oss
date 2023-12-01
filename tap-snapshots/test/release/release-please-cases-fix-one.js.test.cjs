@@ -13,45 +13,45 @@ Object {
     ---
     
     
-    <details><summary>2012.0.4</summary>
+    <details><summary>2013.0.2-pre</summary>
     
-    ## [2012.0.4](https://github.com/npm/npm-cli-release-please/compare/v2012.0.3...v2012.0.4) (2023-11-28)
-    
-    ### Bug Fixes
-    
-    * [\`0a2bf35\`](https://github.com/npm/npm-cli-release-please/commit/0a2bf35304e69331138d4981bd7ecc75d86e83de) update pkg3 (@lukekarrys)
-    
-    ### Dependencies
-    
-    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg1-v2012.0.4): \`pkg1@2012.0.4\`
-    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg2-v2012.0.4): \`pkg2@2012.0.4\`
-    </details>
-    
-    <details><summary>pkg1: 2012.0.4</summary>
-    
-    ## [2012.0.4](https://github.com/npm/npm-cli-release-please/compare/pkg1-v2012.0.3...pkg1-v2012.0.4) (2023-11-28)
-    
-    ### Dependencies
-    
-    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg2-v2012.0.4): \`pkg2@2012.0.4\`
-    </details>
-    
-    <details><summary>pkg2: 2012.0.4</summary>
-    
-    ## [2012.0.4](https://github.com/npm/npm-cli-release-please/compare/pkg2-v2012.0.3...pkg2-v2012.0.4) (2023-11-28)
-    
-    ### Dependencies
-    
-    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg3-v2012.0.4): \`@npmcli/pkg3@2012.0.4\`
-    </details>
-    
-    <details><summary>pkg3: 2012.0.4</summary>
-    
-    ## [2012.0.4](https://github.com/npm/npm-cli-release-please/compare/pkg3-v2012.0.3...pkg3-v2012.0.4) (2023-11-28)
+    ## [2013.0.2-pre](https://github.com/npm/npm-cli-release-please/compare/v2013.0.1-pre...v2013.0.2-pre) (2023-12-01)
     
     ### Bug Fixes
     
-    * [\`0a2bf35\`](https://github.com/npm/npm-cli-release-please/commit/0a2bf35304e69331138d4981bd7ecc75d86e83de) update pkg3 (@lukekarrys)
+    * [\`99ddeec\`](https://github.com/npm/npm-cli-release-please/commit/99ddeecd1d548f17901e6547d12921b829d4b509) update pkg3 (@lukekarrys)
+    
+    ### Dependencies
+    
+    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg1-v2013.0.2-pre): \`pkg1@2013.0.2-pre\`
+    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg2-v2013.0.2-pre): \`pkg2@2013.0.2-pre\`
+    </details>
+    
+    <details><summary>pkg1: 2013.0.2-pre</summary>
+    
+    ## [2013.0.2-pre](https://github.com/npm/npm-cli-release-please/compare/pkg1-v2013.0.1-pre...pkg1-v2013.0.2-pre) (2023-12-01)
+    
+    ### Dependencies
+    
+    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg2-v2013.0.2-pre): \`pkg2@2013.0.2-pre\`
+    </details>
+    
+    <details><summary>pkg2: 2013.0.2-pre</summary>
+    
+    ## [2013.0.2-pre](https://github.com/npm/npm-cli-release-please/compare/pkg2-v2013.0.1-pre...pkg2-v2013.0.2-pre) (2023-12-01)
+    
+    ### Dependencies
+    
+    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg3-v2013.0.2-pre): \`@npmcli/pkg3@2013.0.2-pre\`
+    </details>
+    
+    <details><summary>pkg3: 2013.0.2-pre</summary>
+    
+    ## [2013.0.2-pre](https://github.com/npm/npm-cli-release-please/compare/pkg3-v2013.0.1-pre...pkg3-v2013.0.2-pre) (2023-12-01)
+    
+    ### Bug Fixes
+    
+    * [\`99ddeec\`](https://github.com/npm/npm-cli-release-please/commit/99ddeecd1d548f17901e6547d12921b829d4b509) update pkg3 (@lukekarrys)
     </details>
     
     ---
@@ -62,9 +62,9 @@ Object {
   "labels": Array [
     "autorelease: pending",
   ],
-  "number": 251,
-  "sha": "2523cec182cd2199f1c41d818c69bdc07a74f80f",
-  "title": "chore: release 2012.0.4",
+  "number": 254,
+  "sha": "18a19f22fceb96272b592a8c4f8144bb890fe084",
+  "title": "chore: release 2013.0.2-pre",
 }
 `
 
@@ -72,104 +72,104 @@ exports[`test/release/release-please.js TAP cases fix one > releases update pkg3
 Array [
   Object {
     "draft": false,
-    "id": 131773216,
-    "major": 2012,
+    "id": 132321884,
+    "major": 2013,
     "minor": 0,
-    "name": "v2012.0.4",
+    "name": "v2013.0.2-pre",
     "notes": String(
-      ## [2012.0.4](https://github.com/npm/npm-cli-release-please/compare/v2012.0.3...v2012.0.4) (2023-11-28)
+      ## [2013.0.2-pre](https://github.com/npm/npm-cli-release-please/compare/v2013.0.1-pre...v2013.0.2-pre) (2023-12-01)
       
       ### Bug Fixes
       
-      * [\`0a2bf35\`](https://github.com/npm/npm-cli-release-please/commit/0a2bf35304e69331138d4981bd7ecc75d86e83de) update pkg3 (@lukekarrys)
+      * [\`99ddeec\`](https://github.com/npm/npm-cli-release-please/commit/99ddeecd1d548f17901e6547d12921b829d4b509) update pkg3 (@lukekarrys)
       
       ### Dependencies
       
-      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg1-v2012.0.4): \`pkg1@2012.0.4\`
-      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg2-v2012.0.4): \`pkg2@2012.0.4\`
+      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg1-v2013.0.2-pre): \`pkg1@2013.0.2-pre\`
+      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg2-v2013.0.2-pre): \`pkg2@2013.0.2-pre\`
     ),
-    "patch": 4,
+    "patch": 2,
     "path": ".",
     "pkgName": "npm-cli-release-please",
-    "prNumber": 251,
-    "publishTag": "latest",
-    "sha": "731c147ec26b668c8fc52d346ded534d6cde1241",
-    "tagName": "v2012.0.4",
-    "uploadUrl": "https://uploads.github.com/repos/npm/npm-cli-release-please/releases/131773216/assets{?name,label}",
-    "url": "https://github.com/npm/npm-cli-release-please/releases/tag/v2012.0.4",
-    "version": "2012.0.4",
+    "prNumber": 254,
+    "publishTag": "prerelease-2013",
+    "sha": "6a8a6ff465fc9ac43e8e0860247fd0daf5ac3edf",
+    "tagName": "v2013.0.2-pre",
+    "uploadUrl": "https://uploads.github.com/repos/npm/npm-cli-release-please/releases/132321884/assets{?name,label}",
+    "url": "https://github.com/npm/npm-cli-release-please/releases/tag/v2013.0.2-pre",
+    "version": "2013.0.2-pre",
   },
   Object {
     "draft": false,
-    "id": 131773219,
-    "major": 2012,
+    "id": 132321886,
+    "major": 2013,
     "minor": 0,
-    "name": "pkg1: v2012.0.4",
+    "name": "pkg1: v2013.0.2-pre",
     "notes": String(
-      ## [2012.0.4](https://github.com/npm/npm-cli-release-please/compare/pkg1-v2012.0.3...pkg1-v2012.0.4) (2023-11-28)
+      ## [2013.0.2-pre](https://github.com/npm/npm-cli-release-please/compare/pkg1-v2013.0.1-pre...pkg1-v2013.0.2-pre) (2023-12-01)
       
       ### Dependencies
       
-      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg2-v2012.0.4): \`pkg2@2012.0.4\`
+      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg2-v2013.0.2-pre): \`pkg2@2013.0.2-pre\`
     ),
-    "patch": 4,
+    "patch": 2,
     "path": "pkg1",
     "pkgName": "pkg1",
-    "prNumber": 251,
-    "publishTag": "latest",
-    "sha": "731c147ec26b668c8fc52d346ded534d6cde1241",
-    "tagName": "pkg1-v2012.0.4",
-    "uploadUrl": "https://uploads.github.com/repos/npm/npm-cli-release-please/releases/131773219/assets{?name,label}",
-    "url": "https://github.com/npm/npm-cli-release-please/releases/tag/pkg1-v2012.0.4",
-    "version": "2012.0.4",
+    "prNumber": 254,
+    "publishTag": "prerelease-2013",
+    "sha": "6a8a6ff465fc9ac43e8e0860247fd0daf5ac3edf",
+    "tagName": "pkg1-v2013.0.2-pre",
+    "uploadUrl": "https://uploads.github.com/repos/npm/npm-cli-release-please/releases/132321886/assets{?name,label}",
+    "url": "https://github.com/npm/npm-cli-release-please/releases/tag/pkg1-v2013.0.2-pre",
+    "version": "2013.0.2-pre",
   },
   Object {
     "draft": false,
-    "id": 131773224,
-    "major": 2012,
+    "id": 132321889,
+    "major": 2013,
     "minor": 0,
-    "name": "pkg2: v2012.0.4",
+    "name": "pkg2: v2013.0.2-pre",
     "notes": String(
-      ## [2012.0.4](https://github.com/npm/npm-cli-release-please/compare/pkg2-v2012.0.3...pkg2-v2012.0.4) (2023-11-28)
+      ## [2013.0.2-pre](https://github.com/npm/npm-cli-release-please/compare/pkg2-v2013.0.1-pre...pkg2-v2013.0.2-pre) (2023-12-01)
       
       ### Dependencies
       
-      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg3-v2012.0.4): \`@npmcli/pkg3@2012.0.4\`
+      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg3-v2013.0.2-pre): \`@npmcli/pkg3@2013.0.2-pre\`
     ),
-    "patch": 4,
+    "patch": 2,
     "path": "pkg2",
     "pkgName": "pkg2",
-    "prNumber": 251,
-    "publishTag": "latest",
-    "sha": "731c147ec26b668c8fc52d346ded534d6cde1241",
-    "tagName": "pkg2-v2012.0.4",
-    "uploadUrl": "https://uploads.github.com/repos/npm/npm-cli-release-please/releases/131773224/assets{?name,label}",
-    "url": "https://github.com/npm/npm-cli-release-please/releases/tag/pkg2-v2012.0.4",
-    "version": "2012.0.4",
+    "prNumber": 254,
+    "publishTag": "prerelease-2013",
+    "sha": "6a8a6ff465fc9ac43e8e0860247fd0daf5ac3edf",
+    "tagName": "pkg2-v2013.0.2-pre",
+    "uploadUrl": "https://uploads.github.com/repos/npm/npm-cli-release-please/releases/132321889/assets{?name,label}",
+    "url": "https://github.com/npm/npm-cli-release-please/releases/tag/pkg2-v2013.0.2-pre",
+    "version": "2013.0.2-pre",
   },
   Object {
     "draft": false,
-    "id": 131773227,
-    "major": 2012,
+    "id": 132321890,
+    "major": 2013,
     "minor": 0,
-    "name": "pkg3: v2012.0.4",
+    "name": "pkg3: v2013.0.2-pre",
     "notes": String(
-      ## [2012.0.4](https://github.com/npm/npm-cli-release-please/compare/pkg3-v2012.0.3...pkg3-v2012.0.4) (2023-11-28)
+      ## [2013.0.2-pre](https://github.com/npm/npm-cli-release-please/compare/pkg3-v2013.0.1-pre...pkg3-v2013.0.2-pre) (2023-12-01)
       
       ### Bug Fixes
       
-      * [\`0a2bf35\`](https://github.com/npm/npm-cli-release-please/commit/0a2bf35304e69331138d4981bd7ecc75d86e83de) update pkg3 (@lukekarrys)
+      * [\`99ddeec\`](https://github.com/npm/npm-cli-release-please/commit/99ddeecd1d548f17901e6547d12921b829d4b509) update pkg3 (@lukekarrys)
     ),
-    "patch": 4,
+    "patch": 2,
     "path": "pkg3",
     "pkgName": "@npmcli/pkg3",
-    "prNumber": 251,
-    "publishTag": "latest",
-    "sha": "731c147ec26b668c8fc52d346ded534d6cde1241",
-    "tagName": "pkg3-v2012.0.4",
-    "uploadUrl": "https://uploads.github.com/repos/npm/npm-cli-release-please/releases/131773227/assets{?name,label}",
-    "url": "https://github.com/npm/npm-cli-release-please/releases/tag/pkg3-v2012.0.4",
-    "version": "2012.0.4",
+    "prNumber": 254,
+    "publishTag": "prerelease-2013",
+    "sha": "6a8a6ff465fc9ac43e8e0860247fd0daf5ac3edf",
+    "tagName": "pkg3-v2013.0.2-pre",
+    "uploadUrl": "https://uploads.github.com/repos/npm/npm-cli-release-please/releases/132321890/assets{?name,label}",
+    "url": "https://github.com/npm/npm-cli-release-please/releases/tag/pkg3-v2013.0.2-pre",
+    "version": "2013.0.2-pre",
   },
 ]
 `

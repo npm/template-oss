@@ -130,7 +130,7 @@ The files `test/release/release-manager.js` and `test/release/release-please.js`
 use recorded `nock` fixtures to generate snapshots. To update these fixtures run:
 
 ```sh
-GITHUB_TOKEN=<YOUR_PAT> npm run test:record --- test/release/release-{please,manager}.js
+GITHUB_TOKEN=$(gh auth token) npm run test:record --- test/release/release-{please,manager}.js
 ```
 
 If you only need to update fixtures for one, it's best to only run that single
