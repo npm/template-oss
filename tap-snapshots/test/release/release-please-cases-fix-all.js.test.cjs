@@ -13,154 +13,83 @@ Object {
     ---
     
     
-    <details><summary>2012.0.3</summary>
+    <details><summary>2013.0.1-pre</summary>
     
-    ## [2012.0.3](https://github.com/npm/npm-cli-release-please/compare/v2012.0.2...v2012.0.3) (2023-11-28)
+    ## [2013.0.1-pre](https://github.com/npm/npm-cli-release-please/compare/v2013.0.0-pre...v2013.0.1-pre) (2023-12-01)
     
     ### Bug Fixes
     
-    * [\`70c69e6\`](https://github.com/npm/npm-cli-release-please/commit/70c69e660943e807aa93b7dd3a319e821a4d2446) update all packages (@lukekarrys)
+    * [\`ba700af\`](https://github.com/npm/npm-cli-release-please/commit/ba700afaad8f7c0b03172514eb94408923ffaedc) update all packages (@lukekarrys)
     
     ### Dependencies
     
-    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg6-v2012.0.2): \`@npmcli/pkg6@2012.0.2\`
-    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg1-v2012.0.3): \`pkg1@2012.0.3\`
-    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg2-v2012.0.3): \`pkg2@2012.0.3\`
-    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg4-v2012.0.2): \`pkg4@2012.0.2\`
-    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg5-v2012.0.2): \`pkg5@2012.0.2\`
-    ## [2012.0.3](https://github.com/npm/npm-cli-release-please/compare/v2012.0.2...v2012.0.3) (2023-11-28)
+    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg6-v2013.0.1-pre): \`@npmcli/pkg6@2013.0.1-pre\`
+    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg1-v2013.0.1-pre): \`pkg1@2013.0.1-pre\`
+    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg2-v2013.0.1-pre): \`pkg2@2013.0.1-pre\`
+    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg4-v2013.0.1-pre): \`pkg4@2013.0.1-pre\`
+    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg5-v2013.0.1-pre): \`pkg5@2013.0.1-pre\`
+    </details>
+    
+    <details><summary>pkg1: 2013.0.1-pre</summary>
+    
+    ## [2013.0.1-pre](https://github.com/npm/npm-cli-release-please/compare/pkg1-v2013.0.0-pre...pkg1-v2013.0.1-pre) (2023-12-01)
     
     ### Bug Fixes
     
-    * [\`70c69e6\`](https://github.com/npm/npm-cli-release-please/commit/70c69e660943e807aa93b7dd3a319e821a4d2446) update all packages (@lukekarrys)
+    * [\`ba700af\`](https://github.com/npm/npm-cli-release-please/commit/ba700afaad8f7c0b03172514eb94408923ffaedc) update all packages (@lukekarrys)
     
     ### Dependencies
     
-    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg6-v2012.0.2): \`@npmcli/pkg6@2012.0.2\`
-    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg1-v2012.0.3): \`pkg1@2012.0.3\`
-    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg2-v2012.0.3): \`pkg2@2012.0.3\`
-    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg4-v2012.0.2): \`pkg4@2012.0.2\`
-    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg5-v2012.0.2): \`pkg5@2012.0.2\`
-    
-    ### Chores
-    
-    * [\`100fd16\`](https://github.com/npm/npm-cli-release-please/commit/100fd16ad4b096374ceebc0e0debec72502170d3) update template-oss (@lukekarrys)
-    
-    ### Chores
-    
-    * [\`100fd16\`](https://github.com/npm/npm-cli-release-please/commit/100fd16ad4b096374ceebc0e0debec72502170d3) update template-oss (@lukekarrys)
+    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg2-v2013.0.1-pre): \`pkg2@2013.0.1-pre\`
     </details>
     
-    <details><summary>pkg1: 2012.0.3</summary>
+    <details><summary>pkg2: 2013.0.1-pre</summary>
     
-    ## [2012.0.3](https://github.com/npm/npm-cli-release-please/compare/pkg1-v2012.0.2...pkg1-v2012.0.3) (2023-11-28)
+    ## [2013.0.1-pre](https://github.com/npm/npm-cli-release-please/compare/pkg2-v2013.0.0-pre...pkg2-v2013.0.1-pre) (2023-12-01)
     
     ### Bug Fixes
     
-    * [\`70c69e6\`](https://github.com/npm/npm-cli-release-please/commit/70c69e660943e807aa93b7dd3a319e821a4d2446) update all packages (@lukekarrys)
+    * [\`ba700af\`](https://github.com/npm/npm-cli-release-please/commit/ba700afaad8f7c0b03172514eb94408923ffaedc) update all packages (@lukekarrys)
     
     ### Dependencies
     
-    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg2-v2012.0.3): \`pkg2@2012.0.3\`
-    ## [2012.0.3](https://github.com/npm/npm-cli-release-please/compare/pkg1-v2012.0.2...pkg1-v2012.0.3) (2023-11-28)
-    
-    ### Bug Fixes
-    
-    * [\`70c69e6\`](https://github.com/npm/npm-cli-release-please/commit/70c69e660943e807aa93b7dd3a319e821a4d2446) update all packages (@lukekarrys)
-    
-    ### Dependencies
-    
-    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg2-v2012.0.3): \`pkg2@2012.0.3\`
-    
-    ### Chores
-    
-    * [\`100fd16\`](https://github.com/npm/npm-cli-release-please/commit/100fd16ad4b096374ceebc0e0debec72502170d3) update template-oss (@lukekarrys)
-    
-    ### Chores
-    
-    * [\`100fd16\`](https://github.com/npm/npm-cli-release-please/commit/100fd16ad4b096374ceebc0e0debec72502170d3) update template-oss (@lukekarrys)
+    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg3-v2013.0.1-pre): \`@npmcli/pkg3@2013.0.1-pre\`
     </details>
     
-    <details><summary>pkg2: 2012.0.3</summary>
+    <details><summary>pkg3: 2013.0.1-pre</summary>
     
-    ## [2012.0.3](https://github.com/npm/npm-cli-release-please/compare/pkg2-v2012.0.2...pkg2-v2012.0.3) (2023-11-28)
-    
-    ### Bug Fixes
-    
-    * [\`70c69e6\`](https://github.com/npm/npm-cli-release-please/commit/70c69e660943e807aa93b7dd3a319e821a4d2446) update all packages (@lukekarrys)
-    
-    ### Dependencies
-    
-    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg3-v2012.0.3): \`@npmcli/pkg3@2012.0.3\`
-    ## [2012.0.3](https://github.com/npm/npm-cli-release-please/compare/pkg2-v2012.0.2...pkg2-v2012.0.3) (2023-11-28)
+    ## [2013.0.1-pre](https://github.com/npm/npm-cli-release-please/compare/pkg3-v2013.0.0-pre...pkg3-v2013.0.1-pre) (2023-12-01)
     
     ### Bug Fixes
     
-    * [\`70c69e6\`](https://github.com/npm/npm-cli-release-please/commit/70c69e660943e807aa93b7dd3a319e821a4d2446) update all packages (@lukekarrys)
-    
-    ### Dependencies
-    
-    * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg3-v2012.0.3): \`@npmcli/pkg3@2012.0.3\`
-    
-    ### Chores
-    
-    * [\`100fd16\`](https://github.com/npm/npm-cli-release-please/commit/100fd16ad4b096374ceebc0e0debec72502170d3) update template-oss (@lukekarrys)
-    
-    ### Chores
-    
-    * [\`100fd16\`](https://github.com/npm/npm-cli-release-please/commit/100fd16ad4b096374ceebc0e0debec72502170d3) update template-oss (@lukekarrys)
+    * [\`ba700af\`](https://github.com/npm/npm-cli-release-please/commit/ba700afaad8f7c0b03172514eb94408923ffaedc) update all packages (@lukekarrys)
     </details>
     
-    <details><summary>pkg3: 2012.0.3</summary>
+    <details><summary>pkg5: 2013.0.1-pre</summary>
     
-    ## [2012.0.3](https://github.com/npm/npm-cli-release-please/compare/pkg3-v2012.0.2...pkg3-v2012.0.3) (2023-11-28)
+    ## [2013.0.1-pre](https://github.com/npm/npm-cli-release-please/compare/pkg5-v2013.0.0-pre...pkg5-v2013.0.1-pre) (2023-12-01)
     
     ### Bug Fixes
     
-    * [\`70c69e6\`](https://github.com/npm/npm-cli-release-please/commit/70c69e660943e807aa93b7dd3a319e821a4d2446) update all packages (@lukekarrys)
-    
-    ### Chores
-    
-    * [\`100fd16\`](https://github.com/npm/npm-cli-release-please/commit/100fd16ad4b096374ceebc0e0debec72502170d3) update template-oss (@lukekarrys)
+    * [\`ba700af\`](https://github.com/npm/npm-cli-release-please/commit/ba700afaad8f7c0b03172514eb94408923ffaedc) update all packages (@lukekarrys)
     </details>
     
-    <details><summary>pkg5: 2012.0.2</summary>
+    <details><summary>pkg4: 2013.0.1-pre</summary>
     
-    ## [2012.0.2](https://github.com/npm/npm-cli-release-please/compare/pkg5-v2012.0.1...pkg5-v2012.0.2) (2023-11-28)
+    ## [2013.0.1-pre](https://github.com/npm/npm-cli-release-please/compare/pkg4-v2013.0.0-pre...pkg4-v2013.0.1-pre) (2023-12-01)
     
     ### Bug Fixes
     
-    * [\`70c69e6\`](https://github.com/npm/npm-cli-release-please/commit/70c69e660943e807aa93b7dd3a319e821a4d2446) update all packages (@lukekarrys)
-    
-    ### Chores
-    
-    * [\`100fd16\`](https://github.com/npm/npm-cli-release-please/commit/100fd16ad4b096374ceebc0e0debec72502170d3) update template-oss (@lukekarrys)
+    * [\`ba700af\`](https://github.com/npm/npm-cli-release-please/commit/ba700afaad8f7c0b03172514eb94408923ffaedc) update all packages (@lukekarrys)
     </details>
     
-    <details><summary>pkg4: 2012.0.2</summary>
+    <details><summary>pkg6: 2013.0.1-pre</summary>
     
-    ## [2012.0.2](https://github.com/npm/npm-cli-release-please/compare/pkg4-v2012.0.1...pkg4-v2012.0.2) (2023-11-28)
-    
-    ### Bug Fixes
-    
-    * [\`70c69e6\`](https://github.com/npm/npm-cli-release-please/commit/70c69e660943e807aa93b7dd3a319e821a4d2446) update all packages (@lukekarrys)
-    
-    ### Chores
-    
-    * [\`100fd16\`](https://github.com/npm/npm-cli-release-please/commit/100fd16ad4b096374ceebc0e0debec72502170d3) update template-oss (@lukekarrys)
-    </details>
-    
-    <details><summary>pkg6: 2012.0.2</summary>
-    
-    ## [2012.0.2](https://github.com/npm/npm-cli-release-please/compare/pkg6-v2012.0.1...pkg6-v2012.0.2) (2023-11-28)
+    ## [2013.0.1-pre](https://github.com/npm/npm-cli-release-please/compare/pkg6-v2013.0.0-pre...pkg6-v2013.0.1-pre) (2023-12-01)
     
     ### Bug Fixes
     
-    * [\`70c69e6\`](https://github.com/npm/npm-cli-release-please/commit/70c69e660943e807aa93b7dd3a319e821a4d2446) update all packages (@lukekarrys)
-    
-    ### Chores
-    
-    * [\`100fd16\`](https://github.com/npm/npm-cli-release-please/commit/100fd16ad4b096374ceebc0e0debec72502170d3) update template-oss (@lukekarrys)
+    * [\`ba700af\`](https://github.com/npm/npm-cli-release-please/commit/ba700afaad8f7c0b03172514eb94408923ffaedc) update all packages (@lukekarrys)
     </details>
     
     ---
@@ -171,9 +100,9 @@ Object {
   "labels": Array [
     "autorelease: pending",
   ],
-  "number": 250,
-  "sha": "a49c28bb3244b51109e6c6e255223a6e30c5937f",
-  "title": "chore: release 2012.0.3",
+  "number": 253,
+  "sha": "f6a18a955ae398f1be6ee8574c987c699ecfc351",
+  "title": "chore: release 2013.0.1-pre",
 }
 `
 
@@ -181,258 +110,187 @@ exports[`test/release/release-please.js TAP cases fix all > releases update all 
 Array [
   Object {
     "draft": false,
-    "id": 131773064,
-    "major": 2012,
+    "id": 132321769,
+    "major": 2013,
     "minor": 0,
-    "name": "v2012.0.3",
+    "name": "v2013.0.1-pre",
     "notes": String(
-      ## [2012.0.3](https://github.com/npm/npm-cli-release-please/compare/v2012.0.2...v2012.0.3) (2023-11-28)
+      ## [2013.0.1-pre](https://github.com/npm/npm-cli-release-please/compare/v2013.0.0-pre...v2013.0.1-pre) (2023-12-01)
       
       ### Bug Fixes
       
-      * [\`70c69e6\`](https://github.com/npm/npm-cli-release-please/commit/70c69e660943e807aa93b7dd3a319e821a4d2446) update all packages (@lukekarrys)
+      * [\`ba700af\`](https://github.com/npm/npm-cli-release-please/commit/ba700afaad8f7c0b03172514eb94408923ffaedc) update all packages (@lukekarrys)
       
       ### Dependencies
       
-      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg6-v2012.0.2): \`@npmcli/pkg6@2012.0.2\`
-      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg1-v2012.0.3): \`pkg1@2012.0.3\`
-      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg2-v2012.0.3): \`pkg2@2012.0.3\`
-      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg4-v2012.0.2): \`pkg4@2012.0.2\`
-      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg5-v2012.0.2): \`pkg5@2012.0.2\`
-      ## [2012.0.3](https://github.com/npm/npm-cli-release-please/compare/v2012.0.2...v2012.0.3) (2023-11-28)
-      
-      ### Bug Fixes
-      
-      * [\`70c69e6\`](https://github.com/npm/npm-cli-release-please/commit/70c69e660943e807aa93b7dd3a319e821a4d2446) update all packages (@lukekarrys)
-      
-      ### Dependencies
-      
-      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg6-v2012.0.2): \`@npmcli/pkg6@2012.0.2\`
-      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg1-v2012.0.3): \`pkg1@2012.0.3\`
-      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg2-v2012.0.3): \`pkg2@2012.0.3\`
-      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg4-v2012.0.2): \`pkg4@2012.0.2\`
-      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg5-v2012.0.2): \`pkg5@2012.0.2\`
-      
-      ### Chores
-      
-      * [\`100fd16\`](https://github.com/npm/npm-cli-release-please/commit/100fd16ad4b096374ceebc0e0debec72502170d3) update template-oss (@lukekarrys)
-      
-      ### Chores
-      
-      * [\`100fd16\`](https://github.com/npm/npm-cli-release-please/commit/100fd16ad4b096374ceebc0e0debec72502170d3) update template-oss (@lukekarrys)
+      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg6-v2013.0.1-pre): \`@npmcli/pkg6@2013.0.1-pre\`
+      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg1-v2013.0.1-pre): \`pkg1@2013.0.1-pre\`
+      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg2-v2013.0.1-pre): \`pkg2@2013.0.1-pre\`
+      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg4-v2013.0.1-pre): \`pkg4@2013.0.1-pre\`
+      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg5-v2013.0.1-pre): \`pkg5@2013.0.1-pre\`
     ),
-    "patch": 3,
+    "patch": 1,
     "path": ".",
     "pkgName": "npm-cli-release-please",
-    "prNumber": 250,
-    "publishTag": "latest",
-    "sha": "53cb51af7139a45fbc4f21c3b74fd5b0eb8a0cf2",
-    "tagName": "v2012.0.3",
-    "uploadUrl": "https://uploads.github.com/repos/npm/npm-cli-release-please/releases/131773064/assets{?name,label}",
-    "url": "https://github.com/npm/npm-cli-release-please/releases/tag/v2012.0.3",
-    "version": "2012.0.3",
+    "prNumber": 253,
+    "publishTag": "prerelease-2013",
+    "sha": "665f6952a3ccde37d33a9498c97c20e568818208",
+    "tagName": "v2013.0.1-pre",
+    "uploadUrl": "https://uploads.github.com/repos/npm/npm-cli-release-please/releases/132321769/assets{?name,label}",
+    "url": "https://github.com/npm/npm-cli-release-please/releases/tag/v2013.0.1-pre",
+    "version": "2013.0.1-pre",
   },
   Object {
     "draft": false,
-    "id": 131773070,
-    "major": 2012,
+    "id": 132321773,
+    "major": 2013,
     "minor": 0,
-    "name": "pkg1: v2012.0.3",
+    "name": "pkg1: v2013.0.1-pre",
     "notes": String(
-      ## [2012.0.3](https://github.com/npm/npm-cli-release-please/compare/pkg1-v2012.0.2...pkg1-v2012.0.3) (2023-11-28)
+      ## [2013.0.1-pre](https://github.com/npm/npm-cli-release-please/compare/pkg1-v2013.0.0-pre...pkg1-v2013.0.1-pre) (2023-12-01)
       
       ### Bug Fixes
       
-      * [\`70c69e6\`](https://github.com/npm/npm-cli-release-please/commit/70c69e660943e807aa93b7dd3a319e821a4d2446) update all packages (@lukekarrys)
+      * [\`ba700af\`](https://github.com/npm/npm-cli-release-please/commit/ba700afaad8f7c0b03172514eb94408923ffaedc) update all packages (@lukekarrys)
       
       ### Dependencies
       
-      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg2-v2012.0.3): \`pkg2@2012.0.3\`
-      ## [2012.0.3](https://github.com/npm/npm-cli-release-please/compare/pkg1-v2012.0.2...pkg1-v2012.0.3) (2023-11-28)
-      
-      ### Bug Fixes
-      
-      * [\`70c69e6\`](https://github.com/npm/npm-cli-release-please/commit/70c69e660943e807aa93b7dd3a319e821a4d2446) update all packages (@lukekarrys)
-      
-      ### Dependencies
-      
-      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg2-v2012.0.3): \`pkg2@2012.0.3\`
-      
-      ### Chores
-      
-      * [\`100fd16\`](https://github.com/npm/npm-cli-release-please/commit/100fd16ad4b096374ceebc0e0debec72502170d3) update template-oss (@lukekarrys)
-      
-      ### Chores
-      
-      * [\`100fd16\`](https://github.com/npm/npm-cli-release-please/commit/100fd16ad4b096374ceebc0e0debec72502170d3) update template-oss (@lukekarrys)
+      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg2-v2013.0.1-pre): \`pkg2@2013.0.1-pre\`
     ),
-    "patch": 3,
+    "patch": 1,
     "path": "pkg1",
     "pkgName": "pkg1",
-    "prNumber": 250,
-    "publishTag": "latest",
-    "sha": "53cb51af7139a45fbc4f21c3b74fd5b0eb8a0cf2",
-    "tagName": "pkg1-v2012.0.3",
-    "uploadUrl": "https://uploads.github.com/repos/npm/npm-cli-release-please/releases/131773070/assets{?name,label}",
-    "url": "https://github.com/npm/npm-cli-release-please/releases/tag/pkg1-v2012.0.3",
-    "version": "2012.0.3",
+    "prNumber": 253,
+    "publishTag": "prerelease-2013",
+    "sha": "665f6952a3ccde37d33a9498c97c20e568818208",
+    "tagName": "pkg1-v2013.0.1-pre",
+    "uploadUrl": "https://uploads.github.com/repos/npm/npm-cli-release-please/releases/132321773/assets{?name,label}",
+    "url": "https://github.com/npm/npm-cli-release-please/releases/tag/pkg1-v2013.0.1-pre",
+    "version": "2013.0.1-pre",
   },
   Object {
     "draft": false,
-    "id": 131773074,
-    "major": 2012,
+    "id": 132321774,
+    "major": 2013,
     "minor": 0,
-    "name": "pkg2: v2012.0.3",
+    "name": "pkg2: v2013.0.1-pre",
     "notes": String(
-      ## [2012.0.3](https://github.com/npm/npm-cli-release-please/compare/pkg2-v2012.0.2...pkg2-v2012.0.3) (2023-11-28)
+      ## [2013.0.1-pre](https://github.com/npm/npm-cli-release-please/compare/pkg2-v2013.0.0-pre...pkg2-v2013.0.1-pre) (2023-12-01)
       
       ### Bug Fixes
       
-      * [\`70c69e6\`](https://github.com/npm/npm-cli-release-please/commit/70c69e660943e807aa93b7dd3a319e821a4d2446) update all packages (@lukekarrys)
+      * [\`ba700af\`](https://github.com/npm/npm-cli-release-please/commit/ba700afaad8f7c0b03172514eb94408923ffaedc) update all packages (@lukekarrys)
       
       ### Dependencies
       
-      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg3-v2012.0.3): \`@npmcli/pkg3@2012.0.3\`
-      ## [2012.0.3](https://github.com/npm/npm-cli-release-please/compare/pkg2-v2012.0.2...pkg2-v2012.0.3) (2023-11-28)
-      
-      ### Bug Fixes
-      
-      * [\`70c69e6\`](https://github.com/npm/npm-cli-release-please/commit/70c69e660943e807aa93b7dd3a319e821a4d2446) update all packages (@lukekarrys)
-      
-      ### Dependencies
-      
-      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg3-v2012.0.3): \`@npmcli/pkg3@2012.0.3\`
-      
-      ### Chores
-      
-      * [\`100fd16\`](https://github.com/npm/npm-cli-release-please/commit/100fd16ad4b096374ceebc0e0debec72502170d3) update template-oss (@lukekarrys)
-      
-      ### Chores
-      
-      * [\`100fd16\`](https://github.com/npm/npm-cli-release-please/commit/100fd16ad4b096374ceebc0e0debec72502170d3) update template-oss (@lukekarrys)
+      * [workspace](https://github.com/npm/npm-cli-release-please/releases/tag/pkg3-v2013.0.1-pre): \`@npmcli/pkg3@2013.0.1-pre\`
     ),
-    "patch": 3,
+    "patch": 1,
     "path": "pkg2",
     "pkgName": "pkg2",
-    "prNumber": 250,
-    "publishTag": "latest",
-    "sha": "53cb51af7139a45fbc4f21c3b74fd5b0eb8a0cf2",
-    "tagName": "pkg2-v2012.0.3",
-    "uploadUrl": "https://uploads.github.com/repos/npm/npm-cli-release-please/releases/131773074/assets{?name,label}",
-    "url": "https://github.com/npm/npm-cli-release-please/releases/tag/pkg2-v2012.0.3",
-    "version": "2012.0.3",
+    "prNumber": 253,
+    "publishTag": "prerelease-2013",
+    "sha": "665f6952a3ccde37d33a9498c97c20e568818208",
+    "tagName": "pkg2-v2013.0.1-pre",
+    "uploadUrl": "https://uploads.github.com/repos/npm/npm-cli-release-please/releases/132321774/assets{?name,label}",
+    "url": "https://github.com/npm/npm-cli-release-please/releases/tag/pkg2-v2013.0.1-pre",
+    "version": "2013.0.1-pre",
   },
   Object {
     "draft": false,
-    "id": 131773080,
-    "major": 2012,
+    "id": 132321776,
+    "major": 2013,
     "minor": 0,
-    "name": "pkg3: v2012.0.3",
+    "name": "pkg3: v2013.0.1-pre",
     "notes": String(
-      ## [2012.0.3](https://github.com/npm/npm-cli-release-please/compare/pkg3-v2012.0.2...pkg3-v2012.0.3) (2023-11-28)
+      ## [2013.0.1-pre](https://github.com/npm/npm-cli-release-please/compare/pkg3-v2013.0.0-pre...pkg3-v2013.0.1-pre) (2023-12-01)
       
       ### Bug Fixes
       
-      * [\`70c69e6\`](https://github.com/npm/npm-cli-release-please/commit/70c69e660943e807aa93b7dd3a319e821a4d2446) update all packages (@lukekarrys)
-      
-      ### Chores
-      
-      * [\`100fd16\`](https://github.com/npm/npm-cli-release-please/commit/100fd16ad4b096374ceebc0e0debec72502170d3) update template-oss (@lukekarrys)
+      * [\`ba700af\`](https://github.com/npm/npm-cli-release-please/commit/ba700afaad8f7c0b03172514eb94408923ffaedc) update all packages (@lukekarrys)
     ),
-    "patch": 3,
+    "patch": 1,
     "path": "pkg3",
     "pkgName": "@npmcli/pkg3",
-    "prNumber": 250,
-    "publishTag": "latest",
-    "sha": "53cb51af7139a45fbc4f21c3b74fd5b0eb8a0cf2",
-    "tagName": "pkg3-v2012.0.3",
-    "uploadUrl": "https://uploads.github.com/repos/npm/npm-cli-release-please/releases/131773080/assets{?name,label}",
-    "url": "https://github.com/npm/npm-cli-release-please/releases/tag/pkg3-v2012.0.3",
-    "version": "2012.0.3",
+    "prNumber": 253,
+    "publishTag": "prerelease-2013",
+    "sha": "665f6952a3ccde37d33a9498c97c20e568818208",
+    "tagName": "pkg3-v2013.0.1-pre",
+    "uploadUrl": "https://uploads.github.com/repos/npm/npm-cli-release-please/releases/132321776/assets{?name,label}",
+    "url": "https://github.com/npm/npm-cli-release-please/releases/tag/pkg3-v2013.0.1-pre",
+    "version": "2013.0.1-pre",
   },
   Object {
     "draft": false,
-    "id": 131773083,
-    "major": 2012,
+    "id": 132321779,
+    "major": 2013,
     "minor": 0,
-    "name": "pkg5: v2012.0.2",
+    "name": "pkg5: v2013.0.1-pre",
     "notes": String(
-      ## [2012.0.2](https://github.com/npm/npm-cli-release-please/compare/pkg5-v2012.0.1...pkg5-v2012.0.2) (2023-11-28)
+      ## [2013.0.1-pre](https://github.com/npm/npm-cli-release-please/compare/pkg5-v2013.0.0-pre...pkg5-v2013.0.1-pre) (2023-12-01)
       
       ### Bug Fixes
       
-      * [\`70c69e6\`](https://github.com/npm/npm-cli-release-please/commit/70c69e660943e807aa93b7dd3a319e821a4d2446) update all packages (@lukekarrys)
-      
-      ### Chores
-      
-      * [\`100fd16\`](https://github.com/npm/npm-cli-release-please/commit/100fd16ad4b096374ceebc0e0debec72502170d3) update template-oss (@lukekarrys)
+      * [\`ba700af\`](https://github.com/npm/npm-cli-release-please/commit/ba700afaad8f7c0b03172514eb94408923ffaedc) update all packages (@lukekarrys)
     ),
-    "patch": 2,
+    "patch": 1,
     "path": "workspaces/arbitrary-name",
     "pkgName": "pkg5",
-    "prNumber": 250,
-    "publishTag": "latest",
-    "sha": "53cb51af7139a45fbc4f21c3b74fd5b0eb8a0cf2",
-    "tagName": "pkg5-v2012.0.2",
-    "uploadUrl": "https://uploads.github.com/repos/npm/npm-cli-release-please/releases/131773083/assets{?name,label}",
-    "url": "https://github.com/npm/npm-cli-release-please/releases/tag/pkg5-v2012.0.2",
-    "version": "2012.0.2",
+    "prNumber": 253,
+    "publishTag": "prerelease-2013",
+    "sha": "665f6952a3ccde37d33a9498c97c20e568818208",
+    "tagName": "pkg5-v2013.0.1-pre",
+    "uploadUrl": "https://uploads.github.com/repos/npm/npm-cli-release-please/releases/132321779/assets{?name,label}",
+    "url": "https://github.com/npm/npm-cli-release-please/releases/tag/pkg5-v2013.0.1-pre",
+    "version": "2013.0.1-pre",
   },
   Object {
     "draft": false,
-    "id": 131773087,
-    "major": 2012,
+    "id": 132321782,
+    "major": 2013,
     "minor": 0,
-    "name": "pkg4: v2012.0.2",
+    "name": "pkg4: v2013.0.1-pre",
     "notes": String(
-      ## [2012.0.2](https://github.com/npm/npm-cli-release-please/compare/pkg4-v2012.0.1...pkg4-v2012.0.2) (2023-11-28)
+      ## [2013.0.1-pre](https://github.com/npm/npm-cli-release-please/compare/pkg4-v2013.0.0-pre...pkg4-v2013.0.1-pre) (2023-12-01)
       
       ### Bug Fixes
       
-      * [\`70c69e6\`](https://github.com/npm/npm-cli-release-please/commit/70c69e660943e807aa93b7dd3a319e821a4d2446) update all packages (@lukekarrys)
-      
-      ### Chores
-      
-      * [\`100fd16\`](https://github.com/npm/npm-cli-release-please/commit/100fd16ad4b096374ceebc0e0debec72502170d3) update template-oss (@lukekarrys)
+      * [\`ba700af\`](https://github.com/npm/npm-cli-release-please/commit/ba700afaad8f7c0b03172514eb94408923ffaedc) update all packages (@lukekarrys)
     ),
-    "patch": 2,
+    "patch": 1,
     "path": "workspaces/not-the-name",
     "pkgName": "pkg4",
-    "prNumber": 250,
-    "publishTag": "latest",
-    "sha": "53cb51af7139a45fbc4f21c3b74fd5b0eb8a0cf2",
-    "tagName": "pkg4-v2012.0.2",
-    "uploadUrl": "https://uploads.github.com/repos/npm/npm-cli-release-please/releases/131773087/assets{?name,label}",
-    "url": "https://github.com/npm/npm-cli-release-please/releases/tag/pkg4-v2012.0.2",
-    "version": "2012.0.2",
+    "prNumber": 253,
+    "publishTag": "prerelease-2013",
+    "sha": "665f6952a3ccde37d33a9498c97c20e568818208",
+    "tagName": "pkg4-v2013.0.1-pre",
+    "uploadUrl": "https://uploads.github.com/repos/npm/npm-cli-release-please/releases/132321782/assets{?name,label}",
+    "url": "https://github.com/npm/npm-cli-release-please/releases/tag/pkg4-v2013.0.1-pre",
+    "version": "2013.0.1-pre",
   },
   Object {
     "draft": false,
-    "id": 131773090,
-    "major": 2012,
+    "id": 132321786,
+    "major": 2013,
     "minor": 0,
-    "name": "pkg6: v2012.0.2",
+    "name": "pkg6: v2013.0.1-pre",
     "notes": String(
-      ## [2012.0.2](https://github.com/npm/npm-cli-release-please/compare/pkg6-v2012.0.1...pkg6-v2012.0.2) (2023-11-28)
+      ## [2013.0.1-pre](https://github.com/npm/npm-cli-release-please/compare/pkg6-v2013.0.0-pre...pkg6-v2013.0.1-pre) (2023-12-01)
       
       ### Bug Fixes
       
-      * [\`70c69e6\`](https://github.com/npm/npm-cli-release-please/commit/70c69e660943e807aa93b7dd3a319e821a4d2446) update all packages (@lukekarrys)
-      
-      ### Chores
-      
-      * [\`100fd16\`](https://github.com/npm/npm-cli-release-please/commit/100fd16ad4b096374ceebc0e0debec72502170d3) update template-oss (@lukekarrys)
+      * [\`ba700af\`](https://github.com/npm/npm-cli-release-please/commit/ba700afaad8f7c0b03172514eb94408923ffaedc) update all packages (@lukekarrys)
     ),
-    "patch": 2,
+    "patch": 1,
     "path": "workspaces/pkg6",
     "pkgName": "@npmcli/pkg6",
-    "prNumber": 250,
-    "publishTag": "latest",
-    "sha": "53cb51af7139a45fbc4f21c3b74fd5b0eb8a0cf2",
-    "tagName": "pkg6-v2012.0.2",
-    "uploadUrl": "https://uploads.github.com/repos/npm/npm-cli-release-please/releases/131773090/assets{?name,label}",
-    "url": "https://github.com/npm/npm-cli-release-please/releases/tag/pkg6-v2012.0.2",
-    "version": "2012.0.2",
+    "prNumber": 253,
+    "publishTag": "prerelease-2013",
+    "sha": "665f6952a3ccde37d33a9498c97c20e568818208",
+    "tagName": "pkg6-v2013.0.1-pre",
+    "uploadUrl": "https://uploads.github.com/repos/npm/npm-cli-release-please/releases/132321786/assets{?name,label}",
+    "url": "https://github.com/npm/npm-cli-release-please/releases/tag/pkg6-v2013.0.1-pre",
+    "version": "2013.0.1-pre",
   },
 ]
 `
