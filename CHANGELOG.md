@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.21.1](https://github.com/npm/template-oss/compare/v4.21.0...v4.21.1) (2023-12-04)
+
+### Bug Fixes
+
+* [`a64e952`](https://github.com/npm/template-oss/commit/a64e9522714e4eef570b20838821364cdf3d635e) [#389](https://github.com/npm/template-oss/pull/389) collapse chores in changelog (@lukekarrys)
+* [`1df98ef`](https://github.com/npm/template-oss/commit/1df98ef0c80d47c29bfeb1e8d66e3d1636dbd5ad) [#389](https://github.com/npm/template-oss/pull/389) run install-latest-npm in temp dir (@lukekarrys)
+
 ## [4.21.0](https://github.com/npm/template-oss/compare/v4.20.0...v4.21.0) (2023-12-01)
 
 ### Features
