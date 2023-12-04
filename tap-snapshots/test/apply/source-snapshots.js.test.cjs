@@ -130,6 +130,7 @@ runs:
       shell: bash
       env:
         NODE_VERSION: \${{ inputs.node }}
+      working-directory: \${{ runner.temp }}
       run: |
         MATCH=""
         SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
@@ -1557,6 +1558,7 @@ runs:
       shell: bash
       env:
         NODE_VERSION: \${{ inputs.node }}
+      working-directory: \${{ runner.temp }}
       run: |
         MATCH=""
         SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
@@ -3321,6 +3323,7 @@ runs:
       shell: bash
       env:
         NODE_VERSION: \${{ inputs.node }}
+      working-directory: \${{ runner.temp }}
       run: |
         MATCH=""
         SPECS=("latest" "next-10" "next-9" "next-8" "next-7" "next-6")
