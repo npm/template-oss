@@ -1365,27 +1365,32 @@ release-please-config.json
     {
       "type": "feat",
       "section": "Features",
-      "hidden": false
+      "hidden": false,
+      "collapse": false
     },
     {
       "type": "fix",
       "section": "Bug Fixes",
-      "hidden": false
+      "hidden": false,
+      "collapse": false
     },
     {
       "type": "docs",
       "section": "Documentation",
-      "hidden": false
+      "hidden": false,
+      "collapse": false
     },
     {
       "type": "deps",
       "section": "Dependencies",
-      "hidden": false
+      "hidden": false,
+      "collapse": false
     },
     {
       "type": "chore",
       "section": "Chores",
-      "hidden": false
+      "hidden": false,
+      "collapse": true
     }
   ],
   "prerelease-type": "pre",
@@ -3020,27 +3025,32 @@ release-please-config.json
     {
       "type": "feat",
       "section": "Features",
-      "hidden": false
+      "hidden": false,
+      "collapse": false
     },
     {
       "type": "fix",
       "section": "Bug Fixes",
-      "hidden": false
+      "hidden": false,
+      "collapse": false
     },
     {
       "type": "docs",
       "section": "Documentation",
-      "hidden": false
+      "hidden": false,
+      "collapse": false
     },
     {
       "type": "deps",
       "section": "Dependencies",
-      "hidden": false
+      "hidden": false,
+      "collapse": false
     },
     {
       "type": "chore",
       "section": "Chores",
-      "hidden": false
+      "hidden": false,
+      "collapse": true
     }
   ],
   "prerelease-type": "pre",
@@ -4392,27 +4402,32 @@ release-please-config.json
     {
       "type": "feat",
       "section": "Features",
-      "hidden": false
+      "hidden": false,
+      "collapse": false
     },
     {
       "type": "fix",
       "section": "Bug Fixes",
-      "hidden": false
+      "hidden": false,
+      "collapse": false
     },
     {
       "type": "docs",
       "section": "Documentation",
-      "hidden": false
+      "hidden": false,
+      "collapse": false
     },
     {
       "type": "deps",
       "section": "Dependencies",
-      "hidden": false
+      "hidden": false,
+      "collapse": false
     },
     {
       "type": "chore",
       "section": "Chores",
-      "hidden": false
+      "hidden": false,
+      "collapse": true
     }
   ],
   "prerelease-type": "pre",

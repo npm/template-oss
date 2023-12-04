@@ -28,10 +28,24 @@ t.test('cases', async t => {
     fs.writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8')
   }
 
-  const matchPr = async (t, s, { flags, msg, prerelease }) => {
+  let init = false
+  const before = (s) => {
     if (s.record) {
       execRepo('git pull')
       execRepo(`git reset --hard origin/${BRANCH}`)
+      if (!init) {
+        init = true
+        execRepo(`npm install ${process.cwd()} -D`)
+        execRepo(`npm run template-oss-apply`)
+        execRepo('git add -A')
+        execRepo(`git commit -m "chore: update template-oss" || true`)
+        execRepo('git push')
+      }
+    }
+  }
+
+  const matchPr = async (t, s, { flags, msg, prerelease }) => {
+    if (s.record) {
       updateJSON(join(REPO_DIR, 'release-please-config.json'), (d) => ({
         ...d,
         'last-release-sha': execRepo('git log --grep="chore: release" --format=format:%H -n1'),
@@ -52,7 +66,7 @@ t.test('cases', async t => {
     t.matchSnapshot(res.pr, `pr ${msg}`)
   }
 
-  const matchReleases = async (t, s, { msg }) => {
+  const matchReleases = async (t, s) => {
     if (s.record) {
       const prList = execRepo(`gh pr list -l "autorelease: pending" -B "${BRANCH}" --json number`)
       const prNumber = JSON.parse(prList)[0].number
@@ -61,28 +75,38 @@ t.test('cases', async t => {
     const res = await releasePlease(t, { setup: s })
     t.notOk(res.pr)
     t.ok(res.releases)
-    t.matchSnapshot(res.releases, `releases ${msg}`)
+    t.matchSnapshot(res.releases, `releases ${t.name}`)
   }
 
   await t.test('fix all', async t => {
     const s = setup(t)
+    before(s)
     await matchPr(t, s, { flags: '-ws -iwr', msg: 'fix: update all packages' })
-    await matchReleases(t, s, { msg: 'update all' })
+    await matchReleases(t, s)
   })
 
   await t.test('fix one', async t => {
     const s = setup(t)
+    before(s)
     await matchPr(t, s, { flags: '-w @npmcli/pkg3', msg: 'fix: update pkg3' })
-    await matchReleases(t, s, { msg: 'update pkg3' })
+    await matchReleases(t, s)
+  })
+
+  await t.test('chore commit', async t => {
+    const s = setup(t)
+    before(s)
+    await matchPr(t, s, { flags: '', msg: 'chore: this is a chore' })
+    await matchReleases(t, s)
   })
 
   await t.test('prerelease', async t => {
     const s = setup(t)
+    before(s)
     await matchPr(t, s, {
       flags: '-ws -iwr',
       msg: 'feat!: update all packages',
       prerelease: true,
     })
-    await matchReleases(t, s, { msg: 'prerelease all' })
+    await matchReleases(t, s)
   })
 })
