@@ -1390,7 +1390,7 @@ release-please-config.json
       "type": "chore",
       "section": "Chores",
       "hidden": false,
-      "collapse": true
+      "collapse": false
     }
   ],
   "prerelease-type": "pre",
@@ -3050,7 +3050,7 @@ release-please-config.json
       "type": "chore",
       "section": "Chores",
       "hidden": false,
-      "collapse": true
+      "collapse": false
     }
   ],
   "prerelease-type": "pre",
@@ -4427,7 +4427,7 @@ release-please-config.json
       "type": "chore",
       "section": "Chores",
       "hidden": false,
-      "collapse": true
+      "collapse": false
     }
   ],
   "prerelease-type": "pre",
