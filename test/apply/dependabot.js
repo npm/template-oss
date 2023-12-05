@@ -54,6 +54,7 @@ t.test('default', async (t) => {
     'versioning-strategy': 'increase-if-necessary',
     'commit-message': { prefix: 'deps', 'prefix-development': 'chore' },
     labels: ['Dependencies'],
+    'open-pull-requests-limit': 10,
   })
 
   t.ok(s.postDependabot)
