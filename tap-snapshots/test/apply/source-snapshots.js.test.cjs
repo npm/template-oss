@@ -184,6 +184,7 @@ updates:
       prefix-development: chore
     labels:
       - "Dependencies"
+    open-pull-requests-limit: 10
   - package-ecosystem: npm
     directory: /
     schedule:
@@ -197,6 +198,7 @@ updates:
       prefix-development: chore
     labels:
       - "Dependencies"
+    open-pull-requests-limit: 10
 
 .github/ISSUE_TEMPLATE/bug.yml
 ========================================
@@ -1617,6 +1619,7 @@ updates:
       prefix-development: chore
     labels:
       - "Dependencies"
+    open-pull-requests-limit: 10
   - package-ecosystem: npm
     directory: /
     schedule:
@@ -1630,6 +1633,7 @@ updates:
       prefix-development: chore
     labels:
       - "Dependencies"
+    open-pull-requests-limit: 10
 
 .github/ISSUE_TEMPLATE/bug.yml
 ========================================
@@ -3381,6 +3385,7 @@ updates:
       prefix-development: chore
     labels:
       - "Dependencies"
+    open-pull-requests-limit: 10
   - package-ecosystem: npm
     directory: /
     schedule:
@@ -3394,6 +3399,7 @@ updates:
       prefix-development: chore
     labels:
       - "Dependencies"
+    open-pull-requests-limit: 10
 
 .github/matchers/tap.json
 ========================================
