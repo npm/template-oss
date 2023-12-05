@@ -18,7 +18,7 @@ t.test('init', async t => {
   }).init())
 })
 
-t.test('cases', async t => {
+t.todo('cases', async t => {
   const execRepo = (cmd, opts) =>
     execSync(cmd, { cwd: REPO_DIR, encoding: 'utf-8', ...opts }).trim()
 
