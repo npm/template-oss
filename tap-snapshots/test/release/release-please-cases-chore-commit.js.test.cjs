@@ -13,16 +13,15 @@ Object {
     ---
     
     
-    <details><summary>2016.0.2-pre</summary>
+    <details><summary>2017.0.3-pre</summary>
     
-    ## [2016.0.2-pre](https://github.com/npm/npm-cli-release-please/compare/v2016.0.1-pre...v2016.0.2-pre) (2023-12-04)
+    ## [2017.0.3-pre](https://github.com/npm/npm-cli-release-please/compare/v2017.0.2-pre...v2017.0.3-pre) (2023-12-05)
     
     ### Chores
     
     <details><summary>Commits</summary>
     
-    * [\`d690bcb\`](https://github.com/npm/npm-cli-release-please/commit/d690bcb622f954314086bc333cd56fa4d2b59897) this is a chore (@lukekarrys)
-    * [\`38acd0f\`](https://github.com/npm/npm-cli-release-please/commit/38acd0f850907c357e51caa56faa42526ace49d9) update template-oss (@lukekarrys)
+    * [\`f936a4b\`](https://github.com/npm/npm-cli-release-please/commit/f936a4be5f739048163b8346568f8bc49b7b53f9) this is a chore (@lukekarrys)
     
     </details>
     </details>
@@ -35,9 +34,9 @@ Object {
   "labels": Array [
     "autorelease: pending",
   ],
-  "number": 264,
-  "sha": "675ff2fa3a03500ce5748e38d05c003d80943e43",
-  "title": "chore: release 2016.0.2-pre",
+  "number": 268,
+  "sha": "9e96e7aa386e69fd38783b037402d2ffd64fb5fc",
+  "title": "chore: release 2017.0.3-pre",
 }
 `
 
@@ -45,30 +44,29 @@ exports[`test/release/release-please.js TAP cases chore commit > releases chore 
 Array [
   Object {
     "draft": false,
-    "id": 132552731,
-    "major": 2016,
+    "id": 132694534,
+    "major": 2017,
     "minor": 0,
-    "name": "v2016.0.2-pre",
+    "name": "v2017.0.3-pre",
     "notes": String(
-      ## [2016.0.2-pre](https://github.com/npm/npm-cli-release-please/compare/v2016.0.1-pre...v2016.0.2-pre) (2023-12-04)
+      ## [2017.0.3-pre](https://github.com/npm/npm-cli-release-please/compare/v2017.0.2-pre...v2017.0.3-pre) (2023-12-05)
       
       ### Chores
       
       Commits
       
-      * [\`d690bcb\`](https://github.com/npm/npm-cli-release-please/commit/d690bcb622f954314086bc333cd56fa4d2b59897) this is a chore (@lukekarrys)
-      * [\`38acd0f\`](https://github.com/npm/npm-cli-release-please/commit/38acd0f850907c357e51caa56faa42526ace49d9) update template-oss (@lukekarrys)
+      * [\`f936a4b\`](https://github.com/npm/npm-cli-release-please/commit/f936a4be5f739048163b8346568f8bc49b7b53f9) this is a chore (@lukekarrys)
     ),
-    "patch": 2,
+    "patch": 3,
     "path": ".",
     "pkgName": "npm-cli-release-please",
-    "prNumber": 264,
-    "publishTag": "prerelease-2016",
-    "sha": "eaa230680541215efd72568054f187e8cebdd2a5",
-    "tagName": "v2016.0.2-pre",
-    "uploadUrl": "https://uploads.github.com/repos/npm/npm-cli-release-please/releases/132552731/assets{?name,label}",
-    "url": "https://github.com/npm/npm-cli-release-please/releases/tag/v2016.0.2-pre",
-    "version": "2016.0.2-pre",
+    "prNumber": 268,
+    "publishTag": "prerelease-2017",
+    "sha": "13b89ef2a76c624b3ebccda40ee817c4112744fc",
+    "tagName": "v2017.0.3-pre",
+    "uploadUrl": "https://uploads.github.com/repos/npm/npm-cli-release-please/releases/132694534/assets{?name,label}",
+    "url": "https://github.com/npm/npm-cli-release-please/releases/tag/v2017.0.3-pre",
+    "version": "2017.0.3-pre",
   },
 ]
 `
