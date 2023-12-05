@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.21.2](https://github.com/npm/template-oss/compare/v4.21.1...v4.21.2) (2023-12-05)
+
+### Bug Fixes
+
+* [`8953024`](https://github.com/npm/template-oss/commit/89530240670cc01826c27c8794ca73c2e29505c1) [#394](https://github.com/npm/template-oss/pull/394) increase open dependabot limit (@lukekarrys)
+* [`9e24894`](https://github.com/npm/template-oss/commit/9e24894b9a9db28f739ed31cd8c3426af11aa0fb) [#392](https://github.com/npm/template-oss/pull/392) do not collapse chores for now (#392) (@lukekarrys)
+
+### Chores
+
+* [`ed599cd`](https://github.com/npm/template-oss/commit/ed599cd3b1c3ec62324ff047d83c25dc45f70603) [#394](https://github.com/npm/template-oss/pull/394) ignore release-please coverage (@lukekarrys)
+
 ## [4.21.1](https://github.com/npm/template-oss/compare/v4.21.0...v4.21.1) (2023-12-04)
 
 ### Bug Fixes
