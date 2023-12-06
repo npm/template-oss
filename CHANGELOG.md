@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.21.3](https://github.com/npm/template-oss/compare/v4.21.2...v4.21.3) (2023-12-06)
+
+### Bug Fixes
+
+* [`acd6429`](https://github.com/npm/template-oss/commit/acd64294a39d7c53ca3c9142fbbf12419974d0cc) [#398](https://github.com/npm/template-oss/pull/398) dont allow release-please to update workspace changelogs (#398) (@lukekarrys)
+
 ## [4.21.2](https://github.com/npm/template-oss/compare/v4.21.1...v4.21.2) (2023-12-05)
 
 ### Bug Fixes
