@@ -34,7 +34,7 @@
   "license": "ISC",
   "dependencies": {
     "@actions/core": "^1.9.1",
-    "@commitlint/cli": "^18.2.0",
+    "@commitlint/cli": "^19.0.0",
     "@commitlint/config-conventional": "^18.1.0",
     "@isaacs/string-locale-compare": "^1.1.0",
     "@npmcli/arborist": "^7.2.1",
