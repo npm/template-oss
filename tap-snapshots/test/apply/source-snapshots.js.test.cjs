@@ -896,7 +896,7 @@ jobs:
             fi
           }
 
-          for release in $(echo '\${{ inputs.releases }}' | jq -r '.[] | @base64'); do
+          for release in $(echo $RELEASES | jq -r '.[] | @base64'); do
             SPEC="$(echo "$release" | base64 --decode | jq -r .pkgName)@$(echo "$release" | base64 --decode | jq -r .version)"
             STATUS=$(each_release "$SPEC")
             if [[ "$STATUS" -eq 1 ]]; then
@@ -2537,7 +2537,7 @@ jobs:
             fi
           }
 
-          for release in $(echo '\${{ inputs.releases }}' | jq -r '.[] | @base64'); do
+          for release in $(echo $RELEASES | jq -r '.[] | @base64'); do
             SPEC="$(echo "$release" | base64 --decode | jq -r .pkgName)@$(echo "$release" | base64 --decode | jq -r .version)"
             STATUS=$(each_release "$SPEC")
             if [[ "$STATUS" -eq 1 ]]; then
@@ -4051,7 +4051,7 @@ jobs:
             fi
           }
 
-          for release in $(echo '\${{ inputs.releases }}' | jq -r '.[] | @base64'); do
+          for release in $(echo $RELEASES | jq -r '.[] | @base64'); do
             SPEC="$(echo "$release" | base64 --decode | jq -r .pkgName)@$(echo "$release" | base64 --decode | jq -r .version)"
             STATUS=$(each_release "$SPEC")
             if [[ "$STATUS" -eq 1 ]]; then
