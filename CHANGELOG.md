@@ -1,5 +1,20 @@
 # Changelog
 
+## [4.21.4](https://github.com/npm/template-oss/compare/v4.21.3...v4.21.4) (2024-04-15)
+
+### Bug Fixes
+
+* [`b8cf803`](https://github.com/npm/template-oss/commit/b8cf8032cde284cf56efb227b578c9bb16971fea) [#430](https://github.com/npm/template-oss/pull/430) only use latest template-oss specific commits in changelog (#430) (@lukekarrys)
+* [`5d806ab`](https://github.com/npm/template-oss/commit/5d806abb13480ea10671ca475cc0d52be10f0790) [#429](https://github.com/npm/template-oss/pull/429) iterate over releases from env var (#429) (@lukekarrys)
+* [`8906397`](https://github.com/npm/template-oss/commit/89063973726c720a4bbab251fa186f783f457ceb) [#423](https://github.com/npm/template-oss/pull/423) turn of body-max-line-length commitlint rule (@lukekarrys)
+
+### Dependencies
+
+* [`0b1c048`](https://github.com/npm/template-oss/commit/0b1c048135fd7edb877ef360e1c4479b5bac73b1) [#423](https://github.com/npm/template-oss/pull/423) `@commitlint/config-conventional@19.2.2`
+* [`47e9d8d`](https://github.com/npm/template-oss/commit/47e9d8d5c1272d3dad23629c77b3d8105c529307) [#423](https://github.com/npm/template-oss/pull/423) bump @commitlint/cli from 18.6.1 to 19.0.3 (@dependabot[bot])
+* [`41ee083`](https://github.com/npm/template-oss/commit/41ee08375c053a4f40050ed4e09324848174b0b8) [#425](https://github.com/npm/template-oss/pull/425) bump undici from 5.28.3 to 6.7.0 (#425) (@dependabot[bot])
+* [`1106838`](https://github.com/npm/template-oss/commit/1106838f4c520855f56bf1ff7bac9f0231372635) [#427](https://github.com/npm/template-oss/pull/427) `proc-log@4.0.0` (#427)
+
 ## [4.21.3](https://github.com/npm/template-oss/compare/v4.21.2...v4.21.3) (2023-12-06)
 
 ### Bug Fixes
