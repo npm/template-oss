@@ -36,11 +36,13 @@ const mockGitHub = ({ commits, authors }) => ({
   },
 })
 
-const mockChangelog = async ({ shas = true, authors = true, previousTag = true } = {}) => {
-  const commits = [{
+const mockChangelog = async ({
+  shas = true,
+  authors = true,
+  previousTag = true,
+  commits: rawCommits = [{
     sha: 'a',
     type: 'feat',
-    notes: [],
     bareMessage: 'Hey now',
     scope: 'bin',
   }, {
@@ -55,13 +57,15 @@ const mockChangelog = async ({ shas = true, authors = true, previousTag = true }
     sha: 'c',
     type: 'deps',
     bareMessage: 'test@1.2.3',
-    notes: [],
   }, {
     sha: 'd',
     type: 'fix',
     bareMessage: 'this fixes it',
-    notes: [],
-  }].map(({ sha, ...rest }) => shas ? { sha, ...rest } : rest)
+  }],
+} = {}) => {
+  const commits = rawCommits
+    .map(({ notes = [], ...rest }) => ({ notes, ...rest }))
+    .map(({ sha, ...rest }) => shas ? { sha, ...rest } : { ...rest })
 
   const github = mockGitHub({ commits, authors })
   const changelog = new ChangelogNotes(github)
@@ -110,5 +114,48 @@ t.test('no tag/authors/shas', async t => {
     '* this fixes it',
     '### Dependencies',
     '* `test@1.2.3`',
+  ])
+})
+
+t.test('filters out multiple template oss commits', async t => {
+  const changelog = await mockChangelog({
+    authors: false,
+    commits: [{
+      sha: 'a',
+      type: 'chore',
+      bareMessage: 'postinstall for dependabot template-oss PR',
+      pullRequest: {
+        number: '100',
+      },
+    }, {
+      sha: 'b',
+      type: 'chore',
+      bareMessage: 'postinstall for dependabot template-oss PR',
+      pullRequest: {
+        number: '101',
+      },
+    }, {
+      sha: 'c',
+      type: 'chore',
+      bareMessage: 'bump @npmcli/template-oss from 1 to 2',
+      pullRequest: {
+        number: '101',
+      },
+    }, {
+      sha: 'd',
+      type: 'chore',
+      bareMessage: 'bump @npmcli/template-oss from 0 to 1',
+      pullRequest: {
+        number: '100',
+      },
+    }],
+  })
+  t.strictSame(changelog, [
+    '## [1.0.0](https://github.com/npm/cli/compare/v0.1.0...v1.0.0) (DATE)',
+    '### Chores',
+    // eslint-disable-next-line max-len
+    '* [`b`](https://github.com/npm/cli/commit/b) [#101](https://github.com/npm/cli/pull/101) postinstall for dependabot template-oss PR',
+    // eslint-disable-next-line max-len
+    '* [`c`](https://github.com/npm/cli/commit/c) [#101](https://github.com/npm/cli/pull/101) bump @npmcli/template-oss from 1 to 2',
   ])
 })
