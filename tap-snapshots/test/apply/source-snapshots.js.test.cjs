@@ -15,7 +15,8 @@ module.exports = {
   rules: {
     'type-enum': [2, 'always', ['feat', 'fix', 'docs', 'deps', 'chore']],
     'header-max-length': [2, 'always', 80],
-    'subject-case': [0, 'always', ['lower-case', 'sentence-case', 'start-case']],
+    'subject-case': [0],
+    'body-max-line-length': [0],
   },
 }
 
@@ -1448,7 +1449,8 @@ module.exports = {
   rules: {
     'type-enum': [2, 'always', ['feat', 'fix', 'docs', 'deps', 'chore']],
     'header-max-length': [2, 'always', 80],
-    'subject-case': [0, 'always', ['lower-case', 'sentence-case', 'start-case']],
+    'subject-case': [0],
+    'body-max-line-length': [0],
   },
 }
 
