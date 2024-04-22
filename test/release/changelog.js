@@ -121,6 +121,10 @@ t.test('filters out multiple template oss commits', async t => {
   const changelog = await mockChangelog({
     authors: false,
     commits: [{
+      sha: 'z',
+      type: 'fix',
+      bareMessage: 'just a fix',
+    }, {
       sha: 'a',
       type: 'chore',
       bareMessage: 'postinstall for dependabot template-oss PR',
@@ -152,10 +156,28 @@ t.test('filters out multiple template oss commits', async t => {
   })
   t.strictSame(changelog, [
     '## [1.0.0](https://github.com/npm/cli/compare/v0.1.0...v1.0.0) (DATE)',
+    '### Bug Fixes',
+    '* [`z`](https://github.com/npm/cli/commit/z) just a fix',
     '### Chores',
     // eslint-disable-next-line max-len
     '* [`b`](https://github.com/npm/cli/commit/b) [#101](https://github.com/npm/cli/pull/101) postinstall for dependabot template-oss PR',
     // eslint-disable-next-line max-len
     '* [`c`](https://github.com/npm/cli/commit/c) [#101](https://github.com/npm/cli/pull/101) bump @npmcli/template-oss from 1 to 2',
   ])
+})
+
+t.test('empty change log with only chore commits', async t => {
+  const changelog = await mockChangelog({
+    authors: false,
+    commits: [{
+      sha: 'a',
+      type: 'chore',
+      bareMessage: 'some chore',
+    }, {
+      sha: 'a',
+      type: 'chore',
+      bareMessage: 'another chore',
+    }],
+  })
+  t.strictSame(changelog, [])
 })
