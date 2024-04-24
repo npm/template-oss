@@ -889,17 +889,10 @@ jobs:
         run: |
           EXIT_CODE=0
 
-          function each_release {
-            if npm view "$@" --loglevel=error > /dev/null; then
-              echo 0
-            else
-              echo 1
-            fi
-          }
-
           for release in $(echo $RELEASES | jq -r '.[] | @base64'); do
             SPEC="$(echo "$release" | base64 --decode | jq -r .pkgName)@$(echo "$release" | base64 --decode | jq -r .version)"
-            STATUS=$(each_release "$SPEC")
+            npm view "$SPEC" --json
+            STATUS=$?
             if [[ "$STATUS" -eq 1 ]]; then
               EXIT_CODE=$STATUS
               echo "$SPEC ERROR"
@@ -2526,17 +2519,10 @@ jobs:
         run: |
           EXIT_CODE=0
 
-          function each_release {
-            if npm view "$@" --loglevel=error > /dev/null; then
-              echo 0
-            else
-              echo 1
-            fi
-          }
-
           for release in $(echo $RELEASES | jq -r '.[] | @base64'); do
             SPEC="$(echo "$release" | base64 --decode | jq -r .pkgName)@$(echo "$release" | base64 --decode | jq -r .version)"
-            STATUS=$(each_release "$SPEC")
+            npm view "$SPEC" --json
+            STATUS=$?
             if [[ "$STATUS" -eq 1 ]]; then
               EXIT_CODE=$STATUS
               echo "$SPEC ERROR"
@@ -4035,17 +4021,10 @@ jobs:
         run: |
           EXIT_CODE=0
 
-          function each_release {
-            if npm view "$@" --loglevel=error > /dev/null; then
-              echo 0
-            else
-              echo 1
-            fi
-          }
-
           for release in $(echo $RELEASES | jq -r '.[] | @base64'); do
             SPEC="$(echo "$release" | base64 --decode | jq -r .pkgName)@$(echo "$release" | base64 --decode | jq -r .version)"
-            STATUS=$(each_release "$SPEC")
+            npm view "$SPEC" --json
+            STATUS=$?
             if [[ "$STATUS" -eq 1 ]]; then
               EXIT_CODE=$STATUS
               echo "$SPEC ERROR"
