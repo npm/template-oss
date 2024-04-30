@@ -153,8 +153,8 @@ The repo file audit.yml needs to be updated:
           uses: actions/setup-node@v3
           id: node
           with:
-            node-version: 20.x
-            check-latest: contains('20.x', '.x')
+            node-version: 22.x
+            check-latest: contains('22.x', '.x')
         - name: Install Latest npm
           uses: ./.github/actions/install-latest-npm
           with:
@@ -175,7 +175,7 @@ The repo file ci.yml needs to be updated:
 
   .github/workflows/ci.yml
   ========================================
-  @@ -76,4 +76,24 @@
+  @@ -77,4 +77,24 @@
            shell: \${{ matrix.platform.shell }}
        steps:
          - name: Checkout
