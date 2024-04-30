@@ -29,7 +29,7 @@ t.test('sets ci versions from engines', async (t) => {
   t.equal(pkg.engines.node, '>=10')
 
   const versions = await getCiJobs(s)
-  t.equal(versions.lint, '20.x')
+  t.equal(versions.lint, '22.x')
   t.strictSame(versions.test, [
     '10.0.0',
     '10.x',
@@ -37,6 +37,7 @@ t.test('sets ci versions from engines', async (t) => {
     '16.x',
     '18.x',
     '20.x',
+    '22.x',
   ])
 })
 
@@ -55,11 +56,11 @@ t.test('can set ci to latest plus other versions', async (t) => {
   t.equal(pkg.engines.node, '*')
 
   const versions = await getCiJobs(s)
-  t.equal(versions.lint, '20.x')
+  t.equal(versions.lint, '22.x')
   t.strictSame(versions.test, [
     '6.x',
     '8.x',
-    '20.x',
+    '22.x',
   ])
 })
 
@@ -111,8 +112,8 @@ t.test('latest ci versions', async (t) => {
   t.equal(pkg.engines, undefined)
 
   const versions = await getCiJobs(s)
-  t.equal(versions.lint, '20.x')
+  t.equal(versions.lint, '22.x')
   t.strictSame(versions.test, [
-    '20.x',
+    '22.x',
   ])
 })
