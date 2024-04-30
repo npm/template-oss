@@ -1,5 +1,5 @@
 - name: Setup Node
-  uses: actions/setup-node@v3
+  uses: actions/setup-node@v4
   id: node
   with:
     node-version: {{#if jobIsMatrix}}$\{{ matrix.node-version }}{{else}}{{ last ciVersions }}{{/if}}
