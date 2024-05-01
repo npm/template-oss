@@ -175,7 +175,7 @@ The repo file ci.yml needs to be updated:
 
   .github/workflows/ci.yml
   ========================================
-  @@ -77,4 +77,24 @@
+  @@ -97,4 +97,24 @@
            shell: \${{ matrix.platform.shell }}
        steps:
          - name: Checkout
