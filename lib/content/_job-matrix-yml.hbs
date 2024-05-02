@@ -11,6 +11,9 @@ strategy:
       - name: macOS
         os: macos-latest
         shell: bash
+      - name: macOS
+        os: macos-13
+        shell: bash
       {{/if}}
       {{#if windowsCI}}
       - name: Windows
@@ -21,6 +24,13 @@ strategy:
       {{#each ciVersions}}
       - {{ . }}
       {{/each}}
+    {{#if macCI}}
+    exclude:
+      {{#each ciVersions}}
+      - platform: {name: macOS, os: macos-{{#if (lte (semverRangeMajor .) 14)}}latest{{else}}13{{/if}}, shell: bash}
+        node-version: {{ . }}
+      {{/each}}
+    {{/if}}
 runs-on: $\{{ matrix.platform.os }}
 defaults:
   run:

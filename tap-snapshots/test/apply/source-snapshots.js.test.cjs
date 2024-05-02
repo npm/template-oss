@@ -471,11 +471,17 @@ jobs:
           - name: macOS
             os: macos-latest
             shell: bash
+          - name: macOS
+            os: macos-13
+            shell: bash
           - name: Windows
             os: windows-latest
             shell: cmd
         node-version:
           - 22.x
+        exclude:
+          - platform: { name: macOS, os: macos-13, shell: bash }
+            node-version: 22.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
       run:
@@ -584,11 +590,17 @@ jobs:
           - name: macOS
             os: macos-latest
             shell: bash
+          - name: macOS
+            os: macos-13
+            shell: bash
           - name: Windows
             os: windows-latest
             shell: cmd
         node-version:
           - 22.x
+        exclude:
+          - platform: { name: macOS, os: macos-13, shell: bash }
+            node-version: 22.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
       run:
@@ -1878,11 +1890,17 @@ jobs:
           - name: macOS
             os: macos-latest
             shell: bash
+          - name: macOS
+            os: macos-13
+            shell: bash
           - name: Windows
             os: windows-latest
             shell: cmd
         node-version:
           - 22.x
+        exclude:
+          - platform: { name: macOS, os: macos-13, shell: bash }
+            node-version: 22.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
       run:
@@ -1978,11 +1996,17 @@ jobs:
           - name: macOS
             os: macos-latest
             shell: bash
+          - name: macOS
+            os: macos-13
+            shell: bash
           - name: Windows
             os: windows-latest
             shell: cmd
         node-version:
           - 22.x
+        exclude:
+          - platform: { name: macOS, os: macos-13, shell: bash }
+            node-version: 22.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
       run:
@@ -2095,11 +2119,17 @@ jobs:
           - name: macOS
             os: macos-latest
             shell: bash
+          - name: macOS
+            os: macos-13
+            shell: bash
           - name: Windows
             os: windows-latest
             shell: cmd
         node-version:
           - 22.x
+        exclude:
+          - platform: { name: macOS, os: macos-13, shell: bash }
+            node-version: 22.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
       run:
@@ -2214,11 +2244,17 @@ jobs:
           - name: macOS
             os: macos-latest
             shell: bash
+          - name: macOS
+            os: macos-13
+            shell: bash
           - name: Windows
             os: windows-latest
             shell: cmd
         node-version:
           - 22.x
+        exclude:
+          - platform: { name: macOS, os: macos-13, shell: bash }
+            node-version: 22.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
       run:
@@ -3525,11 +3561,17 @@ jobs:
           - name: macOS
             os: macos-latest
             shell: bash
+          - name: macOS
+            os: macos-13
+            shell: bash
           - name: Windows
             os: windows-latest
             shell: cmd
         node-version:
           - 22.x
+        exclude:
+          - platform: { name: macOS, os: macos-13, shell: bash }
+            node-version: 22.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
       run:
@@ -3625,11 +3667,17 @@ jobs:
           - name: macOS
             os: macos-latest
             shell: bash
+          - name: macOS
+            os: macos-13
+            shell: bash
           - name: Windows
             os: windows-latest
             shell: cmd
         node-version:
           - 22.x
+        exclude:
+          - platform: { name: macOS, os: macos-13, shell: bash }
+            node-version: 22.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
       run:
@@ -3742,11 +3790,17 @@ jobs:
           - name: macOS
             os: macos-latest
             shell: bash
+          - name: macOS
+            os: macos-13
+            shell: bash
           - name: Windows
             os: windows-latest
             shell: cmd
         node-version:
           - 22.x
+        exclude:
+          - platform: { name: macOS, os: macos-13, shell: bash }
+            node-version: 22.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
       run:
