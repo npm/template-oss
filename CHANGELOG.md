@@ -1,5 +1,26 @@
 # Changelog
 
+## [4.22.0](https://github.com/npm/template-oss/compare/v4.21.4...v4.22.0) (2024-05-03)
+
+### Features
+
+* [`21c9262`](https://github.com/npm/template-oss/commit/21c92624a9342d6fdbaafdf322ded5216b9188e5) [#440](https://github.com/npm/template-oss/pull/440) use macos-(latest|13) based on node version (#440) (@lukekarrys)
+
+### Bug Fixes
+
+* [`8b2e738`](https://github.com/npm/template-oss/commit/8b2e7382cd28c7d25dfaa320b3878443187fee88) [#432](https://github.com/npm/template-oss/pull/432) remove custom node-workspace plugin (@lukekarrys)
+* [`0df268d`](https://github.com/npm/template-oss/commit/0df268d62802b613ce5015d3f30f12f92591dd90) [#442](https://github.com/npm/template-oss/pull/442) properly check for diff with multiple files from overwrite:false (#442) (@lukekarrys)
+* [`2eca24b`](https://github.com/npm/template-oss/commit/2eca24bcfbfc1fad6cfa51cd44555e9c2dfc3536) [#441](https://github.com/npm/template-oss/pull/441) use git+https protocol for repo url (#441) (@lukekarrys)
+* [`732dddc`](https://github.com/npm/template-oss/commit/732dddc38244f4e4a0d6e1a06da416a4d8519dac) [#439](https://github.com/npm/template-oss/pull/439) update actions workflow versions (#439) (@lukekarrys)
+* [`7949ec3`](https://github.com/npm/template-oss/commit/7949ec36484786abeb1c425fb0d9c378064365b5) [#438](https://github.com/npm/template-oss/pull/438) add node 22 to CI matrix (#438) (@lukekarrys)
+* [`6d54cbf`](https://github.com/npm/template-oss/commit/6d54cbf0016403779906d1f563d8ba249d2d9f0e) [#436](https://github.com/npm/template-oss/pull/436) get correct exit code from npm publish/view (#436) (@lukekarrys)
+* [`d0bf7c2`](https://github.com/npm/template-oss/commit/d0bf7c28f9b3244132243067705a524abd18b84b) [#435](https://github.com/npm/template-oss/pull/435) update license (#435) (@lukekarrys)
+* [`df03d8b`](https://github.com/npm/template-oss/commit/df03d8bec39e5e5245b272f1fc9c21556185a95d) [#433](https://github.com/npm/template-oss/pull/433) dont create chore only PRs (#433) (@lukekarrys)
+
+### Dependencies
+
+* [`dff1b5b`](https://github.com/npm/template-oss/commit/dff1b5b54b1393755d59169877cdb31b4466b524) [#432](https://github.com/npm/template-oss/pull/432) bump release-please from 16.3.1 to 16.10.2 (@dependabot[bot])
+
 ## [4.21.4](https://github.com/npm/template-oss/compare/v4.21.3...v4.21.4) (2024-04-15)
 
 ### Bug Fixes
