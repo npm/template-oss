@@ -898,6 +898,8 @@ jobs:
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Check If Published
+        env:
+          RELEASES: \${{ inputs.releases }}
         run: |
           EXIT_CODE=0
 
@@ -2552,6 +2554,8 @@ jobs:
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Check If Published
+        env:
+          RELEASES: \${{ inputs.releases }}
         run: |
           EXIT_CODE=0
 
@@ -4072,6 +4076,8 @@ jobs:
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Check If Published
+        env:
+          RELEASES: \${{ inputs.releases }}
         run: |
           EXIT_CODE=0
 
