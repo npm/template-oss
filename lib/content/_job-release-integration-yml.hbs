@@ -19,6 +19,8 @@ steps:
   {{else}}
   {{> stepsSetupYml }}
   - name: Check If Published
+    env:
+      RELEASES: $\{{ inputs.releases }}
   {{/if}}
     run: |
       EXIT_CODE=0

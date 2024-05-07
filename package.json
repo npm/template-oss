@@ -67,7 +67,7 @@
   ],
   "devDependencies": {
     "@npmcli/eslint-config": "^4.0.0",
-    "@npmcli/template-oss": "4.22.0",
+    "@npmcli/template-oss": "file:./",
     "nock": "^13.3.8",
     "tap": "^16.0.0"
   },
