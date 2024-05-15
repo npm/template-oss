@@ -76,10 +76,11 @@ The module file package.json needs to be updated:
     "lib/"
   ]
   "scripts" is missing, expected {
-    "lint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
+    "eslint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
+    "lint": "npm run eslint",
+    "lintfix": "npm run eslint -- --fix",
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
-    "lintfix": "npm run lint -- --fix",
     "snap": "tap",
     "test": "tap",
     "posttest": "npm run lint"
@@ -123,14 +124,16 @@ The following files are tracked by git but matching a pattern in .gitignore:
 To correct it: move files to not match one of the following patterns:
 
   /*
-  tap-testdir*/
   !**/.gitignore
   !/.commitlintrc.js
   !/.eslintrc.js
   !/.eslintrc.local.*
+  !/.git-blame-ignore-revs
   !/.github/
   !/.gitignore
   !/.npmrc
+  !/.prettierignore
+  !/.prettierrc.js
   !/.release-please-manifest.json
   !/bin/
   !/CHANGELOG*
@@ -148,6 +151,7 @@ To correct it: move files to not match one of the following patterns:
   !/tap-snapshots/
   !/test/
   !/tsconfig.json
+  tap-testdir*/
 
 -------------------------------------------------------------------
 `
@@ -164,14 +168,16 @@ The following files are tracked by git but matching a pattern in .gitignore:
 To correct it: move files to not match one of the following patterns:
 
   /*
-  tap-testdir*/
   !**/.gitignore
   !/.commitlintrc.js
   !/.eslintrc.js
   !/.eslintrc.local.*
+  !/.git-blame-ignore-revs
   !/.github/
   !/.gitignore
   !/.npmrc
+  !/.prettierignore
+  !/.prettierrc.js
   !/.release-please-manifest.json
   !/bin/
   !/CHANGELOG*
@@ -189,6 +195,7 @@ To correct it: move files to not match one of the following patterns:
   !/tap-snapshots/
   !/test/
   !/tsconfig.json
+  tap-testdir*/
   !/workspaces/
   /workspaces/*
   !/workspaces/a/
@@ -203,10 +210,10 @@ The following files are tracked by git but matching a pattern in workspaces/a/.g
 To correct it: move files to not match one of the following patterns:
 
   /*
-  tap-testdir*/
   !**/.gitignore
   !/.eslintrc.js
   !/.eslintrc.local.*
+  !/.git-blame-ignore-revs
   !/.gitignore
   !/bin/
   !/CHANGELOG*
@@ -219,6 +226,7 @@ To correct it: move files to not match one of the following patterns:
   !/scripts/
   !/tap-snapshots/
   !/test/
+  tap-testdir*/
 
 -------------------------------------------------------------------
 
@@ -229,10 +237,10 @@ The following files are tracked by git but matching a pattern in workspaces/b/.g
 To correct it: move files to not match one of the following patterns:
 
   /*
-  tap-testdir*/
   !**/.gitignore
   !/.eslintrc.js
   !/.eslintrc.local.*
+  !/.git-blame-ignore-revs
   !/.gitignore
   !/bin/
   !/CHANGELOG*
@@ -245,6 +253,7 @@ To correct it: move files to not match one of the following patterns:
   !/scripts/
   !/tap-snapshots/
   !/test/
+  tap-testdir*/
 
 -------------------------------------------------------------------
 `
@@ -333,10 +342,11 @@ The module file package.json needs to be updated:
     "lib/"
   ]
   "scripts" is missing, expected {
-    "lint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
+    "eslint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
+    "lint": "npm run eslint",
+    "lintfix": "npm run eslint -- --fix",
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
-    "lintfix": "npm run lint -- --fix",
     "snap": "tap",
     "test": "tap",
     "posttest": "npm run lint",
@@ -412,10 +422,11 @@ The module file package.json needs to be updated:
     "lib/"
   ]
   "scripts" is missing, expected {
-    "lint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
+    "eslint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
+    "lint": "npm run eslint",
+    "lintfix": "npm run eslint -- --fix",
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
-    "lintfix": "npm run lint -- --fix",
     "snap": "tap",
     "test": "tap",
     "posttest": "npm run lint"
@@ -484,10 +495,11 @@ The module file package.json needs to be updated:
     "lib/"
   ]
   "scripts" is missing, expected {
-    "lint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
+    "eslint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
+    "lint": "npm run eslint",
+    "lintfix": "npm run eslint -- --fix",
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
-    "lintfix": "npm run lint -- --fix",
     "snap": "tap",
     "test": "tap",
     "posttest": "npm run lint"
