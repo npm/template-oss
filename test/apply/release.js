@@ -2,7 +2,7 @@ const t = require('tap')
 const { join } = require('path')
 const setup = require('../setup.js')
 
-t.test('no workspace flags in commands', async (t) => {
+t.test('no workspace flags in commands', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -22,7 +22,7 @@ t.test('no workspace flags in commands', async (t) => {
   t.match(release, '--backport=""')
 })
 
-t.test('uses workspace flags in commands', async (t) => {
+t.test('uses workspace flags in commands', async t => {
   const s = await setup(t, {
     workspaces: {
       a: 'a',
@@ -36,7 +36,7 @@ t.test('uses workspace flags in commands', async (t) => {
   t.match(ciRelease, '--ignore-scripts -ws -iwr --if-present\n')
 })
 
-t.test('backport', async (t) => {
+t.test('backport', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {

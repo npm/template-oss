@@ -10,7 +10,7 @@ const setupDependabot = async (t, { branches = ['main'], ...config } = {}) => {
     mocks: {
       '@npmcli/git': {
         is: async () => true,
-        spawn: async (args) => {
+        spawn: async args => {
           const command = args.filter(a => typeof a === 'string').join(' ')
           if (command === 'ls-remote --heads origin') {
             return {
@@ -28,9 +28,9 @@ const setupDependabot = async (t, { branches = ['main'], ...config } = {}) => {
   })
   await s.apply()
 
-  const postDependabot = await s.readFile('.github/workflows/post-dependabot.yml')
-    .catch(() => false)
-  const dependabot = await s.readFile('.github/dependabot.yml')
+  const postDependabot = await s.readFile('.github/workflows/post-dependabot.yml').catch(() => false)
+  const dependabot = await s
+    .readFile('.github/dependabot.yml')
     .then(r => yaml.parse(r).updates)
     .catch(() => false)
 
@@ -41,7 +41,7 @@ const setupDependabot = async (t, { branches = ['main'], ...config } = {}) => {
   }
 }
 
-t.test('default', async (t) => {
+t.test('default', async t => {
   const s = await setupDependabot(t)
 
   t.equal(s.dependabot.length, 1)
@@ -60,7 +60,7 @@ t.test('default', async (t) => {
   t.ok(s.postDependabot)
 })
 
-t.test('change strategy', async (t) => {
+t.test('change strategy', async t => {
   const s = await setupDependabot(t, {
     dependabot: 'some-other-strategy',
   })
@@ -68,7 +68,7 @@ t.test('change strategy', async (t) => {
   t.equal(s.dependabot[0]['versioning-strategy'], 'some-other-strategy')
 })
 
-t.test('turn off specific branch', async (t) => {
+t.test('turn off specific branch', async t => {
   const s = await setupDependabot(t, {
     dependabot: {
       main: false,
@@ -77,24 +77,24 @@ t.test('turn off specific branch', async (t) => {
   t.equal(s.dependabot, null)
 })
 
-t.test('release brancheses', async (t) => {
+t.test('release brancheses', async t => {
   const s = await setupDependabot(t, {
-    branches: [
-      'release/v10',
-    ],
+    branches: ['release/v10'],
   })
 
   t.match(s.dependabot[0], {
     'target-branch': 'release/v10',
-    allow: [{
-      'dependency-type': 'direct',
-      'dependency-name': '@npmcli/template-oss',
-    }],
+    allow: [
+      {
+        'dependency-type': 'direct',
+        'dependency-name': '@npmcli/template-oss',
+      },
+    ],
     labels: ['Dependencies', 'Backport', 'release/v10'],
   })
 })
 
-t.test('no dependabot', async (t) => {
+t.test('no dependabot', async t => {
   const s = await setupDependabot(t, {
     dependabot: false,
   })

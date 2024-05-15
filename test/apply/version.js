@@ -2,7 +2,7 @@ const t = require('tap')
 const { join } = require('path')
 const setup = require('../setup.js')
 
-t.test('applies version', async (t) => {
+t.test('applies version', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {

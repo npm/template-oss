@@ -9,7 +9,7 @@ const output = require('../lib/util/output.js')
 const CONTENT = require('..')
 const { name: NAME, version: VERSION } = require('../package.json')
 
-const createPackageJson = (pkg) => ({
+const createPackageJson = pkg => ({
   'package.json': JSON.stringify(pkg, null, 2),
 })
 
@@ -25,37 +25,41 @@ const pkgWithName = (name, defName) => {
 }
 
 // minimum package.json for no errors
-const okPackage = () => Object.entries(CONTENT.requiredPackages)
-  .reduce((acc, [location, deps]) => {
-    acc[location] = Object.fromEntries(deps.map((name) => {
-      const arg = npa(name)
-      return [arg.name, arg.fetchSpec === 'latest' ? '*' : arg.fetchSpec]
-    }))
-    return acc
-  }, {
-    engines: {
-      node: '^14.17.0 || ^16.13.0 || >=18.0.0',
+const okPackage = () =>
+  Object.entries(CONTENT.requiredPackages).reduce(
+    (acc, [location, deps]) => {
+      acc[location] = Object.fromEntries(
+        deps.map(name => {
+          const arg = npa(name)
+          return [arg.name, arg.fetchSpec === 'latest' ? '*' : arg.fetchSpec]
+        }),
+      )
+      return acc
     },
-    tap: {
-      'nyc-arg': [
-        '--exclude',
-        'tap-snapshots/**',
-      ],
+    {
+      engines: {
+        node: '^14.17.0 || ^16.13.0 || >=18.0.0',
+      },
+      tap: {
+        'nyc-arg': ['--exclude', 'tap-snapshots/**'],
+      },
     },
-  })
+  )
 
 const setupRoot = async (t, root, mocks) => {
   const rootPath = (...p) => join(root, ...p)
 
   // fs methods for reading from the root
-  const rootFs = Object.fromEntries(Object.entries({
-    readdir: fs.readdir,
-    readFile: (p) => fs.readFile(p, { encoding: 'utf-8' }),
-    writeFile: (p, d) => fs.writeFile(p, d, { encoding: 'utf-8' }),
-    appendFile: fs.appendFile,
-    stat: fs.stat,
-    unlink: fs.unlink,
-  }).map(([k, fn]) => [k, (p, ...rest) => fn(rootPath(p), ...rest)]))
+  const rootFs = Object.fromEntries(
+    Object.entries({
+      readdir: fs.readdir,
+      readFile: p => fs.readFile(p, { encoding: 'utf-8' }),
+      writeFile: (p, d) => fs.writeFile(p, d, { encoding: 'utf-8' }),
+      appendFile: fs.appendFile,
+      stat: fs.stat,
+      unlink: fs.unlink,
+    }).map(([k, fn]) => [k, (p, ...rest) => fn(rootPath(p), ...rest)]),
+  )
 
   // Returns a recurisve list of relative file
   // paths in the testdir root
@@ -68,7 +72,7 @@ const setupRoot = async (t, root, mocks) => {
         continue
       }
       if ((await rootFs.stat(nextPath)).isDirectory()) {
-        paths.push(...await readdir(nextPath))
+        paths.push(...(await readdir(nextPath)))
       } else {
         paths.push(nextPath)
       }
@@ -80,7 +84,7 @@ const setupRoot = async (t, root, mocks) => {
   // paths and the values are the full contents
   const readdirSource = async (p = '') => {
     const files = await readdir(p)
-    const contents = await Promise.all(files.map((f) => rootFs.readFile(f)))
+    const contents = await Promise.all(files.map(f => rootFs.readFile(f)))
     return Object.fromEntries(files.map((f, i) => [f, contents[i]]))
   }
 
@@ -92,9 +96,13 @@ const setupRoot = async (t, root, mocks) => {
     ...rootFs,
     readdirSource,
     readdir,
-    readJson: async (f) => JSON.parse(await rootFs.readFile(f)),
+    readJson: async f => JSON.parse(await rootFs.readFile(f)),
     writeJson: (p, d) => rootFs.writeFile(p, JSON.stringify(d, null, 2)),
-    exists: (...p) => fs.access(rootPath(...p)).then(() => true).catch(() => false),
+    exists: (...p) =>
+      fs
+        .access(rootPath(...p))
+        .then(() => true)
+        .catch(() => false),
     join: rootPath,
     apply: () => apply(root),
     check: () => check(root),
@@ -102,18 +110,9 @@ const setupRoot = async (t, root, mocks) => {
   }
 }
 
-const setup = async (t, {
-  package = {},
-  workspaces = {},
-  testdir = {},
-  mocks = {},
-  ok = false,
-} = {}) => {
+const setup = async (t, { package = {}, workspaces = {}, testdir = {}, mocks = {}, ok = false } = {}) => {
   const wsLookup = {}
-  const pkg = merge(
-    ok ? okPackage() : {},
-    pkgWithName(package, 'testpkg')
-  )
+  const pkg = merge(ok ? okPackage() : {}, pkgWithName(package, 'testpkg'))
 
   // convenience for passing in workspaces as an object
   // and getting those converted to a proper workspaces array
@@ -125,10 +124,7 @@ const setup = async (t, {
     merge(testdir, { [wsDir]: {} })
 
     for (const [wsBase, wsPkgName] of wsEntries) {
-      const wsPkg = merge(
-        pkgWithName(wsPkgName, wsBase),
-        ok ? okPackage() : {}
-      )
+      const wsPkg = merge(pkgWithName(wsPkgName, wsBase), ok ? okPackage() : {})
       const wsPath = posix.join(wsDir, wsBase)
       // obj to lookup workspaces by path in tests
       wsLookup[wsBase] = wsPath
@@ -139,10 +135,7 @@ const setup = async (t, {
 
   // creates dir with a root package.json and
   // package.json files for each workspace
-  const root = t.testdir(merge(
-    createPackageJson(pkg),
-    testdir
-  ))
+  const root = t.testdir(merge(createPackageJson(pkg), testdir))
 
   return {
     ...(await setupRoot(t, root, mocks)),
@@ -152,7 +145,7 @@ const setup = async (t, {
 
 const setupGit = async (...args) => {
   const s = await setup(...args)
-  const git = (arg) => Git.spawn(arg.split(' '), { cwd: s.root })
+  const git = arg => Git.spawn(arg.split(' '), { cwd: s.root })
 
   const gca = async () => {
     await git('add -A .')
@@ -170,19 +163,21 @@ const setupGit = async (...args) => {
   }
 }
 
-const cleanSnapshot = (str) => str
-  .replace(resolve(), '{{ROOT}}')
-  .replace(/\\+/g, '/')
-  .replace(/\r\n/g, '\n')
-  .replace(new RegExp(`("version": "|${esc(NAME)}@)${esc(VERSION)}`, 'g'), '$1{{VERSION}}')
+const cleanSnapshot = str =>
+  str
+    .replace(resolve(), '{{ROOT}}')
+    .replace(/\\+/g, '/')
+    .replace(/\r\n/g, '\n')
+    .replace(new RegExp(`("version": "|${esc(NAME)}@)${esc(VERSION)}`, 'g'), '$1{{VERSION}}')
 const formatSnapshots = {
-  checks: (arr) => output(arr).trim(),
-  readdir: (arr) => arr.sort(localeCompare).join('\n').trim(),
-  readdirSource: (obj) => Object.entries(obj)
-    .sort((a, b) => localeCompare(a[0], b[0]))
-    .map(([file, content]) => [file, '='.repeat(40), content].join('\n').trim())
-    .join('\n\n')
-    .trim(),
+  checks: arr => output(arr).trim(),
+  readdir: arr => arr.sort(localeCompare).join('\n').trim(),
+  readdirSource: obj =>
+    Object.entries(obj)
+      .sort((a, b) => localeCompare(a[0], b[0]))
+      .map(([file, content]) => [file, '='.repeat(40), content].join('\n').trim())
+      .join('\n\n')
+      .trim(),
 }
 
 module.exports = setup
@@ -192,7 +187,7 @@ module.exports.pkgVersion = VERSION
 module.exports.clean = cleanSnapshot
 module.exports.format = formatSnapshots
 module.exports.okPackage = okPackage
-module.exports.fixture = (f) => fs.readFile(resolve(__dirname, 'fixtures', f), 'utf-8')
+module.exports.fixture = f => fs.readFile(resolve(__dirname, 'fixtures', f), 'utf-8')
 module.exports.log = (t, f = () => true) => {
   const cb = (...args) => f(...args) && console.error(...args)
   process.on('log', cb)

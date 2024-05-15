@@ -1,14 +1,11 @@
 const t = require('tap')
 const setup = require('../setup.js')
 
-t.test('allow paths are merged', async (t) => {
+t.test('allow paths are merged', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
-        allowPaths: [
-          '/a',
-          '/b',
-        ],
+        allowPaths: ['/a', '/b'],
       },
     },
   })
@@ -20,16 +17,13 @@ t.test('allow paths are merged', async (t) => {
   t.ok(ignore.includes('!/lib/'))
 })
 
-t.test('works with custom content', async (t) => {
+t.test('works with custom content', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
         content: 'content_dir',
         defaultContent: false,
-        allowPaths: [
-          '/a',
-          '/b',
-        ],
+        allowPaths: ['/a', '/b'],
       },
     },
     testdir: {

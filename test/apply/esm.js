@@ -1,7 +1,7 @@
 const t = require('tap')
 const setup = require('../setup.js')
 
-t.test('basic', async (t) => {
+t.test('basic', async t => {
   const s = await setup(t, {
     package: {
       type: 'module',

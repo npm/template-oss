@@ -1,7 +1,7 @@
 const t = require('tap')
 const setup = require('../setup.js')
 
-t.test('can disable eslint', async (t) => {
+t.test('can disable eslint', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -23,7 +23,7 @@ t.test('can disable eslint', async (t) => {
   t.notMatch(checks[0].solution, 'eslint')
 })
 
-t.test('can enable prettier', async (t) => {
+t.test('can enable prettier', async t => {
   const s = await setup(t, {
     ok: true,
     package: {
@@ -41,11 +41,7 @@ t.test('can enable prettier', async (t) => {
 
   const checks = await s.check()
   t.equal(checks.length, 1)
-  t.match(checks[0].body, [
-    'prettier',
-    'eslint-config-prettier',
-    '@github/prettier-config',
-  ])
+  t.match(checks[0].body, ['prettier', 'eslint-config-prettier', '@github/prettier-config'])
 
   await s.writeJson('package.json', {
     ...pkg,

@@ -19,7 +19,7 @@ ReleaseManager.run({
     },
   }).values,
 })
-  .then((result) => {
+  .then(result => {
     core.setOutput('result', result)
     return null
   })

@@ -5,25 +5,25 @@ const setup = require('../setup.js')
 t.cleanSnapshot = setup.clean
 t.formatSnapshot = setup.format.checks
 
-t.test('check empty dir', async (t) => {
+t.test('check empty dir', async t => {
   const s = await setup(t)
   await t.resolveMatchSnapshot(s.check())
 })
 
-t.test('workspaces with empty dir', async (t) => {
+t.test('workspaces with empty dir', async t => {
   const s = await setup(t, {
     workspaces: { a: '@name/aaaa', b: 'bbb' },
   })
   await t.resolveMatchSnapshot(s.check())
 })
 
-t.test('not ok without required', async (t) => {
+t.test('not ok without required', async t => {
   const s = await setup(t)
   await s.apply()
   await t.resolveMatchSnapshot(s.check())
 })
 
-t.test('changelog', async (t) => {
+t.test('changelog', async t => {
   const s = await setup(t, {
     ok: true,
     testdir: {
@@ -34,7 +34,7 @@ t.test('changelog', async (t) => {
   await t.resolveMatchSnapshot(s.check())
 })
 
-t.test('gitignore', async (t) => {
+t.test('gitignore', async t => {
   const s = await setup.git(t, { ok: true })
 
   await s.writeFile('ignorethis', 'empty')
@@ -45,7 +45,7 @@ t.test('gitignore', async (t) => {
   await t.resolveMatchSnapshot(s.check())
 })
 
-t.test('gitignore with workspaces workspace', async (t) => {
+t.test('gitignore with workspaces workspace', async t => {
   const s = await setup.git(t, {
     ok: true,
     workspaces: {
@@ -63,7 +63,7 @@ t.test('gitignore with workspaces workspace', async (t) => {
   await t.resolveMatchSnapshot(s.check())
 })
 
-t.test('unwanted', async (t) => {
+t.test('unwanted', async t => {
   const s = await setup(t, {
     ok: true,
     package: {

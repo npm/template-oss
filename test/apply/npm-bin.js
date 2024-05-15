@@ -2,7 +2,7 @@ const t = require('tap')
 const { join } = require('path')
 const setup = require('../setup.js')
 
-t.test('custom npm path', async (t) => {
+t.test('custom npm path', async t => {
   const s = await setup(t, {
     ok: true,
     package: {
@@ -16,7 +16,7 @@ t.test('custom npm path', async (t) => {
   t.equal(scripts.posttest, 'node /path/to/npm run lint')
 })
 
-t.test('relative npm bin with workspaces', async (t) => {
+t.test('relative npm bin with workspaces', async t => {
   const s = await setup(t, {
     ok: true,
     package: {
@@ -38,7 +38,7 @@ t.test('relative npm bin with workspaces', async (t) => {
   })
   await s.apply()
 
-  const readScripts = (p) => s.readJson(join(p, 'package.json')).then(r => r.scripts)
+  const readScripts = p => s.readJson(join(p, 'package.json')).then(r => r.scripts)
 
   const ws = s.workspaces
   const pkgs = ['', ws.a, ws.b, ws.c, ws.d, ws.e]

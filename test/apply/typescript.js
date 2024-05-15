@@ -1,7 +1,7 @@
 const t = require('tap')
 const setup = require('../setup.js')
 
-t.test('basic', async (t) => {
+t.test('basic', async t => {
   const s = await setup(t, {
     ok: true,
     package: {
@@ -33,7 +33,7 @@ t.test('basic', async (t) => {
   t.ok(await s.exists('.commitlintrc.cjs'))
 })
 
-t.test('no default content', async (t) => {
+t.test('no default content', async t => {
   const s = await setup(t, {
     ok: true,
     package: {
@@ -56,7 +56,7 @@ t.test('no default content', async (t) => {
   t.strictSame(checks[0].body, ['typescript', 'tshy', '@typescript-eslint/parser'])
 })
 
-t.test('with tap 16', async (t) => {
+t.test('with tap 16', async t => {
   const s = await setup(t, {
     ok: true,
     package: {

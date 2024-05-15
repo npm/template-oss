@@ -5,7 +5,7 @@ const setup = require('../setup.js')
 t.cleanSnapshot = setup.clean
 t.formatSnapshot = setup.format.checks
 
-t.test('update and remove errors', async (t) => {
+t.test('update and remove errors', async t => {
   const s = await setup(t, { ok: true })
 
   await s.apply()
@@ -16,17 +16,14 @@ t.test('update and remove errors', async (t) => {
   const ci = await s.readFile(ciPath)
   await s.writeFile(ciPath, ci.split('\n').slice(0, -21).join('\n'))
 
-  await s.appendFile(
-    join('.github', 'workflows', 'audit.yml'),
-    '>>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<'
-  )
+  await s.appendFile(join('.github', 'workflows', 'audit.yml'), '>>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<')
 
   await s.writeFile('.eslintrc.json', 'this has to be deleted')
 
   await t.resolveMatchSnapshot(s.check())
 })
 
-t.test('will diff json', async (t) => {
+t.test('will diff json', async t => {
   const s = await setup(t, { ok: true })
   await s.apply()
 
@@ -44,7 +41,7 @@ t.test('will diff json', async (t) => {
   await t.resolveMatchSnapshot(s.check())
 })
 
-t.test('json overwrite', async (t) => {
+t.test('json overwrite', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -66,7 +63,7 @@ t.test('json overwrite', async (t) => {
   t.strictSame(await s.check(), [])
 })
 
-t.test('json merge', async (t) => {
+t.test('json merge', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -88,7 +85,7 @@ t.test('json merge', async (t) => {
   t.strictSame(await s.check(), [])
 })
 
-t.test('json delete', async (t) => {
+t.test('json delete', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -110,7 +107,7 @@ t.test('json delete', async (t) => {
   t.strictSame(await s.check(), [])
 })
 
-t.test('different headers', async (t) => {
+t.test('different headers', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -131,7 +128,7 @@ t.test('different headers', async (t) => {
   t.strictSame(await s.check(), [])
 })
 
-t.test('unknown file type', async (t) => {
+t.test('unknown file type', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {

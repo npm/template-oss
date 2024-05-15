@@ -27,13 +27,13 @@ const checks = [
   [{ a: '^1.0.0' }, 'a@sometag', false],
 ]
 
-checks.forEach((args) => {
+checks.forEach(args => {
   const res = args.pop()
   const [pkg, spec, ...rest] = args
   t.equal(hasPackage({ dependencies: pkg }, spec, ...rest), res, `${JSON.stringify(pkg)}-${spec}`)
 })
 
-t.test('works with file urls', async (t) => {
+t.test('works with file urls', async t => {
   const root = t.testdir({
     nested: {
       'package.json': JSON.stringify({
@@ -50,7 +50,6 @@ t.test('works with file urls', async (t) => {
           version: '5.0.1',
         }),
       },
-
     },
   })
 

@@ -2,7 +2,7 @@ const t = require('tap')
 const { join } = require('path')
 const setup = require('../setup.js')
 
-t.test('turn off root files', async (t) => {
+t.test('turn off root files', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -26,7 +26,7 @@ t.test('turn off root files', async (t) => {
   t.ok(await s.exists('.eslintrc.yml'))
 })
 
-t.test('turn off root rm only', async (t) => {
+t.test('turn off root rm only', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -54,7 +54,7 @@ t.test('turn off root rm only', async (t) => {
   t.ok(await s.exists('.eslintrc.yml'))
 })
 
-t.test('turn off root add only', async (t) => {
+t.test('turn off root add only', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -82,7 +82,7 @@ t.test('turn off root add only', async (t) => {
   t.notOk(await s.exists('.eslintrc.yml'))
 })
 
-t.test('turn off specific files', async (t) => {
+t.test('turn off specific files', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -120,7 +120,7 @@ t.test('turn off specific files', async (t) => {
   t.ok(await s.exists('.eslintrc.yml'))
 })
 
-t.test('root can set workspace files', async (t) => {
+t.test('root can set workspace files', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -146,7 +146,7 @@ t.test('root can set workspace files', async (t) => {
   t.ok(await s.exists(s.workspaces.a, '.npmrc'))
 })
 
-t.test('workspace config can override root', async (t) => {
+t.test('workspace config can override root', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -179,7 +179,7 @@ t.test('workspace config can override root', async (t) => {
   t.notOk(await s.exists(s.workspaces.a, '.npmrc'))
 })
 
-t.test('workspaces can override content', async (t) => {
+t.test('workspaces can override content', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -209,7 +209,7 @@ t.test('workspaces can override content', async (t) => {
   t.ok(await s.exists('x.js'))
 })
 
-t.test('content can override partials', async (t) => {
+t.test('content can override partials', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -239,7 +239,7 @@ t.test('content can override partials', async (t) => {
   t.ok(release.includes('job: 1'))
 })
 
-t.test('content can extend files', async (t) => {
+t.test('content can extend files', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -259,7 +259,7 @@ t.test('content can extend files', async (t) => {
   t.ok(release.includes('smoke-publish'))
 })
 
-t.test('config via multiple locations', async (t) => {
+t.test('config via multiple locations', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -301,7 +301,7 @@ t.test('config via multiple locations', async (t) => {
   t.equal(ws.split('\n').slice(-1)[0], 'npm-ws-a-ws-b-ws-c')
 })
 
-t.test('private workspace', async (t) => {
+t.test('private workspace', async t => {
   const s = await setup(t, {
     package: {
       name: 'root-pkg',

@@ -1,20 +1,23 @@
 const t = require('tap')
 const setup = require('../setup.js')
 
-const PLUGINS = [
-  'node-workspace',
-  'node-workspace-format',
-]
+const PLUGINS = ['node-workspace', 'node-workspace-format']
 
-t.test('root only', async (t) => {
+t.test('root only', async t => {
   const prvt = { private: true }
   const cases = [
     [{}, { plugins: false, pr: true }],
     [{ workspaces: { a: 'a' } }, { plugins: true, pr: true }],
     [{ workspaces: { a: prvt } }, { plugins: false, pr: true }],
     [{ package: prvt }, { plugins: false, pr: false }],
-    [{ package: prvt, workspaces: { a: 'a' } }, { plugins: true, pr: true }],
-    [{ package: prvt, workspaces: { a: prvt } }, { plugins: false, pr: false }],
+    [
+      { package: prvt, workspaces: { a: 'a' } },
+      { plugins: true, pr: true },
+    ],
+    [
+      { package: prvt, workspaces: { a: prvt } },
+      { plugins: false, pr: false },
+    ],
   ]
 
   for (const [config, expected] of cases) {

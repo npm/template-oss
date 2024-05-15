@@ -1,7 +1,7 @@
 const t = require('tap')
 const setup = require('../setup.js')
 
-t.test('json merge', async (t) => {
+t.test('json merge', async t => {
   const s = await setup(t, {
     ok: true,
     package: {

@@ -4,13 +4,13 @@ const setup = require('../setup.js')
 t.cleanSnapshot = setup.clean
 t.formatSnapshot = setup.format.readdirSource
 
-t.test('root only', async (t) => {
+t.test('root only', async t => {
   const s = await setup(t)
   await s.apply()
   await t.resolveMatchSnapshot(s.readdirSource())
 })
 
-t.test('with workspaces', async (t) => {
+t.test('with workspaces', async t => {
   const s = await setup(t, {
     workspaces: { a: 'a', b: 'b' },
   })
@@ -18,7 +18,7 @@ t.test('with workspaces', async (t) => {
   await t.resolveMatchSnapshot(s.readdirSource())
 })
 
-t.test('workspaces only', async (t) => {
+t.test('workspaces only', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -32,7 +32,7 @@ t.test('workspaces only', async (t) => {
   await t.resolveMatchSnapshot(s.readdirSource())
 })
 
-t.test('with content path', async (t) => {
+t.test('with content path', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -50,7 +50,7 @@ t.test('with content path', async (t) => {
   await t.resolveMatchSnapshot(s.readdirSource())
 })
 
-t.test('workspaces with nested content path', async (t) => {
+t.test('workspaces with nested content path', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {

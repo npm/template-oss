@@ -3,7 +3,7 @@ module.exports = {
     add: {
       'target.json': {
         file: 'source.json',
-        parser: (p) => p.Json,
+        parser: p => p.Json,
       },
     },
   },

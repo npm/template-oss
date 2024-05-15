@@ -3,7 +3,7 @@ module.exports = {
     add: {
       'target.json': {
         file: 'source.json',
-        parser: (p) => p.JsonMerge,
+        parser: p => p.JsonMerge,
       },
     },
   },
