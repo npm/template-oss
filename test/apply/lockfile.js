@@ -1,7 +1,7 @@
 const t = require('tap')
 const setup = require('../setup.js')
 
-t.test('lockfile', async (t) => {
+t.test('lockfile', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -17,7 +17,7 @@ t.test('lockfile', async (t) => {
   t.ok(npmrc.includes('package-lock=true'))
 })
 
-t.test('no lockfile by default', async (t) => {
+t.test('no lockfile by default', async t => {
   const s = await setup(t)
   await s.apply()
   const gitignore = await s.readFile('.gitignore')

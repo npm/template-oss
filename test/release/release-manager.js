@@ -8,13 +8,16 @@ t.test('init', async t => {
   t.rejects(ReleaseManager.run({}))
   t.rejects(ReleaseManager.run({ token: 'ok' }))
   t.rejects(ReleaseManager.run({ token: 'ok', repo: 'ok' }))
-  t.doesNotThrow(() => new ReleaseManager({
-    token: 'ok',
-    repo: 'ok',
-    pr: 'ok',
-    silent: false,
-    defaultTag: 'latest',
-  }))
+  t.doesNotThrow(
+    () =>
+      new ReleaseManager({
+        token: 'ok',
+        repo: 'ok',
+        pr: 'ok',
+        silent: false,
+        defaultTag: 'latest',
+      }),
+  )
 })
 
 t.test('mock release manager', async t => {

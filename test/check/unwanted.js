@@ -1,7 +1,7 @@
 const t = require('tap')
 const setup = require('../setup.js')
 
-t.test('unwanted can be overriden with allow', async (t) => {
+t.test('unwanted can be overriden with allow', async t => {
   const s = await setup(t, {
     ok: true,
     package: {
@@ -9,9 +9,7 @@ t.test('unwanted can be overriden with allow', async (t) => {
         eslint: '^8.0.0',
       },
       templateOSS: {
-        allowedPackages: [
-          'eslint',
-        ],
+        allowedPackages: ['eslint'],
       },
     },
   })

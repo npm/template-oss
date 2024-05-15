@@ -10,9 +10,7 @@ const mockGitHub = ({ commits, authors }) => ({
           // simulate a bad sha passed in that doesnt return a commit
           acc[`_${c.sha}`] = null
         } else {
-          const author = i % 2
-            ? { user: { login: 'username' } }
-            : { name: 'Name' }
+          const author = i % 2 ? { user: { login: 'username' } } : { name: 'Name' }
           acc[`_${c.sha}`] = { authors: { nodes: authors ? [author] : [] } }
         }
       }
@@ -22,12 +20,14 @@ const mockGitHub = ({ commits, authors }) => ({
   octokit: {
     rest: {
       repos: {
-        listPullRequestsAssociatedWithCommit: async (commit) => {
+        listPullRequestsAssociatedWithCommit: async commit => {
           if (commit.commit_sha === 'd') {
             return {
-              data: [{
-                number: 50,
-              }],
+              data: [
+                {
+                  number: 50,
+                },
+              ],
             }
           }
         },
@@ -40,32 +40,37 @@ const mockChangelog = async ({
   shas = true,
   authors = true,
   previousTag = true,
-  commits: rawCommits = [{
-    sha: 'a',
-    type: 'feat',
-    bareMessage: 'Hey now',
-    scope: 'bin',
-  }, {
-    sha: 'b',
-    type: 'feat',
-    notes: [{ title: 'BREAKING CHANGE', text: 'breaking' }],
-    bareMessage: 'b',
-    pullRequest: {
-      number: '100',
+  commits: rawCommits = [
+    {
+      sha: 'a',
+      type: 'feat',
+      bareMessage: 'Hey now',
+      scope: 'bin',
     },
-  }, {
-    sha: 'c',
-    type: 'deps',
-    bareMessage: 'test@1.2.3',
-  }, {
-    sha: 'd',
-    type: 'fix',
-    bareMessage: 'this fixes it',
-  }],
+    {
+      sha: 'b',
+      type: 'feat',
+      notes: [{ title: 'BREAKING CHANGE', text: 'breaking' }],
+      bareMessage: 'b',
+      pullRequest: {
+        number: '100',
+      },
+    },
+    {
+      sha: 'c',
+      type: 'deps',
+      bareMessage: 'test@1.2.3',
+    },
+    {
+      sha: 'd',
+      type: 'fix',
+      bareMessage: 'this fixes it',
+    },
+  ],
 } = {}) => {
   const commits = rawCommits
     .map(({ notes = [], ...rest }) => ({ notes, ...rest }))
-    .map(({ sha, ...rest }) => shas ? { sha, ...rest } : { ...rest })
+    .map(({ sha, ...rest }) => (shas ? { sha, ...rest } : { ...rest }))
 
   const github = mockGitHub({ commits, authors })
   const changelog = new ChangelogNotes(github)
@@ -79,7 +84,7 @@ const mockChangelog = async ({
 
   return notes
     .split('\n')
-    .map((l) => l.replace(/\d{4}-\d{2}-\d{2}/g, 'DATE'))
+    .map(l => l.replace(/\d{4}-\d{2}-\d{2}/g, 'DATE'))
     .filter(Boolean)
 }
 
@@ -120,39 +125,45 @@ t.test('no tag/authors/shas', async t => {
 t.test('filters out multiple template oss commits', async t => {
   const changelog = await mockChangelog({
     authors: false,
-    commits: [{
-      sha: 'z',
-      type: 'fix',
-      bareMessage: 'just a fix',
-    }, {
-      sha: 'a',
-      type: 'chore',
-      bareMessage: 'postinstall for dependabot template-oss PR',
-      pullRequest: {
-        number: '100',
+    commits: [
+      {
+        sha: 'z',
+        type: 'fix',
+        bareMessage: 'just a fix',
       },
-    }, {
-      sha: 'b',
-      type: 'chore',
-      bareMessage: 'postinstall for dependabot template-oss PR',
-      pullRequest: {
-        number: '101',
+      {
+        sha: 'a',
+        type: 'chore',
+        bareMessage: 'postinstall for dependabot template-oss PR',
+        pullRequest: {
+          number: '100',
+        },
       },
-    }, {
-      sha: 'c',
-      type: 'chore',
-      bareMessage: 'bump @npmcli/template-oss from 1 to 2',
-      pullRequest: {
-        number: '101',
+      {
+        sha: 'b',
+        type: 'chore',
+        bareMessage: 'postinstall for dependabot template-oss PR',
+        pullRequest: {
+          number: '101',
+        },
       },
-    }, {
-      sha: 'd',
-      type: 'chore',
-      bareMessage: 'bump @npmcli/template-oss from 0 to 1',
-      pullRequest: {
-        number: '100',
+      {
+        sha: 'c',
+        type: 'chore',
+        bareMessage: 'bump @npmcli/template-oss from 1 to 2',
+        pullRequest: {
+          number: '101',
+        },
       },
-    }],
+      {
+        sha: 'd',
+        type: 'chore',
+        bareMessage: 'bump @npmcli/template-oss from 0 to 1',
+        pullRequest: {
+          number: '100',
+        },
+      },
+    ],
   })
   t.strictSame(changelog, [
     '## [1.0.0](https://github.com/npm/cli/compare/v0.1.0...v1.0.0) (DATE)',
@@ -169,15 +180,18 @@ t.test('filters out multiple template oss commits', async t => {
 t.test('empty change log with only chore commits', async t => {
   const changelog = await mockChangelog({
     authors: false,
-    commits: [{
-      sha: 'a',
-      type: 'chore',
-      bareMessage: 'some chore',
-    }, {
-      sha: 'a',
-      type: 'chore',
-      bareMessage: 'another chore',
-    }],
+    commits: [
+      {
+        sha: 'a',
+        type: 'chore',
+        bareMessage: 'some chore',
+      },
+      {
+        sha: 'a',
+        type: 'chore',
+        bareMessage: 'another chore',
+      },
+    ],
   })
   t.strictSame(changelog, [])
 })

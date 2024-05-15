@@ -3,21 +3,24 @@ module.exports = {
     add: {
       'header.txt': {
         file: 'source.txt',
-        parser: (p) => class extends p.Base {
-          static header = 'Different header'
-        },
+        parser: p =>
+          class extends p.Base {
+            static header = 'Different header'
+          },
       },
       'noheader.txt': {
         file: 'source.txt',
-        parser: (p) => class extends p.Base {
-          static header = null
-        },
+        parser: p =>
+          class extends p.Base {
+            static header = null
+          },
       },
       'nocomment.txt': {
         file: 'source.txt',
-        parser: (p) => class extends p.Base {
-          comment = null
-        },
+        parser: p =>
+          class extends p.Base {
+            comment = null
+          },
       },
     },
   },

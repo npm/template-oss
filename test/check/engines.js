@@ -1,68 +1,69 @@
 const t = require('tap')
 const setup = require('../setup.js')
 
-const setupEngines = ({ engines, omitEngines }) => setup(t, {
-  ok: true,
-  package: {
-    engines: { node: engines },
-    templateOSS: {
-      omitEngines,
-    },
-    dependencies: {
-      eighteen: '1.0.0',
-      sixteen: '1.0.0',
-      nothing: '1.0.0',
-      anything: '1.0.0',
-      ohdoteight: '1.0.0',
-    },
-  },
-  testdir: {
-    node_modules: {
-      nothing: {
-        'package.json': JSON.stringify({
-          name: 'nothing',
-          version: '1.0.0',
-        }),
+const setupEngines = ({ engines, omitEngines }) =>
+  setup(t, {
+    ok: true,
+    package: {
+      engines: { node: engines },
+      templateOSS: {
+        omitEngines,
       },
-      anything: {
-        'package.json': JSON.stringify({
-          name: 'anything',
-          version: '1.0.0',
-          engines: {
-            node: '*',
-          },
-        }),
-      },
-      ohdoteight: {
-        'package.json': JSON.stringify({
-          name: 'ohdoteight',
-          version: '1.0.0',
-          engines: {
-            node: '>=0.8',
-          },
-        }),
-      },
-      eighteen: {
-        'package.json': JSON.stringify({
-          name: 'eighteen',
-          version: '1.0.0',
-          engines: {
-            node: '>=18',
-          },
-        }),
-      },
-      sixteen: {
-        'package.json': JSON.stringify({
-          name: 'sixteen',
-          version: '1.0.0',
-          engines: {
-            node: '>=16',
-          },
-        }),
+      dependencies: {
+        eighteen: '1.0.0',
+        sixteen: '1.0.0',
+        nothing: '1.0.0',
+        anything: '1.0.0',
+        ohdoteight: '1.0.0',
       },
     },
-  },
-})
+    testdir: {
+      node_modules: {
+        nothing: {
+          'package.json': JSON.stringify({
+            name: 'nothing',
+            version: '1.0.0',
+          }),
+        },
+        anything: {
+          'package.json': JSON.stringify({
+            name: 'anything',
+            version: '1.0.0',
+            engines: {
+              node: '*',
+            },
+          }),
+        },
+        ohdoteight: {
+          'package.json': JSON.stringify({
+            name: 'ohdoteight',
+            version: '1.0.0',
+            engines: {
+              node: '>=0.8',
+            },
+          }),
+        },
+        eighteen: {
+          'package.json': JSON.stringify({
+            name: 'eighteen',
+            version: '1.0.0',
+            engines: {
+              node: '>=18',
+            },
+          }),
+        },
+        sixteen: {
+          'package.json': JSON.stringify({
+            name: 'sixteen',
+            version: '1.0.0',
+            engines: {
+              node: '>=16',
+            },
+          }),
+        },
+      },
+    },
+  })
 
 const cases = [
   [['^14 || ^16 || >=18'], ['eighteen', 'sixteen']],

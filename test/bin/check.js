@@ -1,8 +1,12 @@
 const t = require('tap')
 
-const templateCheck = (mocks) => t.mock('../../bin/check.js', mocks && {
-  '../../lib/check/index.js': async () => mocks(),
-})
+const templateCheck = mocks =>
+  t.mock(
+    '../../bin/check.js',
+    mocks && {
+      '../../lib/check/index.js': async () => mocks(),
+    },
+  )
 
 const _console = console
 const _prefix = process.env.npm_config_local_prefix
@@ -25,7 +29,7 @@ t.afterEach(() => {
   }
 })
 
-t.test('no local prefix', async (t) => {
+t.test('no local prefix', async t => {
   await templateCheck()
 
   t.equal(process.exitCode, 1, 'exit code')
@@ -33,24 +37,27 @@ t.test('no local prefix', async (t) => {
   t.equal(errors.length, 1)
 })
 
-t.test('problems', async (t) => {
+t.test('problems', async t => {
   process.env.npm_config_local_prefix = t.testdir()
 
-  await templateCheck(() => [{
-    title: 'message1',
-    body: ['a', 'b'],
-    solution: 'solution1',
-  }, {
-    title: 'message2',
-    body: ['c'],
-    solution: 'solution2',
-  }])
+  await templateCheck(() => [
+    {
+      title: 'message1',
+      body: ['a', 'b'],
+      solution: 'solution1',
+    },
+    {
+      title: 'message2',
+      body: ['c'],
+      solution: 'solution2',
+    },
+  ])
 
   t.ok(process.exitCode, 'exit code')
   t.matchSnapshot(errors.join('\n'))
 })
 
-t.test('no problems', async (t) => {
+t.test('no problems', async t => {
   process.env.npm_config_local_prefix = t.testdir()
 
   await templateCheck(() => [])

@@ -1,7 +1,7 @@
 const t = require('tap')
 const setup = require('../setup.js')
 
-t.test('ok with required', async (t) => {
+t.test('ok with required', async t => {
   const s = await setup(t, {
     ok: true,
   })
@@ -9,7 +9,7 @@ t.test('ok with required', async (t) => {
   t.strictSame(await s.check(), [])
 })
 
-t.test('required in each location', async (t) => {
+t.test('required in each location', async t => {
   const s = await setup(t, {
     package: {
       dependencies: {
@@ -44,18 +44,16 @@ t.test('required in each location', async (t) => {
   t.strictSame(await s.check(), [])
 })
 
-t.test('can be pinned', async (t) => {
+t.test('can be pinned', async t => {
   const config = {
     templateOSS: {
       requiredPackages: {
-        devDependencies: [
-          'a@1.0.0',
-        ],
+        devDependencies: ['a@1.0.0'],
       },
     },
   }
 
-  await t.test('ok', async (t) => {
+  await t.test('ok', async t => {
     const s = await setup(t, {
       package: {
         devDependencies: {
@@ -69,7 +67,7 @@ t.test('can be pinned', async (t) => {
     t.strictSame(await s.check(), [])
   })
 
-  await t.test('not ok', async (t) => {
+  await t.test('not ok', async t => {
     const s = await setup(t, {
       package: {
         devDependencies: {

@@ -10,17 +10,18 @@ t.test('init', async t => {
   await t.rejects(ReleasePlease.run({}))
   await t.rejects(ReleasePlease.run({ token: 'ok' }))
   await t.rejects(ReleasePlease.run({ token: 'ok', repo: 'ok' }))
-  await t.rejects(new ReleasePlease({
-    token: 'ok',
-    repo: 'ok',
-    branch: 'ok',
-    defaultTag: 'ok',
-  }).init())
+  await t.rejects(
+    new ReleasePlease({
+      token: 'ok',
+      repo: 'ok',
+      branch: 'ok',
+      defaultTag: 'ok',
+    }).init(),
+  )
 })
 
 t.todo('cases', async t => {
-  const execRepo = (cmd, opts) =>
-    execSync(cmd, { cwd: REPO_DIR, encoding: 'utf-8', ...opts }).trim()
+  const execRepo = (cmd, opts) => execSync(cmd, { cwd: REPO_DIR, encoding: 'utf-8', ...opts }).trim()
 
   const updateJSON = (p, fn) => {
     const file = resolve(REPO_DIR, p)
@@ -29,7 +30,7 @@ t.todo('cases', async t => {
   }
 
   let init = false
-  const before = (s) => {
+  const before = s => {
     if (s.record) {
       execRepo('git pull')
       execRepo(`git reset --hard origin/${BRANCH}`)
@@ -46,7 +47,7 @@ t.todo('cases', async t => {
 
   const matchPr = async (t, s, { flags, msg, prerelease }) => {
     if (s.record) {
-      updateJSON(join(REPO_DIR, 'release-please-config.json'), (d) => ({
+      updateJSON(join(REPO_DIR, 'release-please-config.json'), d => ({
         ...d,
         'last-release-sha': execRepo('git log --grep="chore: release" --format=format:%H -n1'),
         'release-search-depth': 7,

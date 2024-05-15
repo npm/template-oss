@@ -4,7 +4,7 @@ const setup = require('../setup.js')
 t.cleanSnapshot = setup.clean
 t.formatSnapshot = setup.format.readdir
 
-t.test('turn off repo', async (t) => {
+t.test('turn off repo', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -16,7 +16,7 @@ t.test('turn off repo', async (t) => {
   await t.resolveMatchSnapshot(s.readdir())
 })
 
-t.test('turn off module', async (t) => {
+t.test('turn off module', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -28,7 +28,7 @@ t.test('turn off module', async (t) => {
   await t.resolveMatchSnapshot(s.readdir())
 })
 
-t.test('turn off root', async (t) => {
+t.test('turn off root', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -41,7 +41,7 @@ t.test('turn off root', async (t) => {
   await t.resolveMatchSnapshot(s.readdir())
 })
 
-t.test('turn off add/rm types', async (t) => {
+t.test('turn off add/rm types', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -58,7 +58,7 @@ t.test('turn off add/rm types', async (t) => {
   await t.resolveMatchSnapshot(s.readdir())
 })
 
-t.test('turn off specific files', async (t) => {
+t.test('turn off specific files', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -93,7 +93,7 @@ t.test('turn off specific files', async (t) => {
   await t.resolveMatchSnapshot(s.readdir())
 })
 
-t.test('workspaces with relative content path', async (t) => {
+t.test('workspaces with relative content path', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -118,7 +118,7 @@ t.test('workspaces with relative content path', async (t) => {
   await t.resolveMatchSnapshot(s.readdir())
 })
 
-t.test('workspaces', async (t) => {
+t.test('workspaces', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -149,7 +149,7 @@ t.test('workspaces', async (t) => {
   await t.resolveMatchSnapshot(s.readdir())
 })
 
-t.test('workspaces only (like npm/cli)', async (t) => {
+t.test('workspaces only (like npm/cli)', async t => {
   const s = await setup(t, {
     package: {
       templateOSS: {
@@ -163,7 +163,7 @@ t.test('workspaces only (like npm/cli)', async (t) => {
   await t.resolveMatchSnapshot(s.readdir())
 })
 
-t.test('private workspace', async (t) => {
+t.test('private workspace', async t => {
   const s = await setup(t, {
     package: {
       name: 'root-pkg',
