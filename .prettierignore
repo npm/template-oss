@@ -1,0 +1,14 @@
+# This file is automatically added by @npmcli/template-oss. Do not edit.
+
+tap-testdir*/
+tap-snapshots/
+test/fixtures/**/*.json
+workspace/test-workspace/**
+/.commitlintrc.js
+/.eslintrc.js
+/.github/
+/.prettierrc.js
+/.release-please-manifest.json
+/package.json
+/release-please-config.json
+/tsconfig.json
