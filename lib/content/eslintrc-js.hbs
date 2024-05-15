@@ -9,13 +9,9 @@ const localConfigs = readdir(__dirname)
 module.exports = {
   root: true,
   ignorePatterns: [
-    'tap-testdir*/',
-    {{#each workspaceGlobs}}
+    {{#each lintIgnorePaths}}
     '{{ . }}',
     {{/each}}
-    {{#if typescript}}
-    'dist/',
-    {{/if}}
   ],
   {{#if typescript}}
   parser: '@typescript-eslint/parser',
@@ -28,5 +24,8 @@ module.exports = {
   extends: [
     '@npmcli',
     ...localConfigs,
+    {{#if prettier}}
+    'prettier',
+    {{/if}}
   ],
 }

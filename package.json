@@ -10,17 +10,17 @@
     "template-oss-release-manager": "bin/release-manager.js"
   },
   "scripts": {
-    "lint": "eslint \"**/*.{js,cjs,ts,mjs,jsx,tsx}\"",
-    "lintfix": "npm run lint -- --fix",
+    "lint": "npm run eslint",
+    "lintfix": "npm run eslint -- --fix",
     "posttest": "npm run lint",
     "snap": "tap",
     "test": "tap",
     "template-oss-apply": "template-oss-apply --force",
     "postlint": "template-oss-check",
     "postinstall": "template-oss-apply",
+    "eslint": "eslint \"**/*.{js,cjs,ts,mjs,jsx,tsx}\"",
     "test-all": "npm run test -ws -iwr --if-present",
-    "lint-all": "npm run lint -ws -iwr --if-present",
-    "test:record": "TAP_SNAPSHOT=1 NOCK_RECORD=1 tap"
+    "lint-all": "npm run lint -ws -iwr --if-present"
   },
   "repository": {
     "type": "git",

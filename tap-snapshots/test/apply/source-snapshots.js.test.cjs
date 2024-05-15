@@ -1231,17 +1231,17 @@ jobs:
 
 # ignore everything in the root
 /*
-# transient test directories
-tap-testdir*/
 
-# keep these
 !**/.gitignore
 !/.commitlintrc.js
 !/.eslintrc.js
 !/.eslintrc.local.*
+!/.git-blame-ignore-revs
 !/.github/
 !/.gitignore
 !/.npmrc
+!/.prettierignore
+!/.prettierrc.js
 !/.release-please-manifest.json
 !/bin/
 !/CHANGELOG*
@@ -1259,6 +1259,7 @@ tap-testdir*/
 !/tap-snapshots/
 !/test/
 !/tsconfig.json
+tap-testdir*/
 
 .npmrc
 ========================================
@@ -1341,10 +1342,11 @@ package.json
   "name": "testpkg",
   "version": "1.0.0",
   "scripts": {
-    "lint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
+    "eslint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
+    "lint": "npm run eslint",
+    "lintfix": "npm run eslint -- --fix",
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
-    "lintfix": "npm run lint -- --fix",
     "snap": "tap",
     "test": "tap",
     "posttest": "npm run lint"
@@ -2887,17 +2889,17 @@ jobs:
 
 # ignore everything in the root
 /*
-# transient test directories
-tap-testdir*/
 
-# keep these
 !**/.gitignore
 !/.commitlintrc.js
 !/.eslintrc.js
 !/.eslintrc.local.*
+!/.git-blame-ignore-revs
 !/.github/
 !/.gitignore
 !/.npmrc
+!/.prettierignore
+!/.prettierrc.js
 !/.release-please-manifest.json
 !/bin/
 !/CHANGELOG*
@@ -2915,6 +2917,7 @@ tap-testdir*/
 !/tap-snapshots/
 !/test/
 !/tsconfig.json
+tap-testdir*/
 !/workspaces/
 /workspaces/*
 !/workspaces/a/
@@ -3007,10 +3010,11 @@ package.json
     "workspaces/b"
   ],
   "scripts": {
-    "lint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
+    "eslint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
+    "lint": "npm run eslint",
+    "lintfix": "npm run eslint -- --fix",
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
-    "lintfix": "npm run lint -- --fix",
     "snap": "tap",
     "test": "tap",
     "posttest": "npm run lint",
@@ -3134,13 +3138,11 @@ workspaces/a/.gitignore
 
 # ignore everything in the root
 /*
-# transient test directories
-tap-testdir*/
 
-# keep these
 !**/.gitignore
 !/.eslintrc.js
 !/.eslintrc.local.*
+!/.git-blame-ignore-revs
 !/.gitignore
 !/bin/
 !/CHANGELOG*
@@ -3153,6 +3155,7 @@ tap-testdir*/
 !/scripts/
 !/tap-snapshots/
 !/test/
+tap-testdir*/
 
 workspaces/a/package.json
 ========================================
@@ -3160,10 +3163,11 @@ workspaces/a/package.json
   "name": "a",
   "version": "1.0.0",
   "scripts": {
-    "lint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
+    "eslint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
+    "lint": "npm run eslint",
+    "lintfix": "npm run eslint -- --fix",
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
-    "lintfix": "npm run lint -- --fix",
     "snap": "tap",
     "test": "tap",
     "posttest": "npm run lint"
@@ -3214,13 +3218,11 @@ workspaces/b/.gitignore
 
 # ignore everything in the root
 /*
-# transient test directories
-tap-testdir*/
 
-# keep these
 !**/.gitignore
 !/.eslintrc.js
 !/.eslintrc.local.*
+!/.git-blame-ignore-revs
 !/.gitignore
 !/bin/
 !/CHANGELOG*
@@ -3233,6 +3235,7 @@ tap-testdir*/
 !/scripts/
 !/tap-snapshots/
 !/test/
+tap-testdir*/
 
 workspaces/b/package.json
 ========================================
@@ -3240,10 +3243,11 @@ workspaces/b/package.json
   "name": "b",
   "version": "1.0.0",
   "scripts": {
-    "lint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
+    "eslint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
+    "lint": "npm run eslint",
+    "lintfix": "npm run eslint -- --fix",
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
-    "lintfix": "npm run lint -- --fix",
     "snap": "tap",
     "test": "tap",
     "posttest": "npm run lint"
@@ -4498,13 +4502,11 @@ workspaces/a/.gitignore
 
 # ignore everything in the root
 /*
-# transient test directories
-tap-testdir*/
 
-# keep these
 !**/.gitignore
 !/.eslintrc.js
 !/.eslintrc.local.*
+!/.git-blame-ignore-revs
 !/.gitignore
 !/bin/
 !/CHANGELOG*
@@ -4517,6 +4519,7 @@ tap-testdir*/
 !/scripts/
 !/tap-snapshots/
 !/test/
+tap-testdir*/
 
 workspaces/a/package.json
 ========================================
@@ -4524,10 +4527,11 @@ workspaces/a/package.json
   "name": "a",
   "version": "1.0.0",
   "scripts": {
-    "lint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
+    "eslint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
+    "lint": "npm run eslint",
+    "lintfix": "npm run eslint -- --fix",
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
-    "lintfix": "npm run lint -- --fix",
     "snap": "tap",
     "test": "tap",
     "posttest": "npm run lint"
@@ -4578,13 +4582,11 @@ workspaces/b/.gitignore
 
 # ignore everything in the root
 /*
-# transient test directories
-tap-testdir*/
 
-# keep these
 !**/.gitignore
 !/.eslintrc.js
 !/.eslintrc.local.*
+!/.git-blame-ignore-revs
 !/.gitignore
 !/bin/
 !/CHANGELOG*
@@ -4597,6 +4599,7 @@ tap-testdir*/
 !/scripts/
 !/tap-snapshots/
 !/test/
+tap-testdir*/
 
 workspaces/b/package.json
 ========================================
@@ -4604,10 +4607,11 @@ workspaces/b/package.json
   "name": "b",
   "version": "1.0.0",
   "scripts": {
-    "lint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
+    "eslint": "eslint /"**/*.{js,cjs,ts,mjs,jsx,tsx}/"",
+    "lint": "npm run eslint",
+    "lintfix": "npm run eslint -- --fix",
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
-    "lintfix": "npm run lint -- --fix",
     "snap": "tap",
     "test": "tap",
     "posttest": "npm run lint"

@@ -3,10 +3,20 @@
   "files": {{{ json distPaths }}},
   "type": {{#if esm}}"module"{{else}}{{{ del }}}{{/if}},
   "scripts": {
-    "lint": "{{#if eslint}}eslint \"**/*.{js,cjs,ts,mjs,jsx,tsx}\"{{else}}echo linting disabled{{/if}}",
+    {{#if eslint}}
+    "eslint": "eslint \"**/*.{{{ extGlob lintExtensions }}}\"",
+    "lint": "{{ localNpmPath }} run eslint {{~#if prettier}} && {{ localNpmPath }} run prettier -- --check{{/if}}",
+    "lintfix": "{{ localNpmPath }} run eslint -- --fix {{~#if prettier}} && {{ localNpmPath }} run prettier -- --write{{/if}}",
+    {{#if prettier}}
+    "prettier": "prettier \"**/*.{{{ extGlob formatExtensions }}}\"",
+    {{/if}}
+    {{else}}
+    "eslint": {{{ del }}},
+    "lint": "echo linting disabled",
+    "lintfix": {{{ del }}},
+    {{/if}}
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
-    "lintfix": "{{ localNpmPath }} run lint -- --fix",
     "snap": "{{#if typescript}}{{#if tap16}}c8 {{/if}}{{/if}}tap",
     "test": "{{#if typescript}}{{#if tap16}}c8 {{/if}}{{/if}}tap",
     "posttest": "{{ localNpmPath }} run lint",
