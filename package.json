@@ -10,8 +10,8 @@
     "template-oss-release-manager": "bin/release-manager.js"
   },
   "scripts": {
-    "lint": "npm run eslint",
-    "lintfix": "npm run eslint -- --fix",
+    "lint": "npm run eslint && npm run prettier -- --check",
+    "lintfix": "npm run eslint -- --fix && npm run prettier -- --write",
     "posttest": "npm run lint",
     "snap": "tap",
     "test": "tap",
@@ -19,6 +19,7 @@
     "postlint": "template-oss-check",
     "postinstall": "template-oss-apply",
     "eslint": "eslint \"**/*.{js,cjs,ts,mjs,jsx,tsx}\"",
+    "prettier": "prettier \"**/*.{js,cjs,ts,mjs,jsx,tsx,json}\"",
     "test-all": "npm run test -ws -iwr --if-present",
     "lint-all": "npm run lint -ws -iwr --if-present"
   },
@@ -66,9 +67,12 @@
     "lib/"
   ],
   "devDependencies": {
+    "@github/prettier-config": "0.0.6",
     "@npmcli/eslint-config": "^4.0.0",
     "@npmcli/template-oss": "file:./",
+    "eslint-config-prettier": "^9.1.0",
     "nock": "^13.3.8",
+    "prettier": "^3.2.5",
     "tap": "^16.0.0"
   },
   "tap": {
@@ -86,7 +90,8 @@
   },
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
-    "publish": true
+    "publish": true,
+    "prettier": true
   },
   "engines": {
     "node": "^18.17.0 || >=20.5.0"
