@@ -1,9 +1,8 @@
 const nock = require('nock')
-const { resolve, relative, dirname, sep, join, basename, extname } = require('path')
+const { resolve, dirname, join, basename, extname } = require('path')
 const fs = require('fs')
 
 const DIR = __dirname
-const CWD = process.cwd()
 const RECORD = 'NOCK_RECORD' in process.env ? true : undefined
 
 // These are the live GitHub repo and branch that are used to
