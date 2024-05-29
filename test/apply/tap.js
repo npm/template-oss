@@ -31,9 +31,6 @@ t.test('tap@16', async t => {
   await s.apply()
   const pkg = await s.readJson('package.json')
   t.strictSame(pkg.tap, {
-    'nyc-arg': [
-      '--exclude',
-      'tap-snapshots/**',
-    ],
+    'nyc-arg': ['--exclude', 'tap-snapshots/**'],
   })
 })
