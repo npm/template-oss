@@ -1,7 +1,7 @@
 const t = require('tap')
 
 const templateCheck = mocks =>
-  t.mock(
+  t.mockRequire(
     '../../bin/check.js',
     mocks && {
       '../../lib/check/index.js': async () => mocks(),

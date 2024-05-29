@@ -40,12 +40,22 @@
   },
   "templateVersion": {{{ del }}},
   "standard": {{{ del }}},
+  "nyc": {{#if tapOver17}}{
+    "exclude": {{{ json workspaceGlobs }}}
+  }{{else}}{{{ del }}}{{/if}},
   "tap": {
+    {{#if tapOver17}}
+    {{#if workspaceGlobs}}
+    "exclude": {{{ json workspaceGlobs }}},
+    {{/if}}
+    "test-ignore": {{{ del }}},
+    {{else}}
     {{#if workspacePaths}}
       "exclude": {{#if tap18}}[
         "{{ join workspaceGlobs "," }}"
         ]{{else }}{{{ del }}}{{/if}},
       "test-ignore": {{#if tap18}}{{{ del }}}{{else}}"^({{ join workspacePaths "|" }})/"{{/if}},
+    {{/if}}
     {{/if}}
     {{#if typescript}}
     {{#if tap16}}
@@ -57,7 +67,8 @@
     ],
     {{/if}}
     {{/if}}
-    "nyc-arg": {{#if tap18}}{{{ del }}}{{else}}[
+    "show-full-coverage": {{#if tapOver17}}true{{else}}{{{ del }}}{{/if}},
+    "nyc-arg": {{#if tapOver17}}{{{ del }}}{{else}}[
       {{#each workspaceGlobs}}
       "--exclude",
       "{{ . }}",
