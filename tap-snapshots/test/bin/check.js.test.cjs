@@ -5,7 +5,7 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
-exports[`test/bin/check.js TAP problems > must match snapshot 1`] = `
+exports[`test/bin/check.js > TAP > problems > must match snapshot 1`] = `
 
 Some problems were detected:
 

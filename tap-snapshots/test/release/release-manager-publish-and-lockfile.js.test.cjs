@@ -5,7 +5,7 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
-exports[`test/release/release-manager.js TAP publish and lockfile > must match snapshot 1`] = `
+exports[`test/release/release-manager.js > TAP > publish and lockfile > must match snapshot 1`] = `
 ### Release Checklist for v7.5.4
 
 - [ ] 1. Approve this PR
