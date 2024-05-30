@@ -50,6 +50,7 @@
     {{/if}}
     "test-ignore": {{{ del }}},
     {{else}}
+    "exclude": {{{ del }}},
     {{#if workspacePaths}}
       "exclude": {{#if tap18}}[
         "{{ join workspaceGlobs "," }}"
