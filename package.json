@@ -42,7 +42,7 @@
     "@npmcli/git": "^5.0.3",
     "@npmcli/map-workspaces": "^3.0.0",
     "@npmcli/package-json": "^5.0.0",
-    "@octokit/rest": "^19.0.4",
+    "@octokit/rest": "^21.0.0",
     "dedent": "^1.5.1",
     "diff": "^5.0.0",
     "glob": "^10.1.0",
