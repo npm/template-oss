@@ -152,7 +152,7 @@ exports[`test/release/release-manager.js TAP npm/cli > must match snapshot 1`] =
 - [ ] 11. Label and fast-track \`nodejs/node\` PR
 
     > **Note**:
-    > This requires being a \`nodejs\` collaborator. Currently @lukekarrys is so ping them to do these steps!
+    > This requires being a \`nodejs\` collaborator. This could be you! 
 
     - Thumbs-up reaction on the Fast-track comment
     - Add an LGTM / Approval
