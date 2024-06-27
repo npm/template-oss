@@ -1,5 +1,27 @@
 # Changelog
 
+## [4.23.0](https://github.com/npm/template-oss/compare/v4.22.0...v4.23.0) (2024-06-27)
+
+### Features
+
+* [`60ee94f`](https://github.com/npm/template-oss/commit/60ee94f58f085c9f85a73638501a1baac67507a7) [#447](https://github.com/npm/template-oss/pull/447) add prettier support (@lukekarrys, @jumoel)
+
+### Bug Fixes
+
+* [`b35bca5`](https://github.com/npm/template-oss/commit/b35bca55b28b41773aa6b936fc626bc15b40eae5) [#447](https://github.com/npm/template-oss/pull/447) run prettier (@lukekarrys)
+* [`8aef509`](https://github.com/npm/template-oss/commit/8aef509c19639a08a47cf0378ea54799229891ff) [#446](https://github.com/npm/template-oss/pull/446) dont conclude checks if they were never set (#446) (@lukekarrys)
+* [`9440c4f`](https://github.com/npm/template-oss/commit/9440c4f2a8292d4920d9a6d815a13dbd75146ecf) [#444](https://github.com/npm/template-oss/pull/444) pass releases to publish check (#444) (@lukekarrys)
+
+### Dependencies
+
+* [`8252fb2`](https://github.com/npm/template-oss/commit/8252fb28a4e6eb8ffb268f54f79b34f1af1dfe2d) [#452](https://github.com/npm/template-oss/pull/452) bump release-please from 16.10.2 to 16.12.0 (#452) (@dependabot[bot], @wraithgar)
+
+### Chores
+
+* [`b07d17a`](https://github.com/npm/template-oss/commit/b07d17a63391cbefbb08ffc1492460bfb6ce1a7c) [#448](https://github.com/npm/template-oss/pull/448) add .git-blame-ignore-revs for initial prettier (#448) (@lukekarrys)
+* [`210247e`](https://github.com/npm/template-oss/commit/210247ef9622f2f3f9f9924ce30c68e471353896) [#447](https://github.com/npm/template-oss/pull/447) add prettier:true to template-oss config (@lukekarrys, @jumoel)
+* [`1a073e4`](https://github.com/npm/template-oss/commit/1a073e477827cf8b49edbd694aca536dc545f1ec) [#443](https://github.com/npm/template-oss/pull/443) bump @npmcli/template-oss to 4.22.0 (@lukekarrys)
+
 ## [4.22.0](https://github.com/npm/template-oss/compare/v4.21.4...v4.22.0) (2024-05-03)
 
 ### Features
