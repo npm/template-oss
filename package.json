@@ -42,7 +42,7 @@
     "@npmcli/git": "^5.0.3",
     "@npmcli/map-workspaces": "^3.0.0",
     "@npmcli/package-json": "^5.0.0",
-    "@octokit/rest": "^19.0.4",
+    "@octokit/rest": "^21.0.0",
     "dedent": "^1.5.1",
     "diff": "^5.0.0",
     "glob": "^10.1.0",
@@ -68,7 +68,7 @@
   ],
   "devDependencies": {
     "@github/prettier-config": "0.0.6",
-    "@npmcli/eslint-config": "^4.0.0",
+    "@npmcli/eslint-config": "^4.0.5",
     "@npmcli/template-oss": "file:./",
     "eslint-config-prettier": "^9.1.0",
     "nock": "^13.3.8",
