@@ -5,7 +5,7 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
-exports[`test/release/release-manager.js TAP prerelease > must match snapshot 1`] = `
+exports[`test/release/release-manager.js > TAP > prerelease > must match snapshot 1`] = `
 ### Release Checklist for v10.0.0-pre.0
 
 - [ ] 1. Checkout the release branch

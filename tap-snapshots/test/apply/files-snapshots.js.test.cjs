@@ -5,7 +5,7 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
-exports[`test/apply/files-snapshots.js TAP private workspace > expect resolving Promise 1`] = `
+exports[`test/apply/files-snapshots.js > TAP > private workspace > promise must resolve to match snapshot 1`] = `
 .commitlintrc.js
 .eslintrc.js
 .github/actions/create-check/action.yml
@@ -42,7 +42,7 @@ workspaces/b/.gitignore
 workspaces/b/package.json
 `
 
-exports[`test/apply/files-snapshots.js TAP turn off add/rm types > expect resolving Promise 1`] = `
+exports[`test/apply/files-snapshots.js > TAP > turn off add/rm types > promise must resolve to match snapshot 1`] = `
 .commitlintrc.js
 .github/actions/create-check/action.yml
 .github/actions/install-latest-npm/action.yml
@@ -65,7 +65,7 @@ package.json
 release-please-config.json
 `
 
-exports[`test/apply/files-snapshots.js TAP turn off module > expect resolving Promise 1`] = `
+exports[`test/apply/files-snapshots.js > TAP > turn off module > promise must resolve to match snapshot 1`] = `
 .commitlintrc.js
 .github/actions/create-check/action.yml
 .github/actions/install-latest-npm/action.yml
@@ -88,7 +88,7 @@ package.json
 release-please-config.json
 `
 
-exports[`test/apply/files-snapshots.js TAP turn off repo > expect resolving Promise 1`] = `
+exports[`test/apply/files-snapshots.js > TAP > turn off repo > promise must resolve to match snapshot 1`] = `
 .eslintrc.js
 .gitignore
 .npmrc
@@ -98,11 +98,11 @@ package.json
 SECURITY.md
 `
 
-exports[`test/apply/files-snapshots.js TAP turn off root > expect resolving Promise 1`] = `
+exports[`test/apply/files-snapshots.js > TAP > turn off root > promise must resolve to match snapshot 1`] = `
 package.json
 `
 
-exports[`test/apply/files-snapshots.js TAP turn off specific files > expect resolving Promise 1`] = `
+exports[`test/apply/files-snapshots.js > TAP > turn off specific files > promise must resolve to match snapshot 1`] = `
 .eslintrc.yml
 .github/actions/create-check/action.yml
 .github/actions/install-latest-npm/action.yml
@@ -131,7 +131,7 @@ release-please-config.json
 SECURITY.md
 `
 
-exports[`test/apply/files-snapshots.js TAP workspaces > expect resolving Promise 1`] = `
+exports[`test/apply/files-snapshots.js > TAP > workspaces > promise must resolve to match snapshot 1`] = `
 .github/actions/create-check/action.yml
 .github/actions/install-latest-npm/action.yml
 .github/dependabot.yml
@@ -158,7 +158,7 @@ workspaces/d/.gitignore
 workspaces/d/package.json
 `
 
-exports[`test/apply/files-snapshots.js TAP workspaces only (like npm/cli) > expect resolving Promise 1`] = `
+exports[`test/apply/files-snapshots.js > TAP > workspaces only (like npm/cli) > promise must resolve to match snapshot 1`] = `
 .github/actions/create-check/action.yml
 .github/actions/install-latest-npm/action.yml
 .github/dependabot.yml
@@ -182,7 +182,7 @@ workspaces/b/.gitignore
 workspaces/b/package.json
 `
 
-exports[`test/apply/files-snapshots.js TAP workspaces with relative content path > expect resolving Promise 1`] = `
+exports[`test/apply/files-snapshots.js > TAP > workspaces with relative content path > promise must resolve to match snapshot 1`] = `
 content_dir/index.js
 content_dir2/index.js
 package.json

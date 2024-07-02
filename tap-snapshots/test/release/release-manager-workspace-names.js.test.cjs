@@ -5,7 +5,7 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
-exports[`test/release/release-manager.js TAP workspace names > expect resolving Promise 1`] = `
+exports[`test/release/release-manager.js > TAP > workspace names > promise must resolve to match snapshot 1`] = `
 ### Release Checklist for v10.2.2
 
 - [ ] 1. Checkout the release branch

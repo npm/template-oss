@@ -5,7 +5,7 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
-exports[`test/check/diff-snapshots.js TAP different headers > expect resolving Promise 1`] = `
+exports[`test/check/diff-snapshots.js > TAP > different headers > promise must resolve to match snapshot 1`] = `
 Some problems were detected:
 
 -------------------------------------------------------------------
@@ -21,7 +21,7 @@ To correct it: npx template-oss-apply --force
 -------------------------------------------------------------------
 `
 
-exports[`test/check/diff-snapshots.js TAP json delete > expect resolving Promise 1`] = `
+exports[`test/check/diff-snapshots.js > TAP > json delete > promise must resolve to match snapshot 1`] = `
 Some problems were detected:
 
 -------------------------------------------------------------------
@@ -39,7 +39,7 @@ To correct it: npx template-oss-apply --force
 -------------------------------------------------------------------
 `
 
-exports[`test/check/diff-snapshots.js TAP json merge > initial check 1`] = `
+exports[`test/check/diff-snapshots.js > TAP > json merge > initial check 1`] = `
 Some problems were detected:
 
 -------------------------------------------------------------------
@@ -56,7 +56,7 @@ To correct it: npx template-oss-apply --force
 -------------------------------------------------------------------
 `
 
-exports[`test/check/diff-snapshots.js TAP json overwrite > expect resolving Promise 1`] = `
+exports[`test/check/diff-snapshots.js > TAP > json overwrite > promise must resolve to match snapshot 1`] = `
 Some problems were detected:
 
 -------------------------------------------------------------------
@@ -73,7 +73,7 @@ To correct it: npx template-oss-apply --force
 -------------------------------------------------------------------
 `
 
-exports[`test/check/diff-snapshots.js TAP unknown file type > expect resolving Promise 1`] = `
+exports[`test/check/diff-snapshots.js > TAP > unknown file type > promise must resolve to match snapshot 1`] = `
 Some problems were detected:
 
 -------------------------------------------------------------------
@@ -87,7 +87,7 @@ To correct it: npx template-oss-apply --force
 -------------------------------------------------------------------
 `
 
-exports[`test/check/diff-snapshots.js TAP update and remove errors > expect resolving Promise 1`] = `
+exports[`test/check/diff-snapshots.js > TAP > update and remove errors > promise must resolve to match snapshot 1`] = `
 Some problems were detected:
 
 -------------------------------------------------------------------
@@ -97,7 +97,7 @@ The repo file audit.yml needs to be updated:
   .github/workflows/audit.yml
   ========================================
   [@npmcli/template-oss ERROR] There was an erroring getting the target file
-  [@npmcli/template-oss ERROR] Error: {{ROOT}}/test/check/tap-testdir-diff-snapshots-update-and-remove-errors/.github/workflows/audit.yml
+  [@npmcli/template-oss ERROR] Error: {{ROOT}}/.tap/fixtures/test-check-diff-snapshots.js-update-and-remove-errors/.github/workflows/audit.yml
   
   YAMLParseError: Implicit keys need to be on a single line at line 42, column 1:
   
@@ -222,7 +222,7 @@ To correct it: npx template-oss-apply --force
 -------------------------------------------------------------------
 `
 
-exports[`test/check/diff-snapshots.js TAP will diff json > expect resolving Promise 1`] = `
+exports[`test/check/diff-snapshots.js > TAP > will diff json > promise must resolve to match snapshot 1`] = `
 Some problems were detected:
 
 -------------------------------------------------------------------

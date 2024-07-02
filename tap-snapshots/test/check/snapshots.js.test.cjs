@@ -5,7 +5,7 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
-exports[`test/check/snapshots.js TAP changelog > expect resolving Promise 1`] = `
+exports[`test/check/snapshots.js > TAP > changelog > promise must resolve to match snapshot 1`] = `
 Some problems were detected:
 
 -------------------------------------------------------------------
@@ -22,7 +22,7 @@ To correct it: reformat the changelog to have the correct heading
 -------------------------------------------------------------------
 `
 
-exports[`test/check/snapshots.js TAP check empty dir > expect resolving Promise 1`] = `
+exports[`test/check/snapshots.js > TAP > check empty dir > promise must resolve to match snapshot 1`] = `
 Some problems were detected:
 
 -------------------------------------------------------------------
@@ -111,7 +111,7 @@ To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @n
 -------------------------------------------------------------------
 `
 
-exports[`test/check/snapshots.js TAP gitignore > expect resolving Promise 1`] = `
+exports[`test/check/snapshots.js > TAP > gitignore > promise must resolve to match snapshot 1`] = `
 Some problems were detected:
 
 -------------------------------------------------------------------
@@ -156,7 +156,7 @@ To correct it: move files to not match one of the following patterns:
 -------------------------------------------------------------------
 `
 
-exports[`test/check/snapshots.js TAP gitignore with workspaces workspace > expect resolving Promise 1`] = `
+exports[`test/check/snapshots.js > TAP > gitignore with workspaces workspace > promise must resolve to match snapshot 1`] = `
 Some problems were detected:
 
 -------------------------------------------------------------------
@@ -258,7 +258,7 @@ To correct it: move files to not match one of the following patterns:
 -------------------------------------------------------------------
 `
 
-exports[`test/check/snapshots.js TAP not ok without required > expect resolving Promise 1`] = `
+exports[`test/check/snapshots.js > TAP > not ok without required > promise must resolve to match snapshot 1`] = `
 Some problems were detected:
 
 -------------------------------------------------------------------
@@ -274,7 +274,7 @@ To correct it: npm rm @npmcli/template-oss @npmcli/eslint-config tap && npm i @n
 -------------------------------------------------------------------
 `
 
-exports[`test/check/snapshots.js TAP unwanted > expect resolving Promise 1`] = `
+exports[`test/check/snapshots.js > TAP > unwanted > promise must resolve to match snapshot 1`] = `
 Some problems were detected:
 
 -------------------------------------------------------------------
@@ -288,7 +288,7 @@ To correct it: npm rm eslint
 -------------------------------------------------------------------
 `
 
-exports[`test/check/snapshots.js TAP workspaces with empty dir > expect resolving Promise 1`] = `
+exports[`test/check/snapshots.js > TAP > workspaces with empty dir > promise must resolve to match snapshot 1`] = `
 Some problems were detected:
 
 -------------------------------------------------------------------

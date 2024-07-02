@@ -73,19 +73,16 @@
     "eslint-config-prettier": "^9.1.0",
     "nock": "^13.3.8",
     "prettier": "^3.2.5",
-    "tap": "^16.0.0"
+    "tap": "^19.0.2"
   },
   "tap": {
     "timeout": 600,
-    "nyc-arg": [
-      "--exclude",
-      "workspace/test-workspace/**",
-      "--exclude",
-      "tap-snapshots/**"
-    ],
-    "test-ignore": "^(workspace/test-workspace)/",
     "node-arg": [
       "--no-experimental-fetch"
+    ],
+    "show-full-coverage": true,
+    "exclude": [
+      "workspace/test-workspace/**"
     ]
   },
   "templateOSS": {
@@ -98,5 +95,10 @@
   },
   "workspaces": [
     "workspace/test-workspace"
-  ]
+  ],
+  "nyc": {
+    "exclude": [
+      "workspace/test-workspace/**"
+    ]
+  }
 }
