@@ -54,7 +54,7 @@
     "just-diff": "^6.0.0",
     "just-omit": "^2.2.0",
     "lodash": "^4.17.21",
-    "minimatch": "^9.0.2",
+    "minimatch": "^10.0.1",
     "npm-package-arg": "^11.0.1",
     "proc-log": "^4.0.0",
     "release-please": "16.12.0",
