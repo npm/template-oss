@@ -72,7 +72,7 @@ runs:
       with:
         result-encoding: string
         script: |
-          const { repo: { owner, repo}, runId, serverUrl } = context          
+          const { repo: { owner, repo}, runId, serverUrl } = context
           const { JOB_NAME, SHA } = process.env
 
           const job = await github.rest.actions.listJobsForWorkflowRun({
@@ -146,7 +146,7 @@ runs:
             MATCH=$SPEC
             echo "Found compatible version: npm@$MATCH"
             break
-          fi  
+          fi
         done
 
         if [ -z $MATCH ]; then
@@ -725,7 +725,7 @@ jobs:
         id: flags
         run: |
           dependabot_dir="\${{ steps.metadata.outputs.directory }}"
-          if [[ "$dependabot_dir" == "/" ]]; then
+          if [[ "$dependabot_dir" == "/" || "$dependabot_dir" == "/main" ]]; then
             echo "workspace=-iwr" >> $GITHUB_OUTPUT
           else
             # strip leading slash from directory so it works as a
@@ -1414,7 +1414,7 @@ SECURITY.md
 
 GitHub takes the security of our software products and services seriously, including the open source code repositories managed through our GitHub organizations, such as [GitHub](https://github.com/GitHub).
 
-If you believe you have found a security vulnerability in this GitHub-owned open source repository, you can report it to us in one of two ways. 
+If you believe you have found a security vulnerability in this GitHub-owned open source repository, you can report it to us in one of two ways.
 
 If the vulnerability you have found is *not* [in scope for the GitHub Bug Bounty Program](https://bounty.github.com/#scope) or if you do not wish to be considered for a bounty reward, please report the issue to us directly through [opensource-security@github.com](mailto:opensource-security@github.com).
 
@@ -1512,7 +1512,7 @@ runs:
       with:
         result-encoding: string
         script: |
-          const { repo: { owner, repo}, runId, serverUrl } = context          
+          const { repo: { owner, repo}, runId, serverUrl } = context
           const { JOB_NAME, SHA } = process.env
 
           const job = await github.rest.actions.listJobsForWorkflowRun({
@@ -1586,7 +1586,7 @@ runs:
             MATCH=$SPEC
             echo "Found compatible version: npm@$MATCH"
             break
-          fi  
+          fi
         done
 
         if [ -z $MATCH ]; then
@@ -2383,7 +2383,7 @@ jobs:
         id: flags
         run: |
           dependabot_dir="\${{ steps.metadata.outputs.directory }}"
-          if [[ "$dependabot_dir" == "/" ]]; then
+          if [[ "$dependabot_dir" == "/" || "$dependabot_dir" == "/main" ]]; then
             echo "workspace=-iwr" >> $GITHUB_OUTPUT
           else
             # strip leading slash from directory so it works as a
@@ -3099,7 +3099,7 @@ SECURITY.md
 
 GitHub takes the security of our software products and services seriously, including the open source code repositories managed through our GitHub organizations, such as [GitHub](https://github.com/GitHub).
 
-If you believe you have found a security vulnerability in this GitHub-owned open source repository, you can report it to us in one of two ways. 
+If you believe you have found a security vulnerability in this GitHub-owned open source repository, you can report it to us in one of two ways.
 
 If the vulnerability you have found is *not* [in scope for the GitHub Bug Bounty Program](https://bounty.github.com/#scope) or if you do not wish to be considered for a bounty reward, please report the issue to us directly through [opensource-security@github.com](mailto:opensource-security@github.com).
 
@@ -3300,7 +3300,7 @@ runs:
       with:
         result-encoding: string
         script: |
-          const { repo: { owner, repo}, runId, serverUrl } = context          
+          const { repo: { owner, repo}, runId, serverUrl } = context
           const { JOB_NAME, SHA } = process.env
 
           const job = await github.rest.actions.listJobsForWorkflowRun({
@@ -3374,7 +3374,7 @@ runs:
             MATCH=$SPEC
             echo "Found compatible version: npm@$MATCH"
             break
-          fi  
+          fi
         done
 
         if [ -z $MATCH ]; then
@@ -3907,7 +3907,7 @@ jobs:
         id: flags
         run: |
           dependabot_dir="\${{ steps.metadata.outputs.directory }}"
-          if [[ "$dependabot_dir" == "/" ]]; then
+          if [[ "$dependabot_dir" == "/" || "$dependabot_dir" == "/main" ]]; then
             echo "workspace=-iwr" >> $GITHUB_OUTPUT
           else
             # strip leading slash from directory so it works as a

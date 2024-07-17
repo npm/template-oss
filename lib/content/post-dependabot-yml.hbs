@@ -26,7 +26,7 @@ jobs:
         id: flags
         run: |
           dependabot_dir="$\{{ steps.metadata.outputs.directory }}"
-          if [[ "$dependabot_dir" == "/" ]]; then
+          if [[ "$dependabot_dir" == "/" || "$dependabot_dir" == "/{{ releaseBranch }}" ]]; then
             echo "workspace=-iwr" >> $GITHUB_OUTPUT
           else
             # strip leading slash from directory so it works as a
@@ -64,7 +64,7 @@ jobs:
         run: |
           git commit -am "$\{{ steps.apply.outputs.message }}"
           git push
-      
+
       # If the previous step failed, then reset the commit and remove any workflow changes
       # and attempt to commit and push again. This is helpful because we will have a commit
       # with the correct prefix that we can then --amend with @npmcli/stafftools later.
@@ -98,4 +98,3 @@ jobs:
           echo "This PR has a breaking change. Run 'npx -p @npmcli/stafftools gh template-oss-fix'"
           echo "for more information on how to fix this with a BREAKING CHANGE footer."
           exit 1
-          
