@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.23.1](https://github.com/npm/template-oss/compare/v4.23.0...v4.23.1) (2024-07-17)
+
+### Bug Fixes
+
+* [`ca47705`](https://github.com/npm/template-oss/commit/ca477050dece8e0f4a628abad67ad79e084a298f) [#462](https://github.com/npm/template-oss/pull/462) Use `include-workspace-root` for `/main` in Post Dependabot (#462) (@hashtagchris)
+
 ## [4.23.0](https://github.com/npm/template-oss/compare/v4.22.0...v4.23.0) (2024-06-27)
 
 ### Features
