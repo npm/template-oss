@@ -1,5 +1,14 @@
 # Changelog
 
+## [4.23.2](https://github.com/npm/template-oss/compare/v4.23.1...v4.23.2) (2024-08-13)
+
+### Bug Fixes
+
+* [`fa37073`](https://github.com/npm/template-oss/commit/fa37073fd9a4cc7dea2d783bac7055fb35a3d787) [#469](https://github.com/npm/template-oss/pull/469) proper workspace tap config for tap18 and up (@wraithgar)
+* [`6a2200d`](https://github.com/npm/template-oss/commit/6a2200dc746742d9e155df5834b49a779875206e) [#465](https://github.com/npm/template-oss/pull/465) omit nyc config for all tap versions above 18 (#465) (@wraithgar)
+* [`6ee703d`](https://github.com/npm/template-oss/commit/6ee703d12a4f1874493ead2be8de207928ca9cb4) Don't restrict length for commit message footer (#467) (@hashtagchris)
+* [`87d3ed9`](https://github.com/npm/template-oss/commit/87d3ed921f4b180946818558c6fef5817090ebe7) [#466](https://github.com/npm/template-oss/pull/466) update codeql runner version (#466) (@wraithgar)
+
 ## [4.23.1](https://github.com/npm/template-oss/compare/v4.23.0...v4.23.1) (2024-07-17)
 
 ### Bug Fixes
