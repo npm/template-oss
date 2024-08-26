@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.23.3](https://github.com/npm/template-oss/compare/v4.23.2...v4.23.3) (2024-08-26)
+### Bug Fixes
+* [`a102a8b`](https://github.com/npm/template-oss/commit/a102a8bc448e0f29de451456b3fc4f563b93b790) [#471](https://github.com/npm/template-oss/pull/471) no duplicate changelog entries (#471) (@lukekarrys)
+
 ## [4.23.2](https://github.com/npm/template-oss/compare/v4.23.1...v4.23.2) (2024-08-13)
 
 ### Bug Fixes
