@@ -15,7 +15,7 @@
     "eslint": "eslint \"**/*.{js,cjs,ts,mjs,jsx,tsx}\""
   },
   "devDependencies": {
-    "@npmcli/eslint-config": "^4.0.0",
+    "@npmcli/eslint-config": "^5.0.0",
     "@npmcli/template-oss": "file:../../",
     "tap": "^16.0.0"
   },
