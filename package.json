@@ -56,7 +56,7 @@
     "lodash": "^4.17.21",
     "minimatch": "^9.0.2",
     "npm-package-arg": "^11.0.1",
-    "proc-log": "^4.0.0",
+    "proc-log": "^5.0.0",
     "release-please": "16.12.0",
     "semver": "^7.3.5",
     "undici": "^6.7.0",
