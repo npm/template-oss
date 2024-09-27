@@ -41,7 +41,7 @@
     "@npmcli/arborist": "^7.2.1",
     "@npmcli/git": "^5.0.3",
     "@npmcli/map-workspaces": "^3.0.0",
-    "@npmcli/package-json": "^5.0.0",
+    "@npmcli/package-json": "^6.0.0",
     "@octokit/rest": "^19.0.4",
     "dedent": "^1.5.1",
     "diff": "^6.0.0",
