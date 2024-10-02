@@ -1,5 +1,20 @@
 # Changelog
 
+## [4.23.4](https://github.com/npm/template-oss/compare/v4.23.3...v4.23.4) (2024-10-02)
+### Dependencies
+* [`d267eb3`](https://github.com/npm/template-oss/commit/d267eb37f516cace03d8d30fbaf20a91d8525005) [#487](https://github.com/npm/template-oss/pull/487) bump `proc-log@5.0.0`
+* [`1d3b53e`](https://github.com/npm/template-oss/commit/1d3b53e5a0a35dbf15303f2d19008e0e23c431b3) [#487](https://github.com/npm/template-oss/pull/487) bump `npm-package-arg@12.0.0`
+* [`6840cf2`](https://github.com/npm/template-oss/commit/6840cf2ea812bbbcec29660d7484184346e0887d) [#487](https://github.com/npm/template-oss/pull/487) bump `json-parse-even-better-errors@4.0.0`
+* [`552c637`](https://github.com/npm/template-oss/commit/552c637f699dc7ad8f8c3e5b74882bbbc4b7ec93) [#487](https://github.com/npm/template-oss/pull/487) bump `ini@5.0.0`
+* [`c6fd556`](https://github.com/npm/template-oss/commit/c6fd5564c61694d1d60524fd548cc69ed70c6635) [#487](https://github.com/npm/template-oss/pull/487) bump `hosted-git-info@8.0.0`
+* [`4a3fa8e`](https://github.com/npm/template-oss/commit/4a3fa8e9e15c7c78c7740b2481dc33bee09669fc) [#487](https://github.com/npm/template-oss/pull/487) bump `@npmcli/package-json@6.0.0`
+* [`5ddf209`](https://github.com/npm/template-oss/commit/5ddf2094bad15c19c41e514851e3f354c0204b6d) [#487](https://github.com/npm/template-oss/pull/487) bump `@npmcli/map-workspaces@4.0.0`
+* [`6ff9e17`](https://github.com/npm/template-oss/commit/6ff9e171b722844fb933622eb43d4a9e3bd3ef22) [#487](https://github.com/npm/template-oss/pull/487) bump `@npmcli/git@6.0.0`
+* [`e815f95`](https://github.com/npm/template-oss/commit/e815f956cd66c133afeb6bd8119b05b984435651) [#482](https://github.com/npm/template-oss/pull/482) bump release-please from 16.12.0 to 16.13.0 (#482) (@dependabot[bot])
+* [`3528a02`](https://github.com/npm/template-oss/commit/3528a02b307bc56fe9bcdf813b7c51769287a0b8) [#474](https://github.com/npm/template-oss/pull/474) bump diff from 5.2.0 to 6.0.0 (#474) (@dependabot[bot])
+### Chores
+* [`eb549a4`](https://github.com/npm/template-oss/commit/eb549a4d112f370db7557a4e30446d4a90c57db3) [#473](https://github.com/npm/template-oss/pull/473) bump @npmcli/eslint-config from 4.0.5 to 5.0.0 (@dependabot[bot])
+
 ## [4.23.3](https://github.com/npm/template-oss/compare/v4.23.2...v4.23.3) (2024-08-26)
 ### Bug Fixes
 * [`a102a8b`](https://github.com/npm/template-oss/commit/a102a8bc448e0f29de451456b3fc4f563b93b790) [#471](https://github.com/npm/template-oss/pull/471) no duplicate changelog entries (#471) (@lukekarrys)
