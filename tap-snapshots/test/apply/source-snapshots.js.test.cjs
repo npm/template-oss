@@ -1401,7 +1401,7 @@ release-please-config.json
       "hidden": true
     }
   ],
-  "prerelease-type": "pre",
+  "prerelease-type": "pre.0",
   "packages": {
     ".": {
       "package-name": ""
@@ -3081,7 +3081,7 @@ release-please-config.json
       "hidden": true
     }
   ],
-  "prerelease-type": "pre",
+  "prerelease-type": "pre.0",
   "packages": {
     ".": {
       "package-name": "",
@@ -4468,7 +4468,7 @@ release-please-config.json
       "hidden": true
     }
   ],
-  "prerelease-type": "pre",
+  "prerelease-type": "pre.0",
   "packages": {
     "workspaces/a": {},
     "workspaces/b": {}

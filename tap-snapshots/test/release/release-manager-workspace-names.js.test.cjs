@@ -70,7 +70,11 @@ exports[`test/release/release-manager.js TAP workspace names > expect resolving 
     gh workflow run update-cli.yml --repo npm/documentation
     \`\`\`
 
-- [ ] 7. Merge release PR
+- [ ] 7. Approve and Merge release PR
+
+    \`\`\`sh
+    gh pr review --approve
+    \`\`\`
 
     \`\`\`sh
     gh pr merge --rebase

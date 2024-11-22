@@ -61,7 +61,11 @@ exports[`test/release/release-manager.js TAP prerelease > must match snapshot 1`
     gh workflow run update-cli.yml --repo npm/documentation
     \`\`\`
 
-- [ ] 6. Merge release PR
+- [ ] 6. Approve and Merge release PR
+
+    \`\`\`sh
+    gh pr review --approve
+    \`\`\`
 
     \`\`\`sh
     gh pr merge --rebase
