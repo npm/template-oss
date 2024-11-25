@@ -1,5 +1,14 @@
 # Changelog
 
+## [4.23.5](https://github.com/npm/template-oss/compare/v4.23.4...v4.23.5) (2024-11-25)
+### Bug Fixes
+* [`7915f76`](https://github.com/npm/template-oss/commit/7915f76b665128a56905801e984fd6197dbe2fd1) [#492](https://github.com/npm/template-oss/pull/492) add number suffix to prerelease (@wraithgar)
+### Dependencies
+* [`48087ac`](https://github.com/npm/template-oss/commit/48087ac77cd8bfa45cb01f52a2058b99c87c5b1a) [#494](https://github.com/npm/template-oss/pull/494) bump release-please from 16.13.0 to 16.15.0 (#494) (@dependabot[bot])
+* [`bac43ef`](https://github.com/npm/template-oss/commit/bac43efe11896bcc204237996837d8f1dab912f4) [#480](https://github.com/npm/template-oss/pull/480) bump diff from 6.0.0 to 7.0.0 (#480) (@dependabot[bot])
+### Chores
+* [`f0847b2`](https://github.com/npm/template-oss/commit/f0847b2d8185a2c5f54d4b4146666dbd98720e30) [#492](https://github.com/npm/template-oss/pull/492) snapshots (@wraithgar)
+
 ## [4.23.4](https://github.com/npm/template-oss/compare/v4.23.3...v4.23.4) (2024-10-02)
 ### Dependencies
 * [`d267eb3`](https://github.com/npm/template-oss/commit/d267eb37f516cace03d8d30fbaf20a91d8525005) [#487](https://github.com/npm/template-oss/pull/487) bump `proc-log@5.0.0`
