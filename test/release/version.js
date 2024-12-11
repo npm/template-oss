@@ -1,6 +1,6 @@
-const t = require('tap');
-const { Version } = require('release-please/build/src/version.js');
-const { SemverVersioningStrategy } = require('../../lib/release/semver-versioning-strategy');
+const t = require('tap')
+const { Version } = require('release-please/build/src/version.js')
+const { SemverVersioningStrategy } = require('../../lib/release/semver-versioning-strategy')
 
 const commit = {
   type: 'chore',
@@ -11,17 +11,17 @@ const commit = {
   bareMessage: '',
   sha: '',
   message: '',
-};
+}
 
-const g = (v) => ({ ...commit, ...v });
+const g = v => ({ ...commit, ...v })
 
 const COMMITS = {
   major: [{ type: 'feat' }, {}, {}, { breaking: true }].map(g),
   minor: [{}, {}, { type: 'feat' }].map(g),
   patch: [{}, { type: 'chore' }, { type: 'fix' }].map(g),
-};
+}
 
-const throws = "THROWS"
+const throws = 'THROWS'
 
 const checks = [
   // Normal releases
@@ -67,30 +67,24 @@ const checks = [
   ['2.0.0-rc.1', 'major', false, undefined, '2.0.0'],
   ['2.0.0-0', 'major', false, undefined, '2.0.0'],
   ['xxxx', 'major', false, undefined, throws],
-];
+]
 
-t.test('SemverVersioningStrategy', async (t) => {
+t.test('SemverVersioningStrategy', async t => {
   for (const [version, commits, prerelease, prereleaseType, expected] of checks) {
-    const name = [version, commits, prerelease, prereleaseType, expected];
-    const id = name.map((v) => (typeof v === 'undefined' ? 'undefined' : v)).join(',');    
+    const name = [version, commits, prerelease, prereleaseType, expected]
+    const id = name.map(v => (typeof v === 'undefined' ? 'undefined' : v)).join(',')
     const instance = new SemverVersioningStrategy({ prerelease, prereleaseType })
-    
+
     if (expected === throws) {
-      t.throws(() => instance.bump(Version.parse(version), COMMITS[commits]), id);
-      continue;
+      t.throws(() => instance.bump(Version.parse(version), COMMITS[commits]), id)
+      continue
     }
 
-    const bump = instance.bump(
-      Version.parse(version),
-      COMMITS[commits]
-    );
+    const bump = instance.bump(Version.parse(version), COMMITS[commits])
 
-    const determine = instance.determineReleaseType(
-      Version.parse(version),
-      COMMITS[commits]
-    );
+    const determine = instance.determineReleaseType(Version.parse(version), COMMITS[commits])
 
-    t.equal(bump.toString(), expected, id);
-    t.equal(determine.bump().toString(), expected, id);
+    t.equal(bump.toString(), expected, id)
+    t.equal(determine.bump().toString(), expected, id)
   }
-});
+})
