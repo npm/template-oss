@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.23.6](https://github.com/npm/template-oss/compare/v4.23.5...v4.23.6) (2024-12-11)
+### Bug Fixes
+* [`252092a`](https://github.com/npm/template-oss/commit/252092a4e06fcfd1e64efdaa5c392b3cccada13a) [#495](https://github.com/npm/template-oss/pull/495) correct versions with prereleases (#495) (@reggi)
+
 ## [4.23.5](https://github.com/npm/template-oss/compare/v4.23.4...v4.23.5) (2024-11-25)
 ### Bug Fixes
 * [`7915f76`](https://github.com/npm/template-oss/commit/7915f76b665128a56905801e984fd6197dbe2fd1) [#492](https://github.com/npm/template-oss/pull/492) add number suffix to prerelease (@wraithgar)
