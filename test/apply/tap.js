@@ -13,7 +13,9 @@ t.test('tap@18', async t => {
 
   await s.apply()
   const pkg = await s.readJson('package.json')
-  t.strictSame(pkg.tap, {})
+  t.strictSame(pkg.tap, {
+    'show-full-coverage': true,
+  })
 })
 
 t.test('tap@16', async t => {

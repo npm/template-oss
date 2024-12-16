@@ -88,8 +88,8 @@ const setupRoot = async (t, root, mocks) => {
     return Object.fromEntries(files.map((f, i) => [f, contents[i]]))
   }
 
-  const apply = t.mock('../lib/apply/index.js', mocks)
-  const check = t.mock('../lib/check/index.js', mocks)
+  const apply = t.mockRequire('../lib/apply/index.js', mocks)
+  const check = t.mockRequire('../lib/check/index.js', mocks)
 
   return {
     root,

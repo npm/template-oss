@@ -5,7 +5,7 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
-exports[`test/release/release-manager.js TAP mock release manager > must match snapshot 1`] = `
+exports[`test/release/release-manager.js > TAP > mock release manager > must match snapshot 1`] = `
 ### Release Checklist for v4.0.5
 
 - [ ] 1. Checkout the release branch and test
