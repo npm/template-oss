@@ -53,12 +53,20 @@ const setupRoot = async (t, root, mocks) => {
   const rootFs = Object.fromEntries(
     Object.entries({
       readdir: fs.readdir,
-      readFile: p => fs.readFile(p, { encoding: 'utf-8' }),
+      readFile: p => {
+        console.log(p)
+        return fs.readFile(p, { encoding: 'utf-8' })
+      },
       writeFile: (p, d) => fs.writeFile(p, d, { encoding: 'utf-8' }),
       appendFile: fs.appendFile,
       stat: fs.stat,
       unlink: fs.unlink,
-    }).map(([k, fn]) => [k, (p, ...rest) => fn(rootPath(p), ...rest)]),
+    }).map(([k, fn]) => [
+      k,
+      (p, ...rest) => {
+        return fn(rootPath(p), ...rest)
+      },
+    ]),
   )
 
   // Returns a recurisve list of relative file
@@ -136,6 +144,8 @@ const setup = async (t, { package = {}, workspaces = {}, testdir = {}, mocks = {
   // creates dir with a root package.json and
   // package.json files for each workspace
   const root = t.testdir(merge(createPackageJson(pkg), testdir))
+
+  console.log({ root })
 
   return {
     ...(await setupRoot(t, root, mocks)),
