@@ -258,7 +258,7 @@ To correct it: move files to not match one of the following patterns:
 -------------------------------------------------------------------
 `
 
-exports[`test/check/snapshots.js > TAP > not ok without required > promise must resolve to match snapshot 1`] = `
+exports[`test/check/snapshots.js > TAP > not good without required > promise must resolve to match snapshot 1`] = `
 Some problems were detected:
 
 -------------------------------------------------------------------

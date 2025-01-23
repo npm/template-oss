@@ -54,7 +54,6 @@ const setupRoot = async (t, root, mocks) => {
     Object.entries({
       readdir: fs.readdir,
       readFile: p => {
-        console.log(p)
         return fs.readFile(p, { encoding: 'utf-8' })
       },
       writeFile: (p, d) => fs.writeFile(p, d, { encoding: 'utf-8' }),
@@ -144,8 +143,6 @@ const setup = async (t, { package = {}, workspaces = {}, testdir = {}, mocks = {
   // creates dir with a root package.json and
   // package.json files for each workspace
   const root = t.testdir(merge(createPackageJson(pkg), testdir))
-
-  console.log({ root })
 
   return {
     ...(await setupRoot(t, root, mocks)),
