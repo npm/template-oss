@@ -20,13 +20,8 @@ t.test('importOrRequire', async t => {
   const typeModule = await importOrRequire(path.join(dir, 'esm/index.js'))
   t.same(typeModule, 'type module')
 
-  if (process.version.replace('v', '').split('.')[0] >= '22') {
-    const results = await importOrRequire(path.join(dir, 'esm.js'))
-    t.same(results, 'esm')
-  } else {
-    const results = await importOrRequire(path.join(dir, 'esm.js'))
-    t.same(results, {})
-  }
+  const results = await importOrRequire(path.join(dir, 'esm.js'))
+  t.same(results, 'esm')
 
   await Promise.all(
     // double 'js' triggers the cache
