@@ -94,7 +94,7 @@
     "prettier": true
   },
   "engines": {
-    "node": "^20.17.0 || >=22.9.0"
+    "node": "^18.17.0 || >=20.5.0"
   },
   "workspaces": [
     "workspace/test-workspace"
