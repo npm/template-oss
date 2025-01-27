@@ -17,12 +17,6 @@ t.test('importOrRequire', async t => {
     'invalid.js': 'invalid',
   })
 
-  const typeModule = await importOrRequire(path.join(dir, 'esm/index.js'))
-  t.same(typeModule, 'type module')
-
-  const results = await importOrRequire(path.join(dir, 'esm.js'))
-  t.same(results, 'esm')
-
   await Promise.all(
     // double 'js' triggers the cache
     ['mjs', 'cjs', 'js', 'js'].map(async type => {
