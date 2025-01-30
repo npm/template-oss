@@ -1,9 +1,8 @@
 const nock = require('nock')
-const { resolve, relative, dirname, sep, join, basename } = require('path')
+const { resolve, dirname, join, basename, extname } = require('path')
 const fs = require('fs')
 
 const DIR = __dirname
-const CWD = process.cwd()
 const RECORD = 'NOCK_RECORD' in process.env ? true : undefined
 
 // These are the live GitHub repo and branch that are used to
@@ -12,9 +11,12 @@ const REPO = 'npm/npm-cli-release-please'
 const BRANCH = 'template-oss-mock-testing-branch-do-not-delete'
 
 const getPath = t => {
-  const fixtureName = relative(CWD, t.testdirName).split(`${sep}tap-testdir-`)[1]
+  const fullExt = extname(t.testdirName)
+  const testName = fullExt.replace(/\.js-/, '')
+  const testFileName = basename(t.testdirName, fullExt).replace(/^test-release-/, '')
+  const fixtureName = `${testFileName}-${testName}`
   return {
-    fixtureName: basename(fixtureName),
+    fixtureName,
     fixturePath: resolve(DIR, 'nocks', `${fixtureName}.json`),
   }
 }
@@ -61,7 +63,7 @@ const setup = t => {
 }
 
 const releasePlease = async (t, { setup: s, ...opts } = {}) => {
-  const ReleasePlease = t.mock('../../lib/release/release-please.js')
+  const ReleasePlease = t.mockRequire('../../lib/release/release-please.js')
   try {
     return await ReleasePlease.run({
       token: s.token,
@@ -82,7 +84,7 @@ const releasePlease = async (t, { setup: s, ...opts } = {}) => {
 
 const releaseManager = (t, { cwd = t.testdir({ 'package.json': '{"name":"pkg"}' }), ...opts } = {}) => {
   const s = setup(t)
-  const ReleaseManager = t.mock('../../lib/release/release-manager.js')
+  const ReleaseManager = t.mockRequire('../../lib/release/release-manager.js')
   return ReleaseManager.run({
     token: s.token,
     repo: REPO,

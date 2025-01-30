@@ -5,7 +5,7 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
-exports[`test/apply/source-snapshots.js TAP root only > expect resolving Promise 1`] = `
+exports[`test/apply/source-snapshots.js > TAP > root only > promise must resolve to match snapshot 1`] = `
 .commitlintrc.js
 ========================================
 /* This file is automatically added by @npmcli/template-oss. Do not edit. */
@@ -1426,7 +1426,7 @@ If the vulnerability you have found is [in scope for the GitHub Bug Bounty Progr
 Thanks for helping make GitHub safe for everyone.
 `
 
-exports[`test/apply/source-snapshots.js TAP with content path > expect resolving Promise 1`] = `
+exports[`test/apply/source-snapshots.js > TAP > with content path > promise must resolve to match snapshot 1`] = `
 content_dir/index.js
 ========================================
 module.exports={}
@@ -1444,7 +1444,7 @@ package.json
 }
 `
 
-exports[`test/apply/source-snapshots.js TAP with workspaces > expect resolving Promise 1`] = `
+exports[`test/apply/source-snapshots.js > TAP > with workspaces > promise must resolve to match snapshot 1`] = `
 .commitlintrc.js
 ========================================
 /* This file is automatically added by @npmcli/template-oss. Do not edit. */
@@ -3272,7 +3272,7 @@ workspaces/b/package.json
 }
 `
 
-exports[`test/apply/source-snapshots.js TAP workspaces only > expect resolving Promise 1`] = `
+exports[`test/apply/source-snapshots.js > TAP > workspaces only > promise must resolve to match snapshot 1`] = `
 .github/actions/create-check/action.yml
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
@@ -4636,7 +4636,7 @@ workspaces/b/package.json
 }
 `
 
-exports[`test/apply/source-snapshots.js TAP workspaces with nested content path > expect resolving Promise 1`] = `
+exports[`test/apply/source-snapshots.js > TAP > workspaces with nested content path > promise must resolve to match snapshot 1`] = `
 content_dir/index.js
 ========================================
 module.exports={}

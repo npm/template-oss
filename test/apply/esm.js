@@ -17,7 +17,7 @@ t.test('basic', async t => {
     },
   })
   await s.apply()
-
   const file = await s.readFile('content_dir/file.js')
+
   t.match(file, 'var x = 1;')
 })

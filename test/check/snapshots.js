@@ -17,7 +17,7 @@ t.test('workspaces with empty dir', async t => {
   await t.resolveMatchSnapshot(s.check())
 })
 
-t.test('not ok without required', async t => {
+t.test('not good without required', async t => {
   const s = await setup(t)
   await s.apply()
   await t.resolveMatchSnapshot(s.check())

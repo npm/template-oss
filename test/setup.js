@@ -53,12 +53,19 @@ const setupRoot = async (t, root, mocks) => {
   const rootFs = Object.fromEntries(
     Object.entries({
       readdir: fs.readdir,
-      readFile: p => fs.readFile(p, { encoding: 'utf-8' }),
+      readFile: p => {
+        return fs.readFile(p, { encoding: 'utf-8' })
+      },
       writeFile: (p, d) => fs.writeFile(p, d, { encoding: 'utf-8' }),
       appendFile: fs.appendFile,
       stat: fs.stat,
       unlink: fs.unlink,
-    }).map(([k, fn]) => [k, (p, ...rest) => fn(rootPath(p), ...rest)]),
+    }).map(([k, fn]) => [
+      k,
+      (p, ...rest) => {
+        return fn(rootPath(p), ...rest)
+      },
+    ]),
   )
 
   // Returns a recurisve list of relative file
@@ -88,8 +95,8 @@ const setupRoot = async (t, root, mocks) => {
     return Object.fromEntries(files.map((f, i) => [f, contents[i]]))
   }
 
-  const apply = t.mock('../lib/apply/index.js', mocks)
-  const check = t.mock('../lib/check/index.js', mocks)
+  const apply = t.mockRequire('../lib/apply/index.js', mocks)
+  const check = t.mockRequire('../lib/check/index.js', mocks)
 
   return {
     root,
