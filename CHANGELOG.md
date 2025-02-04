@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.24.1](https://github.com/npm/template-oss/compare/v4.24.0...v4.24.1) (2025-02-04)
+### Bug Fixes
+* [`4f871ab`](https://github.com/npm/template-oss/commit/4f871ab853b41d745cfd6078f3bbe1855f5750e7) [#503](https://github.com/npm/template-oss/pull/503) tap exclude (#503) (@reggi)
+
 ## [4.24.0](https://github.com/npm/template-oss/compare/v4.23.6...v4.24.0) (2025-01-30)
 ### Features
 * [`402d480`](https://github.com/npm/template-oss/commit/402d4804efe15fcbda90c96e36efcb600cc08dc2) [#500](https://github.com/npm/template-oss/pull/500) engines to ^20.17.0 || >=22.9.0 (#500) (@reggi)
