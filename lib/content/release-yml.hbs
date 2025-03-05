@@ -186,6 +186,7 @@ jobs:
     uses: ./.github/workflows/release-integration.yml
     {{#if publish}}
     permissions:
+      contents: read
       id-token: write
     secrets:
       PUBLISH_TOKEN: $\{{ secrets.PUBLISH_TOKEN }}
