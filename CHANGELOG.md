@@ -1,5 +1,10 @@
 # Changelog
 
+## [4.24.2](https://github.com/npm/template-oss/compare/v4.24.1...v4.24.2) (2025-03-05)
+### Bug Fixes
+* [`fa962c3`](https://github.com/npm/template-oss/commit/fa962c3b6761ee48ee9a10e7f6252f81f6605f4f) [#506](https://github.com/npm/template-oss/pull/506) propagate content read for release integration (#506) (@reggi)
+* [`1cb710e`](https://github.com/npm/template-oss/commit/1cb710e2770047fe60f3930faca66881a1a81196) [#505](https://github.com/npm/template-oss/pull/505) adds permissions to all workflows (#505) (@reggi)
+
 ## [4.24.1](https://github.com/npm/template-oss/compare/v4.24.0...v4.24.1) (2025-02-04)
 ### Bug Fixes
 * [`4f871ab`](https://github.com/npm/template-oss/commit/4f871ab853b41d745cfd6078f3bbe1855f5750e7) [#503](https://github.com/npm/template-oss/pull/503) tap exclude (#503) (@reggi)
