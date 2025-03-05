@@ -356,6 +356,9 @@ on:
     # "At 08:00 UTC (01:00 PT) on Monday" https://crontab.guru/#0_8_*_*_1
     - cron: "0 8 * * 1"
 
+permissions:
+  contents: read
+
 jobs:
   audit:
     name: Audit Dependencies
@@ -409,6 +412,10 @@ on:
       check-sha:
         required: true
         type: string
+
+permissions:
+  contents: read
+  checks: write
 
 jobs:
   lint-all:
@@ -546,6 +553,9 @@ on:
     # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
     - cron: "0 9 * * 1"
 
+permissions:
+  contents: read
+
 jobs:
   lint:
     name: Lint
@@ -650,6 +660,9 @@ on:
   schedule:
     # "At 10:00 UTC (03:00 PT) on Monday" https://crontab.guru/#0_10_*_*_1
     - cron: "0 10 * * 1"
+
+permissions:
+  contents: read
 
 jobs:
   analyze:
@@ -813,6 +826,9 @@ on:
       - edited
       - synchronize
 
+permissions:
+  contents: read
+
 jobs:
   commitlint:
     name: Lint Commits
@@ -871,6 +887,9 @@ on:
         required: true
         type: string
         description: 'A json array of releases. Required fields: publish: tagName, publishTag. publish check: pkgName, version'
+
+permissions:
+  contents: read
 
 jobs:
   publish:
@@ -1797,6 +1816,9 @@ on:
     # "At 08:00 UTC (01:00 PT) on Monday" https://crontab.guru/#0_8_*_*_1
     - cron: "0 8 * * 1"
 
+permissions:
+  contents: read
+
 jobs:
   audit:
     name: Audit Dependencies
@@ -1850,6 +1872,9 @@ on:
   schedule:
     # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
     - cron: "0 9 * * 1"
+
+permissions:
+  contents: read
 
 jobs:
   lint:
@@ -1957,6 +1982,9 @@ on:
     # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
     - cron: "0 9 * * 1"
 
+permissions:
+  contents: read
+
 jobs:
   lint:
     name: Lint
@@ -2062,6 +2090,10 @@ on:
       check-sha:
         required: true
         type: string
+
+permissions:
+  contents: read
+  checks: write
 
 jobs:
   lint-all:
@@ -2205,6 +2237,9 @@ on:
     # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
     - cron: "0 9 * * 1"
 
+permissions:
+  contents: read
+
 jobs:
   lint:
     name: Lint
@@ -2309,6 +2344,9 @@ on:
   schedule:
     # "At 10:00 UTC (03:00 PT) on Monday" https://crontab.guru/#0_10_*_*_1
     - cron: "0 10 * * 1"
+
+permissions:
+  contents: read
 
 jobs:
   analyze:
@@ -2472,6 +2510,9 @@ on:
       - edited
       - synchronize
 
+permissions:
+  contents: read
+
 jobs:
   commitlint:
     name: Lint Commits
@@ -2530,6 +2571,9 @@ on:
         required: true
         type: string
         description: 'A json array of releases. Required fields: publish: tagName, publishTag. publish check: pkgName, version'
+
+permissions:
+  contents: read
 
 jobs:
   publish:
@@ -3526,6 +3570,9 @@ on:
     # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
     - cron: "0 9 * * 1"
 
+permissions:
+  contents: read
+
 jobs:
   lint:
     name: Lint
@@ -3632,6 +3679,9 @@ on:
     # "At 09:00 UTC (02:00 PT) on Monday" https://crontab.guru/#0_9_*_*_1
     - cron: "0 9 * * 1"
 
+permissions:
+  contents: read
+
 jobs:
   lint:
     name: Lint
@@ -3737,6 +3787,10 @@ on:
       check-sha:
         required: true
         type: string
+
+permissions:
+  contents: read
+  checks: write
 
 jobs:
   lint-all:
@@ -3996,6 +4050,9 @@ on:
       - edited
       - synchronize
 
+permissions:
+  contents: read
+
 jobs:
   commitlint:
     name: Lint Commits
@@ -4054,6 +4111,9 @@ on:
         required: true
         type: string
         description: 'A json array of releases. Required fields: publish: tagName, publishTag. publish check: pkgName, version'
+
+permissions:
+  contents: read
 
 jobs:
   publish:
