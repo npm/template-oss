@@ -3,6 +3,9 @@ name: CI {{~#if isWorkspace}} - {{ pkgName }}{{/if}}
 on:
   {{> onCiYml }}
 
+permissions:
+  contents: read
+
 jobs:
   lint:
     {{> jobYml jobName="Lint" }}

@@ -19,6 +19,9 @@ on:
         required: true
     {{/if}} 
 
+permissions:
+  contents: read
+
 jobs:
   publish:
     {{> jobReleaseIntegrationYml }}

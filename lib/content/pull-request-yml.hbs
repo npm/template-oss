@@ -8,6 +8,9 @@ on:
       - edited
       - synchronize
 
+permissions:
+  contents: read
+  
 jobs:
   commitlint:
     {{> jobYml jobName="Lint Commits" jobCheckout=(obj fetch-depth=0) }}

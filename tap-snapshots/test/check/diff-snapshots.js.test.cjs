@@ -99,23 +99,23 @@ The repo file audit.yml needs to be updated:
   [@npmcli/template-oss ERROR] There was an erroring getting the target file
   [@npmcli/template-oss ERROR] Error: {{ROOT}}/.tap/fixtures/test-check-diff-snapshots.js-update-and-remove-errors/.github/workflows/audit.yml
   
-  YAMLParseError: Implicit keys need to be on a single line at line 42, column 1:
+  YAMLParseError: Implicit keys need to be on a single line at line 45, column 1:
   
           run: npm audit --audit-level=none
   >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
   ^
   
-  YAMLParseError: Block scalar header includes extra characters: >>>>I at line 42, column 2:
+  YAMLParseError: Block scalar header includes extra characters: >>>>I at line 45, column 2:
   
   >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
    ^
   
-  YAMLParseError: Not a YAML token: HOPE THIS IS NOT VALID YAML<<<<<<<<<<< at line 42, column 7:
+  YAMLParseError: Not a YAML token: HOPE THIS IS NOT VALID YAML<<<<<<<<<<< at line 45, column 7:
   
   >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   
-  YAMLParseError: Implicit map keys need to be followed by map values at line 42, column 1:
+  YAMLParseError: Implicit map keys need to be followed by map values at line 45, column 1:
   
           run: npm audit --audit-level=none
   >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
@@ -133,6 +133,9 @@ The repo file audit.yml needs to be updated:
     schedule:
       # "At 08:00 UTC (01:00 PT) on Monday" https://crontab.guru/#0_8_*_*_1
       - cron: "0 8 * * 1"
+  
+  permissions:
+    contents: read
   
   jobs:
     audit:
@@ -175,7 +178,7 @@ The repo file ci.yml needs to be updated:
 
   .github/workflows/ci.yml
   ========================================
-  @@ -97,4 +97,24 @@
+  @@ -100,4 +100,24 @@
            shell: \${{ matrix.platform.shell }}
        steps:
          - name: Checkout
