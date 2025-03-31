@@ -126,6 +126,7 @@ To correct it: move files to not match one of the following patterns:
   /*
   !**/.gitignore
   !/.commitlintrc.js
+  !/.eslint.config.js
   !/.eslintrc.js
   !/.eslintrc.local.*
   !/.git-blame-ignore-revs
@@ -170,6 +171,7 @@ To correct it: move files to not match one of the following patterns:
   /*
   !**/.gitignore
   !/.commitlintrc.js
+  !/.eslint.config.js
   !/.eslintrc.js
   !/.eslintrc.local.*
   !/.git-blame-ignore-revs
@@ -211,6 +213,7 @@ To correct it: move files to not match one of the following patterns:
 
   /*
   !**/.gitignore
+  !/.eslint.config.js
   !/.eslintrc.js
   !/.eslintrc.local.*
   !/.git-blame-ignore-revs
@@ -238,6 +241,7 @@ To correct it: move files to not match one of the following patterns:
 
   /*
   !**/.gitignore
+  !/.eslint.config.js
   !/.eslintrc.js
   !/.eslintrc.local.*
   !/.git-blame-ignore-revs

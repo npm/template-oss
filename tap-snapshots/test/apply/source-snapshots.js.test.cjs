@@ -1255,6 +1255,7 @@ jobs:
 
 !**/.gitignore
 !/.commitlintrc.js
+!/.eslint.config.js
 !/.eslintrc.js
 !/.eslintrc.local.*
 !/.git-blame-ignore-revs
@@ -2940,6 +2941,7 @@ jobs:
 
 !**/.gitignore
 !/.commitlintrc.js
+!/.eslint.config.js
 !/.eslintrc.js
 !/.eslintrc.local.*
 !/.git-blame-ignore-revs
@@ -3188,6 +3190,7 @@ workspaces/a/.gitignore
 /*
 
 !**/.gitignore
+!/.eslint.config.js
 !/.eslintrc.js
 !/.eslintrc.local.*
 !/.git-blame-ignore-revs
@@ -3268,6 +3271,7 @@ workspaces/b/.gitignore
 /*
 
 !**/.gitignore
+!/.eslint.config.js
 !/.eslintrc.js
 !/.eslintrc.local.*
 !/.git-blame-ignore-revs
@@ -4569,6 +4573,7 @@ workspaces/a/.gitignore
 /*
 
 !**/.gitignore
+!/.eslint.config.js
 !/.eslintrc.js
 !/.eslintrc.local.*
 !/.git-blame-ignore-revs
@@ -4649,6 +4654,7 @@ workspaces/b/.gitignore
 /*
 
 !**/.gitignore
+!/.eslint.config.js
 !/.eslintrc.js
 !/.eslintrc.local.*
 !/.git-blame-ignore-revs
