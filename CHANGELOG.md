@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.24.3](https://github.com/npm/template-oss/compare/v4.24.2...v4.24.3) (2025-03-31)
+### Bug Fixes
+* [`f0975da`](https://github.com/npm/template-oss/commit/f0975dabf5bca5621f5219b20e7596e534b4101c) allow eslint.config.js in npm project gitignore files (#508) (@owlstronaut)
+
 ## [4.24.2](https://github.com/npm/template-oss/compare/v4.24.1...v4.24.2) (2025-03-05)
 ### Bug Fixes
 * [`fa962c3`](https://github.com/npm/template-oss/commit/fa962c3b6761ee48ee9a10e7f6252f81f6605f4f) [#506](https://github.com/npm/template-oss/pull/506) propagate content read for release integration (#506) (@reggi)
