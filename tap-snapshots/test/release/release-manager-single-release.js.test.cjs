@@ -37,6 +37,6 @@ exports[`test/release/release-manager.js > TAP > single release > must match sna
     Release Please will run on the just pushed release commit and create GitHub releases and tags for each package.
 
     \`\`\`sh
-    gh run watch -R npm/node-semver $(gh run list -R npm/node-semver -w release -b main -L 1 --json databaseId -q ".[0].databaseId")
+    gh run watch -R npm/node-semver $(gh run list -R npm/node-semver --workspace release -b main -L 1 --json databaseId -q ".[0].databaseId")
     \`\`\`
 `

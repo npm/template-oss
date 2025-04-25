@@ -354,8 +354,8 @@ The module file package.json needs to be updated:
     "snap": "tap",
     "test": "tap",
     "posttest": "npm run lint",
-    "test-all": "npm run test -ws -iwr --if-present",
-    "lint-all": "npm run lint -ws -iwr --if-present"
+    "test-all": "npm run test --workspaces --include-workspace-root --if-present",
+    "lint-all": "npm run lint --workspaces --include-workspace-root --if-present"
   }
   "tap" is missing, expected {
     "test-ignore": "^(workspaces/a|workspaces/b)/",

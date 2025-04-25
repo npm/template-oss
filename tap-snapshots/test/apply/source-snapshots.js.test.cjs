@@ -744,7 +744,7 @@ jobs:
           else
             # strip leading slash from directory so it works as a
             # a path to the workspace flag
-            echo "workspace=-w \${dependabot_dir#/}" >> $GITHUB_OUTPUT
+            echo "workspace=--workspace \${dependabot_dir#/}" >> $GITHUB_OUTPUT
           fi
 
       - name: Apply Changes
@@ -1906,9 +1906,9 @@ jobs:
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
-        run: npm run lint --ignore-scripts -w a
+        run: npm run lint --ignore-scripts --workspace a
       - name: Post Lint
-        run: npm run postlint --ignore-scripts -w a
+        run: npm run postlint --ignore-scripts --workspace a
 
   test:
     name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
@@ -1960,7 +1960,7 @@ jobs:
       - name: Add Problem Matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
       - name: Test
-        run: npm test --ignore-scripts -w a
+        run: npm test --ignore-scripts --workspace a
 
 .github/workflows/ci-b.yml
 ========================================
@@ -2015,9 +2015,9 @@ jobs:
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
-        run: npm run lint --ignore-scripts -w b
+        run: npm run lint --ignore-scripts --workspace b
       - name: Post Lint
-        run: npm run postlint --ignore-scripts -w b
+        run: npm run postlint --ignore-scripts --workspace b
 
   test:
     name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
@@ -2069,7 +2069,7 @@ jobs:
       - name: Add Problem Matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
       - name: Test
-        run: npm test --ignore-scripts -w b
+        run: npm test --ignore-scripts --workspace b
 
 .github/workflows/ci-release.yml
 ========================================
@@ -2135,9 +2135,9 @@ jobs:
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
-        run: npm run lint --ignore-scripts -ws -iwr --if-present
+        run: npm run lint --ignore-scripts --workspaces --include-workspace-root --if-present
       - name: Post Lint
-        run: npm run postlint --ignore-scripts -ws -iwr --if-present
+        run: npm run postlint --ignore-scripts --workspaces --include-workspace-root --if-present
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.6.0
         if: steps.create-check.outputs.check-id && always()
@@ -2206,7 +2206,7 @@ jobs:
       - name: Add Problem Matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
       - name: Test
-        run: npm test --ignore-scripts -ws -iwr --if-present
+        run: npm test --ignore-scripts --workspaces --include-workspace-root --if-present
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.6.0
         if: steps.create-check.outputs.check-id && always()
@@ -2430,7 +2430,7 @@ jobs:
           else
             # strip leading slash from directory so it works as a
             # a path to the workspace flag
-            echo "workspace=-w \${dependabot_dir#/}" >> $GITHUB_OUTPUT
+            echo "workspace=--workspace \${dependabot_dir#/}" >> $GITHUB_OUTPUT
           fi
 
       - name: Apply Changes
@@ -2771,7 +2771,7 @@ jobs:
       - name: Run Post Pull Request Actions
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
-        run: npm run rp-pull-request --ignore-scripts -ws -iwr --if-present -- --pr="\${{ needs.release.outputs.pr-number }}" --commentId="\${{ needs.release.outputs.comment-id }}"
+        run: npm run rp-pull-request --ignore-scripts --workspaces --include-workspace-root --if-present -- --pr="\${{ needs.release.outputs.pr-number }}" --commentId="\${{ needs.release.outputs.comment-id }}"
       - name: Commit
         id: commit
         env:
@@ -3068,8 +3068,8 @@ package.json
     "snap": "tap",
     "test": "tap",
     "posttest": "npm run lint",
-    "test-all": "npm run test -ws -iwr --if-present",
-    "lint-all": "npm run lint -ws -iwr --if-present"
+    "test-all": "npm run test --workspaces --include-workspace-root --if-present",
+    "lint-all": "npm run lint --workspaces --include-workspace-root --if-present"
   },
   "author": "GitHub Inc.",
   "files": [
@@ -3607,9 +3607,9 @@ jobs:
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
-        run: npm run lint --ignore-scripts -w a
+        run: npm run lint --ignore-scripts --workspace a
       - name: Post Lint
-        run: npm run postlint --ignore-scripts -w a
+        run: npm run postlint --ignore-scripts --workspace a
 
   test:
     name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
@@ -3661,7 +3661,7 @@ jobs:
       - name: Add Problem Matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
       - name: Test
-        run: npm test --ignore-scripts -w a
+        run: npm test --ignore-scripts --workspace a
 
 .github/workflows/ci-b.yml
 ========================================
@@ -3716,9 +3716,9 @@ jobs:
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
-        run: npm run lint --ignore-scripts -w b
+        run: npm run lint --ignore-scripts --workspace b
       - name: Post Lint
-        run: npm run postlint --ignore-scripts -w b
+        run: npm run postlint --ignore-scripts --workspace b
 
   test:
     name: Test - \${{ matrix.platform.name }} - \${{ matrix.node-version }}
@@ -3770,7 +3770,7 @@ jobs:
       - name: Add Problem Matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
       - name: Test
-        run: npm test --ignore-scripts -w b
+        run: npm test --ignore-scripts --workspace b
 
 .github/workflows/ci-release.yml
 ========================================
@@ -3836,9 +3836,9 @@ jobs:
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
-        run: npm run lint --ignore-scripts -ws -iwr --if-present
+        run: npm run lint --ignore-scripts --workspaces --include-workspace-root --if-present
       - name: Post Lint
-        run: npm run postlint --ignore-scripts -ws -iwr --if-present
+        run: npm run postlint --ignore-scripts --workspaces --include-workspace-root --if-present
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.6.0
         if: steps.create-check.outputs.check-id && always()
@@ -3907,7 +3907,7 @@ jobs:
       - name: Add Problem Matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
       - name: Test
-        run: npm test --ignore-scripts -ws -iwr --if-present
+        run: npm test --ignore-scripts --workspaces --include-workspace-root --if-present
       - name: Conclude Check
         uses: LouisBrunner/checks-action@v1.6.0
         if: steps.create-check.outputs.check-id && always()
@@ -3974,7 +3974,7 @@ jobs:
           else
             # strip leading slash from directory so it works as a
             # a path to the workspace flag
-            echo "workspace=-w \${dependabot_dir#/}" >> $GITHUB_OUTPUT
+            echo "workspace=--workspace \${dependabot_dir#/}" >> $GITHUB_OUTPUT
           fi
 
       - name: Apply Changes
@@ -4315,7 +4315,7 @@ jobs:
       - name: Run Post Pull Request Actions
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
-        run: npm run rp-pull-request --ignore-scripts -ws -iwr --if-present -- --pr="\${{ needs.release.outputs.pr-number }}" --commentId="\${{ needs.release.outputs.comment-id }}"
+        run: npm run rp-pull-request --ignore-scripts --workspaces --include-workspace-root --if-present -- --pr="\${{ needs.release.outputs.pr-number }}" --commentId="\${{ needs.release.outputs.comment-id }}"
       - name: Commit
         id: commit
         env:
