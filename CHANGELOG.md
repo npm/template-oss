@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.24.4](https://github.com/npm/template-oss/compare/v4.24.3...v4.24.4) (2025-04-28)
+### Bug Fixes
+* [`21fa419`](https://github.com/npm/template-oss/commit/21fa419c1d53e60f3e28ce566d5942da9a06d88a) [#511](https://github.com/npm/template-oss/pull/511) remove single-dash options from workflows (#511) (@owlstronaut)
+
 ## [4.24.3](https://github.com/npm/template-oss/compare/v4.24.2...v4.24.3) (2025-03-31)
 ### Bug Fixes
 * [`f0975da`](https://github.com/npm/template-oss/commit/f0975dabf5bca5621f5219b20e7596e534b4101c) allow eslint.config.js in npm project gitignore files (#508) (@owlstronaut)
