@@ -45,6 +45,6 @@ exports[`test/release/release-manager.js > TAP > mock release manager > must mat
     Release Please will run on the just pushed release commit and create GitHub releases and tags for each package.
 
     \`\`\`sh
-    gh run watch -R npm/npm-cli-release-please $(gh run list -R npm/npm-cli-release-please -w release -b main -L 1 --json databaseId -q ".[0].databaseId")
+    gh run watch -R npm/npm-cli-release-please $(gh run list -R npm/npm-cli-release-please --workspace release -b main -L 1 --json databaseId -q ".[0].databaseId")
     \`\`\`
 `

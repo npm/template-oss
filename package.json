@@ -20,8 +20,8 @@
     "postinstall": "template-oss-apply",
     "eslint": "eslint \"**/*.{js,cjs,ts,mjs,jsx,tsx}\"",
     "prettier": "prettier \"**/*.{js,cjs,ts,mjs,jsx,tsx,json}\"",
-    "test-all": "npm run test -ws -iwr --if-present",
-    "lint-all": "npm run lint -ws -iwr --if-present"
+    "test-all": "npm run test --workspaces --include-workspace-root --if-present",
+    "lint-all": "npm run lint --workspaces --include-workspace-root --if-present"
   },
   "repository": {
     "type": "git",

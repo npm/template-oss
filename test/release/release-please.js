@@ -82,14 +82,14 @@ t.todo('cases', async t => {
   await t.test('fix all', async t => {
     const s = setup(t)
     before(s)
-    await matchPr(t, s, { flags: '-ws -iwr', msg: 'fix: update all packages' })
+    await matchPr(t, s, { flags: '--workspaces --include-workspace-root', msg: 'fix: update all packages' })
     await matchReleases(t, s)
   })
 
   await t.test('fix one', async t => {
     const s = setup(t)
     before(s)
-    await matchPr(t, s, { flags: '-w @npmcli/pkg3', msg: 'fix: update pkg3' })
+    await matchPr(t, s, { flags: '--workspace @npmcli/pkg3', msg: 'fix: update pkg3' })
     await matchReleases(t, s)
   })
 
@@ -104,7 +104,7 @@ t.todo('cases', async t => {
     const s = setup(t)
     before(s)
     await matchPr(t, s, {
-      flags: '-ws -iwr',
+      flags: '--workspaces --include-workspace-root',
       msg: 'feat!: update all packages',
       prerelease: true,
     })

@@ -47,9 +47,9 @@ jobs:
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
-        run: npm run lint --ignore-scripts -w test-workspace
+        run: npm run lint --ignore-scripts --workspace test-workspace
       - name: Post Lint
-        run: npm run postlint --ignore-scripts -w test-workspace
+        run: npm run postlint --ignore-scripts --workspace test-workspace
 
   test:
     name: Test - ${{ matrix.platform.name }} - ${{ matrix.node-version }}
@@ -113,4 +113,4 @@ jobs:
       - name: Add Problem Matcher
         run: echo "::add-matcher::.github/matchers/tap.json"
       - name: Test
-        run: npm test --ignore-scripts -w test-workspace
+        run: npm test --ignore-scripts --workspace test-workspace

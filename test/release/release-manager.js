@@ -58,8 +58,8 @@ t.test('repo doesnt exist', async t => {
 t.test('workspace names', async t => {
   const cwd = t.testdir()
   execSync('npm init -y', { cwd })
-  execSync('npm init -y -w ws1', { cwd })
-  execSync('npm pkg set name="@npmcli/arborist" -w ws1', { cwd })
-  execSync('npm init -y -w libnpmdiff', { cwd })
+  execSync('npm init -y --workspace ws1', { cwd })
+  execSync('npm pkg set name="@npmcli/arborist" --workspace ws1', { cwd })
+  execSync('npm init -y --workspace libnpmdiff', { cwd })
   t.resolveMatchSnapshot(releaseManager(t, { cwd, pr: 6923, repo: 'npm/cli' }))
 })
