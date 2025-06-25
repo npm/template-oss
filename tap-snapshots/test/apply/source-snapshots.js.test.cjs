@@ -890,7 +890,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   publish:
@@ -2576,7 +2575,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   publish:
@@ -4120,7 +4118,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   publish:
