@@ -17,11 +17,13 @@ on:
     secrets:
       PUBLISH_TOKEN:
         required: true
-    {{/if}} 
+    {{/if}}
 
 permissions:
   contents: read
+  {{#if publish}}
   id-token: write
+  {{/if}}
 
 jobs:
   publish:
