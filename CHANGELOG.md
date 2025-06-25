@@ -1,5 +1,10 @@
 # Changelog
 
+## [4.24.4](https://github.com/npm/template-oss/compare/v4.24.3...v4.24.4) (2025-06-25)
+### Bug Fixes
+* [`4177f5b`](https://github.com/npm/template-oss/commit/4177f5bda25684b742dce408153a46d95f427c09) [#515](https://github.com/npm/template-oss/pull/515) do not request id-token if no publish (#515) (@wraithgar)
+* [`21fa419`](https://github.com/npm/template-oss/commit/21fa419c1d53e60f3e28ce566d5942da9a06d88a) [#511](https://github.com/npm/template-oss/pull/511) remove single-dash options from workflows (#511) (@owlstronaut)
+
 ## [4.24.3](https://github.com/npm/template-oss/compare/v4.24.2...v4.24.3) (2025-03-31)
 ### Bug Fixes
 * [`f0975da`](https://github.com/npm/template-oss/commit/f0975dabf5bca5621f5219b20e7596e534b4101c) allow eslint.config.js in npm project gitignore files (#508) (@owlstronaut)
