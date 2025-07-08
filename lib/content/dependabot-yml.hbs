@@ -5,7 +5,7 @@ updates:
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: daily
+      interval: {{ interval }}
     target-branch: "{{ branch }}"
     allow:
       - dependency-type: direct
