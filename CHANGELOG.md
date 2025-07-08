@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.25.0](https://github.com/npm/template-oss/compare/v4.24.4...v4.25.0) (2025-07-08)
+### Features
+* [`e7b430e`](https://github.com/npm/template-oss/commit/e7b430e6ceeb84768ab1192e3fdf0be5edbc3fdf) [#518](https://github.com/npm/template-oss/pull/518) Add `dependabotInterval` configuration (#518) (@owlstronaut)
+
 ## [4.24.4](https://github.com/npm/template-oss/compare/v4.24.3...v4.24.4) (2025-06-25)
 ### Bug Fixes
 * [`4177f5b`](https://github.com/npm/template-oss/commit/4177f5bda25684b742dce408153a46d95f427c09) [#515](https://github.com/npm/template-oss/pull/515) do not request id-token if no publish (#515) (@wraithgar)
