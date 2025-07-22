@@ -44,7 +44,7 @@
     "@npmcli/package-json": "^6.0.0",
     "@octokit/rest": "^19.0.4",
     "dedent": "^1.5.1",
-    "diff": "^7.0.0",
+    "diff": "^8.0.2",
     "glob": "^11.0.3",
     "handlebars": "^4.7.7",
     "hosted-git-info": "^8.0.0",
