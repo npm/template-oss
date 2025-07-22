@@ -77,9 +77,6 @@
   },
   "tap": {
     "timeout": 600,
-    "node-arg": [
-      "--no-experimental-fetch"
-    ],
     "exclude": [
       "workspace/test-workspace/**"
     ],

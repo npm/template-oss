@@ -55,6 +55,7 @@ const setup = t => {
       nock.recorder.clear()
       nock.restore()
     } else {
+      nock.cleanAll()
       nock.enableNetConnect()
     }
   })

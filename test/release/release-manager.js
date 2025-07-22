@@ -63,3 +63,17 @@ t.test('workspace names', async t => {
   execSync('npm init -y --workspace libnpmdiff', { cwd })
   t.resolveMatchSnapshot(releaseManager(t, { cwd, pr: 6923, repo: 'npm/cli' }))
 })
+
+t.test('wiki 500 error', async t => {
+  await t.rejects(releaseManager(t, { pr: 1, repo: 'test/repo' }), /Release process fetch failed with status: 500/)
+})
+
+t.test('prerelease filtering', async t => {
+  const result = await releaseManager(t, { pr: 207 })
+  t.matchSnapshot(result)
+})
+
+t.test('wiki with headers', async t => {
+  const result = await releaseManager(t, { pr: 207 })
+  t.matchSnapshot(result)
+})
