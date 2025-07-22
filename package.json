@@ -70,7 +70,7 @@
     "@npmcli/eslint-config": "^5.0.0",
     "@npmcli/template-oss": "file:./",
     "eslint-config-prettier": "^9.1.0",
-    "nock": "^13.3.8",
+    "nock": "^14.0.6",
     "prettier": "^3.2.5",
     "tap": "^21.0.1"
   },
