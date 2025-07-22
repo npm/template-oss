@@ -59,7 +59,6 @@
     "proc-log": "^5.0.0",
     "release-please": "16.15.0",
     "semver": "^7.3.5",
-    "undici": "^6.7.0",
     "yaml": "^2.1.1"
   },
   "files": [
