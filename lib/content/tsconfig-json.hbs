@@ -1,3 +1,21 @@
+{{#if jsdoc}}
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "node16",
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "strict": true,
+    "moduleResolution": "node16",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "types": ["node"]
+  },
+  "include": ["lib/**/*.js"]
+}
+{{else}}
 {
   "compilerOptions": {
     "jsx": "react",
@@ -15,3 +33,4 @@
     "module": "nodenext"
   }
 }
+{{/if}}
