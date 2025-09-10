@@ -5,7 +5,8 @@
     "module": "node16",
     "allowJs": true,
     "checkJs": true,
-    "noEmit": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
     "strict": true,
     "moduleResolution": "node16",
     "esModuleInterop": true,
@@ -13,7 +14,7 @@
     "skipLibCheck": true,
     "types": ["node"]
   },
-  "include": ["lib/**/*.js"]
+  "include": ["lib/**/*.js", "lib/**/*.ts"]
 }
 {{else}}
 {
