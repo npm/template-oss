@@ -39,7 +39,7 @@
     "@commitlint/config-conventional": "^19.2.2",
     "@isaacs/string-locale-compare": "^1.1.0",
     "@npmcli/arborist": "^9.1.2",
-    "@npmcli/git": "^6.0.0",
+    "@npmcli/git": "^7.0.0",
     "@npmcli/map-workspaces": "^5.0.0",
     "@npmcli/package-json": "^7.0.0",
     "@octokit/rest": "^22.0.0",
