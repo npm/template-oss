@@ -1,5 +1,23 @@
 # Changelog
 
+## [4.25.1](https://github.com/npm/template-oss/compare/v4.25.0...v4.25.1) (2025-09-18)
+### Bug Fixes
+* [`1c8f96d`](https://github.com/npm/template-oss/commit/1c8f96d27629a0590de30919d6d2d5c7d76f48ab) [#522](https://github.com/npm/template-oss/pull/522) use native fetch instead of undici (@owlstronaut)
+### Dependencies
+* [`729b8e7`](https://github.com/npm/template-oss/commit/729b8e7eec259546a05e75e8cec649c73f634180) [#527](https://github.com/npm/template-oss/pull/527) `@npmcli/git@7.0.0` (#527)
+* [`2ac2fd0`](https://github.com/npm/template-oss/commit/2ac2fd076ab8596c3b5bba31536886fdac029245) [#525](https://github.com/npm/template-oss/pull/525) `npm-package-arg@13.0.0`
+* [`289aaae`](https://github.com/npm/template-oss/commit/289aaaeef0c8aa07dcf60b8a584850682850b354) [#525](https://github.com/npm/template-oss/pull/525) `hosted-git-info@9.0.0`
+* [`f0d3f14`](https://github.com/npm/template-oss/commit/f0d3f14907d2e9e89ce241da6ea3c62809574182) [#525](https://github.com/npm/template-oss/pull/525) `@npmcli/package-json@7.0.0`
+* [`629d83e`](https://github.com/npm/template-oss/commit/629d83e2686838662a9df56ad7455bfa6e83b209) [#525](https://github.com/npm/template-oss/pull/525) `@npmcli/map-workspaces@5.0.0`
+* [`aaa8fa5`](https://github.com/npm/template-oss/commit/aaa8fa58fe6ea076508c84aba726a88376dd685c) [#522](https://github.com/npm/template-oss/pull/522) `nock@14.0.6`
+* [`94f5484`](https://github.com/npm/template-oss/commit/94f548483ce966109feb4119ebb6fa0ca3edc401) [#522](https://github.com/npm/template-oss/pull/522) `@octokit/rest@22.0.0`
+* [`e9c360b`](https://github.com/npm/template-oss/commit/e9c360b9881db839d0b296435e5f7a523127cd8c) [#522](https://github.com/npm/template-oss/pull/522) remove undici
+* [`1617bd5`](https://github.com/npm/template-oss/commit/1617bd560088e3136dc5d72175fe225a46500cdd) [#521](https://github.com/npm/template-oss/pull/521) `diff@8.0.2`
+* [`c3f8175`](https://github.com/npm/template-oss/commit/c3f8175c2b754171a1593150073f27d214a30182) [#521](https://github.com/npm/template-oss/pull/521) `release-please@17.1.1`
+* [`6bdb74f`](https://github.com/npm/template-oss/commit/6bdb74f590332e603c486ea40d0e7a9d24c7656a) [#521](https://github.com/npm/template-oss/pull/521) `glob@11.0.3`
+* [`69d1d04`](https://github.com/npm/template-oss/commit/69d1d04b0ab832728aa159bd792ab8d0d1682cb2) [#521](https://github.com/npm/template-oss/pull/521) `minimatch@10.0.3`
+* [`e7118d1`](https://github.com/npm/template-oss/commit/e7118d194fc844734c3400435cc4917bb2871c0d) [#520](https://github.com/npm/template-oss/pull/520) `@npmcli/arborist@9.1.2` (#520)
+
 ## [4.25.0](https://github.com/npm/template-oss/compare/v4.24.4...v4.25.0) (2025-07-08)
 ### Features
 * [`e7b430e`](https://github.com/npm/template-oss/commit/e7b430e6ceeb84768ab1192e3fdf0be5edbc3fdf) [#518](https://github.com/npm/template-oss/pull/518) Add `dependabotInterval` configuration (#518) (@owlstronaut)
