@@ -17,8 +17,16 @@
     {{/if}}
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
+    {{#if isNodeTest}}
+    "snap": "node --test --test-update-snapshots",
+    "test": "node --test --test-timeout=3000",
+    "test:cover": "node --test --experimental-test-coverage --test-timeout=3000 --test-coverage-lines=100 --test-coverage-functions=100 --test-coverage-branches=100",
+    {{else}}
     "snap": "{{#if typescript}}{{#if tap16}}c8 {{/if}}{{/if}}tap",
     "test": "{{#if typescript}}{{#if tap16}}c8 {{/if}}{{/if}}tap",
+    "test:cover": {{{ del }}},
+    "test:nocover": {{{ del }}},
+    {{/if}}
     "posttest": "{{ localNpmPath }} run lint",
     {{#if isRootMono}}
     "test-all": "{{ localNpmPath }} run test {{ allFlags }}",
@@ -40,6 +48,10 @@
   },
   "templateVersion": {{{ del }}},
   "standard": {{{ del }}},
+  {{#if isNodeTest}}
+  "nyc": {{{ del }}},
+  "tap": {{{ del }}}
+  {{else}}
   "nyc": {{#if tap18}}{
     "exclude": {{{ json workspaceGlobs }}}
   }{{else}}{{{ del }}}{{/if}},
@@ -78,4 +90,5 @@
       "tap-snapshots/**"
     ]{{/if}}
   }
+  {{/if}}
 }

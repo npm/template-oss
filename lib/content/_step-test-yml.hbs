@@ -1,4 +1,15 @@
+{{#unless isNodeTest}}
 - name: Add Problem Matcher
   run: echo "::add-matcher::.github/matchers/tap.json"
+{{/unless}}
+{{#if isNodeTest}}
+- name: Test (with coverage on Node >= 24)
+  if: $\{{ fromJSON(matrix.node-version) >= 24 }}
+  run: {{ rootNpmPath }} run test:cover --ignore-scripts {{~#if jobRunFlags}} {{ jobRunFlags }}{{/if}}
+- name: Test (without coverage on Node < 24)
+  if: $\{{ fromJSON(matrix.node-version) < 24 }}
+  run: {{ rootNpmPath }} test --ignore-scripts {{~#if jobRunFlags}} {{ jobRunFlags }}{{/if}}
+{{else}}
 - name: Test
   run: {{ rootNpmPath }} test --ignore-scripts {{~#if jobRunFlags}} {{ jobRunFlags }}{{/if}}
+{{/if}}
