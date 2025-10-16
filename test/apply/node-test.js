@@ -15,7 +15,7 @@ t.test('node:test runner', async t => {
   const pkg = await s.readJson('package.json')
 
   // Verify test scripts are for node:test
-  t.equal(pkg.scripts.test, 'node --test --test-timeout=3000')
+  t.equal(pkg.scripts.test, 'node --test')
   t.equal(
     pkg.scripts['test:cover'],
     'node --test --experimental-test-coverage --test-timeout=3000 --test-coverage-lines=100 --test-coverage-functions=100 --test-coverage-branches=100',

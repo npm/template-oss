@@ -21,8 +21,8 @@ t.test('CI workflow with node:test does not include tap matcher', async t => {
   // Verify conditional test steps for coverage
   t.match(ciWorkflow, /Test \(with coverage on Node >= 24\)/, 'should have test with coverage step for Node >= 24')
   t.match(ciWorkflow, /Test \(without coverage on Node < 24\)/, 'should have test without coverage step for Node < 24')
-  t.match(ciWorkflow, 'fromJSON(matrix.node-version) >= 24', 'should check if Node version >= 24')
-  t.match(ciWorkflow, 'fromJSON(matrix.node-version) < 24', 'should check if Node version < 24')
+  t.match(ciWorkflow, "startsWith(matrix.node-version, '24')", 'should check if Node version starts with 24')
+  t.match(ciWorkflow, "!startsWith(matrix.node-version, '24')", 'should check if Node version does not start with 24')
   t.match(ciWorkflow, /test:cover/, 'should use test:cover script for Node >= 24')
 })
 

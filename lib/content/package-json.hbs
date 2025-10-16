@@ -19,7 +19,7 @@
     "template-oss-apply": "template-oss-apply --force",
     {{#if isNodeTest}}
     "snap": "node --test --test-update-snapshots",
-    "test": "node --test --test-timeout=3000",
+    "test": "node --test",
     "test:cover": "node --test --experimental-test-coverage --test-timeout=3000 --test-coverage-lines=100 --test-coverage-functions=100 --test-coverage-branches=100",
     {{else}}
     "snap": "{{#if typescript}}{{#if tap16}}c8 {{/if}}{{/if}}tap",
