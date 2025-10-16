@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.26.0](https://github.com/npm/template-oss/compare/v4.25.1...v4.26.0) (2025-10-16)
+### Features
+* [`f3f2f25`](https://github.com/npm/template-oss/commit/f3f2f25f51f2b01565fd1724d40873808f6ad0ca) [#529](https://github.com/npm/template-oss/pull/529) adds testRunner config to specify using node:test (@owlstronaut)
+
 ## [4.25.1](https://github.com/npm/template-oss/compare/v4.25.0...v4.25.1) (2025-09-18)
 ### Bug Fixes
 * [`1c8f96d`](https://github.com/npm/template-oss/commit/1c8f96d27629a0590de30919d6d2d5c7d76f48ab) [#522](https://github.com/npm/template-oss/pull/522) use native fetch instead of undici (@owlstronaut)
