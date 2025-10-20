@@ -15,12 +15,12 @@ t.test('node:test runner', async t => {
   const pkg = await s.readJson('package.json')
 
   // Verify test scripts are for node:test
-  t.equal(pkg.scripts.test, 'node --test ./test/**/*.js')
+  t.equal(pkg.scripts.test, "node --test './test/**/*.js'")
   t.equal(
     pkg.scripts['test:cover'],
-    'node --test --experimental-test-coverage --test-timeout=3000 --test-coverage-lines=100 --test-coverage-functions=100 --test-coverage-branches=100 ./test/**/*.js',
+    "node --test --experimental-test-coverage --test-timeout=3000 --test-coverage-lines=100 --test-coverage-functions=100 --test-coverage-branches=100 './test/**/*.js'",
   )
-  t.equal(pkg.scripts.snap, 'node --test --test-update-snapshots ./test/**/*.js')
+  t.equal(pkg.scripts.snap, "node --test --test-update-snapshots './test/**/*.js'")
 
   // Verify tap section is removed
   t.notOk(pkg.tap, 'tap section should not be present')
@@ -51,13 +51,13 @@ t.test('node:test runner with incomplete coverage', async t => {
   const pkg = await s.readJson('package.json')
 
   // Verify test scripts are for node:test
-  t.equal(pkg.scripts.test, 'node --test ./test/**/*.js')
+  t.equal(pkg.scripts.test, "node --test './test/**/*.js'")
   t.equal(
     pkg.scripts['test:cover'],
-    'node --test --experimental-test-coverage --test-timeout=3000 ./test/**/*.js',
+    "node --test --experimental-test-coverage --test-timeout=3000 './test/**/*.js'",
     'test:cover should not include coverage thresholds when coverageThreshold is 0',
   )
-  t.equal(pkg.scripts.snap, 'node --test --test-update-snapshots ./test/**/*.js')
+  t.equal(pkg.scripts.snap, "node --test --test-update-snapshots './test/**/*.js'")
 })
 
 t.test('tap runner (default)', async t => {
