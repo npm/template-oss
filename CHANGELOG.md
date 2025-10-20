@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.27.0](https://github.com/npm/template-oss/compare/v4.26.1...v4.27.0) (2025-10-20)
+### Features
+* [`2e563b4`](https://github.com/npm/template-oss/commit/2e563b4defe381f18f49ccaa5ffc5d0c93d262dd) [#533](https://github.com/npm/template-oss/pull/533) adds coverageThreshold as a config, uses non-workspace dir for tests (#533) (@owlstronaut)
+
 ## [4.26.1](https://github.com/npm/template-oss/compare/v4.26.0...v4.26.1) (2025-10-20)
 ### Bug Fixes
 * [`eeb4266`](https://github.com/npm/template-oss/commit/eeb426620b7145cfa54821332993f5d2ab98c59a) [#531](https://github.com/npm/template-oss/pull/531) uses ci-friendly startsWith instead of fromJSON (#531) (@owlstronaut)
