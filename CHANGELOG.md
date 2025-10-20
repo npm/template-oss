@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.26.1](https://github.com/npm/template-oss/compare/v4.26.0...v4.26.1) (2025-10-20)
+### Bug Fixes
+* [`eeb4266`](https://github.com/npm/template-oss/commit/eeb426620b7145cfa54821332993f5d2ab98c59a) [#531](https://github.com/npm/template-oss/pull/531) uses ci-friendly startsWith instead of fromJSON (#531) (@owlstronaut)
+
 ## [4.26.0](https://github.com/npm/template-oss/compare/v4.25.1...v4.26.0) (2025-10-16)
 ### Features
 * [`f3f2f25`](https://github.com/npm/template-oss/commit/f3f2f25f51f2b01565fd1724d40873808f6ad0ca) [#529](https://github.com/npm/template-oss/pull/529) adds testRunner config to specify using node:test (@owlstronaut)
