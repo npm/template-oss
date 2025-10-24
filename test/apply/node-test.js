@@ -16,6 +16,7 @@ t.test('node:test runner', async t => {
 
   // Verify test scripts are for node:test
   t.equal(pkg.scripts.test, "node --test './test/**/*.js'")
+  t.equal(pkg.scripts['test:node20'], 'node --test test')
   t.equal(
     pkg.scripts['test:cover'],
     "node --test --experimental-test-coverage --test-timeout=3000 --test-coverage-lines=100 --test-coverage-functions=100 --test-coverage-branches=100 './test/**/*.js'",
@@ -52,6 +53,7 @@ t.test('node:test runner with incomplete coverage', async t => {
 
   // Verify test scripts are for node:test
   t.equal(pkg.scripts.test, "node --test './test/**/*.js'")
+  t.equal(pkg.scripts['test:node20'], 'node --test test')
   t.equal(
     pkg.scripts['test:cover'],
     "node --test --experimental-test-coverage --test-timeout=3000 './test/**/*.js'",
