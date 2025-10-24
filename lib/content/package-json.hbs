@@ -20,6 +20,7 @@
     {{#if isNodeTest}}
     "snap": "node --test --test-update-snapshots './test/**/*.js'",
     "test": "node --test './test/**/*.js'",
+    "test:node20": "node --test test",
     "test:cover": "node --test --experimental-test-coverage --test-timeout=3000{{#if coverageThreshold}} --test-coverage-lines={{coverageThreshold}} --test-coverage-functions={{coverageThreshold}} --test-coverage-branches={{coverageThreshold}}{{/if}} './test/**/*.js'",
     {{else}}
     "snap": "{{#if typescript}}{{#if tap16}}c8 {{/if}}{{/if}}tap",

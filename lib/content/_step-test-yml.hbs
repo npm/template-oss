@@ -6,8 +6,11 @@
 - name: Test (with coverage on Node >= 24)
   if: $\{{ startsWith(matrix.node-version, '24') }}
   run: {{ rootNpmPath }} run test:cover --ignore-scripts {{~#if jobRunFlags}} {{ jobRunFlags }}{{/if}}
-- name: Test (without coverage on Node < 24)
-  if: $\{{ !startsWith(matrix.node-version, '24') }}
+- name: Test (on Node 20 with globbing workaround)
+  if: $\{{ startsWith(matrix.node-version, '20') }}
+  run: {{ rootNpmPath }} run test:node20 --ignore-scripts {{~#if jobRunFlags}} {{ jobRunFlags }}{{/if}}
+- name: Test
+  if: $\{{ !startsWith(matrix.node-version, '24') && !startsWith(matrix.node-version, '20') }}
   run: {{ rootNpmPath }} test --ignore-scripts {{~#if jobRunFlags}} {{ jobRunFlags }}{{/if}}
 {{else}}
 - name: Test
