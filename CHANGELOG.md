@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.28.0](https://github.com/npm/template-oss/compare/v4.27.1...v4.28.0) (2025-10-29)
+### Features
+* [`dccde95`](https://github.com/npm/template-oss/commit/dccde954df3085bb0de4f6c20867038ca401574c) [#537](https://github.com/npm/template-oss/pull/537) adds script to run tests with node 20 correctly (@owlstronaut)
+
 ## [4.27.1](https://github.com/npm/template-oss/compare/v4.27.0...v4.27.1) (2025-10-20)
 ### Bug Fixes
 * [`c9ae7dc`](https://github.com/npm/template-oss/commit/c9ae7dc210e3bfb9de7f25eb33e9905ae3fdd0b5) [#535](https://github.com/npm/template-oss/pull/535) some test folders need quotes for correct globbing (#535) (@owlstronaut)
