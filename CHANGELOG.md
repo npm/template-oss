@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.28.1](https://github.com/npm/template-oss/compare/v4.28.0...v4.28.1) (2025-11-21)
+### Dependencies
+* [`06ab9b5`](https://github.com/npm/template-oss/commit/06ab9b51d9297d7789b117ff622de42e5d7be9f0) [#546](https://github.com/npm/template-oss/pull/546) bump ini from 5.0.0 to 6.0.0 (#546) (@dependabot[bot])
+* [`d0dc345`](https://github.com/npm/template-oss/commit/d0dc345710fe8b8a87edd423ea63b61796e82c71) [#541](https://github.com/npm/template-oss/pull/541) bump @commitlint/cli from 19.8.1 to 20.1.0 (#541) (@dependabot[bot])
+* [`0c603c7`](https://github.com/npm/template-oss/commit/0c603c7460294e85bd461662bd529105716e43a3) [#544](https://github.com/npm/template-oss/pull/544) bump proc-log from 5.0.0 to 6.0.0 (#544) (@dependabot[bot])
+* [`1137f1b`](https://github.com/npm/template-oss/commit/1137f1b6c507104b31f5db7f415ed5bc7cb2901e) [#540](https://github.com/npm/template-oss/pull/540) bump @commitlint/config-conventional from 19.8.1 to 20.0.0 (#540) (@dependabot[bot])
+* [`a45855f`](https://github.com/npm/template-oss/commit/a45855f83af1195e211bd19899e6d33f914541b6) [#539](https://github.com/npm/template-oss/pull/539) bump json-parse-even-better-errors from 4.0.0 to 5.0.0 (#539) (@dependabot[bot])
+* [`0cf63fe`](https://github.com/npm/template-oss/commit/0cf63feb275d0a8b046ec1e9a639340b53576d15) [#543](https://github.com/npm/template-oss/pull/543) bump glob from 11.1.0 to 13.0.0 (#543) (@dependabot[bot])
+### Chores
+* [`26a8165`](https://github.com/npm/template-oss/commit/26a8165de1dbe2fe182471c026d23dff2807d843) [#542](https://github.com/npm/template-oss/pull/542) bump @npmcli/eslint-config from 5.1.0 to 6.0.1 (#542) (@dependabot[bot])
+* [`7723c1c`](https://github.com/npm/template-oss/commit/7723c1cc5f7493937390579e8b88170fd6fe02c6) [#545](https://github.com/npm/template-oss/pull/545) bump eslint-config-prettier from 9.1.2 to 10.1.8 (#545) (@dependabot[bot])
+
 ## [4.28.0](https://github.com/npm/template-oss/compare/v4.27.1...v4.28.0) (2025-10-29)
 ### Features
 * [`dccde95`](https://github.com/npm/template-oss/commit/dccde954df3085bb0de4f6c20867038ca401574c) [#537](https://github.com/npm/template-oss/pull/537) adds script to run tests with node 20 correctly (@owlstronaut)
