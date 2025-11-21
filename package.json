@@ -48,7 +48,7 @@
     "glob": "^13.0.0",
     "handlebars": "^4.7.7",
     "hosted-git-info": "^9.0.0",
-    "ini": "^5.0.0",
+    "ini": "^6.0.0",
     "json-parse-even-better-errors": "^5.0.0",
     "just-deep-map-values": "^1.1.1",
     "just-diff": "^6.0.0",
