@@ -34,7 +34,7 @@
   "author": "GitHub Inc.",
   "license": "ISC",
   "dependencies": {
-    "@actions/core": "^1.9.1",
+    "@actions/core": "^2.0.0",
     "@commitlint/cli": "^20.1.0",
     "@commitlint/config-conventional": "^20.0.0",
     "@isaacs/string-locale-compare": "^1.1.0",
