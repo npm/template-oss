@@ -480,7 +480,7 @@ jobs:
             os: macos-latest
             shell: bash
           - name: macOS
-            os: macos-13
+            os: macos-15-intel
             shell: bash
           - name: Windows
             os: windows-latest
@@ -488,7 +488,7 @@ jobs:
         node-version:
           - 22.x
         exclude:
-          - platform: { name: macOS, os: macos-13, shell: bash }
+          - platform: { name: macOS, os: macos-15-intel, shell: bash }
             node-version: 22.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
@@ -602,7 +602,7 @@ jobs:
             os: macos-latest
             shell: bash
           - name: macOS
-            os: macos-13
+            os: macos-15-intel
             shell: bash
           - name: Windows
             os: windows-latest
@@ -610,7 +610,7 @@ jobs:
         node-version:
           - 22.x
         exclude:
-          - platform: { name: macOS, os: macos-13, shell: bash }
+          - platform: { name: macOS, os: macos-15-intel, shell: bash }
             node-version: 22.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
@@ -1923,7 +1923,7 @@ jobs:
             os: macos-latest
             shell: bash
           - name: macOS
-            os: macos-13
+            os: macos-15-intel
             shell: bash
           - name: Windows
             os: windows-latest
@@ -1931,7 +1931,7 @@ jobs:
         node-version:
           - 22.x
         exclude:
-          - platform: { name: macOS, os: macos-13, shell: bash }
+          - platform: { name: macOS, os: macos-15-intel, shell: bash }
             node-version: 22.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
@@ -2032,7 +2032,7 @@ jobs:
             os: macos-latest
             shell: bash
           - name: macOS
-            os: macos-13
+            os: macos-15-intel
             shell: bash
           - name: Windows
             os: windows-latest
@@ -2040,7 +2040,7 @@ jobs:
         node-version:
           - 22.x
         exclude:
-          - platform: { name: macOS, os: macos-13, shell: bash }
+          - platform: { name: macOS, os: macos-15-intel, shell: bash }
             node-version: 22.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
@@ -2159,7 +2159,7 @@ jobs:
             os: macos-latest
             shell: bash
           - name: macOS
-            os: macos-13
+            os: macos-15-intel
             shell: bash
           - name: Windows
             os: windows-latest
@@ -2167,7 +2167,7 @@ jobs:
         node-version:
           - 22.x
         exclude:
-          - platform: { name: macOS, os: macos-13, shell: bash }
+          - platform: { name: macOS, os: macos-15-intel, shell: bash }
             node-version: 22.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
@@ -2287,7 +2287,7 @@ jobs:
             os: macos-latest
             shell: bash
           - name: macOS
-            os: macos-13
+            os: macos-15-intel
             shell: bash
           - name: Windows
             os: windows-latest
@@ -2295,7 +2295,7 @@ jobs:
         node-version:
           - 22.x
         exclude:
-          - platform: { name: macOS, os: macos-13, shell: bash }
+          - platform: { name: macOS, os: macos-15-intel, shell: bash }
             node-version: 22.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
@@ -3623,7 +3623,7 @@ jobs:
             os: macos-latest
             shell: bash
           - name: macOS
-            os: macos-13
+            os: macos-15-intel
             shell: bash
           - name: Windows
             os: windows-latest
@@ -3631,7 +3631,7 @@ jobs:
         node-version:
           - 22.x
         exclude:
-          - platform: { name: macOS, os: macos-13, shell: bash }
+          - platform: { name: macOS, os: macos-15-intel, shell: bash }
             node-version: 22.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
@@ -3732,7 +3732,7 @@ jobs:
             os: macos-latest
             shell: bash
           - name: macOS
-            os: macos-13
+            os: macos-15-intel
             shell: bash
           - name: Windows
             os: windows-latest
@@ -3740,7 +3740,7 @@ jobs:
         node-version:
           - 22.x
         exclude:
-          - platform: { name: macOS, os: macos-13, shell: bash }
+          - platform: { name: macOS, os: macos-15-intel, shell: bash }
             node-version: 22.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
@@ -3859,7 +3859,7 @@ jobs:
             os: macos-latest
             shell: bash
           - name: macOS
-            os: macos-13
+            os: macos-15-intel
             shell: bash
           - name: Windows
             os: windows-latest
@@ -3867,7 +3867,7 @@ jobs:
         node-version:
           - 22.x
         exclude:
-          - platform: { name: macOS, os: macos-13, shell: bash }
+          - platform: { name: macOS, os: macos-15-intel, shell: bash }
             node-version: 22.x
     runs-on: \${{ matrix.platform.os }}
     defaults:
