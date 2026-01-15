@@ -21,6 +21,9 @@ module.exports = {
     },
   },
   {{/if}}
+  {{#if jsdoc}}
+  parser: '@typescript-eslint/parser',
+  {{/if}}
   extends: [
     '@npmcli',
     ...localConfigs,
