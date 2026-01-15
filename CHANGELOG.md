@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.29.0](https://github.com/npm/template-oss/compare/v4.28.1...v4.29.0) (2026-01-15)
+### Features
+* [`040af67`](https://github.com/npm/template-oss/commit/040af67c26794607522bafa12227f717e6c0313a) [#551](https://github.com/npm/template-oss/pull/551) move node14 tests to macos-15-intel (#551) (@wraithgar)
+### Dependencies
+* [`ed24fbf`](https://github.com/npm/template-oss/commit/ed24fbf03cea13a3f0664e2956ec0ebc7862588a) [#549](https://github.com/npm/template-oss/pull/549) bump @actions/core from 1.11.1 to 2.0.0 (#549) (@dependabot[bot])
+
 ## [4.28.1](https://github.com/npm/template-oss/compare/v4.28.0...v4.28.1) (2025-11-21)
 ### Dependencies
 * [`06ab9b5`](https://github.com/npm/template-oss/commit/06ab9b51d9297d7789b117ff622de42e5d7be9f0) [#546](https://github.com/npm/template-oss/pull/546) bump ini from 5.0.0 to 6.0.0 (#546) (@dependabot[bot])
