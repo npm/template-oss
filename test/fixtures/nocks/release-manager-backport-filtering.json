@@ -1,0 +1,52 @@
+[
+  {
+    "scope": "https://api.github.com:443",
+    "method": "GET",
+    "path": "/repos/npm/npm-cli-release-please/pulls/207",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b0800e726bb6902ffed5c0b93dbb611fe2b1c7a3293734fe29b22394e72769c57a7f625cea593f8e2a1411294605104c387545973ffbd0b10a4a8b3ecb38e749ba68ced4800816f178bc5ee020b6a275779227bf2a22cb3c253149491e99c948b2a988674a5e438a38592662bf66f12266492e304a3024f32fea1645592148aaecee4739944b2a7d9aaa3eb334b75cfe59446d86795f28f2ffce5e6e9e5f7d6e6b79563c5baf58706ed17e52af10fc97748df4154d08c481cf7c298320400ca50192efa2171082687a2a8b0df4fae1ca3116c5aad029ccb1e94cee5a2442506e430a1058ee06942c3257cf1cabcc2e77249ca843f5ed01c7b928095cca93655a1715530a01d749a93149ad53c4d5058129a16d7012d5f89993435c7757447efcee3b3a7cfec9f56aefafce937e6e5d57c7bf9f4872fa0395aa312e5b747cc2b0b316a4637a46989d3920b80a48a6619b6f3d5fa0b1310e6b9c0e064189f1f921e032b9443d63fb39e00f39f594fef542c9465b73b439f982609dd00ae7f7fd24a0bd2029274de1f1040760a2d1718640ccd6f98c04851f6629503ecf807089d418262e5398efa800a08607693029f3baee71cbb0a8a3027196fdf8b42170880693e4729798b7a030310c3e30bb30f0e070020bc0655ef855423ec942c276b146e6f387721266b98a3fee8b7a000bcdc66cc703ca1a5b013fe9ae08d2faab32a4848c8a69294d847d18a998f182505be3997031a6da18d975340f7a41fa4055a6329cc3198aa4842ad157a18609c3d840f4ab387bfa793c9e4f794fd7914e11291a4f8f25151ad5628df7ec9edd523a529b2460f1e48d7bcfad5e7a71968789ca11c2b6b73aa4ecde974bae63067d2e7baaa1b134d9be8d6594de181f42df05ce5b860e587d2f5ebd8356377e6bcbe07d1152915d1dd080cdd08a248736307abc14c8fe300e15964e858b543cb0466ae1fe8a6752a95daf798d69954d22a5c4839a5a5f4f945522df11296e2b668c7f51467388d701a92766c1b9a2f8b0c85f854aaa25828259a2bd9726e4fd60613ed9927bdbe803ed085575ff0dad7c312d3266b9b4f1f1063c50b5e1a98883e595bc0bb2588e817bc343011b3233656fc24e2b20e89582d9171398dcb695c4e832da75a2dbe665177abecaa16a2d90cdf57d94577645a5843dacc8a1cc74541a09ab32074433bd266b66adbba7b265559049e562af12a4be0cb8416c571b5fdf3f2f748696280e30101d34d4fb28f8705761f3bd62c82da987597c4ff95457b52cda56fc9bff6039b059a8654f7be0313dd67a6e61a86a93a9a1ac4768c31527164464ea0da2ad6e0f9400363f3f69f37d5ef356ca3568e5af9e7d3cad1497d7227a57b1297f6bb4e8a57f730076256853968e7f8a839f894da654ceac8ff56786a5c989d9dc5ffcd60c725f5c99794e1495cdac78e83a0ba879689d9356a2d6be7faa896bde389506c878e716f4f24ba07487742dbc596ed18ce4cd7e2c00db115ce34473391a63bf61973228654f7fa0bceaee549c6f1d9357aceaed8ab89d96d776e4767f77f5a84e62713a1792042f3af2b42fb9389d03e10a1fd9710213fb8bf5a9042faf185b4418534c729cef961ff065894ae5f8803ff1ff9c7d101cc299dc3d38c14ca21ff6753e9678ca5eb8886d50aa725cfed9c06f1e036a27c2e8b6c848f4ad9935bd9ab57aae699a667cc5eb2ac0717c4ed36f695aa7aaae3590e6b53e75d3fd86485f3b96892c2864054f8f5bcf8c50241d7400fddc8501d279a69ae861d75a6c6288c5cc3b1b0613a218ac2d0526d9da5578b82cc538c1bb4a65cc8def52b9614faa3c205633bc72c63c3d28fdef53ec5bb9f4791d9b54c5d539dc3bcee4ff63f7f7d9e846f7e519fbdf96673f9f88b7be6752ba546ef91d73de0f7c3a9dc83a6276570f73def9fb47d07a34f9eb603d62b35dbc1192e1bdb05ed9b80ed609d9a73ed743d3dcddae93c4c66f5809bf724537f61d72d4ecba61eace812a39558e6090a7052af6c7e3dc39cd9b6a3aaeeacbb90fff1b873d1c6790cff3df9bafcd9a03fddb5f4eebc90529357505552f1c4fb4c57d9c60bb49edd51412b36b0ee7369ff34a409cde1318ed81f766f07c7a84a4a3168566eb5aa36734c0e2b92801868da5abe2847f1be4f6d4f0b7fa01b4cc26fd61ac9278b55dcad0d2752100a724862100a0dfa4ea92f0cddc8b58c0618c2fe3a52770cec2a12a8765ff0064671f4c0b56c708c0e0e4c4b334dd335dc28743553d371acb926c69aa607ec4ad402a388df63626a09b401da3b849d4c821ca5e1021793c90ac1fa62328fa1e99dcd6a077d0233b72f550133c2d5daea0c3675eaa1affd667bb974b72ff56f2bf46bb688be4bd6c19bdf36cfdfce8d676f1edfdbef0a523d1c6fcdf69db7f24e75b56ce6efed63f79dfb385786d2cbab3280e1dc2947ebeb4719c8a90e94f539dd73b25ec3b8cc9afe7b7ce565470227df4062a3624b90c7b7866ae886ad69dd65f7c25fce8563dcecddd5718bc494142caabf6fa4bcb7211708bb90299c12578ed1188cc6603406ff356370df8be5f2ad38547e2c31014931cda5122251d0baf62a63dd432a70c9aa0b89a6129212188bf41d29bfaf02de732af14312f89bd252426159a124d94a9cf962c1ae46a6db0d28319ef2a5902f5b33d22ba212607de3328e01584bbced0bc52076ecff62b5c17e0022379a23d82df4c53ec0da1d141929be85ea49a2de86816251da5baa1ca37d4be06396cbc746e7cdb2dc47ff83a0b74bb33d77ea09d8e2ec94c6783731784fe4066627bef1f947f3ded38fb8650d121af48582b60ac7d929b0cda8fd56e90fc02303663007b8b0e1190297c1b4b865de5f0338b339d700813af4567227701394ce2b34ef0ddce28850618edee27c006e05103789699993a01ac422eea1f621493000c37ba45ba1ce30c09970f7c39cec08948315310c32d3dfdbe8039db41c3bc4a95dc5304745c2571c3f2be25b8821b48fc128bbbf65a85c08d9b074587fd1f0a4da2e80d2cd743addb153a09b26e1d297ef1a84f9b93c5c4020d7136ed7c04018b54225df22c48cd908b60c0945515f7e5b9c4643860923ba1ac1cf1587389bec82b6a7babd27ac05eac243a44d62127eccdee94e0a0758bbaf0a9286f81c42f873d0c3928404f41b82ffdacfb0e3717f883376180c5ae17a53555f46ea09dbc0ec943af88e7096d0ed10c6aa837424c3aa4f5467a2bb57dacc33544f3f9a61b526aa097faf54d3d31dcfb05f72ad637ba36e137da2cfae34c7532d4f355e0a535eb30edf3e767bc786c6dc56b1d8f7bdd8f7f4eeec1926a06cf7d9583694d7e93db7a50bbac219841ff5f14d41dec237c7742df5201a09699582d09c7379c35e453eac6a221880f83b5aa39fb9bb65d0a8f0eb95dfbc42cc6ab29cbec1617950b737389dca0d5992838e3c486ab6b1bc1b29c20a427e76b4d1d4d7db53c19cc66c429e5371c82592dcb5f56cdf6b06141424acdc1cb46538158c3740208d8484382df6a9727658c42cf092e5a1041429fce6aa438bb6c1419b9f87cd098d639f65e148dea158d28c842c03d71c1bcaafcee53529484012526ebba712f5d6998dacc32667b099193e27220be6d7bb1500e019881bf646259bf75bf98d63590c65ada96dcae2636f6d8f298bf194723ca51c531663ca623406a33118531663ca624c598c298b316531a62cc694c598b218531663ca624c598c298b316531a62cc694c598b21853161f97b2f0139232849d5ce024669f8b3a55d1ffb785c501c911cc137f30f846f89d01b8ebfc42efcd3e941a1478ffaecdcd3bef240d29df0fd0198cccbbd1db4d1b340f3e16520fa5d95a0d807ffa3b4a6c49a0aa5c808d4045414382c409ddd797cfaf5efcf0e497abcb17326f427d1ec7b506202c590cc67ed61916342a9a37e29af78adbc5cd8bccc234cf73ccc2cc6e4ddbc46f7e36ba4a972918c5fd5bcac1b669bc572ded88ba8121604bbd847f38f74394fa2b1a91787bfb753cde1b4511a94f863dcd5499d548b028eb06345d806507da310b87d88f86dffc1b8daeb7b9885c0000"
+    ],
+    "rawHeaders": {
+      "access-control-allow-origin": "*",
+      "access-control-expose-headers": "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset",
+      "cache-control": "private, max-age=60, s-maxage=60",
+      "content-encoding": "gzip",
+      "content-security-policy": "default-src 'none'",
+      "content-type": "application/json; charset=utf-8",
+      "date": "Tue, 22 Jul 2025 21:22:50 GMT",
+      "etag": "W/\"26420892d5243dd7239746568a6d115d69f584cc33dbf79cf7d67b967a94c763\"",
+      "github-authentication-token-expiration": "2025-08-21 21:15:02 UTC",
+      "last-modified": "Sun, 26 Nov 2023 00:08:58 GMT",
+      "referrer-policy": "origin-when-cross-origin, strict-origin-when-cross-origin",
+      "server": "github.com",
+      "strict-transport-security": "max-age=31536000; includeSubdomains; preload",
+      "transfer-encoding": "chunked",
+      "vary": "Accept, Authorization, Cookie, X-GitHub-OTP,Accept-Encoding, Accept, X-Requested-With",
+      "x-accepted-oauth-scopes": "",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "deny",
+      "x-github-api-version-selected": "2022-11-28",
+      "x-github-media-type": "github.v3; format=json",
+      "x-github-request-id": "FC58:28958:73502A:7899AA:6880012A",
+      "x-oauth-scopes": "admin:gpg_key, admin:ssh_signing_key, audit_log, codespace, copilot, delete:packages, gist, notifications, project, repo, user, workflow, write:discussion, write:network_configurations, write:packages",
+      "x-ratelimit-limit": "5000",
+      "x-ratelimit-remaining": "4894",
+      "x-ratelimit-reset": "1753220116",
+      "x-ratelimit-resource": "core",
+      "x-ratelimit-used": "106",
+      "x-xss-protection": "0"
+    },
+    "responseIsBinary": false
+  },
+  {
+    "scope": "https://raw.githubusercontent.com:443",
+    "method": "GET",
+    "path": "/wiki/npm/npm-cli-release-please/Release-Process.md",
+    "body": "",
+    "status": 200,
+    "response": "## Overview\n\nSome overview text here.\n\n### Release the CLI\n\n1. Checkout the release branch\n\n    ```sh\n    gh pr checkout <PR-NUMBER> --force\n    ```\n\n1. Publish\n\n    ```sh\n    npm publish <PUBLISH-FLAGS>\n    ```\n\n1. Set `latest` dist-tag\n\n    <!-- NOT FOR BACKPORT -->\n\n    > **Warning**:\n    > NOT FOR PRERELEASE: Do not run this step for prereleases.\n\n    ```sh\n    node . dist-tag add npm@<X.Y.Z> latest\n    ```\n\n1. Trigger docs update\n\n    <!-- NOT FOR BACKPORT -->\n\n    ```sh\n    gh workflow run update-cli.yml --repo npm/documentation\n    ```\n\n1. Merge release PR\n\n    ```sh\n    gh pr merge <PR-NUMBER> --rebase\n    ```\n\n1. Mark GitHub Release as latest\n\n    <!-- NOT FOR BACKPORT -->\n\n    ```sh\n    gh release edit v<X.Y.Z> --latest\n    ```\n",
+    "rawHeaders": []
+  }
+]
