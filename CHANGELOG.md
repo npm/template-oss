@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.30.0](https://github.com/npm/template-oss/compare/v4.29.0...v4.30.0) (2026-03-19)
+### Features
+* [`6bc2bc0`](https://github.com/npm/template-oss/commit/6bc2bc00ae7b481fcdadfff6e7178e2e294211d3) [#553](https://github.com/npm/template-oss/pull/553) filters items out of the release process that aren't for backports (#553) (@owlstronaut)
+
 ## [4.29.0](https://github.com/npm/template-oss/compare/v4.28.1...v4.29.0) (2026-01-15)
 ### Features
 * [`040af67`](https://github.com/npm/template-oss/commit/040af67c26794607522bafa12227f717e6c0313a) [#551](https://github.com/npm/template-oss/pull/551) move node14 tests to macos-15-intel (#551) (@wraithgar)
