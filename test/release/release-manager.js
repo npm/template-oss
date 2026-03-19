@@ -73,6 +73,11 @@ t.test('prerelease filtering', async t => {
   t.matchSnapshot(result)
 })
 
+t.test('backport filtering', async t => {
+  const result = await releaseManager(t, { pr: 207 })
+  t.matchSnapshot(result)
+})
+
 t.test('wiki with headers', async t => {
   const result = await releaseManager(t, { pr: 207 })
   t.matchSnapshot(result)
