@@ -99,23 +99,23 @@ The repo file audit.yml needs to be updated:
   [@npmcli/template-oss ERROR] There was an erroring getting the target file
   [@npmcli/template-oss ERROR] Error: {{ROOT}}/.tap/fixtures/test-check-diff-snapshots.js-update-and-remove-errors/.github/workflows/audit.yml
   
-  YAMLParseError: Implicit keys need to be on a single line at line 45, column 1:
+  YAMLParseError: Implicit keys need to be on a single line at line 41, column 1:
   
           run: npm audit --audit-level=none
   >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
   ^
   
-  YAMLParseError: Block scalar header includes extra characters: >>>>I at line 45, column 2:
+  YAMLParseError: Block scalar header includes extra characters: >>>>I at line 41, column 2:
   
   >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
    ^
   
-  YAMLParseError: Not a YAML token: HOPE THIS IS NOT VALID YAML<<<<<<<<<<< at line 45, column 7:
+  YAMLParseError: Not a YAML token: HOPE THIS IS NOT VALID YAML<<<<<<<<<<< at line 41, column 7:
   
   >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   
-  YAMLParseError: Implicit map keys need to be followed by map values at line 45, column 1:
+  YAMLParseError: Implicit map keys need to be followed by map values at line 41, column 1:
   
           run: npm audit --audit-level=none
   >>>>I HOPE THIS IS NOT VALID YAML<<<<<<<<<<<
@@ -158,10 +158,6 @@ The repo file audit.yml needs to be updated:
           with:
             node-version: 22.x
             check-latest: contains('22.x', '.x')
-        - name: Install Latest npm
-          uses: ./.github/actions/install-latest-npm
-          with:
-            node: \${{ steps.node.outputs.node-version }}
         - name: Install Dependencies
           run: npm i --ignore-scripts --no-audit --no-fund --package-lock
         - name: Run Production Audit
@@ -178,12 +174,11 @@ The repo file ci.yml needs to be updated:
 
   .github/workflows/ci.yml
   ========================================
-  @@ -100,4 +100,24 @@
-           shell: \${{ matrix.platform.shell }}
+  @@ -97,4 +97,24 @@
        steps:
          - name: Checkout
            uses: actions/checkout@v4
-  +      - name: Setup Git User
+         - name: Setup Git User
   +        run: |
   +          git config --global user.email "npm-cli+bot@github.com"
   +          git config --global user.name "npm CLI robot"
@@ -194,6 +189,7 @@ The repo file ci.yml needs to be updated:
   +          node-version: \${{ matrix.node-version }}
   +          check-latest: contains(matrix.node-version, '.x')
   +      - name: Install Latest npm
+  +        if: \${{ !startsWith(matrix.node-version, '22.') }}
   +        uses: ./.github/actions/install-latest-npm
   +        with:
   +          node: \${{ steps.node.outputs.node-version }}

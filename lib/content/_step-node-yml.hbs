@@ -8,8 +8,18 @@
     cache: npm
     {{/if}}
 {{#if updateNpm}}
+{{#if jobIsMatrix}}
+- name: Install Latest npm
+  if: $\{{ !startsWith(matrix.node-version, '22.') }}
+  uses: ./.github/actions/install-latest-npm
+  with:
+    node: $\{{ steps.node.outputs.node-version }}
+{{else}}
+{{~#unless (eq (semverRangeMajor (last ciVersions)) 22)}}
 - name: Install Latest npm
   uses: ./.github/actions/install-latest-npm
   with:
     node: $\{{ steps.node.outputs.node-version }}
+{{/unless}}
+{{/if}}
 {{/if}}
