@@ -147,13 +147,13 @@ The repo file audit.yml needs to be updated:
           shell: bash
       steps:
         - name: Checkout
-          uses: actions/checkout@v4
+          uses: actions/checkout@v6
         - name: Setup Git User
           run: |
             git config --global user.email "npm-cli+bot@github.com"
             git config --global user.name "npm CLI robot"
         - name: Setup Node
-          uses: actions/setup-node@v4
+          uses: actions/setup-node@v6
           id: node
           with:
             node-version: 26.x
@@ -181,13 +181,13 @@ The repo file ci.yml needs to be updated:
   @@ -107,4 +107,24 @@
        steps:
          - name: Checkout
-           uses: actions/checkout@v4
+           uses: actions/checkout@v6
          - name: Setup Git User
   +        run: |
   +          git config --global user.email "npm-cli+bot@github.com"
   +          git config --global user.name "npm CLI robot"
   +      - name: Setup Node
-  +        uses: actions/setup-node@v4
+  +        uses: actions/setup-node@v6
   +        id: node
   +        with:
   +          node-version: \${{ matrix.node-version }}
