@@ -369,13 +369,13 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 26.x
@@ -427,7 +427,7 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: \${{ inputs.ref }}
       - name: Setup Git User
@@ -443,7 +443,7 @@ jobs:
           token: \${{ secrets.GITHUB_TOKEN }}
           sha: \${{ inputs.check-sha }}
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 26.x
@@ -496,7 +496,7 @@ jobs:
         shell: \${{ matrix.platform.shell }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: \${{ inputs.ref }}
       - name: Setup Git User
@@ -512,7 +512,7 @@ jobs:
           token: \${{ secrets.GITHUB_TOKEN }}
           sha: \${{ inputs.check-sha }}
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: \${{ matrix.node-version }}
@@ -567,13 +567,13 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 26.x
@@ -619,13 +619,13 @@ jobs:
         shell: \${{ matrix.platform.shell }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: \${{ matrix.node-version }}
@@ -676,7 +676,7 @@ jobs:
       security-events: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
@@ -709,7 +709,7 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: \${{ github.event.pull_request.head.ref }}
       - name: Setup Git User
@@ -717,7 +717,7 @@ jobs:
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 26.x
@@ -841,7 +841,7 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Setup Git User
@@ -849,7 +849,7 @@ jobs:
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 26.x
@@ -902,13 +902,13 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 26.x
@@ -975,13 +975,13 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 26.x
@@ -1052,7 +1052,7 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           ref: \${{ needs.release.outputs.pr-branch }}
@@ -1061,7 +1061,7 @@ jobs:
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 26.x
@@ -1832,13 +1832,13 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 26.x
@@ -1889,13 +1889,13 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 26.x
@@ -1941,13 +1941,13 @@ jobs:
         shell: \${{ matrix.platform.shell }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: \${{ matrix.node-version }}
@@ -1999,13 +1999,13 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 26.x
@@ -2051,13 +2051,13 @@ jobs:
         shell: \${{ matrix.platform.shell }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: \${{ matrix.node-version }}
@@ -2110,7 +2110,7 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: \${{ inputs.ref }}
       - name: Setup Git User
@@ -2126,7 +2126,7 @@ jobs:
           token: \${{ secrets.GITHUB_TOKEN }}
           sha: \${{ inputs.check-sha }}
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 26.x
@@ -2179,7 +2179,7 @@ jobs:
         shell: \${{ matrix.platform.shell }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: \${{ inputs.ref }}
       - name: Setup Git User
@@ -2195,7 +2195,7 @@ jobs:
           token: \${{ secrets.GITHUB_TOKEN }}
           sha: \${{ inputs.check-sha }}
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: \${{ matrix.node-version }}
@@ -2256,13 +2256,13 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 26.x
@@ -2308,13 +2308,13 @@ jobs:
         shell: \${{ matrix.platform.shell }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: \${{ matrix.node-version }}
@@ -2365,7 +2365,7 @@ jobs:
       security-events: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
@@ -2398,7 +2398,7 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: \${{ github.event.pull_request.head.ref }}
       - name: Setup Git User
@@ -2406,7 +2406,7 @@ jobs:
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 26.x
@@ -2530,7 +2530,7 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Setup Git User
@@ -2538,7 +2538,7 @@ jobs:
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 26.x
@@ -2591,13 +2591,13 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 26.x
@@ -2664,13 +2664,13 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 26.x
@@ -2741,7 +2741,7 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           ref: \${{ needs.release.outputs.pr-branch }}
@@ -2750,7 +2750,7 @@ jobs:
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 26.x
@@ -3593,13 +3593,13 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 26.x
@@ -3645,13 +3645,13 @@ jobs:
         shell: \${{ matrix.platform.shell }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: \${{ matrix.node-version }}
@@ -3703,13 +3703,13 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 26.x
@@ -3755,13 +3755,13 @@ jobs:
         shell: \${{ matrix.platform.shell }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: \${{ matrix.node-version }}
@@ -3814,7 +3814,7 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: \${{ inputs.ref }}
       - name: Setup Git User
@@ -3830,7 +3830,7 @@ jobs:
           token: \${{ secrets.GITHUB_TOKEN }}
           sha: \${{ inputs.check-sha }}
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 26.x
@@ -3883,7 +3883,7 @@ jobs:
         shell: \${{ matrix.platform.shell }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: \${{ inputs.ref }}
       - name: Setup Git User
@@ -3899,7 +3899,7 @@ jobs:
           token: \${{ secrets.GITHUB_TOKEN }}
           sha: \${{ inputs.check-sha }}
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: \${{ matrix.node-version }}
@@ -3944,7 +3944,7 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: \${{ github.event.pull_request.head.ref }}
       - name: Setup Git User
@@ -3952,7 +3952,7 @@ jobs:
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 26.x
@@ -4076,7 +4076,7 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Setup Git User
@@ -4084,7 +4084,7 @@ jobs:
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 26.x
@@ -4137,13 +4137,13 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 26.x
@@ -4210,13 +4210,13 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 26.x
@@ -4287,7 +4287,7 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           ref: \${{ needs.release.outputs.pr-branch }}
@@ -4296,7 +4296,7 @@ jobs:
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 26.x
