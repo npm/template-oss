@@ -380,10 +380,6 @@ jobs:
         with:
           node-version: 22.x
           check-latest: contains('22.x', '.x')
-      - name: Install Latest npm
-        uses: ./.github/actions/install-latest-npm
-        with:
-          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund --package-lock
       - name: Run Production Audit
@@ -448,10 +444,6 @@ jobs:
         with:
           node-version: 22.x
           check-latest: contains('22.x', '.x')
-      - name: Install Latest npm
-        uses: ./.github/actions/install-latest-npm
-        with:
-          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
@@ -518,6 +510,7 @@ jobs:
           node-version: \${{ matrix.node-version }}
           check-latest: contains(matrix.node-version, '.x')
       - name: Install Latest npm
+        if: \${{ !startsWith(matrix.node-version, '22.') }}
         uses: ./.github/actions/install-latest-npm
         with:
           node: \${{ steps.node.outputs.node-version }}
@@ -577,10 +570,6 @@ jobs:
         with:
           node-version: 22.x
           check-latest: contains('22.x', '.x')
-      - name: Install Latest npm
-        uses: ./.github/actions/install-latest-npm
-        with:
-          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
@@ -630,6 +619,7 @@ jobs:
           node-version: \${{ matrix.node-version }}
           check-latest: contains(matrix.node-version, '.x')
       - name: Install Latest npm
+        if: \${{ !startsWith(matrix.node-version, '22.') }}
         uses: ./.github/actions/install-latest-npm
         with:
           node: \${{ steps.node.outputs.node-version }}
@@ -720,10 +710,6 @@ jobs:
         with:
           node-version: 22.x
           check-latest: contains('22.x', '.x')
-      - name: Install Latest npm
-        uses: ./.github/actions/install-latest-npm
-        with:
-          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Fetch Dependabot Metadata
@@ -852,10 +838,6 @@ jobs:
         with:
           node-version: 22.x
           check-latest: contains('22.x', '.x')
-      - name: Install Latest npm
-        uses: ./.github/actions/install-latest-npm
-        with:
-          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Run Commitlint on Commits
@@ -911,10 +893,6 @@ jobs:
         with:
           node-version: 22.x
           check-latest: contains('22.x', '.x')
-      - name: Install Latest npm
-        uses: ./.github/actions/install-latest-npm
-        with:
-          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Check If Published
@@ -984,10 +962,6 @@ jobs:
         with:
           node-version: 22.x
           check-latest: contains('22.x', '.x')
-      - name: Install Latest npm
-        uses: ./.github/actions/install-latest-npm
-        with:
-          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Release Please
@@ -1064,10 +1038,6 @@ jobs:
         with:
           node-version: 22.x
           check-latest: contains('22.x', '.x')
-      - name: Install Latest npm
-        uses: ./.github/actions/install-latest-npm
-        with:
-          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Create Release Manager Checklist Text
@@ -1841,10 +1811,6 @@ jobs:
         with:
           node-version: 22.x
           check-latest: contains('22.x', '.x')
-      - name: Install Latest npm
-        uses: ./.github/actions/install-latest-npm
-        with:
-          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund --package-lock
       - name: Run Production Audit
@@ -1898,10 +1864,6 @@ jobs:
         with:
           node-version: 22.x
           check-latest: contains('22.x', '.x')
-      - name: Install Latest npm
-        uses: ./.github/actions/install-latest-npm
-        with:
-          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
@@ -1951,6 +1913,7 @@ jobs:
           node-version: \${{ matrix.node-version }}
           check-latest: contains(matrix.node-version, '.x')
       - name: Install Latest npm
+        if: \${{ !startsWith(matrix.node-version, '22.') }}
         uses: ./.github/actions/install-latest-npm
         with:
           node: \${{ steps.node.outputs.node-version }}
@@ -2007,10 +1970,6 @@ jobs:
         with:
           node-version: 22.x
           check-latest: contains('22.x', '.x')
-      - name: Install Latest npm
-        uses: ./.github/actions/install-latest-npm
-        with:
-          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
@@ -2060,6 +2019,7 @@ jobs:
           node-version: \${{ matrix.node-version }}
           check-latest: contains(matrix.node-version, '.x')
       - name: Install Latest npm
+        if: \${{ !startsWith(matrix.node-version, '22.') }}
         uses: ./.github/actions/install-latest-npm
         with:
           node: \${{ steps.node.outputs.node-version }}
@@ -2127,10 +2087,6 @@ jobs:
         with:
           node-version: 22.x
           check-latest: contains('22.x', '.x')
-      - name: Install Latest npm
-        uses: ./.github/actions/install-latest-npm
-        with:
-          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
@@ -2197,6 +2153,7 @@ jobs:
           node-version: \${{ matrix.node-version }}
           check-latest: contains(matrix.node-version, '.x')
       - name: Install Latest npm
+        if: \${{ !startsWith(matrix.node-version, '22.') }}
         uses: ./.github/actions/install-latest-npm
         with:
           node: \${{ steps.node.outputs.node-version }}
@@ -2262,10 +2219,6 @@ jobs:
         with:
           node-version: 22.x
           check-latest: contains('22.x', '.x')
-      - name: Install Latest npm
-        uses: ./.github/actions/install-latest-npm
-        with:
-          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
@@ -2315,6 +2268,7 @@ jobs:
           node-version: \${{ matrix.node-version }}
           check-latest: contains(matrix.node-version, '.x')
       - name: Install Latest npm
+        if: \${{ !startsWith(matrix.node-version, '22.') }}
         uses: ./.github/actions/install-latest-npm
         with:
           node: \${{ steps.node.outputs.node-version }}
@@ -2405,10 +2359,6 @@ jobs:
         with:
           node-version: 22.x
           check-latest: contains('22.x', '.x')
-      - name: Install Latest npm
-        uses: ./.github/actions/install-latest-npm
-        with:
-          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Fetch Dependabot Metadata
@@ -2537,10 +2487,6 @@ jobs:
         with:
           node-version: 22.x
           check-latest: contains('22.x', '.x')
-      - name: Install Latest npm
-        uses: ./.github/actions/install-latest-npm
-        with:
-          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Run Commitlint on Commits
@@ -2596,10 +2542,6 @@ jobs:
         with:
           node-version: 22.x
           check-latest: contains('22.x', '.x')
-      - name: Install Latest npm
-        uses: ./.github/actions/install-latest-npm
-        with:
-          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Check If Published
@@ -2669,10 +2611,6 @@ jobs:
         with:
           node-version: 22.x
           check-latest: contains('22.x', '.x')
-      - name: Install Latest npm
-        uses: ./.github/actions/install-latest-npm
-        with:
-          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Release Please
@@ -2749,10 +2687,6 @@ jobs:
         with:
           node-version: 22.x
           check-latest: contains('22.x', '.x')
-      - name: Install Latest npm
-        uses: ./.github/actions/install-latest-npm
-        with:
-          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Create Release Manager Checklist Text
@@ -3598,10 +3532,6 @@ jobs:
         with:
           node-version: 22.x
           check-latest: contains('22.x', '.x')
-      - name: Install Latest npm
-        uses: ./.github/actions/install-latest-npm
-        with:
-          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
@@ -3651,6 +3581,7 @@ jobs:
           node-version: \${{ matrix.node-version }}
           check-latest: contains(matrix.node-version, '.x')
       - name: Install Latest npm
+        if: \${{ !startsWith(matrix.node-version, '22.') }}
         uses: ./.github/actions/install-latest-npm
         with:
           node: \${{ steps.node.outputs.node-version }}
@@ -3707,10 +3638,6 @@ jobs:
         with:
           node-version: 22.x
           check-latest: contains('22.x', '.x')
-      - name: Install Latest npm
-        uses: ./.github/actions/install-latest-npm
-        with:
-          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
@@ -3760,6 +3687,7 @@ jobs:
           node-version: \${{ matrix.node-version }}
           check-latest: contains(matrix.node-version, '.x')
       - name: Install Latest npm
+        if: \${{ !startsWith(matrix.node-version, '22.') }}
         uses: ./.github/actions/install-latest-npm
         with:
           node: \${{ steps.node.outputs.node-version }}
@@ -3827,10 +3755,6 @@ jobs:
         with:
           node-version: 22.x
           check-latest: contains('22.x', '.x')
-      - name: Install Latest npm
-        uses: ./.github/actions/install-latest-npm
-        with:
-          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Lint
@@ -3897,6 +3821,7 @@ jobs:
           node-version: \${{ matrix.node-version }}
           check-latest: contains(matrix.node-version, '.x')
       - name: Install Latest npm
+        if: \${{ !startsWith(matrix.node-version, '22.') }}
         uses: ./.github/actions/install-latest-npm
         with:
           node: \${{ steps.node.outputs.node-version }}
@@ -3948,10 +3873,6 @@ jobs:
         with:
           node-version: 22.x
           check-latest: contains('22.x', '.x')
-      - name: Install Latest npm
-        uses: ./.github/actions/install-latest-npm
-        with:
-          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Fetch Dependabot Metadata
@@ -4080,10 +4001,6 @@ jobs:
         with:
           node-version: 22.x
           check-latest: contains('22.x', '.x')
-      - name: Install Latest npm
-        uses: ./.github/actions/install-latest-npm
-        with:
-          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Run Commitlint on Commits
@@ -4139,10 +4056,6 @@ jobs:
         with:
           node-version: 22.x
           check-latest: contains('22.x', '.x')
-      - name: Install Latest npm
-        uses: ./.github/actions/install-latest-npm
-        with:
-          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Check If Published
@@ -4212,10 +4125,6 @@ jobs:
         with:
           node-version: 22.x
           check-latest: contains('22.x', '.x')
-      - name: Install Latest npm
-        uses: ./.github/actions/install-latest-npm
-        with:
-          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Release Please
@@ -4292,10 +4201,6 @@ jobs:
         with:
           node-version: 22.x
           check-latest: contains('22.x', '.x')
-      - name: Install Latest npm
-        uses: ./.github/actions/install-latest-npm
-        with:
-          node: \${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
       - name: Create Release Manager Checklist Text
