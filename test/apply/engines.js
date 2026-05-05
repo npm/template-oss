@@ -29,8 +29,8 @@ t.test('sets ci versions from engines', async t => {
   t.equal(pkg.engines.node, '>=10')
 
   const versions = await getCiJobs(s)
-  t.equal(versions.lint, '22.x')
-  t.strictSame(versions.test, ['10.0.0', '10.x', '14.x', '16.x', '18.x', '20.x', '22.x'])
+  t.equal(versions.lint, '26.x')
+  t.strictSame(versions.test, ['10.0.0', '10.x', '14.x', '16.x', '18.x', '20.x', '22.x', '24.x', '26.x'])
 })
 
 t.test('can set ci to latest plus other versions', async t => {
@@ -48,8 +48,8 @@ t.test('can set ci to latest plus other versions', async t => {
   t.equal(pkg.engines.node, '*')
 
   const versions = await getCiJobs(s)
-  t.equal(versions.lint, '22.x')
-  t.strictSame(versions.test, ['6.x', '8.x', '22.x'])
+  t.equal(versions.lint, '26.x')
+  t.strictSame(versions.test, ['6.x', '8.x', '26.x'])
 })
 
 t.test('sort by major', async t => {
@@ -86,6 +86,6 @@ t.test('latest ci versions', async t => {
   t.equal(pkg.engines, undefined)
 
   const versions = await getCiJobs(s)
-  t.equal(versions.lint, '22.x')
-  t.strictSame(versions.test, ['22.x'])
+  t.equal(versions.lint, '26.x')
+  t.strictSame(versions.test, ['26.x'])
 })
