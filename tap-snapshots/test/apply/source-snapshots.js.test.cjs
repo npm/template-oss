@@ -164,7 +164,7 @@ runs:
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
 
-* @npm/cli-team
+* @npm/cli-team @npm/cli-triage
 
 .github/dependabot.yml
 ========================================
@@ -1627,7 +1627,7 @@ runs:
 ========================================
 # This file is automatically added by @npmcli/template-oss. Do not edit.
 
-* @npm/cli-team
+* @npm/cli-team @npm/cli-triage
 
 .github/dependabot.yml
 ========================================
