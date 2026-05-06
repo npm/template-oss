@@ -1,5 +1,17 @@
 # Changelog
 
+## [5.0.0](https://github.com/npm/template-oss/compare/v4.30.0...v5.0.0) (2026-05-06)
+### ⚠️ BREAKING CHANGES
+* template-oss now supports node '^22.22.2 || ^24.15.0 || >=26.0.0'
+* removes the test:node20 script and its dedicated CI step now that Node 20 is being deprecated.
+### Features
+* [`383750c`](https://github.com/npm/template-oss/commit/383750c6d91190d354f73ecd5a5322fbcc28766d) [#561](https://github.com/npm/template-oss/pull/561) adds triage team as codeowner (@owlstronaut)
+* [`5058988`](https://github.com/npm/template-oss/commit/5058988c6184d49ea8eb2e180bca626f0351fde6) [#559](https://github.com/npm/template-oss/pull/559) This PR updates the Node.js engine requirement to '^22.22.2 || ^24.15.0 || >=26.0.0' (@owlstronaut)
+* [`d5c369d`](https://github.com/npm/template-oss/commit/d5c369d40d201ab352c8294a46e8d9941fd34699) [#559](https://github.com/npm/template-oss/pull/559) drop Node 20 test workaround (@owlstronaut)
+### Bug Fixes
+* [`bf52d85`](https://github.com/npm/template-oss/commit/bf52d857fc18e162c193214bd73b661fafeb1897) [#558](https://github.com/npm/template-oss/pull/558) bump actions to latest (@owlstronaut)
+* [`394518c`](https://github.com/npm/template-oss/commit/394518c51892a5787a798d44855d06a7252a07fa) [#557](https://github.com/npm/template-oss/pull/557) skip npm update on node 22 (#557) (@owlstronaut)
+
 ## [4.30.0](https://github.com/npm/template-oss/compare/v4.29.0...v4.30.0) (2026-03-19)
 ### Features
 * [`6bc2bc0`](https://github.com/npm/template-oss/commit/6bc2bc00ae7b481fcdadfff6e7178e2e294211d3) [#553](https://github.com/npm/template-oss/pull/553) filters items out of the release process that aren't for backports (#553) (@owlstronaut)
