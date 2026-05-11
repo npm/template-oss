@@ -1,5 +1,9 @@
 # Changelog
 
+## [5.1.0](https://github.com/npm/template-oss/compare/v5.0.0...v5.1.0) (2026-05-11)
+### Features
+* [`6cdec2a`](https://github.com/npm/template-oss/commit/6cdec2ad5c954b4cc46e343dc39cee8847cfe83e) [#562](https://github.com/npm/template-oss/pull/562) breaking changes don't get dropped from prerelease to release (@owlstronaut)
+
 ## [5.0.0](https://github.com/npm/template-oss/compare/v4.30.0...v5.0.0) (2026-05-06)
 ### ⚠️ BREAKING CHANGES
 * template-oss now supports node '^22.22.2 || ^24.15.0 || >=26.0.0'
