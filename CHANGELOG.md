@@ -1,5 +1,16 @@
 # Changelog
 
+## [5.1.1](https://github.com/npm/template-oss/compare/v5.1.0...v5.1.1) (2026-06-16)
+### Dependencies
+* [`a27b22f`](https://github.com/npm/template-oss/commit/a27b22fe9fe5e7090f011c0d28b63f93268bdd60) [#565](https://github.com/npm/template-oss/pull/565) `proc-log@7.0.0`
+* [`82f11bb`](https://github.com/npm/template-oss/commit/82f11bb9d2b526ee75a815c4620a8d5f3048851b) [#565](https://github.com/npm/template-oss/pull/565) `npm-package-arg@14.0.0`
+* [`ca93491`](https://github.com/npm/template-oss/commit/ca934912dcf4b374667d823beeaff21d11fafb73) [#565](https://github.com/npm/template-oss/pull/565) `json-parse-even-better-errors@6.0.0`
+* [`136b1d1`](https://github.com/npm/template-oss/commit/136b1d1e4d82fa4f7ada27e49d4c8ed79b36ba6b) [#565](https://github.com/npm/template-oss/pull/565) `ini@7.0.0`
+* [`179c55a`](https://github.com/npm/template-oss/commit/179c55ad1e67d3c290f777da1dd6edade5f7dec4) [#565](https://github.com/npm/template-oss/pull/565) `hosted-git-info@10.1.1`
+* [`9431c8a`](https://github.com/npm/template-oss/commit/9431c8a6b2741ec416ffb0dcd8214ee1c04f0c51) [#565](https://github.com/npm/template-oss/pull/565) `@npmcli/package-json@8.0.0`
+* [`5c5c680`](https://github.com/npm/template-oss/commit/5c5c680c3a0e28d220bc323b723b4fadbcfa5997) [#565](https://github.com/npm/template-oss/pull/565) `@npmcli/git@8.0.0`
+* [`80307fb`](https://github.com/npm/template-oss/commit/80307fb5bd4cf5e5bd7bdaaf70c53d2e65e80d9c) [#565](https://github.com/npm/template-oss/pull/565) `@npmcli/arborist@10.0.0-pre.0.0`
+
 ## [5.1.0](https://github.com/npm/template-oss/compare/v5.0.0...v5.1.0) (2026-05-11)
 ### Features
 * [`6cdec2a`](https://github.com/npm/template-oss/commit/6cdec2ad5c954b4cc46e343dc39cee8847cfe83e) [#562](https://github.com/npm/template-oss/pull/562) breaking changes don't get dropped from prerelease to release (@owlstronaut)
