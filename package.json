@@ -40,7 +40,7 @@
     "@isaacs/string-locale-compare": "^1.1.0",
     "@npmcli/arborist": "^10.0.0-pre.0.0",
     "@npmcli/git": "^8.0.0",
-    "@npmcli/map-workspaces": "^5.0.0",
+    "@npmcli/map-workspaces": "^6.0.0",
     "@npmcli/package-json": "^8.0.0",
     "@octokit/rest": "^22.0.0",
     "dedent": "^1.5.1",
