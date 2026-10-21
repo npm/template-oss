@@ -41,6 +41,30 @@ Configure the use of `@npmcli/template-oss` in your `package.json` using the
 }
 ```
 
+#### Maintenance releases
+
+Set `templateOSS.backport` to the maintained major version on a maintenance
+branch, then run its pinned `template-oss-apply --force`. For example,
+`"backport": 19` configures a `release/v19` branch to publish stable releases
+under `latest-19` rather than replacing `latest`.
+
+This is template-oss configuration, not a Release Please versioning option.
+Release Please uses the target branch's manifest and release configuration to
+prepare version/changelog PRs and GitHub releases. The template-oss release
+wrapper adds the npm `publishTag` consumed by Release Integration.
+
+The generated workflows pass `--backport` to both release helpers. When the
+argument is omitted or empty, both helpers infer it from a standard
+`release/vN` branch name; an explicit value takes precedence and supports custom
+branch names. Stable backports use `latest-N`, prereleases use
+`prerelease-<package-major>`, and other stable releases use
+`defaultPublishTag` (normally `latest`).
+
+Keep the explicit package configuration even when branch inference is
+available. It also selects maintenance-mode generated files: the manual release
+CI default branch, Dependabot configuration, and omission of repository-wide
+settings that remain owned by the default branch.
+
 #### Workspaces
 
 Individual workspaces can also supply their own config, if they are included by
