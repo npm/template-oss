@@ -57,6 +57,13 @@
   }{{else}}{{{ del }}}{{/if}},
   "tap": {
     {{#if tap18}}
+    "check-coverage": {{{ del }}},
+    {{#if tapAllowIncompleteCoverage}}
+    "allow-incomplete-coverage": true,
+    {{/if}}
+    {{#if tapAllowEmptyCoverage}}
+    "allow-empty-coverage": true,
+    {{/if}}
     {{#if workspaceGlobs}}
     "exclude": {{{ json workspaceGlobs }}},
     {{/if}}
