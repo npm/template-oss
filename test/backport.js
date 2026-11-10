@@ -107,11 +107,14 @@ const setup = (t, mode = 'squash') => {
       write: async () => {},
     },
   }
-  const run = async () => {
+  const run = async ({ checkout = cwd, beforeGit = () => {} } = {}) => {
     const exec = require('node:child_process').execFileSync
     const helper = t.mockRequire('../lib/content/backport.cjs', {
       'node:child_process': {
-        execFileSync: (cmd, args, opts) => exec(cmd, args, { ...opts, cwd: opts.cwd || cwd }),
+        execFileSync: (cmd, args, opts) => {
+          beforeGit(args)
+          return exec(cmd, args, { ...opts, cwd: opts.cwd || checkout })
+        },
       },
     })
     await helper({ github, context, core })
@@ -249,6 +252,55 @@ t.test('recover pushed branches after PR API failure and retry CI failures', asy
   await s.run()
   t.equal(s.calls.created.length, 1, 'CI retry does not duplicate PR')
   t.equal(s.calls.dispatched.length, 1)
+})
+
+t.test('a branch created after the absence check is not changed by the push', async t => {
+  const s = setup(t)
+  let raced = false
+  await s.run({
+    beforeGit: args => {
+      if (args[0] === 'push' && args.includes('HEAD:refs/heads/backport/v1/42')) {
+        s.git('push', 'origin', `${s.base}:refs/heads/backport/v1/42`)
+        raced = true
+      }
+    },
+  })
+  t.ok(raced, 'another writer creates the branch just before the push')
+  t.equal(s.git('ls-remote', 'origin', 'refs/heads/backport/v1/42').split(/\s/)[0], s.base)
+  t.equal(s.calls.errors.length, 1)
+  t.match(s.calls.errors[0], 'cherry-picking and pushing backport branch')
+  t.notMatch(s.calls.errors[0], 'Cherry-pick conflict')
+  t.same(
+    s.calls.created.map(p => p.base),
+    ['release/v2'],
+    'other targets still succeed',
+  )
+  t.same(
+    s.calls.dispatched.map(c => c.ref),
+    ['backport/v2/42'],
+  )
+  t.match(s.calls.failed[0], '1 backport target(s) failed')
+})
+
+t.test('squash detection fetches a base commit that appeared after checkout', async t => {
+  const s = setup(t)
+  const checkout = join(s.root, 'checkout')
+  s.git('clone', '--no-local', '--branch', 'main', join(s.root, 'remote'), checkout)
+  s.pr.base.sha = s.commit('later.txt', 'later\n', 'default branch advances after checkout')
+  s.git('push', 'origin', 'main')
+  t.throws(
+    () =>
+      execFileSync('git', ['cat-file', '-e', s.pr.base.sha], {
+        cwd: checkout,
+        stdio: 'pipe',
+      }),
+    'the API base commit is not in the checkout',
+  )
+  await s.run({ checkout })
+  t.same(s.calls.errors, [])
+  t.same(s.calls.failed, [])
+  t.equal(s.calls.created.length, 2)
+  t.equal(s.calls.dispatched.length, 2)
 })
 
 t.test('unexpected existing branches and closed PRs require manual intervention', async t => {
