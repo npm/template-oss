@@ -72,7 +72,8 @@
     "eslint-config-prettier": "^10.1.8",
     "nock": "^14.0.6",
     "prettier": "^3.2.5",
-    "tap": "^21.0.1"
+    "tap": "^21.0.1",
+    "typescript": "^5.9.3"
   },
   "tap": {
     "timeout": 600,

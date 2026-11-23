@@ -347,6 +347,94 @@ t.test('ambiguous and truncated single-parent histories fail without dropping co
   t.same(s.calls.created, [])
 })
 
+t.test('invalid pull request data is rejected', async t => {
+  const s = setup(t)
+  for (const number of [0, 1.5]) {
+    s.context.payload.pull_request = { merged: true, number }
+    await t.rejects(s.run(), /Invalid pull request number/)
+  }
+  s.context.payload.pull_request = { ...s.pr }
+  s.pr.merged = false
+  await t.rejects(s.run(), /PR #42 is not merged/)
+})
+
+t.test('unusable merge results fail without creating branches', async t => {
+  const s = setup(t, 'single')
+  s.pr.labels = [{ name: 'backport:v1' }]
+  s.pr.merge_commit_sha = 'not-a-sha'
+  await s.run()
+  t.match(s.calls.errors[0], 'Missing or invalid commit SHA')
+  s.pr.merge_commit_sha = s.merged
+  s.pr.commits = 0
+  await s.run()
+  t.match(s.calls.errors[1], 'Unsupported merge history')
+  s.git('commit', '--allow-empty', '-m', 'empty')
+  s.git('push', 'origin', 'main')
+  s.pr.merge_commit_sha = s.git('rev-parse', 'HEAD')
+  s.pr.commits = 1
+  await s.run()
+  t.match(s.calls.errors[2], 'Empty changes cannot be backported automatically')
+  t.same(s.calls.created, [])
+})
+
+t.test('already applied changes are reported as failed picks, not conflicts', async t => {
+  const s = setup(t)
+  s.pr.labels = [{ name: 'backport:v1' }]
+  s.git('checkout', 'release/v1')
+  s.git('cherry-pick', s.merged)
+  s.git('push', 'origin', 'release/v1')
+  s.git('checkout', 'main')
+  await s.run()
+  t.match(s.calls.errors[0], 'Cherry-pick failed (possibly already applied or empty)')
+  t.notMatch(s.calls.errors[0], 'Cherry-pick conflict')
+  t.same(s.calls.created, [])
+})
+
+t.test('existing backport branches must be clean picks on the target history', async t => {
+  const s = setup(t, 'single')
+  s.pr.labels = [{ name: 'backport:v1' }]
+  const trailer = `(cherry picked from commit ${s.merged})`
+  const pushBranch = (start, build) => {
+    s.git('checkout', '--detach', start)
+    build()
+    s.git('push', '--force', 'origin', 'HEAD:refs/heads/backport/v1/42')
+    s.git('checkout', 'main')
+  }
+
+  pushBranch('release/v1', () => s.commit('one.txt', 'one\n', 'missing trailer'))
+  await s.run()
+  t.match(s.calls.errors.at(-1), 'Existing backport branch has unexpected changes')
+
+  pushBranch('release/v1', () => {
+    const side = s.commit('side.txt', 'side\n', 'side')
+    s.git('reset', '--hard', 'release/v1')
+    s.commit('one.txt', 'one\n', 'other side')
+    s.git('merge', '--no-ff', side, '-m', `merge\n\n${trailer}`)
+  })
+  await s.run()
+  t.match(s.calls.errors.at(-1), 'Existing backport branch has unexpected changes', 'rejects merge commits')
+
+  pushBranch(s.merged, () => s.commit('three.txt', 'three\n', `pick\n\n${trailer}`))
+  await s.run()
+  t.match(s.calls.errors.at(-1), 'not based on the target history')
+
+  await s.run({
+    beforeGit: args => {
+      if (args[0] === 'merge-base' && args[1] === '--is-ancestor') {
+        throw Object.assign(new Error('merge-base exploded'), { status: 128 })
+      }
+    },
+  })
+  t.match(s.calls.errors.at(-1), 'verifying existing backport branch): merge-base exploded')
+
+  s.git('push', 'origin', '--delete', 'backport/v1/42')
+  s.calls.prs.push({ number: 77, state: 'open', head: { ref: 'backport/v1/42' }, base: { ref: 'release/v1' } })
+  await s.run()
+  t.match(s.calls.errors.at(-1), 'Backport PR #77 has no branch')
+  t.same(s.calls.created, [])
+  t.same(s.calls.dispatched, [])
+})
+
 t.test('git transport failures are not interpreted as missing branches or conflicts', async t => {
   const s = setup(t)
   s.git('remote', 'set-url', 'origin', join(s.root, 'does-not-exist'))
