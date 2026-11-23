@@ -1,0 +1,41 @@
+name: Backport
+
+on:
+  pull_request_target:
+    types: [closed, labeled]
+
+permissions: {}
+
+concurrency:
+  group: backport-$\{{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  backport:
+    if: >-
+      github.event.pull_request.merged == true &&
+      (
+        (github.event.action == 'closed' &&
+         contains(join(github.event.pull_request.labels.*.name, ','), 'backport:'))
+        ||
+        (github.event.action == 'labeled' &&
+         startsWith(github.event.label.name, 'backport:'))
+      )
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    steps:
+      # Only execute code from the trusted default branch, never the PR head.
+      - name: Checkout Default Branch
+        uses: actions/checkout@v6
+        with:
+          ref: $\{{ github.event.repository.default_branch }}
+          fetch-depth: 0
+      - name: Create Backports
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const backport = require('./.github/scripts/backport.cjs')
+            await backport({ github, context, core })

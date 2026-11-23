@@ -61,6 +61,65 @@ any of the same settings in the root.
 }
 ```
 
+#### Backport PR automation
+
+Backport automation is disabled by default.
+To enable it, set this option in the **root** `package.json` and run `template-oss-apply --force`:
+
+```json
+{
+  "templateOSS": {
+    "backportAutomation": true
+  }
+}
+```
+
+With `rootRepo` enabled, this manages `.github/workflows/backport.yml` and `.github/scripts/backport.cjs`.
+The helper needs no installed dependencies and works in both CommonJS and ESM repositories.
+Workspace configuration alone does not enable it.
+This option is independent of the existing numeric `backport` release/publishing setting and does not change release behavior.
+
+Before using it:
+
+- Apply the generated files to the repository's default branch.
+  The privileged `pull_request_target` workflow only executes the helper from that trusted branch, never from a PR head.
+  It does not install dependencies or run project build scripts.
+- Create each target release branch in advance.
+  A label `backport:X` selects `release/X`: for example, `backport:v5` targets `release/v5`.
+  Targets are literal branch names, not the configurable release-branch pattern.
+  Label suffixes must start with an ASCII letter or digit and otherwise contain only letters, digits, `.`, `_`, `/`, or `-`, and must form valid Git branch names.
+- Provide a root `.github/workflows/ci.yml` supporting `workflow_dispatch`, both on the default branch and on release branches.
+  Template-oss's root CI already uses this convention.
+  The workflow explicitly dispatches it on each backport branch, without custom inputs.
+- Enable **Allow GitHub Actions to create and approve pull requests** in the repository's Actions settings (subject to organization policy).
+  The backport job requests only `contents: write`, `pull-requests: write`, and `actions: write`.
+  Branch rules and repository policies must allow creation of `backport/*` branches and PRs using `GITHUB_TOKEN`.
+
+The workflow runs when a labeled PR merges or a `backport:` label is added to an already-merged PR.
+It reads all current backport labels on each run, so multiple targets and coalesced label events are handled together.
+For PR `123` and label `backport:v5`, it cherry-picks to `backport/v5/123`, opens a PR against `release/v5`, and dispatches CI.
+It never creates or modifies release branches, force-pushes, or automatically merges PRs.
+
+GitHub.com's current [`GITHUB_TOKEN` behavior](https://docs.github.com/en/actions/concepts/security/github_token) allows bot-created/updated PRs to trigger `opened`, `synchronize`, and `reopened` PR workflow runs in an **approval-required** state.
+A writer can select **Approve workflows to run** on the PR.
+The explicit `workflow_dispatch` is an exception to token event suppression and provides CI without relying on those PR runs; it does not approve or replace other required checks.
+A rerun may dispatch CI again.
+
+Reruns reuse open backport PRs and verify existing branches before recovering a failed PR creation or retrying CI.
+Already-merged backport PRs are left alone; closed, unmerged PRs must be reopened manually.
+Unexpected or manually edited backport branches require inspection instead of being overwritten.
+Disabling the option stops managing these files; remove previously generated files explicitly if automation should stop.
+
+Failures appear in the Actions job summary and fail the run without preventing other targets from being attempted.
+Fix permission/API problems or missing targets and rerun the job.
+For conflicts, create a manual backport from the release branch, cherry-pick the original merged change, resolve conflicts, and open a PR using a different branch name.
+Do not expect this workflow to resolve conflicts or overwrite manual resolutions.
+
+Merge commits use their first parent; squash merges use the whole squashed change; rebase merges preserve the complete verified commit series.
+Squash and rebase detection compares patches rather than commit subjects.
+Ambiguous or changed patches, empty/already-applied changes, and single-parent merges whose PR commit list exceeds GitHub's 250-commit API limit require manual backporting rather than risking omitted commits.
+Changes to workflow files can also be rejected by `GITHUB_TOKEN` permissions and require a manual backport.
+
 ### Content
 
 All the templated content for this repo lives in
