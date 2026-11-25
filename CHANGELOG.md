@@ -1,5 +1,16 @@
 # Changelog
 
+## [5.2.0](https://github.com/npm/template-oss/compare/v5.1.1...v5.2.0) (2026-11-23)
+### Features
+* [`dafcbca`](https://github.com/npm/template-oss/commit/dafcbca2615db0b8bf98b5376c15a8d7029f6e0d) [#572](https://github.com/npm/template-oss/pull/572) add opt-in backport PR automation (#572) (@nkolev92)
+### Bug Fixes
+* [`f3ddd0d`](https://github.com/npm/template-oss/commit/f3ddd0d28b1456a18aac2aaa860d65c31650a2fd) [#569](https://github.com/npm/template-oss/pull/569) update CodeQL action to v4 (@martinrrm, @Copilot)
+### Dependencies
+* [`87af9d5`](https://github.com/npm/template-oss/commit/87af9d5d1872c5cb3cbb4cc0858493527bbde0e4) [#567](https://github.com/npm/template-oss/pull/567) `@npmcli/map-workspaces@6.0.0`
+### Chores
+* [`d51ca66`](https://github.com/npm/template-oss/commit/d51ca664d609496a513002bbbe8f2d400c56935e) [#573](https://github.com/npm/template-oss/pull/573) pin typescript to 5.x for tap and cover backport error paths (#573) (@nkolev92)
+* [`75ea0b0`](https://github.com/npm/template-oss/commit/75ea0b07483188972e4442be82e7fb4c7e347046) [#567](https://github.com/npm/template-oss/pull/567) `@npmcli/eslint-config@7.0.0` (Michael Smith)
+
 ## [5.1.1](https://github.com/npm/template-oss/compare/v5.1.0...v5.1.1) (2026-06-16)
 ### Dependencies
 * [`a27b22f`](https://github.com/npm/template-oss/commit/a27b22fe9fe5e7090f011c0d28b63f93268bdd60) [#565](https://github.com/npm/template-oss/pull/565) `proc-log@7.0.0`
