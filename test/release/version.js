@@ -56,6 +56,9 @@ const checks = [
   ['2.0.1-pre.1', 'major', true, undefined, '3.0.0-pre.0'],
   ['2.0.1-pre.1', 'minor', true, undefined, '2.1.0-pre.0'],
   ['2.0.1-pre.1', 'patch', true, undefined, '2.0.1-pre.2'],
+  // dotted prerelease identifiers advance with the default preid
+  ['12.0.0-pre.0', 'patch', true, 'pre', '12.0.0-pre.1'],
+  ['12.0.0-pre.0.0', 'patch', true, 'pre', '12.0.0-pre.0.1'],
   // different prerelease identifiers
   ['2.0.0-beta.1', 'major', true, undefined, '2.0.0-beta.2'],
   ['2.0.0-alpha.1', 'major', true, undefined, '2.0.0-alpha.2'],
