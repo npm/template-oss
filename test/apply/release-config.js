@@ -33,3 +33,12 @@ t.test('root only', async t => {
     })
   }
 })
+
+t.test('prerelease-type is a single identifier', async t => {
+  const s = await setup(t, {})
+  await s.apply()
+
+  const releaseConfig = await s.readJson('release-please-config.json')
+
+  t.equal(releaseConfig['prerelease-type'], 'pre')
+})
